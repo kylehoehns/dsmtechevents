@@ -1,4 +1,4 @@
-# Tech DSM
+# DSM Tech Events
 
 https://techdsm.com
 

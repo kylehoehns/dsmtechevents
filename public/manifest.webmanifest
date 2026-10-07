@@ -1,6 +1,6 @@
 {
-  "name": "Tech DSM",
-  "short_name": "Tech DSM",
+  "name": "DSM Tech Events",
+  "short_name": "DSM Tech",
   "description": "Every Des Moines tech meetup, user group and conference in one place.",
   "start_url": "/",
   "scope": "/",
