@@ -67,7 +67,13 @@ const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
   <div class="acts">
     {e.going > 0 && <span class="going"><b>{e.going}</b>going</span>}
     {e.url && <a class="rsvp" href={e.url} target="_blank" rel="noopener">{cta} <span aria-hidden="true">→</span></a>}
-    {e.description && <button type="button" class="more" aria-expanded="false" aria-controls={descId}>About</button>}
+    {(e.description || e.photo) && <button type="button" class="more" aria-expanded="false" aria-controls={descId}>About</button>}
   </div>
-  {e.description && <div class="desc" id={descId} hidden set:html={formatDescription(e.description)} />}
+  {(e.description || e.photo) && (
+    <div class="desc" id={descId} hidden>
+      {/* Phones hide the photo square, so the full-size flyer lives here. */}
+      {e.photo && <img class="desc-photo" src={e.photo} alt={`Event image for ${e.title}`} loading="lazy" decoding="async" />}
+      {e.description && <Fragment set:html={formatDescription(e.description)} />}
+    </div>
+  )}
 </li>

@@ -244,11 +244,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .more { background: none; border: 0; padding: 4px 0; font: 600 12.5px/1 var(--mono); text-decoration: underline; text-underline-offset: 3px; }
 .more::before { content: "+ "; font-weight: 700; }
 .more[aria-expanded="true"]::before { content: "– "; }
-.desc { grid-column: 2; margin-top: 8px; padding: 10px 12px; background: var(--paper-2); font-size: 14.5px; line-height: 1.55; max-width: 72ch; overflow-wrap: anywhere; }
+.desc { grid-column: 1 / -1; margin-top: 8px; padding: 10px 12px; background: var(--paper-2); font-size: 14.5px; line-height: 1.55; max-width: 72ch; overflow-wrap: anywhere; }
 .desc p { margin: 0 0 0.7em; }
 .desc p:last-child { margin: 0; }
 .desc h4 { margin: 12px 0 4px; font: 800 16px/1 var(--display); text-transform: uppercase; }
 .desc a { color: var(--blue-t); }
+.desc-photo { display: block; width: 100%; max-width: 520px; height: auto; margin: 0 0 10px; border: 1.5px solid var(--line); background: var(--paper); }
 
 /* event photos in their own colors: they're each group's flyer art */
 .ink { overflow: hidden; background: var(--paper-2); border: 1.5px solid var(--line); }
@@ -266,6 +267,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .title { font-size: 18px; }
   .acts, .desc { grid-column: 2 / -1; }
   .show.has-photo .acts, .show.has-photo .desc { grid-column: 3; }
+  .show.has-photo .desc-photo { display: none; } /* the square is already showing it */
 }
 
 /* conference rows: a solid pink slab */
