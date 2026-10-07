@@ -15,6 +15,11 @@
   "name": "techdsm",
   "compatibility_date": "2026-09-01",
   "build": { "command": "npm run build" },
+  // techdsm.kyhoehns.workers.dev stays up alongside techdsm.com, and every
+  // branch push gets a preview URL. Both are wrangler's defaults; declaring
+  // them here silences the deploy warning and keeps them from changing.
+  "workers_dev": true,
+  "preview_urls": true,
   "assets": {
     "directory": "dist",
     // /groups serves /groups/index.html; unknown paths get the real 404 page
