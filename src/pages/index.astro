@@ -98,9 +98,6 @@ const blurb = `Every tech meetup, user group and conference in Des Moines, on on
         <section class="headliners" id="headliners" aria-label="Coming up soon">
           {featured.map((e, i) => (
             <article class:list={['poster', i % 2 ? 'blue' : 'taped']} data-end={e.end} data-groups={e.groupIds.join(' ')}>
-              <a class="strip-link" href={e.url} target="_blank" rel="noopener">
-                <b>Headliner</b> {e.title} · {e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : `${month(e.start)} ${day(e.start)}`} · <span class="countdown" data-start={e.start}>{daysOut(e)} days out</span> →
-              </a>
               <div class="poster-full">
                 <span class="halftone" aria-hidden="true" />
                 {i % 2 === 0 && <span class="tape" aria-hidden="true" />}
