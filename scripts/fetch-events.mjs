@@ -27,7 +27,7 @@ const SOURCES = { secdsm, 'pmi-chapter': pmiChapter };
 
 const root = path.resolve(import.meta.dirname, '..');
 const cacheDir = path.join(root, 'data/cache');
-const UA = 'techdsm/1.0 (+https://techdsm.com; community event calendar, fetched nightly)';
+const UA = 'dsmtechevents/1.0 (+https://dsmtechevents.com; community event calendar, fetched nightly)';
 const BACKFILL_DAYS = 90;
 
 const groups = YAML.parse(await fs.readFile(path.join(root, 'data/groups.yaml'), 'utf8'));

@@ -1,7 +1,7 @@
 // Pages: try the network first so nightly updates show up, fall back to the
 // cached copy when offline (or after 3s on a bad connection).
 // Assets and images: serve from cache, refresh in the background.
-const CACHE = 'techdsm-v1';
+const CACHE = 'dsmtechevents-v1';
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['/', '/groups/'])));

@@ -1,6 +1,6 @@
 # DSM Tech Events
 
-https://techdsm.com
+https://dsmtechevents.com
 
 One place to see every upcoming Des Moines tech meetup, user group and
 conference. A static site on Cloudflare, refreshed every night from each group's Meetup

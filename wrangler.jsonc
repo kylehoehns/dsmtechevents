@@ -5,6 +5,10 @@
   // nightly GitHub Action (.github/workflows/refresh.yml) does, and its commit
   // is what triggers a deploy. So what is live is always exactly what is in git.
   //
+  // The Worker keeps its original name, techdsm: visitors never see it, and
+  // renaming would mean a new Worker. It serves dsmtechevents.com; the old
+  // techdsm.com domain redirects there with a Cloudflare Redirect Rule.
+  //
   // Dashboard settings (Workers & Pages → techdsm → Settings → Build). The
   // build command stays empty because both wrangler commands run `build`
   // below; filling it in just builds twice. Preview builds are on, so each
@@ -15,7 +19,7 @@
   "name": "techdsm",
   "compatibility_date": "2026-09-01",
   "build": { "command": "npm run build" },
-  // techdsm.kyhoehns.workers.dev stays up alongside techdsm.com, and every
+  // techdsm.kyhoehns.workers.dev stays up alongside dsmtechevents.com, and every
   // branch push gets a preview URL. Both are wrangler's defaults; declaring
   // them here silences the deploy warning and keeps them from changing.
   "workers_dev": true,
