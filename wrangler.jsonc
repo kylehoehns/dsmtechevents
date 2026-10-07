@@ -5,11 +5,13 @@
   // nightly GitHub Action (.github/workflows/refresh.yml) does, and its commit
   // is what triggers a deploy. So what is live is always exactly what is in git.
   //
-  // Dashboard settings (Workers & Pages → techdsm → Settings → Build):
+  // Dashboard settings (Workers & Pages → techdsm → Settings → Build). The
+  // build command stays empty because both wrangler commands run `build`
+  // below; filling it in just builds twice. Preview builds are on, so each
+  // branch push gets its own preview URL.
   //   Build command:    (empty)
   //   Deploy command:   npx wrangler deploy
-  //   Version command:  npx wrangler versions upload
-  //   Root directory:   /
+  //   Preview command:  npx wrangler preview
   "name": "techdsm",
   "compatibility_date": "2026-09-01",
   "build": { "command": "npm run build" },
