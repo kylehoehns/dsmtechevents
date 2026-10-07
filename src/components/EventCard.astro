@@ -1,69 +1,74 @@
 ---
-import { weekday, day, month, timeRange, formatDescription, dayKey } from '../lib/format.mjs';
+// One event, printed like a show on a venue's listings sheet. Used by the list,
+// and cloned by the calendar's day panel, so both always look the same.
+//
+// Anything that would repeat is left out: the photo square only appears for a
+// real event photo (not the group's logo), the group's full name only when it
+// says more than its short name, and the browser hides the date and street
+// address when the row above already showed them (see app.js).
+import { weekday, day, month, shortRange, formatDescription, dayKey } from '../lib/format.mjs';
 
-const { event: e, byId, past = false } = Astro.props;
+const { event: e, byId } = Astro.props;
 const hosts = e.groupIds.map((id: string) => byId[id]).filter(Boolean);
-const color = hosts[0]?.color ?? 'var(--accent)';
-const mapsUrl = e.address && `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${e.venue ?? ''} ${e.address}`)}`;
-const cta = past ? 'Recap' : e.url?.includes('meetup.com') ? 'RSVP' : 'Details';
+const lead = hosts[0];
+const isMeetup = e.url?.includes('meetup.com');
+const cta = isMeetup ? 'RSVP on Meetup' : e.featured ? 'Tickets & info' : 'Details';
+const pinkInk = lead ? Object.keys(byId).indexOf(lead.id) % 2 === 1 : false;
+const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
 ---
-<article
-  class:list={['event', { featured: e.featured && !past, 'is-past': past }]}
-  style={`--c: ${color}`}
+<li
+  class:list={['show', { headline: e.featured, 'has-photo': !!e.photo }]}
   data-id={e.id}
   data-groups={e.groupIds.join(' ')}
   data-start={e.start}
-  data-end={past ? undefined : e.end}
+  data-end={e.end}
   data-day={dayKey(e.start)}
+  data-venue={e.venueKey}
 >
-  <div class="date" aria-hidden="true">
+  <div class="date">
     <span class="dow">{weekday(e.start)}</span>
-    <span class="num">{day(e.start)}</span>
+    <span class="num mis" data-t={day(e.start)}>{day(e.start)}</span>
     <span class="mon">{month(e.start)}</span>
   </div>
 
-  <div class="body">
-    <div class="hosts">
-      {hosts.length > 0
-        ? hosts.map((g: any) => <a class="host" href={`/?group=${g.id}`} style={`--c: ${g.color}`}><span class="dot" />{g.name}</a>)
-        : <span class="host conf"><span class="dot" />{e.tags.includes('conference') ? 'Conference' : 'Community event'}</span>}
-      <span class="when" />
+  {e.photo && (
+    <div class="photo" aria-hidden="true">
+      <div class:list={['ink', { pinkink: pinkInk }]}><img src={e.photo} alt="" loading="lazy" decoding="async" /></div>
     </div>
+  )}
 
-    <h3 class="title">
-      {e.url ? <a href={e.url} target="_blank" rel="noopener">{e.title}</a> : e.title}
-    </h3>
-
-    <ul class="meta">
-      <li>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
-        <span class="sr-only">{weekday(e.start)} {month(e.start)} {day(e.start)}, </span>{timeRange(e)}
-      </li>
-      {e.venue && (
-        <li>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
-          {mapsUrl ? <a href={mapsUrl} target="_blank" rel="noopener">{e.venue}</a> : e.venue}
-          {e.hybrid && <span class="badge">+ online</span>}
-        </li>
-      )}
-      {e.going > 0 && (
-        <li>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5" /></svg>
-          {e.going} {past ? 'went' : 'going'}
-        </li>
-      )}
-    </ul>
-
-    {e.description && (
-      <details class="desc">
-        <summary>About this event</summary>
-        <div set:html={formatDescription(e.description)} />
-      </details>
+  <div class="body">
+    <span class="when-tag" hidden></span>
+    <p class="band">
+      {hosts.length
+        ? hosts.map((g: any, i: number) => (
+            <>
+              {i > 0 && <span class="with">w/</span>}
+              <a href={`/?group=${g.id}`} data-group={g.id}>{g.short}</a>
+            </>
+          ))
+        : <span class="b">{e.tags.includes('conference') ? 'Headliner · conference' : 'Community event'}</span>}
+      {hosts.length === 1 && lead.showFullName && <span class="with">{lead.name}</span>}
+    </p>
+    {e.series && (
+      <p class="series"><b>{e.series.rule}</b>{e.series.count} dates through {e.series.until}</p>
     )}
+    <h3 class="title">{e.url ? <a href={e.url} target="_blank" rel="noopener">{e.title}</a> : e.title}</h3>
+    <p class="meta">
+      <span class="sr-only">{weekday(e.start)} {month(e.start)} {day(e.start)}, </span>
+      <span class="t">{shortRange(e)}</span>
+      {' · '}
+      {e.online
+        ? <span class="tag-online">Online</span>
+        : <>@ {e.venue ?? 'Venue TBA'}{e.address && <span class="addr">, {e.address}</span>}</>}
+      {e.hybrid && <> · <span class="tag-online">+ online</span></>}
+    </p>
   </div>
 
-  <div class="side">
-    {e.image && <img class="thumb" src={e.image} alt="" loading="lazy" decoding="async" width="600" height="338" />}
-    {e.url && <a class="cta" href={e.url} target="_blank" rel="noopener">{cta}<span aria-hidden="true"> ↗</span></a>}
+  <div class="acts">
+    {e.going > 0 && <span class="going"><b>{e.going}</b>going</span>}
+    {e.url && <a class="rsvp" href={e.url} target="_blank" rel="noopener">{cta} <span aria-hidden="true">→</span></a>}
+    {e.description && <button type="button" class="more" aria-expanded="false" aria-controls={descId}>About</button>}
   </div>
-</article>
+  {e.description && <div class="desc" id={descId} hidden set:html={formatDescription(e.description)} />}
+</li>

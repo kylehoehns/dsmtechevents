@@ -1,38 +1,37 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
-import { fullDate, time } from '../lib/format.mjs';
+import { weekday, day, month, shortTime } from '../lib/format.mjs';
 
 const { groups, updatedAt } = loadData();
+// Groups with something on the books first, soonest first.
 const sorted = [...groups].sort((a, b) =>
-  (a.nextEvent?.start ?? '9999').localeCompare(b.nextEvent?.start ?? '9999') || a.name.localeCompare(b.name));
-const initials = (name: string) => name.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).slice(0, 2).map((w) => w[0]).join('');
+  (a.nextEvent?.start ?? '9999').localeCompare(b.nextEvent?.start ?? '9999') || a.short.localeCompare(b.short));
+const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
 ---
-<Layout title="Groups" active="groups" updatedAt={updatedAt}>
-  <section class="intro">
-    <h1>The groups</h1>
-    <p>Show up, say hi.</p>
-  </section>
-
-  <div class="group-grid">
-    {sorted.map((g) => (
-      <article class="group" style={`--c: ${g.color}`}>
-        <div class="group-head">
-          {g.logo
-            ? <img class="logo" src={g.logo} alt="" loading="lazy" width="56" height="56" />
-            : <span class="logo initials" aria-hidden="true">{initials(g.name)}</span>}
-          <div>
-            <h2>{g.name}</h2>
-            <div class="tags">{g.tags.map((t: string) => <span class="tag">{t}</span>)}</div>
+<Layout title="Groups" nav="groups" updatedAt={updatedAt}
+  blurb={`${groups.length} Des Moines tech groups. Pick one, show up, say hi.`}>
+  <div class="board">
+    {sorted.map((g, i) => (
+      <article class:list={['flyer', { 'has-logo': !!g.logo }]}>
+        {g.logo && (
+          <div class="logo-ink" aria-hidden="true">
+            <div class:list={['ink', { pinkink: i % 2 === 1 }]} style="width:60px;height:60px"><img src={g.logo} alt="" loading="lazy" /></div>
           </div>
-        </div>
+        )}
+        <h2>{g.short}</h2>
+        {g.showFullName && <p class="full">{g.name}</p>}
+        <p class="tags">{g.tags.map((t: string) => <b>{t}</b>)}</p>
         <p class="next">
           {g.nextEvent
-            ? <>Next: <a href={g.nextEvent.url} target="_blank" rel="noopener">{g.nextEvent.title}</a><br /><span class="muted">{fullDate(g.nextEvent.start)} · {time(g.nextEvent.start)}</span></>
-            : <span class="muted">Nothing scheduled yet.</span>}
+            ? <><span class="nd">Next: {when(g.nextEvent)}</span><span class="nt">{g.nextEvent.title}</span>{g.nextEvent.online ? 'Online' : `@ ${g.nextEvent.venue ?? 'TBA'}`} · {g.nextEvent.allDay ? 'All day' : shortTime(g.nextEvent.start)}</>
+            : <><span class="nd idle">Between shows</span>Nothing posted yet. Check their page.</>}
         </p>
-        <div class="group-links">
-          <a href={`/?group=${g.id}`}>Events</a>
+        {g.lastEvent && (
+          <p class="last">Last show {month(g.lastEvent.start)} {day(g.lastEvent.start)}{g.lastEvent.going ? ` · ${g.lastEvent.going} went` : ''}</p>
+        )}
+        <div class="links">
+          {g.upcomingCount > 0 && <a class="primary" href={`/?group=${g.id}`}>{g.upcomingCount} {g.upcomingCount === 1 ? 'show' : 'shows'}</a>}
           {g.meetupUrl && <a href={g.meetupUrl} target="_blank" rel="noopener">Meetup ↗</a>}
           {g.website && <a href={g.website} target="_blank" rel="noopener">Website ↗</a>}
         </div>
