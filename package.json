@@ -8,8 +8,7 @@
   "scripts": {
     "fetch": "node scripts/fetch-events.mjs",
     "dev": "astro dev",
-    "build": "npm run fetch && astro build",
-    "build:offline": "astro build",
+    "build": "astro build",
     "preview": "astro preview"
   },
   "dependencies": {

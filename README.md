@@ -3,8 +3,8 @@
 https://techdsm.com
 
 One place to see every upcoming Des Moines tech meetup, user group and
-conference. A static site on Cloudflare Pages, rebuilt every night from each
-group's Meetup calendar.
+conference. A static site on Cloudflare, refreshed every night from each group's Meetup
+calendar (and a couple of groups' own websites).
 
 ## How it works
 
@@ -17,6 +17,9 @@ group's Meetup calendar.
    Meetup is unreachable.
 3. `astro build` merges the cache with the hand-added events in
    `data/events.yaml` and writes static HTML to `dist/`.
+4. A GitHub Action (`.github/workflows/refresh.yml`) runs the fetch every
+   night and commits `data/cache/` when anything changed. That push is what
+   deploys the site, so the live site always matches what's in git.
 
 ## Adding things
 
@@ -34,26 +37,19 @@ Anything else gets added by hand.
 
 ```sh
 npm install
-npm run fetch          # pull fresh events into data/cache/
-npm run dev            # http://localhost:4321
-npm run build          # fetch + build, what Cloudflare runs
-npm run build:offline  # build from the cache only
+npm run fetch    # pull fresh events into data/cache/
+npm run dev      # http://localhost:4321
+npm run build    # what Cloudflare runs (no fetching, just the committed data)
 ```
 
-## Deploying to Cloudflare
+## Deploying
 
-**Site (Pages):** Workers & Pages → Create → Pages → connect this repo.
-Build command `npm run build`, output directory `dist`. Every push to `main`
-deploys.
+Cloudflare Workers static assets, connected to `main` with Workers Builds.
+`wrangler.jsonc` holds the config and lists the dashboard build settings.
+Every push to `main` deploys, including the nightly data commits.
 
-**Nightly refresh:** Pages project → Settings → Builds → Deploy hooks → add one
-and copy its URL. Then:
+To refresh events right away instead of waiting for the night run:
 
 ```sh
-cd workers/rebuild
-npx wrangler deploy
-npx wrangler secret put DEPLOY_HOOK_URL   # paste the hook URL
+gh workflow run refresh.yml
 ```
-
-The Worker calls the hook at 10:00 UTC daily. You can also `curl -X POST` the
-hook URL any time to refresh right away.

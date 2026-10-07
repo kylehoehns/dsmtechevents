@@ -1,0 +1,26 @@
+{
+  // Static-asset Worker, connected to `main` with Workers Builds. It serves
+  // `dist/`, which `astro build` makes from the repo, including the event data
+  // committed to data/cache/. Cloudflare never fetches events itself: the
+  // nightly GitHub Action (.github/workflows/refresh.yml) does, and its commit
+  // is what triggers a deploy. So what is live is always exactly what is in git.
+  //
+  // Dashboard settings (Workers & Pages → techdsm → Settings → Build):
+  //   Build command:    (empty)
+  //   Deploy command:   npx wrangler deploy
+  //   Version command:  npx wrangler versions upload
+  //   Root directory:   /
+  "name": "techdsm",
+  "compatibility_date": "2026-09-01",
+  "build": { "command": "npm run build" },
+  "assets": {
+    "directory": "dist",
+    // /groups serves /groups/index.html; unknown paths get the real 404 page
+    // rather than the home page.
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  // Declared here, not toggled in the dashboard: every deploy reconciles the
+  // Worker against this file, so a dashboard-only setting gets reset.
+  "observability": { "enabled": true, "head_sampling_rate": 1 }
+}

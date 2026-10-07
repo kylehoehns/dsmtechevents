@@ -72,7 +72,12 @@ async function fetchGroup(group) {
   for (const e of [...carried, ...fresh.events]) byId.set(e.id, { ...byId.get(e.id), ...e });
   const events = [...byId.values()].map(({ status, ...e }) => e).sort((a, b) => a.start.localeCompare(b.start));
 
-  return { fetchedAt: new Date().toISOString(), logo: fresh.logo ?? previous.logo ?? null, enriched: fresh.enriched, events };
+  const result = { logo: fresh.logo ?? previous.logo ?? null, enriched: fresh.enriched, events };
+  // Only move the timestamp when something changed, so an unchanged night
+  // leaves the file untouched and the refresh workflow has nothing to commit.
+  const { fetchedAt, ...previousResult } = previous;
+  const unchanged = fetchedAt && JSON.stringify(previousResult) === JSON.stringify(result);
+  return { fetchedAt: unchanged ? fetchedAt : new Date().toISOString(), ...result };
 }
 
 // Meetup groups and plain iCal feeds.
