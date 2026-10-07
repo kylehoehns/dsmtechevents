@@ -1,0 +1,10 @@
+{
+  "name": "techdsm-rebuild",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "triggers": {
+    // 10:00 UTC = 5am Des Moines in summer, 4am in winter
+    "crons": ["0 10 * * *"]
+  }
+  // DEPLOY_HOOK_URL is a secret: npx wrangler secret put DEPLOY_HOOK_URL
+}

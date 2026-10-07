@@ -1,0 +1,25 @@
+# Hand-added events: conferences, joint meetups, anything not on a group's feed.
+# Times are Des Moines local time. Leave out `time` for an all-day event.
+#
+#   title, url, start (YYYY-MM-DD), end (optional, multi-day), time / endTime ("HH:MM")
+#   venue, address, description, tags, hosts (group ids), featured (pins to the top)
+
+- title: Tech Fuse DSM 2026
+  url: https://techfusedsm.com/
+  start: 2026-10-15
+  end: 2026-10-16
+  time: "08:00"
+  endTime: "17:00"
+  venue: Community Choice Convention Center
+  address: 833 5th Ave, Des Moines, IA 50309
+  description: Two-day Des Moines tech conference. Rooted in tech, fueled by community.
+  tags: [conference]
+  featured: true
+
+- title: Iowa Code Camp
+  url: https://iowacodecamp.com/
+  start: 2026-11-07
+  venue: Ankeny, IA
+  description: One-day conference for software developers — front-end frameworks, cloud infrastructure, databases, and working on engineering teams.
+  tags: [conference]
+  featured: true

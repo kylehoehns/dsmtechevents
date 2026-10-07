@@ -1,0 +1,55 @@
+{
+  "fetchedAt": "2026-10-07T22:03:47.475Z",
+  "logo": null,
+  "enriched": true,
+  "events": [
+    {
+      "id": "producttank-315588233",
+      "sourceId": "315588233",
+      "allDay": false,
+      "title": "The Best User Story I Never Wrote",
+      "start": "2026-08-18T21:30:00.000Z",
+      "end": "2026-08-18T23:00:00.000Z",
+      "description": "What if the PM’s job isn’t to write — it’s to ask the right questions? In this session, we explore how one team is using AI not to automate product management, but to make it sharper.\n\nCome for a demonstration of the tooling Jon Harcey uses every day to build production products.\n\nAttendees will leave with: a new frame for AI as a thinking partner (not a replacement), practical guidance on enterprise-safe AI infrastructure, and a workflow they can adapt for their own team immediately.\n\nThanks to our sponsor: [Source Allies](https://www.sourceallies.com/)\n\n4:30 - 5:00 Networking\n5:00 - 6:00 Presentation",
+      "url": "https://www.meetup.com/producttank-des-moines-ames/events/315588233/",
+      "venue": "Source Allies",
+      "address": "4501 NW Urbandale Dr",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/7/b/c/a/600_535291690.jpeg",
+      "going": 21
+    },
+    {
+      "id": "producttank-316421956",
+      "sourceId": "316421956",
+      "allDay": false,
+      "title": "End of Summer | Product Networking Mixer",
+      "start": "2026-09-22T21:30:00.000Z",
+      "end": "2026-09-22T23:00:00.000Z",
+      "description": "**ProductTank Des Moines/Ames** invites you to our **End of Summer**\n**Networking mixer**\n\n* Tuesday, Sept 22nd\n* 4:30 - 6 pm\n* Big Grove Brewery\n* Address: 555 17th St, Des Moines, IA 50309\n* **Pay your own way; come as you are!**\n\nGrab a beverage and unwind with fellow Product folks as we move into Fall!\nCasual conversation about Product, Tech, and Design.",
+      "url": "https://www.meetup.com/producttank-des-moines-ames/events/316421956/",
+      "venue": "Big Grove Brewery",
+      "address": "555 17th Street,, Des Moines",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/7/b/c/a/600_535291690.jpeg",
+      "going": 15
+    },
+    {
+      "id": "producttank-316553691",
+      "sourceId": "316553691",
+      "title": "3 Illusions in Software Delivery with Joel Tosi",
+      "start": "2026-10-14T21:30:00.000Z",
+      "end": "2026-10-14T23:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/producttank-des-moines-ames/events/316553691/",
+      "description": "We are thrilled to welcome **Joel Tosi** — co-author of Signals & Levers (ITRevolution, September 2026), Coaching for Learning, and Create Your Dojo — who helps organizations evolve through learning by blending systems thinking, agile, lean, and DevOps practices. He joins ProductTank Des Moines ahead of his Tech Fuse Des Moines keynote.\n\nSpecial thanks to **F&G** for sponsoring the venue and for having a senior leader kick off and welcome the group.\n\n**Overview:**\nSoftware delivery is influenced by a myriad of factors - internal ability to execute, customer demands, and an every shifting market for starters. But software delivery is also full of illusions, making it more and more difficult to see what is actually happening!\n\nIn this session, we will look at 3 of the most common illusions - Illusion of Progress, Illusion of Predictability, and Illusion of Control. We will explore the signals that tell us we are under these illusions and, most importantly, how to break free.\n\nWant to understand why all of those meetings aren't helping? What about all of that planning? How about why all that agile stuff you are doing (in your own special way) seems to make things slower? And how about that eternal debate around tech debt vs shipping features?\n\n**Note:** Guests need to register 48 hours in advance of the meeting.\n\n**Schedule:**\n4:30 - 5:00 Kickoff, Welcome and Networking\n5:00 - 6:00 Session",
+      "venue": "F&G",
+      "address": "801 Grand Ave, Des Moines, IA 50309",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/a/8/a/f/600_536143183.jpeg",
+      "going": 19
+    }
+  ]
+}

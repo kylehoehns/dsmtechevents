@@ -1,0 +1,39 @@
+{
+  "fetchedAt": "2026-10-07T22:03:43.920Z",
+  "logo": "https://secure.meetupstatic.com/photos/event/b/3/e/6/600_525706054.jpeg",
+  "enriched": true,
+  "events": [
+    {
+      "id": "iadnug-316281444",
+      "sourceId": "316281444",
+      "allDay": false,
+      "title": "Social@.NET - 2026 Evening Social",
+      "start": "2026-09-03T22:30:00.000Z",
+      "end": "2026-09-04T00:30:00.000Z",
+      "description": "**Agenda**\nNo technical agenda! Come join us at Gilroy's to catch up, start up new conversations, and enjoy each other's company!\n\nWe will have appetizers to enjoy on the patio, so if you have the time, stop by and say hello!\n\n05:30pm-07:30pm - Social Time\n\n**Platinum Sponsor – QCI**\nSince 1995, QCI has grown to be one of the largest, Iowa-based, technology consulting firms, one client at a time. There is no secret to our success. We simply hire the best people and support a culture that is obsessed with delivering excellent service to our clients. In QCI, our clients have a partner that is large enough to provide highly skilled consultants across a wide area of expertise. Our dedication to client service has resulted in a long-term relationships through which we understand that placing the interests of our clients first is the key to being a trusted partner.\n\nFor more information, visit [https://www.qci.com](https://www.qci.com/)\n\n**Platinum Sponsor – Source Allies**\nSource Allies is a local technical consultancy who values collaboration, craftsmanship, and an ownership mentality. We provide a home to our teammates where we encourage each other to grow not only technically, but as peers & consultants. This is evident in the quality software we deliver to clients.\n\nLearn about our “ownership mentality” at: [https://www.sourceallies.com](https://www.sourceallies.com/)",
+      "url": "https://www.meetup.com/iadnug/events/316281444/",
+      "venue": "Gilroy's Kitchen + Pub + Patio",
+      "address": "1238 8th St, West Des Moines",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/b/3/e/6/600_525706054.jpeg",
+      "going": 12
+    },
+    {
+      "id": "iadnug-316779818",
+      "sourceId": "316779818",
+      "title": ".NET@Noon - Build Your First Real-Time Voice Agent",
+      "start": "2026-10-08T17:00:00.000Z",
+      "end": "2026-10-08T18:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/iadnug/events/316779818/",
+      "description": "**Agenda**\nThis will be a Zoom meeting at Noon\n\n11:50am-12:00pm - Pre-Session Waiting Room\n12:00pm-1:00pm - Presentation, JetBrains giveaway\n\n**Build Your First Real-Time Voice Agent**\nReal‑time voice agents sound simple in demos but fall apart the moment real users show up. Latency creeps in, people talk over the agent, accents and background noise wreck the transcript, and the whole experience slides straight into the uncanny valley.\n\nThis hands‑on session walks through building a production‑ready voice agent end to end using .NET, low‑latency speech‑to‑text, responsive LLM orchestration, and fast speech synthesis. You’ll learn how to handle barge‑in interruptions, reliably detect end‑of‑turn boundaries, and add empythetic emotional responsiveness that makes the agent feel natural without slowing it down.\n\n**Platinum Sponsor – QCI**\nSince 1995, QCI has grown to be one of the largest, Iowa-based, technology consulting firms, one client at a time. There is no secret to our success. We simply hire the best people and support a culture that is obsessed with delivering excellent service to our clients. In QCI, our clients have a partner that is large enough to provide highly skilled consultants across a wide area of expertise. Our dedication to client service has resulted in a long-term relationships through which we understand that placing the interests of our clients first is the key to being a trusted partner.\n\nFor more information, visit [https://www.qci.com](https://www.qci.com/)\n\n**Platinum Sponsor – Source Allies**\nSource Allies is a local technical consultancy who values collaboration, craftsmanship, and an ownership mentality. We provide a home to our teammates where we encourage each other to grow not only technically, but as peers & consultants. This is evident in the quality software we deliver to clients.\n\nLearn about our “ownership mentality” at: [https://www.sourceallies.com](https://www.sourceallies.com/)",
+      "venue": "Online",
+      "address": null,
+      "online": true,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/b/3/e/6/600_525706054.jpeg",
+      "going": 20
+    }
+  ]
+}

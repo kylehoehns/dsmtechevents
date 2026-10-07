@@ -1,0 +1,71 @@
+{
+  "fetchedAt": "2026-10-07T22:03:49.581Z",
+  "logo": "https://secure.meetupstatic.com/photos/event/6/c/d/1/600_491667857.jpeg",
+  "enriched": true,
+  "events": [
+    {
+      "id": "dsmdata-315499336",
+      "sourceId": "315499336",
+      "allDay": false,
+      "title": "Des Moines Data for Good Update",
+      "start": "2026-07-28T21:00:00.000Z",
+      "end": "2026-07-28T22:30:00.000Z",
+      "description": "The Des Moines Data for Good group has been utilizing their talents to help our community over the past several years. We will get to hear about their work and impact, a deep dive into a recent project and hear about opportunities to join the group. This is an event you don't want to miss!\n\nFor more information about this group, check out their website.\nhttps://www.dsmdataforgood.com/",
+      "url": "https://www.meetup.com/des-moines-data-analytics/events/315499336/",
+      "venue": "Wellmark Building",
+      "address": "1331 Grand Avenue, Des Moines",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/b/d/9/a/600_518268538.jpeg",
+      "going": 32
+    },
+    {
+      "id": "dsmdata-316271371",
+      "sourceId": "316271371",
+      "allDay": false,
+      "title": "Knowledge Graphs: The Memory Your Data Team Doesn't Have (Yet)",
+      "start": "2026-09-14T21:00:00.000Z",
+      "end": "2026-09-14T22:30:00.000Z",
+      "description": "Most teams relearn the same lessons over and over. Every investigation ends in a chat window or a one off notebook, and the hard won context evaporates the moment it closes. Knowledge Graphs turn an organization's scattered, hard-won expertise into a durable, machine-readable asset that both people and AI agents can use; continuously mined, source-attributed, and self-improving. Every answer you find once, you never have to find again. Learn once. Know forever.\n\nJoin Everette Petsinger, Data Scientist at John Deere, to see how it works and how your life will be changed forever.",
+      "url": "https://www.meetup.com/des-moines-data-analytics/events/316271371/",
+      "venue": "John Deere Financial",
+      "address": "6400 Northwest 86th Street, Johnston",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/9/9/8/d/600_535839309.jpeg",
+      "going": 33
+    },
+    {
+      "id": "dsmdata-316389479",
+      "sourceId": "316389479",
+      "title": "ISU Business Analytics Symposium",
+      "start": "2026-10-15T14:00:00.000Z",
+      "end": "2026-10-15T21:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/des-moines-data-analytics/events/316389479/",
+      "description": "This event is hosted by Iowa State University and is not affiliated with the Des Moines Data & Analytics Community group.\n\nThis event does includes a cost. You must register with ISU to attend.\n[ISU Event Details](https://www.ivybusiness.iastate.edu/business-analytics-symposium/)\n\nThis year’s event will focus on leading change with business analytics. Through real-world case studies and practitioner insights, speakers will share how organizations move from insight to action, from analysis to implementation, and from data-informed thinking to measurable business results.",
+      "venue": "Community Choice Credit Union Convention Center",
+      "address": "833 5th Ave, Des Moines",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/a/c/e/d/600_535964269.jpeg",
+      "going": 4
+    },
+    {
+      "id": "dsmdata-316665472",
+      "sourceId": "316665472",
+      "title": "Reimagining Analytics Delivery for the AI Era",
+      "start": "2026-10-20T21:00:00.000Z",
+      "end": "2026-10-20T22:30:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/des-moines-data-analytics/events/316665472/",
+      "description": "As AI and advanced analytics capabilities continue to expand, many organizations are looking for ways to deliver greater business impact while helping their teams develop broader skills and stronger collaboration practices.\n\nPrincipal Financial has been experimenting with a model that brings business intelligence analysts, analytics engineers, and data scientists together to work as an integrated team on shared business challenges. While still early in the journey, they are already seeing changes in how work gets done, how knowledge is shared, and how individuals approach problem-solving.\nThis session would explore:\n\n* Why we chose to create cross-disciplinary teams.\n* How the model works in practice.\n* The role of T-shaped learning in developing more adaptable analytics professionals.\n* How collaboration between BI, analytics engineering, and data science influences solution design and delivery.\n* Examples of knowledge transfer and skill development occurring across disciplines.\n* Early lessons learned, successes, and challenges.\n* Observed changes in team behaviors, decision-making, and ownership.\n* How integrated teams may help organizations scale AI and advanced analytics capabilities more effectively rate with peers.",
+      "venue": "Principal Financial",
+      "address": "750 Park Street, Des Moines",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/b/9/d/0/600_536267568.jpeg",
+      "going": 18
+    }
+  ]
+}

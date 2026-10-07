@@ -1,0 +1,71 @@
+{
+  "fetchedAt": "2026-10-07T22:03:45.426Z",
+  "logo": "https://secure.meetupstatic.com/photos/event/5/e/8/6/600_526884198.jpeg",
+  "enriched": true,
+  "events": [
+    {
+      "id": "devopsdsm-315470117",
+      "sourceId": "315470117",
+      "allDay": false,
+      "title": "July Lightning Talks",
+      "start": "2026-07-22T23:00:00.000Z",
+      "end": "2026-07-23T00:00:00.000Z",
+      "description": "DevOpsDSM returns on Wednesday, July 22nd from 6 to 7pm for a Lightning Talks night at Source Allies.\n\nLightning talks are a chance to hear several quick presentations, giving everyone exposure to a variety of ideas, technologies, and real-world experiences. The format keeps the evening fast-paced while creating plenty of opportunities to discover something new.\n\nThis month's speakers include Austin Adamson, Joel Miller, Kyle Wagner, and Mason Spree. Our Lightning Talks will cover a wide range of topics, including deploying a simple LLM pipeline on Kubernetes with Seldon Core, using time series databases for observability, logging, and metrics, exploring why software engineering remains essential in an AI-driven world, and lessons learned from building and maintaining synthetic tests for platform and site reliability engineering. After the presentations, there will be plenty of time for questions, discussion, and sharing experiences with fellow attendees.\n\nWhether you're looking for practical takeaways, new perspectives, or simply an opportunity to connect with fellow practitioners, Lightning Talks are a great way to spend an evening with the local DevOps community, and learn at lightning speed! We will also be having a giveaway for a 1 year GitKracken subscription for in-person attendees.\n\nFood and drinks will be provided.\nHosted in person at Source Allies and streamed online. RSVP so we can get a head count!",
+      "url": "https://www.meetup.com/devopsdsm/events/315470117/",
+      "venue": "Source Allies",
+      "address": "4501 NW Urbandale Dr",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/9/a/9/7/600_535119575.jpeg",
+      "going": 18
+    },
+    {
+      "id": "devopsdsm-315859296",
+      "sourceId": "315859296",
+      "allDay": false,
+      "title": "The SaaS Startup Dependency Graph",
+      "start": "2026-08-26T23:00:00.000Z",
+      "end": "2026-08-27T00:00:00.000Z",
+      "description": "Launching a SaaS product takes much more than writing great code. Before customers can sign up, there are business, financial, security, and infrastructure decisions that all have to happen in the right order. Miss a dependency, and you can lose days untangling problems that could have been avoided.\n\nJoin us on Tuesday, August 26th, as Travis Smith presents \"The SaaS Startup Dependency Graph.\" Travis will walk through the real sequence of tasks involved in launching a SaaS business, from forming an LLC and obtaining an EIN to setting up banking, cloud identity, payment processing, and a secure production environment. Along the way, he'll highlight the privacy, identity, and architectural decisions that are easiest to make early and most costly to change later.\n\nWhether you're building a side project, launching a startup, or just interested in the operational side of software delivery, this session goes well beyond just the code.\n\nAs always, we'll have time for questions, discussion, and networking with fellow members of the DevOpsDSM community.\n\nHosted at Source Allies from 6:00–7:00 PM, with food, drinks, and a live stream available for remote attendees.",
+      "url": "https://www.meetup.com/devopsdsm/events/315859296/",
+      "venue": "Source Allies",
+      "address": "4501 NW Urbandale Dr",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/4/b/a/d/600_535399373.jpeg",
+      "going": 17
+    },
+    {
+      "id": "devopsdsm-316404457",
+      "sourceId": "316404457",
+      "allDay": false,
+      "title": "SaltStack: Configuration Management From Cloud Images to Developer Desktops",
+      "start": "2026-09-23T23:00:00.000Z",
+      "end": "2026-09-24T00:00:00.000Z",
+      "description": "***SaltStack: Configuration Management From Cloud Images to Developer Desktops***\n\nConfiguration management doesn’t stop at servers. On Wednesday, September 23rd, DevOpsDSM welcomes John Lengeling from Source Allies for a look at how SaltStack can provide a consistent approach to configuration across cloud infrastructure, servers, and developer workstations.\n\nJohn will explore SaltStack’s architecture and how it can be used to build Azure images and AWS AMIs, manage server configurations, and provision developer desktops. He’ll also discuss how Infrastructure as Code and configuration automation can help teams reduce drift, improve consistency, speed up onboarding, and maintain reliable environments across platforms.\n\nThis session will offer a broader look at what configuration management can accomplish across an organization.\nDevOpsDSM meets from 6–7pm, hosted at Source Allies. Food and drinks provided.\n\n**Speaker Bio:** John Lengeling is a DevOps Engineer with more than 25 years of experience supporting embedded systems development and R&D organizations. His expertise includes infrastructure automation, CI/CD, cloud platforms, Infrastructure as Code, and configuration management. He focuses on helping engineering teams improve productivity, consistency, and scalability through automation and modern DevOps practices.",
+      "url": "https://www.meetup.com/devopsdsm/events/316404457/",
+      "venue": "Source Allies",
+      "address": "4501 NW Urbandale Dr",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/d/6/f/0/600_535975024.jpeg",
+      "going": 10
+    },
+    {
+      "id": "devopsdsm-316781004",
+      "sourceId": "316781004",
+      "title": "Human in the Loop:  Orchestrating Agents for Safety",
+      "start": "2026-10-28T23:00:00.000Z",
+      "end": "2026-10-29T00:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/devopsdsm/events/316781004/",
+      "description": "Human in the Loop: Orchestrating Agents for Safety\n\nAs AI agents take on more complex tasks and workflows, where and how should people remain part of the process?\nJoin DevOpsDSM on Wednesday, October 28th for Ethan Spoestra’s presentation, “Human in the Loop: Orchestrating Agents for Safety.”\n\nThe session will explore the intersection of AI agents, orchestration, human involvement, and safety, with a focus on the role people can play as increasingly capable agents become part of software and operational workflows.\n\nCome learn, ask questions, and continue the conversation with the tech community. DevOpsDSM meets from 6–7pm at Source Allies. Food and drinks will be provided.",
+      "venue": "Source Allies",
+      "address": "4501 NW Urbandale Dr, Urbandale, IA 50322",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/b/6/f/2/600_536386834.jpeg",
+      "going": 8
+    }
+  ]
+}

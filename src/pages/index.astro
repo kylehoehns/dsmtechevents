@@ -1,0 +1,86 @@
+---
+import Layout from '../layouts/Layout.astro';
+import EventCard from '../components/EventCard.astro';
+import { loadData } from '../lib/data.mjs';
+import { site } from '../lib/site.mjs';
+import { monthKey, monthLabel, fullDate, timeRange, day, month } from '../lib/format.mjs';
+
+const { events, upcoming, past, groups, byId, updatedAt } = loadData();
+
+const months = new Map<string, typeof events>();
+for (const e of upcoming) {
+  const key = monthKey(e.start);
+  if (!months.has(key)) months.set(key, []);
+  months.get(key)!.push(e);
+}
+const featured = upcoming.filter((e) => e.featured);
+
+// Lean copy of the events for the calendar grid, which renders in the browser.
+// The day panel under it reuses the list's event cards, matched by id.
+const calendarData = events.map((e) => ({
+  id: e.id, title: e.title, start: e.start, end: e.end, groups: e.groupIds, featured: e.featured,
+}));
+const groupData = Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short, color: g.color }]));
+---
+<Layout updatedAt={updatedAt}>
+  <section class="intro">
+    <h1>What's happening in <span>Des Moines tech</span></h1>
+    <p>{site.tagline} {groups.length} groups, refreshed nightly.</p>
+  </section>
+
+  {featured.length > 0 && (
+    <section class="featured-strip" aria-label="Featured events">
+      {featured.map((e) => (
+        <a class="feature" href={e.url} target="_blank" rel="noopener" data-end={e.end} data-groups={e.groupIds.join(' ')}>
+          <span class="feature-label">{e.tags.includes('conference') ? 'Conference' : 'Featured'}</span>
+          <strong>{e.title}</strong>
+          <span>{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : fullDate(e.start)}{e.venue && ` · ${e.venue}`}</span>
+        </a>
+      ))}
+    </section>
+  )}
+
+  <div class="toolbar" id="toolbar">
+    <div class="segmented" role="tablist" aria-label="View">
+      <button type="button" role="tab" data-view="list" aria-selected="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" /></svg>
+        List
+      </button>
+      <button type="button" role="tab" data-view="calendar" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>
+        Calendar
+      </button>
+    </div>
+  </div>
+
+  <div class="active-group" id="active-group" hidden>
+    Showing events from <strong></strong>
+    <button type="button" class="link-btn">Show all groups</button>
+  </div>
+
+  <section id="list-view" class="list-view" aria-label="Upcoming events">
+    {[...months].map(([key, list]) => (
+      <section class="month" data-month={key}>
+        <h2 class="month-label">{monthLabel(list[0].start)}</h2>
+        <div class="events">
+          {list.map((e) => <EventCard event={e} byId={byId} />)}
+        </div>
+      </section>
+    ))}
+    <p class="empty" hidden>No upcoming events for this group.</p>
+
+    {past.length > 0 && (
+      <details class="past-events">
+        <summary>Recent events <span class="muted">· last 3 months</span></summary>
+        <div class="events">
+          {past.map((e) => <EventCard event={e} byId={byId} past />)}
+        </div>
+      </details>
+    )}
+  </section>
+
+  <section id="calendar-view" class="calendar-view" aria-label="Calendar" hidden></section>
+
+  <script type="application/json" id="calendar-data" set:html={JSON.stringify({ events: calendarData, groups: groupData })} />
+  <script>import "../scripts/app.js";</script>
+</Layout>

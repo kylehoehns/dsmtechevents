@@ -1,0 +1,79 @@
+---
+import '../styles/global.css';
+import { site } from '../lib/site.mjs';
+
+interface Props { title?: string; active?: 'events' | 'groups'; updatedAt?: string }
+const { title, active = 'events', updatedAt } = Astro.props;
+const pageTitle = title ? `${title} · ${site.name}` : site.name;
+const updated = updatedAt && new Intl.DateTimeFormat('en-US', { timeZone: site.timeZone, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(updatedAt));
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={site.tagline} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={site.tagline} />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121316" media="(prefers-color-scheme: dark)" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Tech DSM" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/">
+          <img src="/icons/icon.svg" alt="" width="28" height="28" />
+          <span>{site.name}</span>
+        </a>
+        <nav class="nav">
+          <a href="/" aria-current={active === 'events' ? 'page' : undefined}>Events</a>
+          <a href="/groups/" aria-current={active === 'groups' ? 'page' : undefined}>Groups</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <slot />
+    </main>
+
+    <footer class="site-footer wrap">
+      <p>
+        Events refresh nightly from each group's Meetup page.
+        {updated && <> Last updated {updated}.</>}
+      </p>
+      <p>Run a group or an event? <a href={site.repo}>Add it on GitHub</a>.</p>
+    </footer>
+
+    <div class="install-hint" id="install-hint" hidden>
+      <span>Install this on your phone: tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.</span>
+      <button type="button" aria-label="Dismiss">✕</button>
+    </div>
+
+    <script>
+      if ('serviceWorker' in navigator && import.meta.env.PROD) {
+        navigator.serviceWorker.register('/sw.js');
+      }
+
+      // iOS has no install prompt, so show a one-time hint in Safari.
+      const hint = document.getElementById('install-hint');
+      const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const standalone = matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
+      let dismissed = false;
+      try { dismissed = localStorage.getItem('install-hint') === 'dismissed'; } catch {}
+      if (hint && isIos && !standalone && !dismissed) {
+        hint.hidden = false;
+        hint.querySelector('button')?.addEventListener('click', () => {
+          hint.hidden = true;
+          try { localStorage.setItem('install-hint', 'dismissed'); } catch {}
+        });
+      }
+    </script>
+  </body>
+</html>

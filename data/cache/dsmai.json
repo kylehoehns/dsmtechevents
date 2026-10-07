@@ -1,0 +1,71 @@
+{
+  "fetchedAt": "2026-10-07T22:03:46.775Z",
+  "logo": "https://secure.meetupstatic.com/photos/event/5/5/7/600_514381367.jpeg",
+  "enriched": true,
+  "events": [
+    {
+      "id": "dsmai-311239023",
+      "sourceId": "311239023",
+      "allDay": false,
+      "title": "Trust, But Verify: Human-in-the-Loop for Agents That Actually Matter",
+      "start": "2026-08-18T22:30:00.000Z",
+      "end": "2026-08-19T00:30:00.000Z",
+      "description": "AI agents are getting good at taking action. The hard part isn't making them capable, it's knowing when to make them stop.\n\nIn this talk we'll walk through the full spectrum of human-in-the-loop patterns, from lightweight inline confirmations to out-of-band permission gates to handing your agent a wallet with real money in it and more. Each pattern fits a different level of consequence, and knowing which to reach for is what separates demo agents from production ones. We'll cover the honest tradeoffs of latency, user experience, and trust so you can make the right call for your specific use case.\n\nThe entire talk is built around various live demos that escalate in stakes with every step. You'll leave with a mental model and working reference architecture you can apply the same day.\n\n_____________________________\nJoin us for the next DSM AI Group!\n\n5:30 - 6:00 - Socializing/Networking\n6:00 - Speaker begins",
+      "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239023/",
+      "venue": "We Write Code",
+      "address": "130 E 3rd St Suite 202, Des Moines",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/b/f/e/e/600_525949134.jpeg",
+      "going": 35
+    },
+    {
+      "id": "dsmai-316356573",
+      "sourceId": "316356573",
+      "allDay": false,
+      "title": "429 Problems: Scaling Systems Without Breaking Everything",
+      "start": "2026-09-15T22:30:00.000Z",
+      "end": "2026-09-16T00:30:00.000Z",
+      "description": "We’ll explore the real world tradeoffs of parallel processing through a case study of an AI pipeline that processes and analyzes large volumes of user-submitted political opinions. The system performs moderation, embedding generation, and downstream analysis using a distributed, event-driven architecture built on AWS.\n\nIn this session attendees will learn how to design scalable, resilient pipelines using parallel processing while avoiding common pitfalls like rate limits, throttling, and cascading failures. They’ll leave with practical patterns for building fault-tolerant systems, balancing throughput with external constraints, and handling partial failures gracefully.\n\nWe’ll break down how parallelism improves throughput and responsiveness, while also examining the less obvious challenges it introduces, such as rate limiting, back pressure, partial failures, and data consistency.\n\nWhile the case study uses AWS services, the architectural principles are cloud-agnostic and applicable to any distributed system handling high-throughput workloads.\n\n***\n\nSee you at the next DSM AI Event:\n5:30 - 6:00 - Socializing/Networking\n6:00 - Speaker begins",
+      "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/316356573/",
+      "venue": "We Write Code",
+      "address": "130 E 3rd St Suite 202, Des Moines",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/b/f/e/e/600_525949134.jpeg",
+      "going": 23
+    },
+    {
+      "id": "dsmai-316356587",
+      "sourceId": "316356587",
+      "title": "Building a physical product in the age of AI",
+      "start": "2026-10-20T22:30:00.000Z",
+      "end": "2026-10-21T00:30:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/316356587/",
+      "description": "What happens when a software developer decides to build a physical product?\n\nIn this session, Levi Rosol will share the story behind GridSmith—a modular tabletop terrain system that started as a personal frustration with existing products and evolved into a real business. Along the way, AI became much more than a coding assistant. It became a design partner, a CAD tutor, a rubber duck, a technical writer, a marketing assistant, and an endless source of ideas.\n\nWe'll explore the entire journey: identifying the problem worth solving, designing hundreds of iterations of a physical product, learning OpenSCAD through AI-assisted development, optimizing for 3D printing and manufacturing, building an e-commerce website through \"vibe coding,\" and launching a product that people can actually buy.\n\nThis isn't a session about replacing developers with AI. It's about how modern AI tools dramatically lower the barrier between an idea and a finished product, allowing a single person to wear the hats of engineer, product designer, manufacturer, and entrepreneur.\n\nWhether you're a developer, maker, or simply curious about what AI can enable, you'll leave with practical insights, honest lessons learned, and hopefully the confidence to start building that idea you've been putting off.\n\n***\n\nJoin us for the next DSM AI Group!\n5:30 - 6:00 - Socializing/Networking\n6:00 - Speaker begins",
+      "venue": "We Write Code",
+      "address": "130 E 3rd St Suite 202, Des Moines",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/b/f/e/e/600_525949134.jpeg",
+      "going": 19
+    },
+    {
+      "id": "dsmai-316699314",
+      "sourceId": "316699314",
+      "title": "DSM AI Group Monthly Meeting (Speaker TBD)",
+      "start": "2026-11-17T23:30:00.000Z",
+      "end": "2026-11-18T01:30:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/316699314/",
+      "description": "Join us for the next DSM AI Group!\n\nTopic and Speaker will be announced closer to the posted date.",
+      "venue": "We Write Code",
+      "address": "130 E 3rd St Ste 202, Des Moines, IA 50309",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/b/f/e/e/600_525949134.jpeg",
+      "going": 2
+    }
+  ]
+}

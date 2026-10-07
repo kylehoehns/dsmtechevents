@@ -1,0 +1,23 @@
+{
+  "fetchedAt": "2026-10-07T22:03:46.101Z",
+  "logo": null,
+  "enriched": true,
+  "events": [
+    {
+      "id": "aws-316828991",
+      "sourceId": "316828991",
+      "title": "Re:Invent Recap - January 2027",
+      "start": "2027-01-12T23:30:00.000Z",
+      "end": "2027-01-13T00:30:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/aws-user-group-des-moines/events/316828991/",
+      "description": "Let's all get together and discuss Re: Invent.\nWhat announcements are you most excited about?\nDid anything that was announced force you to rethink what you are going to be doing in 2027?\n\nStop by for some free pizza, and good discussion.",
+      "venue": "Lean Techniques, Inc.",
+      "address": "9131 Northpark Dr, Johnston, IA 50131",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/b/2/0/e/600_461265582.jpeg",
+      "going": 3
+    }
+  ]
+}

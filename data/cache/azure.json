@@ -1,0 +1,23 @@
+{
+  "fetchedAt": "2026-10-07T22:03:50.268Z",
+  "logo": "https://secure.meetupstatic.com/photos/event/6/5/a/8/600_498566024.jpeg",
+  "enriched": true,
+  "events": [
+    {
+      "id": "azure-315743826",
+      "sourceId": "315743826",
+      "allDay": false,
+      "title": "Beyond the YAML Spaghetti: Building App-Centric Systems with Radius",
+      "start": "2026-07-22T17:00:00.000Z",
+      "end": "2026-07-22T18:00:00.000Z",
+      "description": "Modern cloud-native development is often less about writing code and more about \"YAML plumbing.\" Between IaC templates, secret management, and Kubernetes manifests, the actual application logic gets buried under layers of infrastructure configuration. Why does our tooling force us to think about VPCs and subnets when we just want to connect a service to a database?",
+      "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/315743826/",
+      "venue": "Online",
+      "address": null,
+      "online": true,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/1/8/4/b/600_535266219.jpeg",
+      "going": 5
+    }
+  ]
+}
