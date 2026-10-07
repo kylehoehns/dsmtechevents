@@ -13,7 +13,6 @@ const hosts = e.groupIds.map((id: string) => byId[id]).filter(Boolean);
 const lead = hosts[0];
 const isMeetup = e.url?.includes('meetup.com');
 const cta = isMeetup ? 'RSVP on Meetup' : e.featured ? 'Tickets & info' : 'Details';
-const pinkInk = lead ? Object.keys(byId).indexOf(lead.id) % 2 === 1 : false;
 const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
 ---
 <li
@@ -33,7 +32,7 @@ const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
 
   {e.photo && (
     <div class="photo" aria-hidden="true">
-      <div class:list={['ink', { pinkink: pinkInk }]}><img src={e.photo} alt="" loading="lazy" decoding="async" /></div>
+      <div class="ink"><img src={e.photo} alt="" loading="lazy" decoding="async" /></div>
     </div>
   )}
 

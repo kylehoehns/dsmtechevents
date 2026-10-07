@@ -250,17 +250,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .desc h4 { margin: 12px 0 4px; font: 800 16px/1 var(--display); text-transform: uppercase; }
 .desc a { color: var(--blue-t); }
 
-/* halftone photo: grayscale, screened, printed in one ink */
-.ink { position: relative; overflow: hidden; isolation: isolate; background: var(--blue-fill); }
-.ink.pinkink { background: var(--pink-fill); }
-.ink img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-  filter: grayscale(1) contrast(1.25) brightness(1.12); mix-blend-mode: screen;
-}
-.ink::after {
-  content: ""; position: absolute; inset: 0; opacity: 0.38; pointer-events: none;
-  background: radial-gradient(circle, transparent 1.4px, #f3ede1 2px) 0 0/5px 5px;
-}
+/* event photos in their own colors: they're each group's flyer art */
+.ink { overflow: hidden; background: var(--paper-2); border: 1.5px solid var(--line); }
+.ink img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 @container (min-width: 640px) {
   .show { grid-template-columns: 70px minmax(0, 1fr); gap: 0 18px; padding: 14px 0; }
