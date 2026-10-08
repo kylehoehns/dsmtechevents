@@ -8,20 +8,22 @@
 // conferences), so titles must also match an allow-list. TechBrews outside
 // the Des Moines metro are skipped, based on the venue's city.
 import { toText } from './html.mjs';
-import { calendarEvents, isUpcoming, times, eventUrl } from './ical.mjs';
+import { calendarEvents, times, eventUrl } from './ical.mjs';
 
 const FEED = 'https://www.technologyiowa.org/events/calendar/techbrews/ics/';
 const TECHBREW = /tech\s*brew/i;
 const METRO = ['Des Moines', 'West Des Moines', 'Urbandale', 'Clive', 'Johnston', 'Ankeny', 'Altoona', 'Grimes', 'Waukee', 'Windsor Heights', 'Pleasant Hill'];
 
-export default async function taiTechbrew(group, { get, now = Date.now() }) {
+// `since`: the fetch passes its 90-day cutoff, so recent past TechBrews (still
+// in the feed) fill Recently from the first run instead of only once they pass.
+export default async function taiTechbrew(group, { get, now = Date.now(), since = now }) {
   const all = calendarEvents(await get(FEED), 'TAI TechBrew feed');
   // TAI's feed always holds past TechBrews too; an empty one means it broke.
   if (!all.length) throw new Error('TAI TechBrew feed has no events');
-  const upcoming = all.filter((e) => isUpcoming(e, now) && TECHBREW.test(e.summary ?? ''));
+  const wanted = all.filter((e) => e.status !== 'CANCELLED' && (e.end ?? e.start).getTime() >= since && TECHBREW.test(e.summary ?? ''));
 
   const events = [];
-  for (const e of upcoming) {
+  for (const e of wanted) {
     const url = eventUrl(e);
     if (!url) throw new Error(`TechBrew "${e.summary}" has no URL`);
     const page = readEventPage(await get(url), url);

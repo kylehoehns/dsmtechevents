@@ -82,7 +82,15 @@ test('tai-techbrew keeps only TechBrew: other TAI events are dropped even if upc
   const events = await taiTechbrew({ id: 'techbrew' }, site);
   assert.ok(events.every((e) => /techbrew/i.test(e.title)));
   assert.ok(!site.requested.some((u) => u.includes('cio-roundtable')), 'CIO Roundtable is never even looked at');
-  assert.ok(!site.requested.some((u) => u.includes('techbrew-with-featured-guest')), 'past TechBrews are skipped');
+  assert.ok(!site.requested.some((u) => u.includes('techbrew-september-2026')), 'past TechBrews are skipped by default');
+});
+
+test('tai-techbrew includes past TechBrews back to the fetch cutoff, for Recently', async () => {
+  const site = techbrewSite();
+  const events = await taiTechbrew({ id: 'techbrew' }, { ...site, since: site.now - 90 * 86_400_000 });
+  const ids = events.map((e) => e.sourceId);
+  assert.ok(ids.includes('techbrew-september-2026'), 'the September TechBrew is in');
+  assert.ok(ids.includes('techbrew-october-2026'));
 });
 
 test('tai-techbrew skips TechBrews outside the Des Moines metro', async () => {
