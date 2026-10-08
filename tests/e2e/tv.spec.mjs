@@ -40,3 +40,21 @@ test('asks the browser to keep the screen awake, and again when the tab comes ba
   await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
   await expect.poll(() => page.evaluate(() => window.__locks)).toBe(2);
 });
+
+test('slides are screen-printed in, and still step through', async ({ page }) => {
+  await page.goto('/tv/');
+  await expect(page.locator('.tv')).toHaveAttribute('data-fx', 'print');
+  await page.keyboard.press('ArrowRight');
+  await expect(current(page).getByRole('heading', { name: 'Coding Dojo' })).toBeVisible();
+  await expect(page.locator('.slide.was-on')).toHaveClass(/overview/); // the old slide lingers for the wipe
+  await page.clock.runFor(2000);
+  await expect(page.locator('.slide.was-on')).toHaveCount(0);
+});
+
+test('?fx=off, or reduced motion, keeps the plain swap', async ({ page }) => {
+  await page.goto('/tv/?fx=off');
+  await expect(page.locator('.tv')).not.toHaveAttribute('data-fx');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/tv/');
+  await expect(page.locator('.tv')).not.toHaveAttribute('data-fx');
+});

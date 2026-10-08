@@ -5,8 +5,11 @@
 //
 // Slides: a "Coming up" overview, then one poster per event with a QR code
 // to its Meetup (or conference) page. ← → step, space pauses.
+// Each change is screen-printed in (src/styles/tv-fx.css). Reduced motion,
+// or ?fx=off for a TV stick too slow for it, gets a plain swap.
 import QRCode from 'qrcode';
 import Layout from '../layouts/Layout.astro';
+import '../styles/tv-fx.css';
 import { loadData } from '../lib/data.mjs';
 import { weekday, day, month, shortRange, shortTime } from '../lib/format.mjs';
 import { site } from '../lib/site.mjs';
@@ -195,16 +198,38 @@ const slides = await Promise.all(events.map(async (e) => ({
     clock.textContent = clockFmt.format(new Date());
   }
 
+  // Screen-print transitions, unless motion is reduced or ?fx=off.
+  const fx = new URLSearchParams(location.search).get('fx') !== 'off' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'print' : '';
+  if (fx) {
+    document.getElementById('tv')!.dataset.fx = fx;
+    document.querySelectorAll<HTMLElement>('.slide').forEach((s, n) => {
+      s.style.setProperty('--tilt', n % 2 ? '0.5deg' : '-0.6deg');
+      // --i staggers rows and lines within each group
+      for (const group of s.querySelectorAll('ol, .info, .date-block, .overview-head')) {
+        [...group.children].forEach((el, i) => (el as HTMLElement).style.setProperty('--i', String(i)));
+      }
+    });
+  }
+  let leaving = 0;
+
   let slides: HTMLElement[] = [];
   let index = 0;
   let timer = 0;
   let paused = false;
 
   function show(i: number) {
+    const prev = document.querySelector<HTMLElement>('.slide.is-on');
     refresh();
     slides = [...document.querySelectorAll<HTMLElement>('.slide')];
     if (!slides.length) return;
     index = (i + slides.length) % slides.length;
+    // The slide going out stays up for a beat so the next one can cover it.
+    if (fx && prev && prev !== slides[index]) {
+      document.querySelectorAll('.was-on').forEach((s) => s.classList.remove('was-on'));
+      if (prev.isConnected) prev.classList.add('was-on');
+      clearTimeout(leaving);
+      leaving = window.setTimeout(() => prev.classList.remove('was-on'), 1600);
+    }
     slides.forEach((s, n) => s.classList.toggle('is-on', n === index));
     // Restart the progress bar.
     bar.classList.remove('run');

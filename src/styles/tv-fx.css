@@ -1,0 +1,61 @@
+/* Screen-print motion for /tv/. tv.astro sets data-fx="print" on .tv (not
+   under prefers-reduced-motion or ?fx=off), marks the
+   showing slide .is-on and the one leaving .was-on for a beat. Every effect is
+   an entrance plus a quiet idle; text is still from ~1.5s on. Motion is
+   transform, opacity and clip-path, plus a one-off color/text-shadow on the
+   print plates. --i is each row's or line's position, for staggers. */
+
+.tv[data-fx] .slide { transition: none; }
+.tv[data-fx] .slide.is-on { z-index: 2; }
+.tv[data-fx] .slide.was-on { opacity: 1; z-index: 1; }
+
+/* ------------------------------------------------------------------ print
+   Screen print: a squeegee pulls the new sheet across the old one. The pink
+   plate lands first, way off register; then the ink comes down and snaps
+   into register. Halftone dots flash and dry. Idle: the plate creeps. */
+.tv[data-fx=print] .slide { --plate: var(--pink); --off: 0.4; }
+/* these clip their overflow (ellipsis, line clamp), so the plate starts closer */
+.tv[data-fx=print] :is(h2, li > span) { --off: 0.15; }
+.tv[data-fx=print] .slide.headliner { --plate: #0a6cc0; }
+.tv[data-fx=print] .slide.is-on { animation: fx-pull-in 0.7s cubic-bezier(0.6, 0, 0.3, 1); }
+.tv[data-fx=print] .slide.was-on { animation: fx-pull-out 0.7s cubic-bezier(0.6, 0, 0.3, 1) forwards; }
+@keyframes fx-pull-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes fx-pull-out { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 0 0 100%); } }
+
+/* the squeegee blade rides the edge of the wipe */
+.tv[data-fx=print] .slide.is-on::before {
+  content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  background: linear-gradient(90deg, transparent calc(100% - 1.8vw), var(--plate) calc(100% - 1.8vw) calc(100% - 0.7vw), #f3ede1 calc(100% - 0.7vw));
+  animation: fx-blade 0.7s cubic-bezier(0.6, 0, 0.3, 1) both;
+}
+@keyframes fx-blade { from { transform: translateX(-100%); } 92% { opacity: 1; } to { transform: translateX(0); opacity: 0; } }
+
+/* two plates on plain text: plate color as a text-shadow, ink color after */
+.tv[data-fx=print] .slide.is-on :is(h2, .hosts, .time, .where, .going, .dow, .mon, li > span, .qr span) {
+  animation: fx-plate 1.3s ease-out backwards;
+  animation-delay: calc(0.2s + var(--i, 0) * 0.07s);
+}
+@keyframes fx-plate {
+  0% { color: transparent; text-shadow: calc(var(--off) * 1em) calc(var(--off) * 0.4em) 0 var(--plate); }
+  45% { color: transparent; text-shadow: calc(var(--off) * 0.1em) calc(var(--off) * 0.05em) 0 var(--plate); }
+  70% { text-shadow: calc(var(--off) * -0.15em) calc(var(--off) * -0.08em) 0 var(--plate); }
+  100% { text-shadow: 0 0 0 transparent; }
+}
+/* .misprint already has its pink plate (::before): slide that into register */
+.tv[data-fx=print] .slide.is-on .misprint { animation: fx-ink 1.2s ease-out 0.2s backwards; }
+@keyframes fx-ink { 0%, 45% { color: transparent; } }
+.tv[data-fx=print] .slide.is-on .misprint::before {
+  animation: fx-register 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s backwards, fx-creep 5s ease-in-out 1.4s infinite alternate;
+}
+.tv[data-fx=print] .tv-logo::before { animation: fx-creep 7s ease-in-out infinite alternate; }
+@keyframes fx-register { from { transform: translate(-0.3em, 0.1em); } 55% { transform: translate(-1px, 0); } to { transform: translate(3px, 2px); } }
+@keyframes fx-creep { from { transform: translate(3px, 2px); } to { transform: translate(7px, -1px); } }
+
+/* halftone flashes on wet, then dries back to a hint in the top corner */
+.tv[data-fx=print] .slide::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; /* under the text and the QR */
+  background: radial-gradient(circle, var(--plate) 1.3px, transparent 2px) 0 0 / 9px 9px;
+  -webkit-mask: linear-gradient(200deg, #000, transparent 55%); mask: linear-gradient(200deg, #000, transparent 55%);
+}
+.tv[data-fx=print] .slide.is-on::after { animation: fx-dry 2.6s ease-out 0.3s forwards; }
+@keyframes fx-dry { 0% { opacity: 0; } 15% { opacity: 0.45; } 100% { opacity: 0.1; } }
