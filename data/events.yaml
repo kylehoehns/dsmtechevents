@@ -17,7 +17,7 @@
   featured: true
 
 - title: Iowa Code Camp 2026
-  url: https://www.tickettailor.com/events/iowacodecamp/2402912
+  url: https://iowacodecamp.com/
   start: 2026-11-07
   time: "08:00"
   endTime: "17:00"
@@ -26,6 +26,6 @@
   description: |-
     Free, one-day, in-person conference for software developers: front-end frameworks, cloud infrastructure, databases, and working on engineering teams. Running since 2008, with about 240 people at each Des Moines-area camp.
 
-    More at https://iowacodecamp.com/
+    Register (free) at https://www.tickettailor.com/events/iowacodecamp/2402912
   tags: [conference]
   featured: true
