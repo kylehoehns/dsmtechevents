@@ -29,9 +29,9 @@ for (const file of pages) {
   for (const m of raw.matchAll(/<title>([^<]*)<\/title>|<meta property="og:(?:title|description)" content="([^"]*)"/g)) {
     if ((m[1] ?? m[2]).includes('&amp;')) problems.push(`${rel}: "&" in the title or share text (Slack shows it as &amp;): ${m[1] ?? m[2]}`);
   }
-  // ↗ has an emoji form; iOS draws the blue emoji box when the font lacks the
-  // glyph. U+FE0E after it asks for the plain text arrow.
-  if (/↗(?!\uFE0E)/.test(html)) problems.push(`${rel}: a ↗ without U+FE0E after it shows as an emoji on iPhones; write it as ↗\uFE0E`);
+  // ↗ isn't in the display font, so phones draw it as an emoji or a thin
+  // fallback arrow. Buttons use <OutArrow /> (an inline SVG) instead.
+  if (html.includes('↗')) problems.push(`${rel}: a typed ↗ (phones draw it as an emoji or a thin arrow); use <OutArrow />`);
   // Structured data must parse, or search engines drop it silently.
   for (const m of raw.matchAll(/<script type="application\/(?:ld\+)?json"[^>]*>([\s\S]*?)<\/script>/g)) {
     try { JSON.parse(m[1]); } catch (err) { problems.push(`${rel}: embedded JSON doesn't parse (${err.message})`); }
