@@ -21,7 +21,7 @@ const photo = e.photo;
 const thumbSrcset = photo && photo.small !== photo.large ? `${photo.small} 180w, ${photo.large} 600w` : undefined;
 // "Tomorrow" / "Tonight" as of the build, so the tag is in the page from the
 // start and nothing moves when app.js re-checks it against the real date.
-const whenTag = whenLabel(e.start, e.end);
+const whenTag = whenLabel(e.start, e.end, Date.now(), e);
 // Tapping the venue opens a map search (app.js switches it to Apple Maps on iPhones).
 const mapQuery = [e.venue, e.fullAddress ?? e.address ?? 'Des Moines, IA'].filter(Boolean).join(', ');
 const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
@@ -32,6 +32,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
   data-groups={e.groupIds.join(' ')}
   data-start={e.start}
   data-end={e.end}
+  data-days={e.multiDay && !e.allDay ? '' : undefined}
   data-day={dayKey(e.start)}
   data-venue={e.venueKey}
 >

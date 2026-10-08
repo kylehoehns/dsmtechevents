@@ -63,7 +63,7 @@ const slides = await Promise.all(events.map(async (e) => ({
       </section>
 
       {slides.map(({ e, hosts, where, qr }) => (
-        <section class:list={['slide', 'poster-slide', { headliner: e.headliner }]} data-end={e.end} data-start={e.start}>
+        <section class:list={['slide', 'poster-slide', { headliner: e.headliner }]} data-end={e.end} data-start={e.start} data-days={e.multiDay && !e.allDay ? '' : undefined}>
           <div class="date-block">
             <span class="dow">{weekday(e.start)}</span>
             <span class="num misprint" data-t={day(e.start)}>{day(e.start)}</span>
@@ -189,7 +189,7 @@ const slides = await Promise.all(events.map(async (e) => ({
     }
     for (const s of document.querySelectorAll<HTMLElement>('.poster-slide')) {
       const tag = s.querySelector<HTMLElement>('.when-tag')!;
-      const label = whenLabel(s.dataset.start!, s.dataset.end!, now);
+      const label = whenLabel(s.dataset.start!, s.dataset.end!, now, { multiDay: 'days' in s.dataset });
       tag.textContent = label;
       tag.hidden = !label;
     }

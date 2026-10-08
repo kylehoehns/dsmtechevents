@@ -118,3 +118,14 @@ test('dateRange spans months and ends on the last real day', () => {
   // Ends at midnight Des Moines time (05:00Z): the last day is the 16th, not the 17th.
   assert.equal(dateRange('2026-10-15T13:00:00.000Z', '2026-10-17T05:00:00.000Z'), 'Oct 15–16');
 });
+
+test('a two-day conference is only "Happening now" during its hours', () => {
+  // Oct 15–16, 8a–5p Des Moines time.
+  const [start, end] = ['2026-10-15T13:00:00.000Z', '2026-10-16T22:00:00.000Z'];
+  const at = (iso) => whenLabel(start, end, Date.parse(iso), { multiDay: true });
+  assert.equal(at('2026-10-15T15:00:00Z'), 'Happening now', 'day one, 10am');
+  assert.equal(at('2026-10-16T02:00:00Z'), 'Tomorrow', 'day one, 9pm: back tomorrow');
+  assert.equal(at('2026-10-16T12:00:00Z'), 'Today', 'day two, 7am');
+  assert.equal(at('2026-10-16T17:00:00Z'), 'Happening now', 'day two, noon');
+  assert.equal(whenLabel(start, end, Date.parse('2026-10-16T02:00:00Z')), 'Happening now', 'without the flag it runs straight through, as before');
+});

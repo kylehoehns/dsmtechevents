@@ -13,6 +13,9 @@ on:
     # mid-morning, mid-afternoon, and just before evening meetups start. Off
     # the hour because GitHub queues on-the-hour schedules and runs them late.
     - cron: '20 10,15,19,23 * * *'
+    # Just after midnight Sunday night in Des Moines (01:05 summer, 00:05
+    # winter), so "This week" / "Next week" roll over at midnight, not 5:20am.
+    - cron: '5 6 * * 1'
   workflow_dispatch:
 
 # main is protected by a ruleset (changes go through PRs with a green ci

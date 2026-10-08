@@ -35,7 +35,7 @@ for (const el of $$('#list-view [data-end], .poster[data-end]')) if (Date.parse(
 for (const el of $$('.show', listView)) {
   const tag = $('.when-tag', el);
   if (!tag) continue;
-  const label = whenLabel(el.dataset.start, el.dataset.end, now);
+  const label = whenLabel(el.dataset.start, el.dataset.end, now, { multiDay: 'days' in el.dataset });
   if (tag.textContent !== label) tag.textContent = label;
   tag.hidden = !label;
 }

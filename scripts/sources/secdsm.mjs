@@ -15,7 +15,9 @@ export default async function secdsm(group, { get }) {
 
   const doors = /doors=(\d{2}:\d{2})/.exec(html)?.[1] ?? '18:00';
   const address = decode(/addr=([^"&]+)/.exec(decode(html))?.[1] ?? '').trim() || null;
-  const venue = toText(/<strong[^>]*>([^<]+)<\/strong>\s*hosts us/.exec(html)?.[1] ?? '') || null;
+  // Their venue is written "T12 Distillery @ The Foundry"; our cards already put
+  // "@" before the venue, so say "at" inside the name.
+  const venue = toText(/<strong[^>]*>([^<]+)<\/strong>\s*hosts us/.exec(html)?.[1] ?? '').replace(/\s+@\s+/g, ' at ') || null;
 
   const meetings = html.split(/class="secdsm-job(?: [^"]*)?"/).slice(1);
   if (!meetings.length) throw new Error('no schedule blocks found on secdsm.org');
