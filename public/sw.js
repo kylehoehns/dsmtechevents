@@ -1,9 +1,10 @@
 // Pages: try the network first so data refreshes show up, fall back to the
 // cached copy when offline (or after 3s on a bad connection).
-// Our CSS, JS and fonts: precached on install, so an offline page is styled.
+// Our CSS, JS and fonts: precached on install, so an offline page is styled;
+// files an older build used are dropped whenever the home page is refreshed.
 // Meetup event photos: their own small cache, oldest dropped past 60.
 // Bump VERSION to start every cache fresh; activate deletes the old ones.
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE = `dsmtechevents-${VERSION}`;
 const IMAGES = `dsmtechevents-images-${VERSION}`;
 const MAX_IMAGES = 60;
@@ -45,26 +46,53 @@ self.addEventListener('fetch', (e) => {
 
 async function networkFirst(req) {
   const cache = await caches.open(CACHE);
+  // One cached copy per page: /?group=pyowa and / are the same HTML.
+  const key = new URL(req.url).pathname;
   try {
     const res = await Promise.race([
       fetch(req),
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
     ]);
-    if (res.ok) cache.put(req, res.clone());
+    if (res.ok) {
+      await cache.put(key, res.clone());
+      if (key === '/') pruneAssets(cache, await res.clone().text());
+    }
     return res;
   } catch {
-    return (await cache.match(req, { ignoreSearch: true })) ?? (await cache.match('/')) ?? Response.error();
+    return (await cache.match(key)) ?? offlinePage();
+  }
+}
+
+// A page never visited while online has no saved copy; say so rather than
+// showing another page under its address.
+const offlinePage = () => new Response(
+  '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline · DSM Tech Events</title>'
+  + '<body style="font:16px system-ui;padding:24px;max-width:36em"><h1>You\'re offline</h1><p>This page hasn\'t been saved on this device yet. <a href="/">The event list</a> works offline once you\'ve opened it.</p>',
+  { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
+);
+
+// Drop built CSS/JS/fonts that the current home page no longer uses.
+async function pruneAssets(cache, html) {
+  const used = new Set(html.match(/\/_astro\/[^"'\s)]+/g) ?? []);
+  for (const k of await cache.keys()) {
+    const path = new URL(k.url).pathname;
+    if (path.startsWith('/_astro/') && !used.has(path)) await cache.delete(k);
   }
 }
 
 async function staleWhileRevalidate(req, name) {
   const cache = await caches.open(name);
   const cached = await cache.match(req);
-  const fresh = fetch(req).then(async (res) => {
-    // Cross-origin images come back opaque (status 0); that's fine to cache.
-    if (res.ok || res.type === 'opaque') {
-      await cache.put(req, res.clone());
-      if (name === IMAGES) trim(cache);
+  // Meetup's image host allows CORS, so fetch photos as readable responses:
+  // an opaque one counts as ~7MB against the storage quota, a real one ~25KB.
+  const fetched = name === IMAGES ? fetch(req.url, { mode: 'cors', credentials: 'omit' }).catch(() => fetch(req)) : fetch(req);
+  const fresh = fetched.then(async (res) => {
+    if (res.ok) {
+      // A full quota shouldn't turn a good download into a broken image.
+      try {
+        await cache.put(req, res.clone());
+        if (name === IMAGES) await trim(cache);
+      } catch {}
     }
     return res;
   }).catch(() => cached ?? Response.error());

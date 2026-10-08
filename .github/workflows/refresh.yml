@@ -66,4 +66,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Refresh event data" -m "$(git diff --cached --stat | tail -1)"
+          # A PR may have merged while this run fetched and built; replay the
+          # data commit on top instead of failing the push and losing the run.
+          git pull --rebase --quiet
           git push
