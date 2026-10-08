@@ -14,6 +14,7 @@ const VIEWS = [
   ['/groups/', null],
   ['/about/', null],
   ['/add/', null],
+  ['/status/', null],
   ['/404', null],
 ];
 
