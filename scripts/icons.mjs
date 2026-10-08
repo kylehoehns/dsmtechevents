@@ -46,4 +46,24 @@ out('icon-maskable-512.png', await png(tile('DSM', 512, 0.36), 512));
 // Browser tab: a rounded "D" tile. Satori draws the letter as a path, so the
 // SVG needs no font.
 out('icon.svg', await svg(tile('D', 64, 0.78, 12), 64));
-out('icon-32.png', await png(tile('D', 32, 0.78, 6), 32));
+const tab32 = await png(tile('D', 32, 0.78, 6), 32);
+out('icon-32.png', tab32);
+
+// /favicon.ico, for browsers and bookmark lists that ask for it directly
+// instead of reading the <link> tags. An .ico file can just hold PNGs.
+function ico(images) {
+  const header = Buffer.alloc(6 + 16 * images.length);
+  header.writeUInt16LE(1, 2); // type: icon
+  header.writeUInt16LE(images.length, 4);
+  let offset = header.length;
+  images.forEach(({ size, data }, i) => {
+    const e = 6 + 16 * i;
+    header.writeUInt8(size, e); header.writeUInt8(size, e + 1); // width, height
+    header.writeUInt16LE(1, e + 4); header.writeUInt16LE(32, e + 6); // planes, bits per pixel
+    header.writeUInt32LE(data.length, e + 8); header.writeUInt32LE(offset, e + 12);
+    offset += data.length;
+  });
+  return Buffer.concat([header, ...images.map((i) => i.data)]);
+}
+fs.writeFileSync('public/favicon.ico', ico([{ size: 16, data: await png(tile('D', 16, 0.78, 3), 16) }, { size: 32, data: tab32 }]));
+console.log('wrote public/favicon.ico');
