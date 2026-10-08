@@ -462,6 +462,8 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .add-page h2 { margin: 0 0 6px; font: 900 24px/1 var(--display); text-transform: uppercase; }
 .add-page ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
 .add-page section > p { margin: 8px 0 0; }
+.add-page a { color: var(--link-t, var(--blue-t)); }
+.foot .fine a { color: inherit; }
 .email-box { background: var(--pink-fill); color: var(--on-pink); padding: 16px 18px 18px; transform: rotate(-0.4deg); }
 .email-box .address { margin: 6px 0 12px; font: 700 clamp(18px, 5vw, 26px)/1.2 var(--mono); overflow-wrap: anywhere; }
 .email-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
