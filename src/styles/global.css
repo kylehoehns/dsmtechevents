@@ -305,7 +305,9 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 }
 
 /* conference rows: a solid pink slab */
-.show.headline { background: var(--pink-fill); color: var(--on-pink); border-bottom: 0; margin: 8px 0; padding-left: 8px; padding-right: 10px; }
+.show.headline { position: relative; background: var(--pink-fill); color: var(--on-pink); border-bottom: 0; margin: 8px 0 9.5px; padding-left: 8px; padding-right: 10px; }
+/* the slab can't carry the dashed separator itself, so draw it 8px below, matching the gap above */
+.show.headline::after { content: ""; position: absolute; left: 0; right: 0; bottom: -9.5px; border-bottom: 1.5px dashed var(--line); }
 .show.headline .date .num { color: var(--on-pink); }
 .show.headline .date .num::before { color: var(--blue-fill); mix-blend-mode: normal; }
 .show.headline .band span.b { font-size: 18px; }
