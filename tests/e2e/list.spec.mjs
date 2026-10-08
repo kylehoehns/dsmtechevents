@@ -56,7 +56,7 @@ test('a venue already listed above drops its street address', async ({ page }) =
 
 test('venue links open Google Maps', async ({ page }) => {
   await page.goto('/');
-  const map = row(page, 'Coding Dojo').getByRole('link', { name: /Source Allies.*open in maps/ });
+  const map = row(page, 'Coding Dojo').getByRole('link', { name: /Source Allies.*opens map in new tab/ });
   await expect(map).toHaveAttribute('href', /^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=Source%20Allies%2C%204501/);
 });
 
@@ -65,7 +65,7 @@ test.describe('on an iPhone', () => {
 
   test('venue links open Apple Maps', async ({ page }) => {
     await page.goto('/');
-    const map = row(page, 'Coding Dojo').getByRole('link', { name: /Source Allies.*open in maps/ });
+    const map = row(page, 'Coding Dojo').getByRole('link', { name: /Source Allies.*opens map in new tab/ });
     await expect(map).toHaveAttribute('href', /^https:\/\/maps\.apple\.com\/\?q=Source%20Allies%2C%204501/);
   });
 });

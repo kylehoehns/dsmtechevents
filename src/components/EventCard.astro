@@ -70,7 +70,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
       {e.online
         ? <span class="tag-online">Online</span>
         : e.venue
-          ? <>@ <a class="map" href={mapUrl} data-q={mapQuery} data-click="map" target="_blank" rel="noopener">{e.venue}{e.address && <span class="addr">, {e.address}</span>}<span class="sr-only"> (open in maps)</span></a></>
+          ? <>@ <a class="map" href={mapUrl} data-q={mapQuery} data-click="map" target="_blank" rel="noopener"><span class="venue">{e.venue}</span>{e.address && <span class="addr">, {e.address}</span>}<span class="sr-only"> (opens map in new tab)</span></a></>
           : <>@ Venue TBA</>}
       {e.hybrid && <> · <span class="tag-online">+ online</span></>}
     </p>
