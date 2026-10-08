@@ -34,11 +34,6 @@ jobs:
       - run: npm run build
       - name: commit changed event data
         run: |
-          # The link-preview image lists the next few events, so it goes stale
-          # as events pass even when no group posted anything new. Recording
-          # its file name (a hash of the lineup) makes those nights commit and
-          # redeploy too.
-          ls dist/og > data/cache/og-image.txt
           git add data/cache
           if git diff --cached --quiet; then
             echo "No event changes."
