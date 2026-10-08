@@ -4,8 +4,9 @@ import { Font } from 'astro:assets';
 import { site } from '../lib/site.mjs';
 
 // headTitle replaces the whole <title> (for search); title gets " · DSM Tech Events".
-interface Props { title?: string; headTitle?: string; description?: string; noindex?: boolean; nav?: 'list' | 'calendar' | 'groups' | 'add' | null; updatedAt?: string; blurb?: string }
-const { title, headTitle, description = site.tagline, noindex = false, nav = 'list', updatedAt, blurb } = Astro.props;
+// bare: just the page itself (fonts and head, no masthead, footer or their scripts), for /tv/.
+interface Props { bare?: boolean; title?: string; headTitle?: string; description?: string; noindex?: boolean; nav?: 'list' | 'calendar' | 'groups' | 'add' | null; updatedAt?: string; blurb?: string }
+const { bare = false, title, headTitle, description = site.tagline, noindex = false, nav = 'list', updatedAt, blurb } = Astro.props;
 const pageTitle = headTitle ?? (title ? `${title} · ${site.name}` : site.name);
 const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-US', { timeZone: site.timeZone, ...opts });
 const updated = updatedAt && fmt({ month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(updatedAt));
@@ -53,6 +54,7 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
     </script>
   </head>
   <body>
+    {bare ? <slot /> : <>
     <a class="sr-only skip" href="#main">Skip to events</a>
     <header class="mast">
       <div class="wrap">
@@ -149,5 +151,6 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
         });
       }
     </script>
+    </>}
   </body>
 </html>

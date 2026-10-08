@@ -52,6 +52,14 @@ npm run dev      # http://localhost:4321
 npm run build    # what Cloudflare runs (no fetching, just the committed data)
 ```
 
+## Lobby TV
+
+`/tv/` is a full-screen, self-running version for a screen at a coworking
+space or meetup venue: a "Coming up" overview, then one poster per event in
+the next three weeks with a QR code to its Meetup or conference page. It
+reloads itself hourly to pick up new events. ← → step through slides, space
+pauses. It isn't linked from the site and is kept out of search.
+
 ## Tests
 
 ```sh
