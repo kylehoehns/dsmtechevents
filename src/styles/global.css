@@ -451,6 +451,11 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .email-actions .primary { background: var(--on-pink); color: var(--pink-fill); border-color: var(--on-pink); }
 .email-actions .copied { font: 600 12.5px/1 var(--mono); }
 .email-box :focus-visible { outline-color: var(--on-pink); }
+.badge-kit img { display: block; max-width: 100%; height: auto; }
+.snippet { margin-top: 10px; border: 1.5px solid var(--line); background: var(--paper-2); }
+.snippet-head { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-bottom: 1.5px solid var(--line); font: 12.5px/1.2 var(--mono); }
+.snippet-head button { font: 800 14px/1 var(--display); text-transform: uppercase; background: var(--ink); color: var(--paper); border: 0; padding: 6px 10px 5px; min-width: 6.5em; }
+.snippet pre { margin: 0; padding: 10px; overflow-x: auto; font: 12.5px/1.45 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
 .add-page .dev-note { margin: 0; font-size: 14px; color: var(--ink-soft); }
 .add-page code { font: 13px var(--mono); background: var(--paper-2); padding: 0 4px; }
 .empty { padding: 16px 0; font-size: 13.5px; margin: 0; }
@@ -463,6 +468,7 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .foot .big a { text-decoration: none; background: var(--pink-fill); color: var(--on-pink); padding: 2px 8px 0; display: inline-block; transform: rotate(-1deg); }
 .foot p { margin: 0; font-size: 13.5px; }
 .foot :focus-visible { outline-color: var(--on-blue); }
+.install-app { margin-top: 8px; font: 800 15px/1 var(--display); text-transform: uppercase; background: var(--on-blue); color: var(--blue-fill); border: 0; padding: 8px 12px 7px; }
 @media (min-width: 760px) { .foot .fine { text-align: right; } }
 
 /* iOS install hint */

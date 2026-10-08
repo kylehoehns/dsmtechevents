@@ -28,6 +28,14 @@ for (const file of pages) {
   }
 }
 
+// Page weight: the home page is the biggest (every card, plus hidden ones for
+// the calendar). Fail well before it gets slow on a phone.
+const BUDGET_KB = 350;
+for (const file of pages) {
+  const kb = fs.statSync(file).size / 1024;
+  if (kb > BUDGET_KB) problems.push(`${path.relative(dist, file)}: ${Math.round(kb)}KB of HTML, over the ${BUDGET_KB}KB budget`);
+}
+
 if (problems.length) {
   console.error(`check-dist: ${problems.length} problem(s) in the built site:\n  ${problems.join('\n  ')}`);
   process.exit(1);
