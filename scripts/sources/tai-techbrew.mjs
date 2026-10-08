@@ -12,7 +12,7 @@ import { toText } from './html.mjs';
 
 const FEED = 'https://www.technologyiowa.org/events/calendar/techbrews/ics/';
 const TECHBREW = /tech\s*brew/i;
-export const METRO = ['Des Moines', 'West Des Moines', 'Urbandale', 'Clive', 'Johnston', 'Ankeny', 'Altoona', 'Grimes', 'Waukee', 'Windsor Heights', 'Pleasant Hill'];
+const METRO = ['Des Moines', 'West Des Moines', 'Urbandale', 'Clive', 'Johnston', 'Ankeny', 'Altoona', 'Grimes', 'Waukee', 'Windsor Heights', 'Pleasant Hill'];
 
 export default async function taiTechbrew(group, { get, now = Date.now() }) {
   const ics = await get(FEED);
@@ -48,7 +48,7 @@ export default async function taiTechbrew(group, { get, now = Date.now() }) {
 }
 
 // Venue, "street, City." and the body text of a Sugar Calendar event page.
-export function readEventPage(html, url) {
+function readEventPage(html, url) {
   const row = (name) => new RegExp(`sc-frontend-single-event__details__${name} [\\s\\S]*?__details__val">([\\s\\S]*?)</div>`).exec(html)?.[1];
   const venueHtml = row('venue');
   const locationHtml = row('location');

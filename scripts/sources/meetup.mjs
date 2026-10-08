@@ -1,6 +1,7 @@
 // Reading Meetup data, with no network calls, so tests can feed it saved pages.
 // fetch-events.mjs does the fetching and hands the text to these.
 import ical from 'node-ical';
+import { meetupUrl } from '../../src/lib/meetup.mjs';
 
 // Upcoming events from an iCal feed (Meetup's or any public calendar).
 export function parseFeed(ics, group, { slug, now }) {
@@ -17,7 +18,7 @@ export function parseFeed(ics, group, { slug, now }) {
         start: e.start.toISOString(),
         end: (e.end ?? e.start).toISOString(),
         allDay: e.datetype === 'date',
-        url: slug ? `https://www.meetup.com/${slug}/events/${id}/` : (e.url?.val ?? e.url ?? group.website),
+        url: slug ? meetupUrl(slug, `events/${id}/`) : (e.url?.val ?? e.url ?? group.website),
         description: cleanDescription(e.description, group.name),
         venue: e.location || null,
       };

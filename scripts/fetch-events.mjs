@@ -18,7 +18,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import YAML from 'yaml';
-import { meetupSlug } from '../src/lib/meetup.mjs';
+import { meetupSlug, meetupUrl } from '../src/lib/meetup.mjs';
 import secdsm from './sources/secdsm.mjs';
 import pmiChapter from './sources/pmi-chapter.mjs';
 import taiTechbrew from './sources/tai-techbrew.mjs';
@@ -79,7 +79,7 @@ async function fetchGroup(group) {
 // Meetup groups and plain iCal feeds.
 async function fetchFeed(group, now, cutoff) {
   const slug = meetupSlug(group.meetup);
-  const feedUrl = group.ical ?? (slug && `https://www.meetup.com/${slug}/events/ical/`);
+  const feedUrl = group.ical ?? (slug && meetupUrl(slug, 'events/ical/'));
   if (!feedUrl) throw new Error('needs a meetup, ical or source entry');
 
   const upcoming = parseFeed(await get(feedUrl), group, { slug, now });
@@ -91,7 +91,7 @@ async function fetchFeed(group, now, cutoff) {
   let enriched = false;
   if (slug) {
     try {
-      const details = parseEventsPage(await get(`https://www.meetup.com/${slug}/events/`), slug);
+      const details = parseEventsPage(await get(meetupUrl(slug, 'events/')), slug);
       logo = details.logo;
       recent = enrich(upcoming, details, group, { now, cutoff });
       facts = { members: details.members, pastCount: details.pastCount };
