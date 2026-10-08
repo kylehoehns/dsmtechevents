@@ -130,3 +130,9 @@ test('iowans-of-things reads the Upcoming Events section of the homepage', async
 test('iowans-of-things fails loudly when the homepage changes', async () => {
   await assert.rejects(iowansOfThings({ id: 'iot' }, serve('<html>new site</html>')), /no Upcoming Events section/);
 });
+
+test('secdsm says "at" inside a venue name written with "@"', async () => {
+  const html = fixture('secdsm.html').replace('Example Hall', 'T12 Distillery @ The Foundry');
+  const [e] = await secdsm({ id: 'secdsm', website: 'https://secdsm.org/' }, { get: async () => html });
+  assert.equal(e.venue, 'T12 Distillery at The Foundry');
+});

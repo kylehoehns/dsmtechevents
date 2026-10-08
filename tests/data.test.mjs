@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { mkdtempSync, cpSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { loadData, shortAddress } from '../src/lib/data.mjs';
+import { loadData, shortAddress, sameNight } from '../src/lib/data.mjs';
 
 const dataDir = fileURLToPath(new URL('./fixtures/data', import.meta.url));
 const now = Date.parse('2026-10-07T17:00:00Z');
@@ -81,4 +81,14 @@ test('the old featured: key fails loudly instead of quietly un-pinking a confere
   cpSync(dataDir, dir, { recursive: true });
   writeFileSync(path.join(dir, 'events.yaml'), '- title: Old Conf\n  start: 2026-11-01\n  featured: true\n');
   assert.throws(() => loadData({ dataDir: dir, now }), /now headliner/);
+});
+
+test('a joint meetup titled differently by each host is still one event', () => {
+  const base = { start: '2026-10-20T22:30:00.000Z', address: '801 Grand Ave, Des Moines', venue: 'F&G' };
+  const a = { ...base, title: 'Joint night - JVM vs. CLR', groupIds: ['cijug'] };
+  assert.ok(sameNight(a, { ...base, title: 'JVM vs CLR (with CIJUG)', groupIds: ['iadnug'] }));
+  assert.ok(!sameNight(a, { ...base, title: 'Kubernetes office hours', groupIds: ['devops'] }), 'two different talks in one building');
+  assert.ok(!sameNight(a, { ...base, start: '2026-10-21T22:30:00.000Z', title: 'JVM vs CLR', groupIds: ['iadnug'] }), 'different night');
+  assert.ok(!sameNight(a, { ...base, address: '1 Main St', venue: 'Elsewhere', title: 'JVM vs CLR', groupIds: ['iadnug'] }), 'different place');
+  assert.ok(!sameNight(a, { ...a }), 'the same group twice is the series logic, not this');
 });

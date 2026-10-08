@@ -39,9 +39,21 @@ export const todayWord = (iso) => (Number(hourFmt.format(new Date(iso))) >= 16 ?
 // The tag on an event row: "Happening now", "Today"/"Tonight", "Tomorrow" or
 // nothing. The build prints it for the day it ran and the browser re-checks,
 // so both must call this.
-export function whenLabel(start, end, now = Date.now()) {
+export function whenLabel(start, end, now = Date.now(), { multiDay = false, allDay = false } = {}) {
   const today = dayKey(now);
-  if (dayKey(start) <= today && today <= lastDay(start, end)) return Date.parse(start) <= now ? 'Happening now' : todayWord(start);
+  const last = lastDay(start, end);
+  if (dayKey(start) <= today && today <= last) {
+    // A timed conference over several days runs its hours each day (8a-5p
+    // twice), not straight through the night: overnight it's "Tomorrow", the
+    // next morning "Today", and "Happening now" only during the hours.
+    if (multiDay && !allDay && Date.parse(start) <= now) {
+      const opens = Date.parse(start) + daysBetween(dayKey(start), today) * DAY;
+      const closes = Date.parse(end) - daysBetween(today, last) * DAY;
+      if (now < opens) return todayWord(new Date(opens).toISOString());
+      if (now > closes) return today < last ? 'Tomorrow' : '';
+    }
+    return Date.parse(start) <= now ? 'Happening now' : todayWord(start);
+  }
   return daysBetween(today, dayKey(start)) === 1 ? 'Tomorrow' : '';
 }
 

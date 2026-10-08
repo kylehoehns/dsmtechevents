@@ -59,6 +59,20 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
     if (existing) existing.groupIds = [...new Set([...existing.groupIds, ...e.groupIds])];
     else merged.set(key, { ...e });
   }
+  // Co-hosts sometimes title the same night differently ("Joint night - JVM vs.
+  // CLR" vs "JVM vs CLR, with CIJUG"). Fold those too: same start, same place,
+  // no host in common, and titles that are mostly the same words.
+  const list = [...merged.values()];
+  for (let i = 0; i < list.length; i++) {
+    for (let j = i + 1; j < list.length; j++) {
+      const [a, b] = [list[i], list[j]];
+      if (!a || !b || !sameNight(a, b)) continue;
+      a.groupIds = [...new Set([...a.groupIds, ...b.groupIds])];
+      list[j] = null;
+    }
+  }
+  merged.clear();
+  for (const e of list) if (e) merged.set(e.id, e);
 
   const events = [...merged.values()]
     .map((e) => ({
@@ -152,4 +166,20 @@ export function shortAddress(a) {
 
 function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+// Where an event is, for spotting the same night listed twice: the street
+// number and name ("801 Grand"), else the venue name, or "online".
+const placeKey = (e) => (e.online ? 'online' : (/^\s*(\d+\s+\S+(?:\s+\S+)?)/.exec(e.address ?? '')?.[1] ?? e.venue ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim());
+const STOP = new Set(['the', 'and', 'with', 'for', 'night', 'meetup', 'joint', 'des', 'moines']);
+const titleWords = (t) => new Set(t.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && !STOP.has(w)));
+
+// Two listings of one joint meetup? Exported for tests.
+export function sameNight(a, b) {
+  if (a.start !== b.start || a.groupIds.some((g) => b.groupIds.includes(g))) return false;
+  const place = placeKey(a);
+  if (!place || place !== placeKey(b)) return false;
+  const [x, y] = [titleWords(a.title), titleWords(b.title)];
+  const shared = [...x].filter((w) => y.has(w)).length;
+  return shared > 0 && shared / Math.min(x.size, y.size) >= 0.6;
 }
