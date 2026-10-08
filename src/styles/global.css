@@ -142,7 +142,12 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .poster .when { display: inline-block; font: 900 22px/0.9 var(--display); text-transform: uppercase; margin: 0 0 10px; background: var(--on-pink); color: var(--pink-fill); padding: 4px 8px 2px; }
 .poster.blue .when { background: var(--on-blue); color: var(--blue-fill); }
 .poster .where { margin: 0 0 10px; font: 600 12.5px/1.35 var(--mono); }
-@media (max-width: 1059px) { .poster .where { display: none; } .poster .go { font-size: 14px; padding: 6px 9px 5px; } }
+/* phones: the stamp sits in the line after the date instead of floating over the button */
+@media (max-width: 1059px) {
+  .poster .where { display: none; }
+  .poster .go { font-size: 14px; padding: 6px 9px 5px; }
+  .headliners .poster .stamp-days { position: static; display: inline-block; margin: 0 18px 10px 10px; vertical-align: 2px; }
+}
 .poster .go { display: inline-block; font: 800 15px/1 var(--display); text-transform: uppercase; text-decoration: none; border: 2px solid currentColor; padding: 7px 11px 6px; }
 .poster .go:hover { background: var(--on-pink); color: var(--pink-fill); border-color: var(--on-pink); }
 .poster.blue .go:hover { background: var(--on-blue); color: var(--blue-fill); border-color: var(--on-blue); }
@@ -151,7 +156,7 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   background: radial-gradient(circle, currentColor 1.1px, transparent 1.6px) 0 0/7px 7px;
   -webkit-mask: linear-gradient(200deg, #000 0, transparent 50%); mask: linear-gradient(200deg, #000 0, transparent 50%);
 }
-.poster .stamp-days { position: absolute; right: 12px; bottom: 14px; font: 400 17px/1 var(--marker); transform: rotate(6deg); }
+.poster .stamp-days { position: absolute; right: 12px; bottom: 14px; white-space: nowrap; font: 400 17px/1 var(--marker); transform: rotate(6deg); }
 .poster :focus-visible { outline-color: currentColor; }
 .poster.taped { transform: rotate(-0.6deg); }
 @media (min-width: 1060px) {
