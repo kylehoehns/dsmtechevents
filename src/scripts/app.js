@@ -427,8 +427,12 @@ async function toggleAbout(more) {
       if (fly) { big.loading = 'eager'; await big.decode().catch(() => {}); }
       const from = fly && thumb.getBoundingClientRect();
       set(true);
+      // Measure where the photo lands before the panel starts growing: the
+      // grow animation begins with no padding or margin, which would aim the
+      // photo ~18px high and make it pop down at the end.
+      const to = fly && big.getBoundingClientRect();
       const grow = slide(desc, true);
-      if (fly) await flyImage(big, from, big.getBoundingClientRect(), { rotate: [rotation(thumb), 0], hide: [big] });
+      if (fly) await flyImage(big, from, to, { rotate: [rotation(thumb), 0], hide: [big] });
       await grow;
     } else {
       const from = fly && big.getBoundingClientRect();
