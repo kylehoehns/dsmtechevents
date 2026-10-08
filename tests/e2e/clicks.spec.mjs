@@ -24,8 +24,8 @@ test('an RSVP click sends its kind, host groups and event, and nothing else', as
 test('a joint meetup credits every host, and plain UI clicks send nothing', async ({ page }) => {
   const sent = beacons(page);
   await page.goto('/');
-  await page.locator('.chip').nth(1).click();
-  await page.locator('.chip[data-chip=""]').click();
+  await page.goto('/?group=pyowa');
+  await page.getByRole('button', { name: 'Show all groups' }).click();
   const joint = page.locator('.show[data-groups*=" "] [data-click="title"]').first();
   await joint.click();
   await expect.poll(() => sent.length).toBe(1);

@@ -257,23 +257,9 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 [data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 360px; }
 @media (min-width: 760px) { [data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 640px; } }
 
-/* ---------- group filter: chip strip on phone, a list on desktop ---------- */
+/* ---------- group filter note: only while filtered to one group ---------- */
 .filter { border-top: 2px solid var(--line); border-bottom: 2px solid var(--line); padding: 8px 0; }
-.filter h2 { font: 800 var(--fs-ui)/1 var(--display); text-transform: uppercase; margin: 0 0 6px; letter-spacing: 0.04em; }
-.chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; }
-.chips::-webkit-scrollbar { display: none; }
-.chip {
-  flex: none; display: inline-flex; align-items: baseline; gap: 6px; background: transparent;
-  border: 1.5px solid var(--line); padding: 6px 8px; font: 600 var(--fs-meta)/1 var(--mono); white-space: nowrap;
-}
-.chip .chip-count { font-weight: 400; color: var(--ink-soft); }
-.chip[aria-pressed="true"] { background: var(--blue-fill); color: var(--on-blue); border-color: var(--blue-fill); }
-.chip[aria-pressed="true"] .chip-count { color: var(--on-blue); }
-@media (min-width: 1060px) {
-  .filter { padding: 10px 0 12px; }
-  .chips { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; }
-}
-.filter-note { font-size: var(--fs-meta); margin: 8px 0 0; }
+.filter-note { font-size: var(--fs-meta); margin: 0; }
 .filter-note button { background: none; border: 0; padding: 0; text-decoration: underline; font-weight: 600; }
 .filter-note a { color: inherit; font-weight: 600; }
 
@@ -550,8 +536,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   .nav a:hover:not([aria-current="page"]) { background: var(--pink-fill); color: var(--on-pink); }
   .btn-solid:hover { background: var(--btn-hover-bg, var(--blue-fill)); color: var(--btn-hover-fg, var(--on-blue)); border-color: var(--btn-hover-bg, var(--blue-fill)); }
   .btn-outline:hover { background: var(--btn-hover-bg, var(--pink-fill)); color: var(--btn-hover-fg, var(--on-pink)); border-color: var(--btn-hover-bg, var(--pink-fill)); }
-  .chip:hover:not([aria-pressed="true"]) { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
-  .chip:hover:not([aria-pressed="true"]) .chip-count { color: var(--on-pink); }
   .band a:hover { color: var(--blue-t); text-decoration: underline; text-decoration-thickness: 2px; }
   .title a:hover { text-decoration: underline; text-underline-offset: 3px; }
   .meta a.map:hover .venue { text-decoration-style: solid; }

@@ -45,9 +45,6 @@ const DAYS_WORD = ['One', 'Two', 'Three', 'Four', 'Five'];
 const conferenceLength = (e: any) => { const n = daysBetween(dayKey(e.start), lastDay(e.start, e.end)) + 1; return `${DAYS_WORD[n - 1] ?? n}-day conference`; };
 const headliners = upcoming.filter((e) => e.headliner && daysBetween(today, dayKey(e.start)) <= HEADLINER_DAYS);
 
-const counts = Object.fromEntries(groups.map((g) => [g.id, listed.filter((e) => e.groupIds.includes(g.id)).length]));
-// Only groups with something coming up get a chip; the groups page lists them all.
-const filterGroups = groups.filter((g) => counts[g.id] > 0).sort((a, b) => counts[b.id] - counts[a.id] || a.short.localeCompare(b.short));
 // Recent events shows the last few; "+ All N" opens the rest (90 days' worth).
 const PAST_SHOWN = 3;
 
@@ -68,9 +65,9 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
   <h1 class="sr-only">Upcoming tech events in Des Moines</h1>
   <p class="sr-only" role="status" id="status"></p>
   <div class="layout">
-    {/* Headliners and the group filter come first in the page so phones read
-        and tab them in the order they show. On desktop the grid puts them in
-        the side rail (see .layout in global.css). */}
+    {/* Headliners come first in the page so phones read and tab them in the
+        order they show. On desktop the grid puts them in the side rail (see
+        .layout in global.css). */}
     <div class="lead">
       {headliners.length > 0 && (
         <section class="headliners" id="headliners" aria-label="Coming up soon">
@@ -94,15 +91,10 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
       {/* desktop only; phones hide it */}
       <section class="minical" id="minical" aria-label="This month"></section>
 
-      <div class="filter" id="filter">
-        <h2>Pick a group</h2>
-        <div class="chips" role="group" aria-label="Filter by group">
-          <button type="button" class="chip" data-chip="" aria-pressed="true">All groups <span class="chip-count">{listed.length}</span></button>
-          {filterGroups.map((g) => (
-            <button type="button" class="chip" data-chip={g.id} aria-pressed="false" title={g.name}>{g.short} <span class="chip-count">{counts[g.id]}</span></button>
-          ))}
-        </div>
-        <p class="filter-note" id="filter-note" hidden></p>
+      {/* Shows only while filtered to one group (?group=id, reached from a group
+          name on a card or the Groups page). Search is the way in otherwise. */}
+      <div class="filter" id="filter" hidden>
+        <p class="filter-note" id="filter-note"></p>
       </div>
     </div>
 

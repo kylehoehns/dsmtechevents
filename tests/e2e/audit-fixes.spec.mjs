@@ -5,7 +5,7 @@ test('Recently recounts its summary and "All" button for a group filter', async 
   const sub = page.locator('#recent-sub');
   const before = await sub.textContent();
   const group = await page.locator('#recent-list li').first().getAttribute('data-groups');
-  await page.locator(`.chip[data-chip="${group.split(' ')[0]}"]`).click();
+  await page.goto(`/?group=${group.split(' ')[0]}`);
   const rows = page.locator('#recent-list li:not([hidden])');
   const n = await rows.count();
   const rsvps = (await rows.evaluateAll((lis) => lis.map((li) => Number(li.dataset.going)))).reduce((a, b) => a + b, 0);
