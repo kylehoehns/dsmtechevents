@@ -5,16 +5,18 @@
   // nightly GitHub Action (.github/workflows/refresh.yml) does, and its commit
   // is what triggers a deploy. So what is live is always exactly what is in git.
   //
-  // Serves dsmtechevents.com. The old techdsm.com domain redirects here with a
-  // Redirect Rule on the techdsm.com zone in the Cloudflare dashboard.
+  // Serves dsmtechevents.com. The old techdsm.com domain and its Worker are
+  // retired; nothing redirects from them.
   //
-  // Dashboard settings (Workers & Pages → dsmtechevents → Settings → Build). The
-  // build command stays empty because both wrangler commands run `build`
-  // below; filling it in just builds twice. Preview builds are on, so each
-  // branch push gets its own preview URL.
-  //   Build command:    (empty)
-  //   Deploy command:   npx wrangler deploy
-  //   Preview command:  npx wrangler preview
+  // Dashboard settings (Workers & Pages → dsmtechevents → Settings → Build).
+  // The build command stays empty because both wrangler commands run `build`
+  // below; filling it in just builds twice. Each PR branch gets a preview
+  // upload. Same setup as benchcard.
+  //   Production tab:    Build command (empty), Deploy command
+  //                      `npx wrangler deploy`, Root `/`, Branch `main`
+  //   Previews Base tab: Preview command `npx wrangler versions upload`
+  // The Cloudflare GitHub app must have access to this repo, or pushes never
+  // build (that was the outage on 2026-10-07).
   "name": "dsmtechevents",
   "compatibility_date": "2026-09-01",
   "build": { "command": "npm run build" },
