@@ -91,10 +91,17 @@ export function enrich(upcoming, details, group, { now, cutoff }) {
 // are kept for the backfill window, the fresh copy of an event wins, and
 // `fetchedAt` only moves when something actually changed (so an unchanged
 // run leaves the file alone and the refresh workflow has nothing to commit).
+// `fresh.pageFailed`: the Meetup events page couldn't be read this run, so the
+// feed-only copies lack what the page adds; those fields come from the
+// previous copy of the same event instead of vanishing until the next run.
 export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(now).toISOString() }) {
   const carried = previous.events.filter((e) => Date.parse(e.end) < now && Date.parse(e.end) >= cutoff);
+  const before = new Map(previous.events.map((e) => [e.id, e]));
+  const freshEvents = fresh.pageFailed
+    ? fresh.events.map((e) => ({ ...e, ...pick(before.get(e.id), FROM_PAGE) }))
+    : fresh.events;
   const byId = new Map();
-  for (const e of [...carried, ...fresh.events]) byId.set(e.id, { ...byId.get(e.id), ...e });
+  for (const e of [...carried, ...freshEvents]) byId.set(e.id, { ...byId.get(e.id), ...e });
   const events = [...byId.values()].map(({ status, ...e }) => e).sort((a, b) => a.start.localeCompare(b.start));
 
   // Group facts from Meetup: kept from the last run if this one missed them,
@@ -104,17 +111,22 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
     const v = fresh[k] ?? previous[k];
     if (v != null) facts[k] = v;
   }
-  const result = { logo: fresh.logo ?? previous.logo ?? null, ...facts, enriched: fresh.enriched, events };
-  const { fetchedAt: before, ...previousResult } = previous;
-  const unchanged = before && JSON.stringify(previousResult) === JSON.stringify(result);
-  return { fetchedAt: unchanged ? before : fetchedAt, ...result };
+  const result = { logo: fresh.logo ?? previous.logo ?? null, ...facts, events };
+  // `enriched` was written by older versions; ignoring it here means dropping
+  // it rewrites each file once without moving fetchedAt.
+  const { fetchedAt: lastFetched, enriched, ...previousResult } = previous;
+  const unchanged = lastFetched && JSON.stringify(previousResult) === JSON.stringify(result);
+  return { fetchedAt: unchanged ? lastFetched : fetchedAt, ...result };
 }
+
+const pick = (obj, keys) => Object.fromEntries(keys.filter((k) => obj?.[k] !== undefined).map((k) => [k, obj[k]]));
 
 export function formatAddress(venue) {
   if (!venue?.address) return venue?.city || null;
   const address = venue.address.replace(/, USA$/, '');
   // Check for ", City" rather than just the name: "4501 NW Urbandale Dr" is in
   // Urbandale but doesn't say so.
+  if (!venue.city) return address;
   const hasCity = address.toLowerCase().includes(`, ${venue.city.toLowerCase()}`);
   return hasCity ? address : `${address}, ${venue.city}`;
 }

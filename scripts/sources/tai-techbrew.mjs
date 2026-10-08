@@ -12,7 +12,7 @@ import { calendarEvents, times, eventUrl } from './ical.mjs';
 
 const FEED = 'https://www.technologyiowa.org/events/calendar/techbrews/ics/';
 const TECHBREW = /tech\s*brew/i;
-const METRO = ['Des Moines', 'West Des Moines', 'Urbandale', 'Clive', 'Johnston', 'Ankeny', 'Altoona', 'Grimes', 'Waukee', 'Windsor Heights', 'Pleasant Hill'];
+const METRO = ['Des Moines', 'West Des Moines', 'Urbandale', 'Clive', 'Johnston', 'Ankeny', 'Altoona', 'Grimes', 'Waukee', 'Windsor Heights', 'Pleasant Hill', 'Norwalk', 'Bondurant', 'Indianola', 'Polk City'];
 
 // `since`: the fetch passes its 90-day cutoff, so recent past TechBrews (still
 // in the feed) fill Recently from the first run instead of only once they pass.
@@ -23,11 +23,12 @@ export default async function taiTechbrew(group, { get, now = Date.now(), since 
   const wanted = all.filter((e) => e.status !== 'CANCELLED' && (e.end ?? e.start).getTime() >= since && TECHBREW.test(e.summary ?? ''));
 
   const events = [];
+  const skippedCities = [];
   for (const e of wanted) {
     const url = eventUrl(e);
     if (!url) throw new Error(`TechBrew "${e.summary}" has no URL`);
     const page = readEventPage(await get(url), url);
-    if (!METRO.includes(page.city)) continue;
+    if (!METRO.includes(page.city)) { skippedCities.push(page.city); continue; }
     const sourceId = /\/events\/([^/?#]+)\/?$/.exec(url)?.[1] ?? e.uid;
     events.push({
       id: `${group.id}-${sourceId}`,
@@ -40,6 +41,9 @@ export default async function taiTechbrew(group, { get, now = Date.now(), since 
       address: page.address,
     });
   }
+  // Every TechBrew outside the metro is far likelier to be a changed address
+  // format (city no longer where we look) than a real run of out-of-town ones.
+  if (wanted.length && !events.length) throw new Error(`every TechBrew was outside the metro (cities read: ${skippedCities.map(String).join(', ')})`);
   return events;
 }
 

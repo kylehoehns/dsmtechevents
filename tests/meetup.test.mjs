@@ -87,21 +87,44 @@ test('mergeCache keeps past events, lets fresh copies win, and keeps fetchedAt w
   const past = { id: 'g-1', title: 'Old', start: '2026-09-01T23:00:00.000Z', end: '2026-09-02T01:00:00.000Z' };
   const tooOld = { id: 'g-0', title: 'Ancient', start: '2026-01-01T23:00:00.000Z', end: '2026-01-02T01:00:00.000Z' };
   const next = { id: 'g-2', title: 'Next', start: '2026-10-20T23:00:00.000Z', end: '2026-10-21T01:00:00.000Z' };
-  const previous = { fetchedAt: '2026-10-06T10:20:00.000Z', logo: 'logo.jpg', enriched: true, events: [past, next] };
+  const previous = { fetchedAt: '2026-10-06T10:20:00.000Z', logo: 'logo.jpg', events: [past, next] };
 
-  const same = mergeCache(previous, { events: [next], logo: null, enriched: true }, { now, cutoff, fetchedAt: 'NOW' });
+  const same = mergeCache(previous, { events: [next], logo: null }, { now, cutoff, fetchedAt: 'NOW' });
   assert.equal(same.fetchedAt, '2026-10-06T10:20:00.000Z', 'unchanged data keeps its timestamp');
   assert.deepEqual(same.events.map((e) => e.id), ['g-1', 'g-2'], 'past events within 90 days are carried forward');
   assert.equal(same.logo, 'logo.jpg', 'previous logo is kept if the fetch found none');
 
-  const aged = mergeCache({ ...previous, events: [tooOld, past, next] }, { events: [next], enriched: true }, { now, cutoff, fetchedAt: 'NOW' });
+  const aged = mergeCache({ ...previous, events: [tooOld, past, next] }, { events: [next] }, { now, cutoff, fetchedAt: 'NOW' });
   assert.deepEqual(aged.events.map((e) => e.id), ['g-1', 'g-2'], 'events older than 90 days drop off');
   assert.equal(aged.fetchedAt, 'NOW');
 
-  const renamed = mergeCache(previous, { events: [{ ...next, title: 'Next (room change)', status: 'ACTIVE' }], enriched: true }, { now, cutoff, fetchedAt: 'NOW' });
+  const renamed = mergeCache(previous, { events: [{ ...next, title: 'Next (room change)', status: 'ACTIVE' }] }, { now, cutoff, fetchedAt: 'NOW' });
   assert.equal(renamed.fetchedAt, 'NOW');
   assert.equal(renamed.events.at(-1).title, 'Next (room change)');
   assert.ok(!('status' in renamed.events.at(-1)), 'Meetup status is not stored');
+});
+
+test('mergeCache keeps the page details of upcoming events when the page read failed', () => {
+  const feedCopy = { id: 'g-2', sourceId: '2', title: 'Next', start: '2026-10-20T23:00:00.000Z', end: '2026-10-21T01:00:00.000Z', allDay: false, url: 'https://www.meetup.com/g/events/2/', description: 'feed text', venue: 'feed location' };
+  const enriched = { ...feedCopy, description: 'page text', venue: 'Source Allies', address: '4501 NW Urbandale Dr, Urbandale', online: false, hybrid: false, image: 'photo.jpg', going: 12 };
+  const previous = { fetchedAt: 'THEN', logo: 'logo.jpg', members: 300, events: [enriched] };
+
+  const failed = mergeCache(previous, { events: [{ ...feedCopy }], logo: null, pageFailed: true }, { now, cutoff, fetchedAt: 'NOW' });
+  assert.equal(JSON.stringify(failed), JSON.stringify(previous), 'byte-identical: nothing lost, fetchedAt unchanged');
+
+  const retitled = mergeCache(previous, { events: [{ ...feedCopy, title: 'Renamed' }], pageFailed: true }, { now, cutoff, fetchedAt: 'NOW' });
+  assert.equal(retitled.events[0].title, 'Renamed', 'the feed still wins for the title');
+  assert.equal(retitled.events[0].going, 12);
+
+  const plainFeed = mergeCache(previous, { events: [{ ...feedCopy }] }, { now, cutoff, fetchedAt: 'NOW' });
+  assert.equal(plainFeed.events[0].venue, 'feed location', 'without a page failure the fresh copy wins');
+});
+
+test('mergeCache drops the old enriched flag without moving fetchedAt', () => {
+  const next = { id: 'g-2', title: 'Next', start: '2026-10-20T23:00:00.000Z', end: '2026-10-21T01:00:00.000Z' };
+  const merged = mergeCache({ fetchedAt: 'THEN', logo: null, events: [next] }, { events: [next] }, { now, cutoff, fetchedAt: 'NOW' });
+  assert.equal(merged.fetchedAt, 'THEN');
+  assert.ok(!('enriched' in merged));
 });
 
 test('formatAddress and cleanDescription', () => {
@@ -109,16 +132,18 @@ test('formatAddress and cleanDescription', () => {
   assert.equal(formatAddress({ address: '801 Grand Ave, Des Moines', city: 'Des Moines' }), '801 Grand Ave, Des Moines');
   assert.equal(formatAddress({ address: '4501 NW Urbandale Dr', city: 'Urbandale' }), '4501 NW Urbandale Dr, Urbandale', 'street named after the city');
   assert.equal(formatAddress({ city: 'Ankeny' }), 'Ankeny');
+  assert.equal(formatAddress({ address: '801 Grand Ave', city: null }), '801 Grand Ave', 'a venue with no city');
+  assert.equal(formatAddress({ address: '801 Grand Ave' }), '801 Grand Ave');
   assert.equal(formatAddress(null), null);
   assert.equal(cleanDescription('Pyowa\r\nHello', 'Pyowa'), 'Hello');
   assert.equal(cleanDescription('Hello', 'Pyowa'), 'Hello');
 });
 
 test('mergeCache keeps group facts and leaves them out when unknown', () => {
-  const previous = { fetchedAt: 'THEN', logo: null, members: 300, enriched: true, events: [] };
-  assert.equal(mergeCache(previous, { events: [], enriched: true }, { now, cutoff, fetchedAt: 'NOW' }).fetchedAt, 'THEN', 'a missing fact keeps the old one');
-  assert.ok(!('pastCount' in mergeCache({ events: [] }, { events: [], enriched: true }, { now, cutoff })));
-  const facts = mergeCache({ events: [], members: 300 }, { events: [], members: 326, pastCount: 19, enriched: true }, { now, cutoff });
+  const previous = { fetchedAt: 'THEN', logo: null, members: 300, events: [] };
+  assert.equal(mergeCache(previous, { events: [] }, { now, cutoff, fetchedAt: 'NOW' }).fetchedAt, 'THEN', 'a missing fact keeps the old one');
+  assert.ok(!('pastCount' in mergeCache({ events: [] }, { events: [] }, { now, cutoff })));
+  const facts = mergeCache({ events: [], members: 300 }, { events: [], members: 326, pastCount: 19 }, { now, cutoff });
   assert.deepEqual([facts.members, facts.pastCount], [326, 19]);
 });
 

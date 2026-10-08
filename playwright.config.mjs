@@ -33,7 +33,7 @@ export default defineConfig({
     { name: 'phone', use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 } },
   ],
   webServer: {
-    command: `node --import ./scripts/fake-now.mjs node_modules/astro/bin/astro.mjs build --outDir dist-e2e --silent && node node_modules/astro/bin/astro.mjs preview --outDir dist-e2e --port ${port} --ignore-lock`,
+    command: `node --import ./scripts/fake-now.mjs node_modules/astro/bin/astro.mjs build --outDir dist-e2e --silent && node scripts/csp.mjs dist-e2e && node node_modules/astro/bin/astro.mjs preview --outDir dist-e2e --port ${port} --ignore-lock`,
     env: { DSM_DATA_DIR: 'tests/e2e/fixtures/data', FAKE_NOW: NOW },
     url: `http://localhost:${port}/`,
     timeout: 120_000,

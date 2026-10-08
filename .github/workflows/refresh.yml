@@ -22,6 +22,9 @@ on:
 # check). This job is the one exception: it pushes with a deploy key, which
 # the ruleset lets bypass the rules. The key's private half is the
 # REFRESH_DEPLOY_KEY secret; the public half is under Settings → Deploy keys.
+# The key is handed only to the final commit step: `npm ci`, the fetch and the
+# build run third-party code, so checkout keeps no credentials in .git/config
+# and the key is written to a temp file just for the pull/push, then deleted.
 permissions:
   contents: read
   issues: write # source-issues.mjs opens/closes "Source broken" issues
@@ -34,10 +37,10 @@ jobs:
   refresh:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ssh-key: ${{ secrets.REFRESH_DEPLOY_KEY }}
-      - uses: actions/setup-node@v7
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24'
           cache: npm
@@ -55,6 +58,8 @@ jobs:
       # Build before committing, so data that breaks the site never gets pushed.
       - run: npm run build
       - name: commit changed event data
+        env:
+          DEPLOY_KEY: ${{ secrets.REFRESH_DEPLOY_KEY }}
         run: |
           # The page's "This week" / "Next week" headings are fixed at build
           # time, so the site has to rebuild at least once a day even when no
@@ -69,6 +74,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Refresh event data" -m "$(git diff --cached --stat | tail -1)"
+          # The deploy key exists on disk only from here to the end of the
+          # step. GitHub's host keys come from its API over HTTPS, so ssh
+          # still checks who it is talking to.
+          ssh_dir="$RUNNER_TEMP/deploy-ssh"
+          mkdir -m 700 "$ssh_dir"
+          trap 'rm -rf "$ssh_dir"' EXIT
+          (umask 077 && printf '%s\n' "$DEPLOY_KEY" > "$ssh_dir/key")
+          curl -fsS https://api.github.com/meta | jq -r '.ssh_keys[] | "github.com " + .' > "$ssh_dir/known_hosts"
+          export GIT_SSH_COMMAND="ssh -i $ssh_dir/key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$ssh_dir/known_hosts"
+          git remote set-url origin "git@github.com:${GITHUB_REPOSITORY}.git"
           # A PR may have merged while this run fetched and built; replay the
           # data commit on top instead of failing the push and losing the run.
           git pull --rebase --quiet

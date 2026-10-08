@@ -5,13 +5,16 @@
 # CSP: Cloudflare Web Analytics loads its beacon from static.cloudflareinsights.com
 # and reports to cloudflareinsights.com. connect-src also covers fetch() inside
 # sw.js, which pulls Meetup event photos from secure.meetupstatic.com.
+# script-src: the inline-script-hashes source is a placeholder. scripts/csp.mjs replaces
+# it in dist/_headers with the sha256 of each inline script in the built pages,
+# so only those inline scripts run (no 'unsafe-inline').
 # There is deliberately no default-src or img-src: event photos and logos come
 # from Meetup, group sites (iowansofthings.com) and TAI, and that list grows.
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
-  Content-Security-Policy: script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com https://secure.meetupstatic.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
+  Content-Security-Policy: script-src 'self' 'inline-script-hashes' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com https://secure.meetupstatic.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
   Strict-Transport-Security: max-age=31536000
   Cross-Origin-Opener-Policy: same-origin
 

@@ -92,3 +92,15 @@ test('a joint meetup titled differently by each host is still one event', () => 
   assert.ok(!sameNight(a, { ...base, address: '1 Main St', venue: 'Elsewhere', title: 'JVM vs CLR', groupIds: ['iadnug'] }), 'different place');
   assert.ok(!sameNight(a, { ...a }), 'the same group twice is the series logic, not this');
 });
+
+test('every hand-written event and group website link is a web address', async () => {
+  const YAML = (await import('yaml')).default;
+  const { readFileSync } = await import('node:fs');
+  const real = (f) => YAML.parse(readFileSync(new URL(`../data/${f}`, import.meta.url), 'utf8'));
+  const links = [
+    ...real('events.yaml').map((e) => [e.title, e.url]),
+    ...real('groups.yaml').flatMap((g) => [[g.id, g.website], [g.id, g.ical]]),
+  ].filter(([, url]) => url != null);
+  assert.ok(links.length > 3);
+  for (const [name, url] of links) assert.match(String(url), /^https?:\/\//i, `${name}: ${url}`);
+});

@@ -22,7 +22,7 @@ export default async function secdsm(group, { get }) {
   const meetings = html.split(/class="secdsm-job(?: [^"]*)?"/).slice(1);
   if (!meetings.length) throw new Error('no schedule blocks found on secdsm.org');
 
-  return meetings.flatMap((block) => {
+  const events = meetings.flatMap((block) => {
     const date = /class="secdsm-job-date"[^>]*>(\d{4}-\d{2}-\d{2})</.exec(block)?.[1];
     if (!date) return [];
     const talks = block.split(/class="secdsm-act secdsm-act-[^"]*"/).slice(1).map((act) => ({
@@ -54,4 +54,8 @@ export default async function secdsm(group, { get }) {
       address,
     }];
   });
+  // Blocks but no readable date means the date markup changed, not that
+  // SecDSM stopped meeting.
+  if (!events.length) throw new Error(`${meetings.length} schedule blocks on secdsm.org but no date could be read`);
+  return events;
 }
