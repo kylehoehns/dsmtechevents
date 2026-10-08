@@ -17,7 +17,7 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
       <article id={g.id} data-groups={g.id} class:list={['flyer', { 'has-logo': !!g.logo }]}>
         <div class="flyer-head">
           {g.logo && <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />}
-          <h2>{g.short}{!g.showFullName && <span class="sr-only"> ({g.name})</span>}</h2>
+          <h2>{g.short}{!g.showFullName && g.name !== g.short && <span class="sr-only"> ({g.name})</span>}</h2>
           {g.showFullName && <p class="full">{g.name}</p>}
           {(g.members || g.pastCount) && (
             <p class="facts">{[g.members && `${g.members.toLocaleString('en-US')} members`, g.pastCount && `${g.pastCount} meetups`].filter(Boolean).join(' · ')}</p>
@@ -32,7 +32,9 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
           <p class="last">Last event {month(g.lastEvent.start)} {day(g.lastEvent.start)}{g.lastEvent.going ? ` · ${g.lastEvent.going} went` : ''}</p>
         )}
         <div class="links">
-          {g.upcomingCount > 0 && <a class="primary btn btn-solid btn-small" href={`/?group=${g.id}`}>{plural(g.upcomingCount, 'event')}<span class="sr-only"> from {g.short}</span></a>}
+          {g.upcomingCount > 0
+            ? <a class="primary btn btn-solid btn-small" href={`/?group=${g.id}`}>{plural(g.upcomingCount, 'event')}<span class="sr-only"> from {g.short}</span></a>
+            : g.lastEvent && <a class="btn btn-outline btn-small" href={`/?group=${g.id}`}>Past events<span class="sr-only"> from {g.short}</span></a>}
           {g.meetupUrl && <a class="btn btn-outline btn-small" href={g.meetupUrl} target="_blank" rel="noopener" data-click="meetup">Meetup<span class="sr-only"> page for {g.short} (opens in new tab)</span> <span aria-hidden="true">↗</span></a>}
           {g.website && <a class="btn btn-outline btn-small" href={g.website} target="_blank" rel="noopener" data-click="website">Website<span class="sr-only"> for {g.short} (opens in new tab)</span> <span aria-hidden="true">↗</span></a>}
         </div>
