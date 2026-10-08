@@ -71,3 +71,13 @@ test('unknown groups and impossible dates in the URL are ignored', async ({ page
   await expect(page.getByRole('heading', { name: 'October 2026' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Wednesday, October 14' })).toBeVisible();
 });
+
+test("one group's view shows its whole past from the archive, in place of Recent events", async ({ page }) => {
+  await page.goto('/?group=pyowa');
+  const past = page.getByRole('region', { name: 'Past' });
+  await expect(past.getByRole('listitem').filter({ hasText: 'Pyowa holiday social' })).toBeVisible();
+  await expect(past.getByRole('listitem').filter({ hasText: 'Virtual threads in practice' })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Recent events' })).toBeHidden();
+  await page.getByRole('button', { name: 'Show all groups' }).click();
+  await expect(past).toBeHidden();
+});

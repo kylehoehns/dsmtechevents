@@ -49,7 +49,7 @@ function loadPool() {
       searchIndex = null; // rebuild with the new cards
       // Redraw only what was waiting on it (a redraw would close an open About).
       if (state.view === 'calendar' && $('[aria-busy], .show:not([data-id])', dayPanel)) renderDayPanel();
-      else if (state.q) { listShown = renderList(); renderSide(); }
+      else if (state.q || state.group) { listShown = renderList(); renderSide(); }
     }, () => {
       poolFailed = true;
       pool = null; // try again next time
@@ -179,9 +179,11 @@ function renderList() {
     const count = $('[data-count]', sec);
     count.textContent = $('.far', sec) ? `${n} on the books` : plural(n, 'event');
   }
-  // A search looks back too: past matches, newest first, under the upcoming ones.
+  // A search or one group's view looks back too: past events, newest first,
+  // under the upcoming ones (the archive's rows come with the card pool).
   pastShown = 0;
-  for (const li of $$('li', pastResults)) { li.hidden = !state.q || !found(li); if (!li.hidden) pastShown++; }
+  const pastShows = (li) => (state.q ? found(li) : !!state.group && matches(hostsOf(li)));
+  for (const li of $$('li', pastResults)) { li.hidden = !pastShows(li); if (!li.hidden) pastShown++; }
   pastResults.hidden = pastShown === 0;
   $('[data-count]', pastResults).textContent = plural(pastShown, 'event');
   const empty = $('#list-empty');
@@ -242,8 +244,8 @@ function renderSide() {
     all.hidden = shown <= limit;
     if (all.getAttribute('aria-expanded') !== 'true') all.textContent = `+ All ${shown}`;
   }
-  // A search shows its past matches in the Past section instead.
-  recent.hidden = state.view === 'calendar' || shown === 0 || !!state.q;
+  // A search or one group's view shows past events in the Past section instead.
+  recent.hidden = state.view === 'calendar' || shown === 0 || !!state.q || !!state.group;
   minical.hidden = state.view === 'calendar';
   dayPanel.hidden = state.view !== 'calendar';
 }
@@ -398,8 +400,8 @@ function render() {
   // CSS that reads it must agree with the hidden flags above.
   if (state.view === 'calendar') document.documentElement.dataset.view = 'calendar';
   else delete document.documentElement.dataset.view;
-  // The calendar and a search both read cards the list doesn't have.
-  if (state.view === 'calendar' || state.q) loadPool();
+  // The calendar, a search and one group's past all read the card pool.
+  if (state.view === 'calendar' || state.q || state.group) loadPool();
   if (state.view === 'list') { listShown = renderList(); renderMinical(); } else { pastResults.hidden = true; renderCalendar(); }
   renderSide();
   syncSearchBox();
