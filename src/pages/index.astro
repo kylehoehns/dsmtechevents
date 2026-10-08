@@ -56,7 +56,7 @@ const calendarData = {
   })),
   groups: Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short }])),
 };
-const blurb = `Every tech meetup, user group and conference in Des Moines, on one sheet. <strong>${listed.length} shows on the books</strong> from ${groups.length} groups. Go to one.`;
+const blurb = 'Every tech meetup, user group and conference in Des Moines, on one sheet. Go to one.';
 ---
 <Layout updatedAt={updatedAt} blurb={blurb}>
   <div class="layout">
@@ -101,7 +101,7 @@ const blurb = `Every tech meetup, user group and conference in Des Moines, on on
               <div class="poster-full">
                 <span class="halftone" aria-hidden="true" />
                 {i % 2 === 0 && <span class="tape" aria-hidden="true" />}
-                <div class="bill"><span>Headliner</span><span>{e.multiDay ? 'Two days' : 'One day'}</span></div>
+                <div class="bill"><span>Headliner</span><span>{e.multiDay ? 'Two-day conference' : 'One-day conference'}</span></div>
                 <h2>{e.title}</h2>
                 <p class="when">{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
                 <span class="stamp-days countdown" data-start={e.start}>{daysOut(e)} days out</span>
