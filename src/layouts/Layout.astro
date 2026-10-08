@@ -150,16 +150,21 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
         set: (k: string, v: string | null) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} },
       };
 
-      // Theme: auto (follow the device) -> light -> dark -> auto.
+      // Theme: every tap changes what's on screen. Auto (follow the device)
+      // goes to the device's opposite, and that goes back to auto. A saved
+      // choice that matches the device (left from the old auto, light, dark
+      // cycle, or the device switched since) flips to the opposite too.
       const themeBtn = document.getElementById('theme-btn')!;
+      const deviceDark = matchMedia('(prefers-color-scheme: dark)');
       const showTheme = () => {
         const label = `Theme: ${store.get('theme') ?? 'auto'}`;
         themeBtn.setAttribute('aria-label', label);
         themeBtn.title = label;
       };
       themeBtn.addEventListener('click', () => {
-        const modes = ['auto', 'light', 'dark'];
-        const next = modes[(modes.indexOf(store.get('theme') ?? 'auto') + 1) % modes.length];
+        const device = deviceDark.matches ? 'dark' : 'light';
+        const showing = store.get('theme') ?? device;
+        const next = showing === device ? (device === 'dark' ? 'light' : 'dark') : 'auto';
         store.set('theme', next === 'auto' ? null : next);
         if (next === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = next;
         showTheme();
@@ -201,17 +206,36 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
         installBtn.hidden = true;
       });
 
-      // iOS has no install prompt, so show a one-time hint in Safari.
+      // iOS has no install prompt, so Safari gets a hint until it's dismissed.
+      // Only Safari itself can add to the Home Screen: Chrome, Firefox, Edge
+      // and in-app browsers (Facebook, Instagram, LinkedIn...) on an iPhone
+      // say iPhone too, but either lack Safari's "Version/" or name themselves.
+      // And not on a first visit: someone who came back is worth asking.
       const hint = document.getElementById('install-hint')!;
+      const ua = navigator.userAgent;
+      const iosSafari = /iPhone|iPad|iPod/.test(ua) && /Version\/[\d.]+.*Safari\//.test(ua)
+        && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|YaBrowser|DuckDuckGo|GSA\/|FBAN|FBAV|FB_IAB|Instagram|LinkedInApp|Twitter|Snapchat|Pinterest|Line\//.test(ua);
       const standalone = matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
-      if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !standalone && store.get('install-hint') !== 'dismissed') {
-        hint.hidden = false;
-        // Keep focused elements from scrolling under the fixed hint.
-        document.documentElement.classList.add('has-hint');
-        hint.querySelector('button')!.addEventListener('click', () => {
-          hint.hidden = true; store.set('install-hint', 'dismissed');
-          document.documentElement.classList.remove('has-hint');
-        });
+      if (iosSafari && !standalone && store.get('install-hint') !== 'dismissed') {
+        // One visit per browser session; sessionStorage can throw (private mode, blocked storage).
+        let visits = Number(store.get('visits')) || 0;
+        try {
+          if (!sessionStorage.getItem('visit-counted')) { sessionStorage.setItem('visit-counted', '1'); store.set('visits', String(++visits)); }
+        } catch {}
+        if (visits >= 2) {
+          hint.hidden = false;
+          // The page gets bottom padding the hint's height (global.css), so
+          // the footer and the last buttons can scroll out from under it.
+          const root = document.documentElement;
+          root.classList.add('has-hint');
+          const fit = new ResizeObserver(() => root.style.setProperty('--hint-h', `${hint.offsetHeight}px`));
+          fit.observe(hint);
+          hint.querySelector('button')!.addEventListener('click', () => {
+            hint.hidden = true; store.set('install-hint', 'dismissed');
+            fit.disconnect();
+            root.classList.remove('has-hint');
+          });
+        }
       }
     </script>
     </>}

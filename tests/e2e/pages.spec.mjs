@@ -25,15 +25,14 @@ test('add page copies the email address', async ({ page, context }) => {
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('hello@dsmtechevents.com');
 });
 
-test('theme button cycles auto, light, dark and remembers the choice', async ({ page }) => {
+test('theme button remembers the choice', async ({ page }) => {
+  // Light device: auto, then dark, then back to auto (frontend-fixes.spec.mjs covers every tap flipping).
+  await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
   const html = page.locator('html');
   const theme = page.getByRole('button', { name: /^Theme:/ });
   await expect(theme).toHaveAccessibleName('Theme: auto');
 
-  await theme.click();
-  await expect(theme).toHaveAccessibleName('Theme: light');
-  await expect(html).toHaveAttribute('data-theme', 'light');
   await theme.click();
   await expect(theme).toHaveAccessibleName('Theme: dark');
   await expect(html).toHaveAttribute('data-theme', 'dark');

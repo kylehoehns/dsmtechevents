@@ -46,6 +46,13 @@ if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.userAgent.include
   for (const a of $$('a.map[data-q]')) a.href = `https://maps.apple.com/?q=${encodeURIComponent(a.dataset.q)}`;
 }
 
+// The months the data covers: the cache keeps about 90 days of past events
+// (plus the archive), so earlier months would look quiet when they're just
+// not on file. Paging and ?day= stay inside these, and this month always counts.
+const firstMonth = events.reduce((m, e) => { const k = dayKey(e.start).slice(0, 7); return k < m ? k : m; }, today.slice(0, 7));
+const lastMonth = events.reduce((m, e) => { const k = lastDay(e.start, e.end).slice(0, 7); return k > m ? k : m; }, today.slice(0, 7));
+const inRange = (key) => key.slice(0, 7) >= firstMonth && key.slice(0, 7) <= lastMonth;
+
 // ---- state ----
 const state = {};
 function readUrl() {
@@ -54,7 +61,7 @@ function readUrl() {
   // Ignore unknown groups (and inherited names like ?group=constructor) and
   // dates that don't exist, rather than rendering an empty or broken page.
   state.group = Object.hasOwn(groups, params.get('group') ?? '') ? params.get('group') : '';
-  state.day = isDayKey(params.get('day')) ? params.get('day') : null;
+  state.day = isDayKey(params.get('day')) && inRange(params.get('day')) ? params.get('day') : null;
   state.month = (state.day ?? today).slice(0, 7);
   // A search looks through every group, and shows its results in the list.
   state.q = (params.get('q') ?? '').trim().slice(0, 100);
@@ -109,8 +116,11 @@ function haystack(id) {
 }
 const found = (el) => {
   if (!state.q) return true;
-  const hay = haystack(el.dataset.id);
-  return queryWords(state.q).every((w) => hay.includes(` ${w}`));
+  // Only emoji or punctuation ("🎉", "-", "..."): nothing to look for, so
+  // nothing matches (every() on no words would match everything).
+  const qw = queryWords(state.q);
+  const hay = qw.length && haystack(el.dataset.id);
+  return qw.length > 0 && qw.every((w) => hay.includes(` ${w}`));
 };
 const shows = (el) => matches(hostsOf(el)) && found(el);
 
@@ -224,7 +234,7 @@ function dayCell(key) {
   const dots = list.filter((e) => !e.headliner).map(() => '<i class="dot"></i>').join('');
   const name = `${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}`;
   // Only the selected day is in the tab order; arrow keys move between days.
-  return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}">
+  return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}"${inRange(key) ? '' : ' disabled'}>
     <span class="sr-only">${name}</span><span class="day-num" aria-hidden="true">${Number(key.slice(8))}</span><span class="pills" aria-hidden="true">${pills}</span><span class="dots" aria-hidden="true">${dots}</span>
   </button>`;
 }
@@ -233,15 +243,21 @@ function renderCalendar() {
   if (!state.day || !state.day.startsWith(state.month)) state.day = pickDay(state.month);
   const cells = monthCells(state.month).map(dayCell);
   const [y] = state.month.split('-');
+  // At either end of the data the arrow stays in place (focus stays put) but says why it does nothing.
+  const edge = (step) => {
+    if (step < 0 ? state.month > firstMonth : state.month < lastMonth) return `aria-label="${step < 0 ? 'Previous' : 'Next'} month"`;
+    const name = monthName(step < 0 ? firstMonth : lastMonth, true);
+    return `aria-disabled="true" aria-label="${step < 0 ? `No listings before ${name}` : `Nothing listed after ${name}`}" title="${step < 0 ? `No listings before ${name}` : `Nothing listed after ${name}`}"`;
+  };
   // Rebuilding the grid drops focus. Remember what had it and put it back.
   const had = calView.contains(document.activeElement) ? document.activeElement : null;
   calView.innerHTML = `
     <div class="cal-head">
       <h2>${monthName(state.month)}<span> ${y}</span></h2>
       <div class="cal-nav">
-        <button type="button" class="btn btn-outline" data-month="-1" aria-label="Previous month">←</button>
+        <button type="button" class="btn btn-outline" data-month="-1" ${edge(-1)}>←</button>
         <button type="button" class="btn btn-outline" data-month="0">Today</button>
-        <button type="button" class="btn btn-outline" data-month="1" aria-label="Next month">→</button>
+        <button type="button" class="btn btn-outline" data-month="1" ${edge(1)}>→</button>
       </div>
     </div>
     <div class="grid" role="group" aria-label="${monthName(state.month, true)}">
@@ -275,6 +291,15 @@ function renderDayPanel() {
     if (tag) tag.hidden = true;
     const desc = $('.desc', card);
     if (desc) { desc.id += '-day'; desc.hidden = true; $('.more', card)?.setAttribute('aria-controls', desc.id); }
+    // Over (a past day, or earlier today): read it like Recent events does.
+    // "went", not "going", and no RSVP button; the title still links to it.
+    if (Date.parse(e.end) <= now) {
+      const going = $('.going', card);
+      if (going) going.lastChild.textContent = ' went';
+      $('.rsvp', card)?.remove();
+      const acts = $('.acts', card);
+      if (acts && !acts.children.length) acts.remove();
+    }
     ul.append(card);
   }
   dayPanel.append(ul);
@@ -437,6 +462,7 @@ document.addEventListener('click', (ev) => {
   }
 
   const monthBtn = t.closest('[data-month]');
+  if (monthBtn?.getAttribute('aria-disabled') === 'true') return;
   if (monthBtn) {
     const step = Number(monthBtn.dataset.month);
     state.month = step === 0 ? today.slice(0, 7) : addMonths(state.month, step);
@@ -467,7 +493,7 @@ calView.addEventListener('keydown', (ev) => {
   const dow = new Date(key).getUTCDay();
   const to = step != null ? addDays(key, step) : addDays(key, ev.key === 'Home' ? -dow : 6 - dow);
   const next = $(`.day[data-day="${to}"]`, calView);
-  if (!next) return;
+  if (!next || next.disabled) return;
   cell.tabIndex = -1;
   next.tabIndex = 0;
   next.focus();
