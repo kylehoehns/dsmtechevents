@@ -78,7 +78,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
 
   <div class="acts">
     {e.going > 0 && <span class="going"><b>{e.going}</b> going</span>}
-    {e.url && <a class="rsvp btn btn-solid" href={e.url} target="_blank" rel="noopener" data-click="rsvp" aria-label={`${cta}: ${e.title} (opens in new tab)`}>{cta} <span aria-hidden="true">↗</span></a>}
+    {e.url && <a class="rsvp btn btn-solid" href={e.url} target="_blank" rel="noopener" data-click="rsvp" aria-label={`${cta}: ${e.title} (opens in new tab)`}>{cta} <span aria-hidden="true">↗︎</span></a>}
     {(e.description || e.photo) && <button type="button" class="more" aria-expanded="false" aria-controls={descId}>About<span class="sr-only"> {e.title}</span></button>}
   </div>
   {(e.description || e.photo) && (

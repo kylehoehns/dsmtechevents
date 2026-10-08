@@ -35,8 +35,8 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
           {g.upcomingCount > 0
             ? <a class="primary btn btn-solid btn-small" href={`/?group=${g.id}`}>{plural(g.upcomingCount, 'event')}<span class="sr-only"> from {g.short}</span></a>
             : g.lastEvent && <a class="btn btn-outline btn-small" href={`/?group=${g.id}`}>Past events<span class="sr-only"> from {g.short}</span></a>}
-          {g.meetupUrl && <a class="btn btn-outline btn-small" href={g.meetupUrl} target="_blank" rel="noopener" data-click="meetup">Meetup<span class="sr-only"> page for {g.short} (opens in new tab)</span> <span aria-hidden="true">↗</span></a>}
-          {g.website && <a class="btn btn-outline btn-small" href={g.website} target="_blank" rel="noopener" data-click="website">Website<span class="sr-only"> for {g.short} (opens in new tab)</span> <span aria-hidden="true">↗</span></a>}
+          {g.meetupUrl && <a class="btn btn-outline btn-small" href={g.meetupUrl} target="_blank" rel="noopener" data-click="meetup">Meetup<span class="sr-only"> page for {g.short} (opens in new tab)</span> <span aria-hidden="true">↗︎</span></a>}
+          {g.website && <a class="btn btn-outline btn-small" href={g.website} target="_blank" rel="noopener" data-click="website">Website<span class="sr-only"> for {g.short} (opens in new tab)</span> <span aria-hidden="true">↗︎</span></a>}
         </div>
       </article>
     ))}
