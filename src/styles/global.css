@@ -163,7 +163,10 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 }
 .poster .stamp-days { position: absolute; right: 12px; bottom: 14px; white-space: nowrap; font: 400 17px/1 var(--marker); transform: rotate(6deg); }
 .poster :focus-visible { outline-color: currentColor; }
-.poster.taped { transform: rotate(-0.6deg); }
+/* every poster is taped up, each a little differently, so the stack looks hand-pinned */
+.poster { transform: rotate(-0.6deg); }
+.poster.blue { transform: rotate(0.5deg); }
+.poster.blue .tape { left: 34%; transform: rotate(4deg); }
 @media (min-width: 1060px) {
   .headliners { grid-auto-flow: row; grid-auto-columns: auto; overflow: visible; gap: 18px; padding: 10px 0 0; margin: 0; }
   .headliners:has(.poster + .poster) { grid-auto-columns: auto; }
