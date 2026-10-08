@@ -4,13 +4,9 @@ import { meetupUrl } from '../../src/lib/meetup.mjs';
 import { calendarEvents, isUpcoming, times, eventUrl } from './ical.mjs';
 
 // Upcoming events from an iCal feed (Meetup's or any public calendar).
-// `hadUpcoming`: how many upcoming events the last run found. A feed that
-// suddenly lists none is more likely broken than every event called off at
-// once, so it throws and the last good cache stays (with a source-broken issue).
-export function parseFeed(ics, group, { slug, now, hadUpcoming = 0 }) {
-  const events = calendarEvents(ics).filter((e) => isUpcoming(e, now));
-  if (!events.length && hadUpcoming) throw new Error(`feed lists no upcoming events, but the last run had ${hadUpcoming}`);
-  return events
+export function parseFeed(ics, group, { slug, now }) {
+  return calendarEvents(ics)
+    .filter((e) => isUpcoming(e, now))
     .map((e) => {
       const id = /^event_([^@]+)@/.exec(e.uid)?.[1] ?? e.uid;
       return {
@@ -96,6 +92,18 @@ export function enrich(upcoming, details, group, { now, cutoff }) {
     }
   }
   return recent;
+}
+
+// A Meetup feed with nothing coming up, for a group whose last run had events
+// coming up. Fine if the events page agrees (the events were called off or
+// taken down); broken if the page still lists upcoming events, or couldn't be
+// read either (`details` null). Broken throws, so the last good cache stays
+// and a source-broken issue opens.
+export function checkEmptyFeed(upcoming, details, { now, hadUpcoming }) {
+  if (upcoming.length || !hadUpcoming) return;
+  if (!details) throw new Error(`feed lists no upcoming events (the last run had ${hadUpcoming}), and the events page couldn't be read to confirm`);
+  const onPage = [...details.events.values()].filter((e) => e.status !== 'CANCELLED' && Date.parse(e.end) >= now).length;
+  if (onPage) throw new Error(`feed lists no upcoming events, but the events page lists ${onPage}`);
 }
 
 // Merge a fresh fetch into the previous cache file: past events from the cache

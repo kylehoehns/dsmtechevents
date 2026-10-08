@@ -23,7 +23,7 @@ import secdsm from './sources/secdsm.mjs';
 import pmiChapter from './sources/pmi-chapter.mjs';
 import taiTechbrew from './sources/tai-techbrew.mjs';
 import iowansOfThings from './sources/iowans-of-things.mjs';
-import { parseFeed, parseEventsPage, enrich, mergeCache } from './sources/meetup.mjs';
+import { parseFeed, parseEventsPage, enrich, mergeCache, checkEmptyFeed } from './sources/meetup.mjs';
 import { updateArchive } from './archive.mjs';
 import { manualEvent } from '../src/lib/data.mjs';
 import { safeLinks } from './sources/html.mjs';
@@ -111,15 +111,16 @@ async function fetchFeed(group, now, cutoff, hadUpcoming) {
   const feedUrl = group.ical ?? (slug && meetupUrl(slug, 'events/ical/'));
   if (!feedUrl) throw new Error('needs a meetup, ical or source entry');
 
-  const upcoming = parseFeed(await get(feedUrl), group, { slug, now, hadUpcoming });
+  const upcoming = parseFeed(await get(feedUrl), group, { slug, now });
 
   let recent = [];
   let logo = null;
   let facts = {};
   let enrichError = null;
+  let details = null;
   if (slug) {
     try {
-      const details = parseEventsPage(await get(meetupUrl(slug, 'events/')), slug);
+      details = parseEventsPage(await get(meetupUrl(slug, 'events/')), slug);
       logo = details.logo;
       recent = enrich(upcoming, details, group, { now, cutoff });
       facts = { members: details.members, pastCount: details.pastCount, lastMet: details.lastMet };
@@ -127,6 +128,7 @@ async function fetchFeed(group, now, cutoff, hadUpcoming) {
       console.warn(`  ${group.id}: enrichment skipped (${err.message})`);
       enrichError = `Meetup events page: ${err.message}`;
     }
+    checkEmptyFeed(upcoming, details, { now, hadUpcoming });
   }
 
   // The feed's copy of an upcoming event wins over the page's. If the page
