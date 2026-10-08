@@ -19,6 +19,13 @@ test('starts on the overview and steps through posters', async ({ page }) => {
   await expect(current(page).getByRole('heading', { name: 'Coming up' })).toBeVisible();
 });
 
+test('the overview shows every day of a multi-day event, with its hours apart', async ({ page }) => {
+  await page.goto('/tv/');
+  const row = page.locator('.overview li', { hasText: 'Test Conf 2026' });
+  await expect(row.locator('.row-date')).toHaveText('Thu–Fri Oct 22–23');
+  await expect(row.locator('.row-time')).toHaveText('8a–5p');
+});
+
 test('drops events once they have ended', async ({ page }) => {
   await page.goto('/tv/');
   await expect(page.locator('.slide', { hasText: 'Coding Dojo' })).toHaveCount(2); // overview row + poster

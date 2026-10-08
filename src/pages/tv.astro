@@ -11,7 +11,7 @@ import QRCode from 'qrcode';
 import Layout from '../layouts/Layout.astro';
 import '../styles/tv-fx.css';
 import { loadData } from '../lib/data.mjs';
-import { weekday, day, month, shortRange, shortTime } from '../lib/format.mjs';
+import { weekday, day, month, shortRange, shortTime, dateRange, lastDay } from '../lib/format.mjs';
 import { site } from '../lib/site.mjs';
 
 const { upcoming, byId } = loadData();
@@ -53,10 +53,12 @@ const slides = await Promise.all(events.map(async (e) => ({
         <ol>
           {slides.slice(0, 7).map(({ e, hosts }) => (
             <li class:list={{ headliner: e.headliner }} data-end={e.end}>
-              <span class="row-date"><b>{weekday(e.start)}</b> {month(e.start)} {day(e.start)}</span>
+              <span class="row-date">{e.multiDay
+                ? <><b>{weekday(e.start)}–{weekday(`${lastDay(e.start, e.end)}T17:00:00Z`)}</b> {dateRange(e.start, e.end)}</>
+                : <><b>{weekday(e.start)}</b> {month(e.start)} {day(e.start)}</>}</span>
               <span class="row-group">{hosts}</span>
               <span class="row-title">{e.title}</span>
-              <span class="row-time">{e.multiDay && !e.allDay ? `${shortTime(e.start)}–${shortTime(e.end)}` : shortRange(e)}</span>
+              <span class="row-time">{e.allDay ? 'All day' : `${shortTime(e.start)}–${shortTime(e.end)}`}</span>
             </li>
           ))}
         </ol>
