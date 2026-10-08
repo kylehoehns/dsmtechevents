@@ -42,16 +42,18 @@ const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format
           <span><b>Des Moines, IA</b> · 515 · {builtOn}</span>
           <button type="button" class="theme-btn" id="theme-btn" aria-label="Color theme">Theme: auto</button>
         </div>
-        <a class="logo" href="/" aria-label={`${site.name} home`}><span class="mis" data-t={site.name}>{site.name}</span></a>
-        <div class="mast-row">
-          {blurb ? <p class="blurb" set:html={blurb} /> : <span aria-hidden="true" />}
-          {nav !== null && (
+        <div class="mast-body">
+          <div class="mast-row">
+            <a class="logo" href="/" aria-label={`${site.name} home`}><span class="mis" data-t={site.name}>{site.name}</span></a>
+            {nav !== null && (
             <nav class="nav" aria-label="Main">
               <a href="/" data-nav="list" aria-current={nav === 'list' ? 'page' : undefined}>Events</a>
               <a href="/?view=calendar" data-nav="calendar" aria-current={nav === 'calendar' ? 'page' : undefined}>Calendar</a>
               <a href="/groups/" data-nav="groups" aria-current={nav === 'groups' ? 'page' : undefined}>Groups</a>
             </nav>
-          )}
+            )}
+          </div>
+          {blurb && <p class="blurb" set:html={blurb} />}
         </div>
       </div>
     </header>

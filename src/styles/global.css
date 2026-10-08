@@ -90,25 +90,24 @@ button { font: inherit; color: inherit; cursor: pointer; }
   background: none; border: 1.5px solid var(--line); padding: 3px 8px; font: 600 11.5px/1.2 var(--mono);
 }
 .theme-btn:hover { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
-.logo { display: block; text-decoration: none; margin: 8px 0 0; line-height: 0.8; }
+/* logo and nav share one row on desktop; the nav wraps under the logo on phones */
+.mast-body { display: grid; gap: 10px; padding: 14px 0 12px; border-bottom: 6px double var(--line); }
+.mast-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.logo { display: block; text-decoration: none; line-height: 0.8; }
 .logo .mis {
   font: 900 clamp(40px, 13.4vw, 120px)/0.8 var(--display); text-transform: uppercase;
   letter-spacing: -0.005em; color: var(--blue-t); white-space: nowrap;
 }
 .logo .mis::before { transform: translate(5px, 4px); }
-.mast-row {
-  display: grid; gap: 12px; margin-top: 10px; padding-bottom: 12px; border-bottom: 6px double var(--line);
-}
 .blurb { font-size: 15px; max-width: 52ch; margin: 0; }
 .blurb strong { background: var(--pink-fill); color: var(--on-pink); padding: 0 4px; font-weight: 600; }
-.nav { display: flex; flex-wrap: wrap; align-self: end; }
+.nav { display: flex; flex-wrap: wrap; }
 .nav a {
   font: 800 20px/1 var(--display); text-transform: uppercase; text-decoration: none;
   padding: 8px 12px 7px; border: 2px solid var(--line); margin: 0 -2px -2px 0; background: var(--paper);
 }
 .nav a[aria-current="page"] { background: var(--ink); color: var(--paper); }
 .nav a:hover:not([aria-current="page"]) { background: var(--pink-fill); color: var(--on-pink); }
-@media (min-width: 760px) { .mast-row { grid-template-columns: 1fr auto; align-items: end; } }
 
 /* ---------- headliners (conferences in the next 30 days) ----------
    Phone: one slim strip each above the list, so this week stays on screen.
