@@ -8,12 +8,18 @@
   "scripts": {
     "fetch": "node scripts/fetch-events.mjs",
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/og-image.mjs",
     "preview": "astro preview"
   },
   "dependencies": {
     "astro": "^7.3.6",
     "node-ical": "^0.27.3",
     "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@fontsource/big-shoulders-display": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "satori": "^0.18.3"
   }
 }
