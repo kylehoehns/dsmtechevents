@@ -2,7 +2,7 @@
 # Times are Des Moines local time. Leave out `time` for an all-day event.
 #
 #   title, url, start (YYYY-MM-DD), end (optional, multi-day), time / endTime ("HH:MM")
-#   venue, address, description, tags, hosts (group ids), featured (pins to the top)
+#   venue, address, description, tags, hosts (group ids), headliner (a pink row, and a poster up top when it is close)
 
 - title: Tech Fuse DSM 2026
   url: https://techfusedsm.com/
@@ -14,7 +14,7 @@
   address: 833 5th Ave, Des Moines, IA 50309
   description: Two-day Des Moines tech conference. Rooted in tech, fueled by community.
   tags: [conference]
-  featured: true
+  headliner: true
 
 - title: Iowa Code Camp 2026
   url: https://iowacodecamp.com/
@@ -28,4 +28,4 @@
 
     Register (free) at https://www.tickettailor.com/events/iowacodecamp/2402912
   tags: [conference]
-  featured: true
+  headliner: true

@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
+import { mkdtempSync, cpSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { loadData, shortAddress } from '../src/lib/data.mjs';
 
 const dataDir = fileURLToPath(new URL('./fixtures/data', import.meta.url));
@@ -44,7 +47,7 @@ test('hand-added events use Des Moines time and span days', () => {
   assert.equal(conf.start, '2026-10-15T13:00:00.000Z');
   assert.equal(conf.end, '2026-10-16T22:00:00.000Z');
   assert.equal(conf.multiDay, true);
-  assert.equal(conf.featured, true);
+  assert.equal(conf.headliner, true);
   assert.equal(conf.address, '833 5th Ave');
 });
 
@@ -71,4 +74,11 @@ test('two spellings of one venue at the same street address count as one venue',
   const keys = data.events.filter((e) => e.address?.startsWith('4501 NW Urbandale')).map((e) => e.venueKey);
   assert.ok(keys.length >= 2);
   assert.equal(new Set(keys).size, 1);
+});
+
+test('the old featured: key fails loudly instead of quietly un-pinking a conference', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'dsm-'));
+  cpSync(dataDir, dir, { recursive: true });
+  writeFileSync(path.join(dir, 'events.yaml'), '- title: Old Conf\n  start: 2026-11-01\n  featured: true\n');
+  assert.throws(() => loadData({ dataDir: dir, now }), /now headliner/);
 });

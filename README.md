@@ -44,7 +44,7 @@ expected, and has a test against a saved copy in `tests/fixtures/`.
 Anything else gets added by hand.
 
 **A one-off event** (conference, joint meetup): add it to `data/events.yaml`.
-`featured: true` makes it a headliner: a pink row in the list, and a poster at
+`headliner: true` makes it a headliner: a pink row in the list, and a poster at
 the top (side rail on desktop) from 30 days out until it ends.
 
 ## Local development

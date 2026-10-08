@@ -17,7 +17,7 @@ const rows = upcoming.filter((e) => Date.parse(e.start) < horizon).slice(0, MAX)
 const more = upcoming.filter((e) => Date.parse(e.start) < horizon).length - rows.length;
 const hosts = (e: any) => e.groupIds.map((id: string) => byId[id]?.short).filter(Boolean).join(' w/ ');
 // The label before the title: the hosts, plus "conference" for headliners.
-const label = (e: any) => [hosts(e), e.featured && 'conference'].filter(Boolean).join(' · ') || 'Community';
+const label = (e: any) => [hosts(e), e.headliner && 'conference'].filter(Boolean).join(' · ') || 'Community';
 // The date column carries the dates, so this is only the hours.
 const hours = (e: any) => (e.allDay ? 'All day' : `${shortTime(e.start)}–${shortTime(e.end)}`);
 // "Oct 15–16" for a multi-day event.
@@ -45,7 +45,7 @@ const span = rows.length ? `${month(rows[0].start)} ${day(rows[0].start)} – ${
       {rows.length > 0 ? (
         <ol class="lineup">
           {rows.map((e) => (
-            <li class:list={{ conf: e.featured }} data-end={e.end}>
+            <li class:list={{ headliner: e.headliner }} data-end={e.end}>
               <span class="d"><b>{weekday(e.start)}</b> {dates(e)}</span>
               <span class="t">{hours(e)}</span>
               <span class="what"><b>{label(e)}</b> {e.title}</span>
@@ -95,7 +95,7 @@ const span = rows.length ? `${month(rows[0].start)} ${day(rows[0].start)} – ${
   .lineup .what { grid-area: what; font-size: 14.5px; line-height: 1.3; }
   .lineup .what b { font: 900 16px/1 var(--display); text-transform: uppercase; margin-right: 4px; }
   .lineup .w { grid-area: w; font: 500 12px/1.4 var(--mono); }
-  .lineup li.conf { border-bottom-style: solid; border-bottom-width: 3px; }
+  .lineup li.headliner { border-bottom-style: solid; border-bottom-width: 3px; }
 
   .sheet-foot { margin-top: auto; padding-top: 14px; display: flex; align-items: center; gap: 16px; font-size: 14px; line-height: 1.4; }
   .sheet-foot .qr svg { display: block; width: 0.95in; height: 0.95in; }

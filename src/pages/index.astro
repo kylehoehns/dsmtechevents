@@ -43,7 +43,7 @@ const pooled = [...upcoming.filter((e) => e.repeat), ...far, ...past];
 const HEADLINER_DAYS = 30;
 const DAYS_WORD = ['One', 'Two', 'Three', 'Four', 'Five'];
 const conferenceLength = (e: any) => { const n = daysBetween(dayKey(e.start), lastDay(e.start, e.end)) + 1; return `${DAYS_WORD[n - 1] ?? n}-day conference`; };
-const featured = upcoming.filter((e) => e.featured && daysBetween(today, dayKey(e.start)) <= HEADLINER_DAYS);
+const headliners = upcoming.filter((e) => e.headliner && daysBetween(today, dayKey(e.start)) <= HEADLINER_DAYS);
 
 const counts = Object.fromEntries(groups.map((g) => [g.id, listed.filter((e) => e.groupIds.includes(g.id)).length]));
 // Only groups with something coming up get a chip; the groups page lists them all.
@@ -53,7 +53,7 @@ const PAST_SHOWN = 3;
 
 const calendarData = {
   events: events.map((e) => ({
-    id: e.id, title: e.title, start: e.start, end: e.end, groups: e.groupIds, featured: e.featured, allDay: e.allDay,
+    id: e.id, title: e.title, start: e.start, end: e.end, groups: e.groupIds, headliner: e.headliner, allDay: e.allDay,
   })),
   groups: Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short, url: g.meetupUrl ?? g.website ?? null }])),
 };
@@ -72,9 +72,9 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         and tab them in the order they show. On desktop the grid puts them in
         the side rail (see .layout in global.css). */}
     <div class="lead">
-      {featured.length > 0 && (
+      {headliners.length > 0 && (
         <section class="headliners" id="headliners" aria-label="Coming up soon">
-          {featured.map((e, i) => (
+          {headliners.map((e, i) => (
             <article class:list={['poster', { blue: i % 2 }]} data-end={e.end} data-groups={e.groupIds.join(' ')} data-id={e.id}>
               <div class="poster-full">
                 <span class="halftone" aria-hidden="true" />

@@ -12,7 +12,7 @@ const { event: e, byId } = Astro.props;
 const hosts = e.groupIds.map((id: string) => byId[id]).filter(Boolean);
 const lead = hosts[0];
 const isMeetup = e.url?.includes('meetup.com');
-const cta = isMeetup ? 'RSVP on Meetup' : e.featured ? 'Tickets & info' : 'Details';
+const cta = isMeetup ? 'RSVP on Meetup' : e.headliner ? 'Tickets & info' : 'Details';
 const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
 // Meetup photos come as small webp copies (see meetupPhoto). Most are 16:9 at
 // 600x338; width/height hold that shape until the image arrives.
@@ -26,7 +26,7 @@ const mapQuery = [e.venue, e.fullAddress ?? e.address ?? 'Des Moines, IA'].filte
 const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
 ---
 <li
-  class:list={['show', { headline: e.featured, 'has-photo': !!e.photo }]}
+  class:list={['show', { headliner: e.headliner, 'has-photo': !!e.photo }]}
   data-id={e.id}
   data-groups={e.groupIds.join(' ')}
   data-start={e.start}

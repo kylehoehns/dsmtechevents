@@ -172,14 +172,14 @@ function pickDay(ym) {
 // (dots on a phone) and a spoken summary.
 function dayCell(key) {
   const list = eventsOn(key);
-  const cls = ['day', key.startsWith(state.month) ? '' : 'outside', key < today ? 'past' : '', key === today ? 'today' : '', list.length ? 'has' : '', list.some((e) => e.featured) ? 'conf' : ''].filter(Boolean).join(' ');
+  const cls = ['day', key.startsWith(state.month) ? '' : 'outside', key < today ? 'past' : '', key === today ? 'today' : '', list.length ? 'has' : '', list.some((e) => e.headliner) ? 'headliner' : ''].filter(Boolean).join(' ');
   const pills = list.slice(0, 3).map((e) => {
     const ended = Date.parse(e.end) < now ? ' ended' : '';
-    return e.featured
-      ? `<span class="pill conf${ended}" title="${escapeHtml(e.title)}">${escapeHtml(label(e))}</span>`
+    return e.headliner
+      ? `<span class="pill headliner${ended}" title="${escapeHtml(e.title)}">${escapeHtml(label(e))}</span>`
       : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : shortTime(e.start)}</i> ${escapeHtml(label(e))}</span>`;
   }).join('') + (list.length > 3 ? `<span class="more-n">+${list.length - 3} more</span>` : '');
-  const dots = list.filter((e) => !e.featured).map(() => '<i class="dot"></i>').join('');
+  const dots = list.filter((e) => !e.headliner).map(() => '<i class="dot"></i>').join('');
   const name = `${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}`;
   // Only the selected day is in the tab order; arrow keys move between days.
   return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}">
@@ -206,7 +206,7 @@ function renderCalendar() {
       ${WEEKDAYS.map((d) => `<span class="wd" aria-hidden="true">${d}</span>`).join('')}
       ${cells.join('')}
     </div>
-    <div class="cal-key"><span><i class="k1"></i>Meetup</span><span><i class="k2"></i>Conference</span><span>Tap a day to see its events</span></div>`;
+    <div class="cal-key"><span><i class="key-meetup"></i>Meetup</span><span><i class="key-headliner"></i>Conference</span><span>Tap a day to see its events</span></div>`;
   if (had?.dataset.month != null) $(`[data-month="${had.dataset.month}"]`, calView)?.focus({ preventScroll: true });
   else if (had?.dataset.day) $(`.day[data-day="${state.day}"]`, calView)?.focus({ preventScroll: true });
   renderDayPanel();
@@ -243,7 +243,7 @@ function renderMinical() {
   const cells = monthCells(ym).map((key) => {
     if (!key.startsWith(ym)) return '<span class="blank" aria-hidden="true"></span>';
     const list = eventsOn(key);
-    const cls = [list.length ? 'has' : '', list.some((e) => e.featured) ? 'conf' : '', key === today ? 'today' : '', key < today ? 'past' : ''].filter(Boolean).join(' ');
+    const cls = [list.length ? 'has' : '', list.some((e) => e.headliner) ? 'headliner' : '', key === today ? 'today' : '', key < today ? 'past' : ''].filter(Boolean).join(' ');
     return `<button type="button" class="${cls}" data-goto="${key}" aria-label="${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'no events'}">${Number(key.slice(8))}</button>`;
   });
   minical.innerHTML = `<h2>${monthName(ym)} <a href="?view=calendar" data-nav="calendar">Full calendar</a></h2>
