@@ -41,12 +41,20 @@ test('the browser re-labels a page opened on a later day', async ({ page }) => {
 // reloads a page more than an hour old; these cover the hour before that.
 // The Coding Dojo runs 5:30-7:30p.
 test('a page reopened within the hour re-labels itself', async ({ page }) => {
-  await page.clock.setSystemTime(new Date('2026-10-14T22:00:00Z'));
+  await page.clock.setSystemTime(new Date('2026-10-14T21:00:00Z'));
   await page.goto('/');
   await expect(row(page, 'Coding Dojo').getByText('Tonight', { exact: true })).toBeVisible();
-  await page.clock.setSystemTime(new Date('2026-10-14T22:45:00Z'));
+  await page.clock.setSystemTime(new Date('2026-10-14T21:45:00Z'));
   await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
-  await expect(row(page, 'Coding Dojo').getByText('Happening now', { exact: true })).toBeVisible();
+  await expect(row(page, 'Coding Dojo').getByText('In 45 min', { exact: true })).toBeVisible();
+});
+
+test('the hour before, the tag counts down the minutes', async ({ page }) => {
+  await page.clock.setSystemTime(new Date('2026-10-14T22:05:00Z')); // 5:05p, the Dojo is at 5:30
+  await page.goto('/');
+  await expect(row(page, 'Coding Dojo').getByText('In 25 min', { exact: true })).toBeVisible();
+  await page.clock.runFor('10:00');
+  await expect(row(page, 'Coding Dojo').getByText('In 15 min', { exact: true })).toBeVisible();
 });
 
 test('a page left showing re-checks once a minute', async ({ page }) => {

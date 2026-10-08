@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween, liveLabel, lineup, recentSummary } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
@@ -100,7 +100,8 @@ test('the poster stamp agrees with the row for a multi-day conference', () => {
   assert.equal(stamp('2026-10-15T05:30:00Z'), 'Today', 'day one, just after midnight');
   assert.equal(stamp('2026-10-15T15:00:00Z'), 'Happening now', 'day one, 10am');
   assert.equal(stamp('2026-10-16T02:00:00Z'), 'Tomorrow', 'day one, 9pm');
-  assert.equal(stamp('2026-10-16T12:00:00Z'), 'Today', 'day two, 7am');
+  assert.equal(stamp('2026-10-16T11:00:00Z'), 'Today', 'day two, 6am');
+  assert.equal(stamp('2026-10-16T12:00:00Z'), 'In 60 min', 'day two, 7am: the hour before the doors');
   assert.equal(stamp('2026-10-16T17:00:00Z'), 'Happening now', 'day two, noon');
   assert.equal(stamp('2026-10-16T02:00:00Z', {}), 'Happening now', 'without the flag it runs straight through');
 });
@@ -109,17 +110,18 @@ test('a multi-day conference keeps its local hours across daylight saving', () =
   // Sat Oct 31 – Mon Nov 2, 8a–5p. Clocks fall back early on Sun Nov 1.
   const fall = [localToUtc('2026-10-31', '08:00'), localToUtc('2026-11-02', '17:00')];
   const atFall = (iso) => whenLabel(...fall, Date.parse(iso), { multiDay: true });
-  assert.equal(atFall('2026-11-01T13:30:00Z'), 'Today', 'Sun 7:30am CST, before the doors');
+  assert.equal(atFall('2026-11-01T13:30:00Z'), 'In 30 min', 'Sun 7:30am CST, before the doors');
+  assert.equal(atFall('2026-11-01T12:30:00Z'), 'Today', 'Sun 6:30am CST');
   assert.equal(atFall('2026-11-01T14:30:00Z'), 'Happening now', 'Sun 8:30am CST');
   assert.equal(atFall('2026-11-01T22:30:00Z'), 'Happening now', 'Sun 4:30pm CST');
   assert.equal(atFall('2026-11-01T23:30:00Z'), 'Tomorrow', 'Sun 5:30pm CST');
-  assert.equal(atFall('2026-11-02T13:30:00Z'), 'Today', 'Mon 7:30am CST');
+  assert.equal(atFall('2026-11-02T13:30:00Z'), 'In 30 min', 'Mon 7:30am CST');
   assert.equal(atFall('2026-11-02T14:30:00Z'), 'Happening now', 'Mon 8:30am CST');
   // Sat Mar 13 – Mon Mar 15 2027, 8a–5p. Clocks spring forward early on Sun Mar 14.
   const spring = [localToUtc('2027-03-13', '08:00'), localToUtc('2027-03-15', '17:00')];
   const atSpring = (iso) => whenLabel(...spring, Date.parse(iso), { multiDay: true });
   assert.equal(atSpring('2027-03-13T22:30:00Z'), 'Happening now', 'Sat 4:30pm CST');
-  assert.equal(atSpring('2027-03-14T12:30:00Z'), 'Today', 'Sun 7:30am CDT');
+  assert.equal(atSpring('2027-03-14T12:30:00Z'), 'In 30 min', 'Sun 7:30am CDT');
   assert.equal(atSpring('2027-03-14T13:30:00Z'), 'Happening now', 'Sun 8:30am CDT');
   assert.equal(atSpring('2027-03-15T13:30:00Z'), 'Happening now', 'Mon 8:30am CDT');
   assert.equal(atSpring('2027-03-15T21:30:00Z'), 'Happening now', 'Mon 4:30pm CDT');
@@ -182,9 +184,24 @@ test('a two-day conference is only "Happening now" during its hours', () => {
   const at = (iso) => whenLabel(start, end, Date.parse(iso), { multiDay: true });
   assert.equal(at('2026-10-15T15:00:00Z'), 'Happening now', 'day one, 10am');
   assert.equal(at('2026-10-16T02:00:00Z'), 'Tomorrow', 'day one, 9pm: back tomorrow');
-  assert.equal(at('2026-10-16T12:00:00Z'), 'Today', 'day two, 7am');
+  assert.equal(at('2026-10-16T12:00:00Z'), 'In 60 min', 'day two, 7am');
+  assert.equal(at('2026-10-16T11:30:00Z'), 'Today', 'day two, 6:30am');
   assert.equal(at('2026-10-16T17:00:00Z'), 'Happening now', 'day two, noon');
   assert.equal(whenLabel(start, end, Date.parse('2026-10-16T02:00:00Z')), 'Happening now', 'without the flag it runs straight through, as before');
+});
+
+test('the hour before an event, the row and the poster count the minutes', () => {
+  const [start, end] = ['2026-10-22T22:30:00.000Z', '2026-10-23T00:00:00.000Z']; // CIJUG, Thu 5:30p–7p
+  const at = (iso) => whenLabel(start, end, Date.parse(iso));
+  assert.equal(at('2026-10-22T21:29:00Z'), 'Tonight', '4:29p, just over an hour out');
+  assert.equal(at('2026-10-22T21:30:00Z'), 'In 60 min', '4:30p');
+  assert.equal(at('2026-10-22T22:05:00Z'), 'In 25 min', '5:05p');
+  assert.equal(at('2026-10-22T22:29:30Z'), 'In 1 min', 'seconds before: rounds up, never "In 0 min"');
+  assert.equal(at('2026-10-22T22:30:00Z'), 'Happening now');
+  assert.equal(startsIn(start, Date.parse('2026-10-22T21:00:00Z')), '');
+  // Tech Fuse's poster, day one: "Today" until the hour before the doors.
+  assert.equal(countdown('2026-10-15T13:00:00.000Z', '2026-10-16T22:00:00.000Z', Date.parse('2026-10-15T11:30:00Z')), 'Today');
+  assert.equal(countdown('2026-10-15T13:00:00.000Z', '2026-10-16T22:00:00.000Z', Date.parse('2026-10-15T12:15:00Z')), 'In 45 min');
 });
 
 test('liveLabel (the event-mode TV stamp) counts down, then says Happening now, then nothing', () => {
