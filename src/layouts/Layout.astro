@@ -132,6 +132,17 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
       });
       showTheme();
 
+      // Count outbound clicks (docs/ANALYTICS.md): which kind of link, which
+      // group(s), which event. Nothing about the visitor. sendBeacon survives
+      // the page being left, and a failure never gets in the way of the link.
+      document.addEventListener('click', (ev) => {
+        const a = (ev.target as Element).closest<HTMLElement>('[data-click]');
+        if (!a || !import.meta.env.PROD) return;
+        const host = a.closest<HTMLElement>('[data-groups]');
+        const body = { kind: a.dataset.click, groups: host?.dataset.groups?.split(' ').filter(Boolean) ?? [], event: a.closest<HTMLElement>('[data-id]')?.dataset.id ?? '' };
+        try { navigator.sendBeacon('/api/click', JSON.stringify(body)); } catch {}
+      });
+
       if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('/sw.js');
 
       // An installed app can be resumed days later without reloading. If the page
