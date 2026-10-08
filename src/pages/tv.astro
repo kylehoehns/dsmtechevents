@@ -32,7 +32,7 @@ const slides = await Promise.all(events.map(async (e) => ({
 <Layout bare noindex headTitle={`TV · ${site.name}`}>
   <div class="tv" id="tv">
     <header class="tv-top">
-      <span class="tv-logo mis" data-t={site.name}>{site.name}</span>
+      <span class="tv-logo misprint" data-t={site.name}>{site.name}</span>
       <span class="tv-site">{new URL(site.url).host}</span>
       <time class="tv-clock" id="tv-clock"></time>
     </header>
@@ -40,7 +40,7 @@ const slides = await Promise.all(events.map(async (e) => ({
     <main class="tv-stage">
       <section class="slide overview is-on">
         <div class="overview-head">
-          <h1 class="mis" data-t="Coming up">Coming up</h1>
+          <h1 class="misprint" data-t="Coming up">Coming up</h1>
           <div class="qr site-qr">
             <div class="qr-code" set:html={siteQr} />
             <span>Every event</span>
@@ -50,10 +50,10 @@ const slides = await Promise.all(events.map(async (e) => ({
         <ol>
           {slides.slice(0, 7).map(({ e, hosts }) => (
             <li class:list={{ headliner: e.headliner }} data-end={e.end}>
-              <span class="d"><b>{weekday(e.start)}</b> {month(e.start)} {day(e.start)}</span>
-              <span class="h">{hosts}</span>
-              <span class="t">{e.title}</span>
-              <span class="w">{shortRange(e)}</span>
+              <span class="row-date"><b>{weekday(e.start)}</b> {month(e.start)} {day(e.start)}</span>
+              <span class="row-group">{hosts}</span>
+              <span class="row-title">{e.title}</span>
+              <span class="row-time">{shortRange(e)}</span>
             </li>
           ))}
         </ol>
@@ -63,7 +63,7 @@ const slides = await Promise.all(events.map(async (e) => ({
         <section class:list={['slide', 'poster-slide', { headliner: e.headliner }]} data-end={e.end} data-start={e.start}>
           <div class="date-block">
             <span class="dow">{weekday(e.start)}</span>
-            <span class="num mis" data-t={day(e.start)}>{day(e.start)}</span>
+            <span class="num misprint" data-t={day(e.start)}>{day(e.start)}</span>
             <span class="mon">{month(e.start)}</span>
             <span class="when-tag" hidden></span>
           </div>
@@ -97,14 +97,14 @@ const slides = await Promise.all(events.map(async (e) => ({
   /* The TV is always the dark flyer, whatever the device prefers. */
   html:has(.tv) { background: #141217; cursor: none; }
   .tv {
-    --bg: #1d1c22; --ink: #ece6da; --soft: #bdb6aa; --pink: #e0609f; --blue: #93c2ff; --mis: #c04f87;
+    --bg: #1d1c22; --ink: #ece6da; --soft: #bdb6aa; --pink: #e0609f; --blue: #93c2ff; --misprint: #c04f87;
     position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr auto;
     background: var(--bg); color: var(--ink); overflow: hidden;
     padding: 3vh 4vw 2vh; font-family: var(--sans);
     animation: tv-drift 600s ease-in-out infinite alternate; /* nudges everything a few px against burn-in */
   }
   @keyframes tv-drift { from { translate: -6px -4px; } to { translate: 6px 4px; } }
-  .tv .mis::before { color: var(--mis); mix-blend-mode: normal; }
+  .tv .misprint::before { color: var(--misprint); mix-blend-mode: normal; }
   .tv-top { display: flex; align-items: baseline; gap: 2vw; border-bottom: 3px solid #5d5966; padding-bottom: 1.2vh; }
   .tv-logo { font: 900 5vh/0.9 var(--display); text-transform: uppercase; color: var(--blue); }
   .tv-site { font: 700 2.2vh/1 var(--mono); color: var(--soft); }
@@ -121,12 +121,12 @@ const slides = await Promise.all(events.map(async (e) => ({
   .tv-empty { margin: 0; font: 600 3.4vh/1.3 var(--sans); color: var(--soft); }
   .overview ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.4vh; }
   .overview li { display: grid; grid-template-columns: 14vw 14vw 1fr auto; align-items: baseline; gap: 2vw; padding-bottom: 1.2vh; border-bottom: 2px dashed #5d5966; font-size: 3.2vh; }
-  .overview li.headliner .t { color: var(--pink); }
-  .overview .d { font: 700 2.8vh/1 var(--mono); }
-  .overview .d b { color: var(--blue); }
-  .overview .h { font: 900 3.4vh/1 var(--display); text-transform: uppercase; color: var(--pink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .overview .t { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .overview .w { font: 600 2.6vh/1 var(--mono); color: var(--soft); }
+  .overview li.headliner .row-title { color: var(--pink); }
+  .overview .row-date { font: 700 2.8vh/1 var(--mono); }
+  .overview .row-date b { color: var(--blue); }
+  .overview .row-group { font: 900 3.4vh/1 var(--display); text-transform: uppercase; color: var(--pink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .overview .row-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .overview .row-time { font: 600 2.6vh/1 var(--mono); color: var(--soft); }
 
   .poster-slide { align-items: center; gap: 4vw; padding: 3vh 0; }
   .poster-slide.headliner { background: var(--pink); color: #1d1b2b; margin: 2vh -4vw; padding: 3vh 4vw; }

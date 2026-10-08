@@ -36,7 +36,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
 >
   <div class="date" aria-hidden="true">
     <span class="dow">{weekday(e.start)}</span>
-    <span class="num mis" data-t={day(e.start)}>{day(e.start)}</span>
+    <span class="num misprint" data-t={day(e.start)}>{day(e.start)}</span>
     <span class="mon">{month(e.start)}</span>
   </div>
 
@@ -56,7 +56,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
               <a href={`/?group=${g.id}`} data-group={g.id}>{g.short}</a>
             </>
           ))
-        : <span class="b">{e.tags.includes('conference') ? 'Headliner · conference' : 'Community event'}</span>}
+        : <span class="band-name">{e.tags.includes('conference') ? 'Headliner · conference' : 'Community event'}</span>}
       {hosts.length === 1 && lead.showFullName && <span class="with">{lead.name}</span>}
     </p>
     {e.series && (
@@ -65,7 +65,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
     <h3 class="title">{e.url ? <a href={e.url} target="_blank" rel="noopener" data-click="title" aria-label={`${e.title} (opens in new tab)`}>{e.title}</a> : e.title}</h3>
     <p class="meta">
       <span class="sr-only">{weekday(e.start)} {month(e.start)} {day(e.start)}, </span>
-      <span class="t">{shortRange(e)}</span>
+      <span class="time">{shortRange(e)}</span>
       {' · '}
       {e.online
         ? <span class="tag-online">Online</span>

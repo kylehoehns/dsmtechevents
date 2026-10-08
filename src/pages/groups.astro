@@ -23,8 +23,8 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
         )}
         <p class="next">
           {g.nextEvent
-            ? <><span class="nd">Next: {when(g.nextEvent)}</span><span class="sr-only">, </span><span class="nt">{g.nextEvent.title}</span><span class="sr-only">, </span>{g.nextEvent.online ? 'Online' : `@ ${g.nextEvent.venue ?? 'TBA'}`} · {g.nextEvent.allDay ? 'All day' : shortTime(g.nextEvent.start)}</>
-            : <><span class="nd idle">Nothing scheduled</span>Nothing posted yet. Check their page.</>}
+            ? <><span class="next-when">Next: {when(g.nextEvent)}</span><span class="sr-only">, </span><span class="next-title">{g.nextEvent.title}</span><span class="sr-only">, </span>{g.nextEvent.online ? 'Online' : `@ ${g.nextEvent.venue ?? 'TBA'}`} · {g.nextEvent.allDay ? 'All day' : shortTime(g.nextEvent.start)}</>
+            : <><span class="next-when idle">Nothing scheduled</span>Nothing posted yet. Check their page.</>}
         </p>
         {g.lastEvent && (
           <p class="last">Last event {month(g.lastEvent.start)} {day(g.lastEvent.start)}{g.lastEvent.going ? ` · ${g.lastEvent.going} went` : ''}</p>
