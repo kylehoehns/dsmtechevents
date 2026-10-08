@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-07T22:03:42.541Z",
+  "fetchedAt": "2026-10-08T03:30:37.792Z",
   "logo": "https://secure.meetupstatic.com/photos/event/7/8/6/c/600_460890828.jpeg",
   "enriched": true,
   "events": [
@@ -13,7 +13,7 @@
       "description": "AI-assisted development has come a long way from simple autocomplete, but most developers are only scratching the surface of what's possible today. Join us as Kyle Hoehns demonstrates how modern AI development tools have evolved from helpful coding assistants into capable agents that can help build complete features with minimal human intervention. Drawing from more than a year of daily use on real client projects, Kyle will share his insights into how these tools fit into modern software development workflows.\n\nThis session is completely hands-on. Starting with an empty project, Kyle will build a real REST API feature live using tools such as Claude Code and GitHub Copilot. Along the way, you'll see how AI agents can assist with implementation, testing, iteration, and feature development while still keeping developers in control of the process.\n\n**Speaker Bio:**\nKyle Hoehns\nSoftware Engineer and Teammate Pipeline Architect at Source Allies\nKyle is a seasoned software engineer with more than a decade of experience developing and implementing complex software solutions. With a strong background in backend technologies, including Java and Go, he has delivered scalable and efficient systems across multiple industries. Kyle is passionate about solving problems, improving developer experiences, and believes in not taking himself too seriously.\n\n**Event Details:**\n*Date:* Thursday, July 16th, 2026\n*Time:* 5:30 PM to 7:00 PM\n*Location:* Source Allies\nFood and drinks will be provided.",
       "url": "https://www.meetup.com/central-iowa-java-users-group/events/315286709/",
       "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr",
+      "address": "4501 NW Urbandale Dr, Urbandale",
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/e/6/1/4/600_534778900.jpeg",
@@ -29,7 +29,7 @@
       "description": "For decades, our industry has predicted that the next wave of technology would replace software developers. From COBOL to the dot-com boom, DevOps, and now AI, each shift has promised to fundamentally change our profession.\nYet developers are still here.\n\nThe difference is that every wave has demanded new skills, not fewer developers. As AI continues to reshape software engineering, one thing has become increasingly clear: the developers who thrive will be the ones who understand the fundamentals.\n\nJoin CIJUG as Dustin Thostenson explores why design patterns, system thinking, effective communication, testing, and quality engineering remain just as important today as they've ever been. Rather than focusing on AI tools themselves, this session examines how developers can avoid common pitfalls like AI-generated technical debt, missed business outcomes, and systems that become increasingly difficult to understand and maintain.\nYou'll learn practical approaches to defining problems clearly, designing systems with well-defined responsibilities, and writing tests that build confidence instead of simply checking boxes.\n\n**About the Speaker**\nDustin Thostenson is an independent consultant leading Delta3Consulting. Over the course of his career, he has served as a developer, mentor, trainer, and agile coach, with a passion for helping people grow and teams deliver better outcomes. Dustin also helps lead the Iowa .NET User Group and is an active volunteer in the Central Iowa technology community.\n\n**Event Details**\nThursday, August 20th, 2026\n5:30 PM to 7:00 PM\nHosted at Source Allies\nFood and drinks will be provided.",
       "url": "https://www.meetup.com/central-iowa-java-users-group/events/315859295/",
       "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr",
+      "address": "4501 NW Urbandale Dr, Urbandale",
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/4/b/c/d/600_535399405.jpeg",
@@ -45,7 +45,7 @@
       "description": "Join the Central Iowa Java User Group on Wednesday, September 16th from 5:30 – 7pm at Source Allies for food, drinks, and conversation at a CIJUG social! No presentations. No coding sessions. Just a chance to spend some time with our local CIJUG members.\n\nOur regular meetups give us opportunities to learn about Java, the JVM, software engineering, and new technologies. This month, we're setting the technical topics aside and making time to get to know the people who make up our community.\nCome meet other developers from around Iowa, catch up with people you've met at past CIJUG events, make some new connections, and talk about whatever is on your mind. Java is optional.\n\nIt doesn’t matter if you've been attending CIJUG for years or have never been to one of our events before, you’re welcome to stop by.\n\nWednesday, September 16th, 2026\n5:30 to 7:00 PM\nHosted at Source Allies\nFood and drinks will be provided – hope to see you there!",
       "url": "https://www.meetup.com/central-iowa-java-users-group/events/316358683/",
       "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr",
+      "address": "4501 NW Urbandale Dr, Urbandale",
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/3/9/a/7/600_535934759.jpeg",

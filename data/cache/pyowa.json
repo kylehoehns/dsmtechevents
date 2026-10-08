@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-07T22:03:43.221Z",
+  "fetchedAt": "2026-10-08T03:30:39.130Z",
   "logo": "https://secure.meetupstatic.com/photos/event/2/b/9/b/600_525311163.jpeg",
   "enriched": true,
   "events": [
@@ -13,7 +13,7 @@
       "description": "How do you turn noisy, inconsistent public health data into something genuinely informative?\n\nAaron Hall with Source Allies walks us through the development of Sick Risk, a system that computes illness risk scores by zip code using CDC wastewater surveillance data. He will focus on extracting a stable, interpretable signal from messy real-world data, and the tradeoffs involved in doing so.\n\nAlong the way, he will explore the Python-based, cloud-hosted architecture behind the application.\n\nFinally, he taks a look at how modern AI coding assistants accelerated development, without drifting into \"AI slop.\"\n\nHosted at Source Allies, Tuesday, July 28th 5:30p-7pm. In-person or streamed online.\n\nSpeaker Bio: Dr. Aaron Hall\n\nGenAI & Data Science Consulting at Source Allies.\nAaron Hall is a hands-on AI engineer building real-world systems at the edge of modern machine learning. As a consultant at Source Allies, he ships production-ready solutions using generative AI and retrieval-augmented generation (RAG), focusing on what actually works beyond the demos. Previously, he was a Data Scientist at Los Alamos National Laboratory, applying machine learning at scale across high-performance computing environments and contributing to open-source ML infrastructure. With a PhD in Physics and experience spanning national labs, research, and full-stack development, Aaron brings a rare blend of technical depth and pragmatic engineering, helping teams turn powerful models into reliable, high-impact products.",
       "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315470463/",
       "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr",
+      "address": "4501 NW Urbandale Dr, Urbandale",
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/6/0/b/3/600_534984755.jpeg",
@@ -29,7 +29,7 @@
       "description": "Roboflow: Building a Real-Time Computer Vision Checkout with Python\n\nComputer vision has become more accessible than ever, but what does it take to build a complete, real-time application from camera to customer?\n\nJoin Pyowa on Tuesday, August 25th, as Zac Crane presents \"Roboflow.\" In this session, Zac will demonstrate a computer vision project that uses Python to recognize concession stand items and calculate an order total in real time.\n\nYou'll get a behind-the-scenes look at how Python and Roboflow work together to connect a camera feed, edge computing, an object detection model, pricing logic, and WebSocket communication that instantly sends the running total to a phone display. Along the way, Zac will share lessons learned while building an end-to-end computer vision application that bridges machine learning and real-world software engineering.\n\nAs always, we'll wrap up with time for questions, discussion, and networking with fellow members of the Pyowa community.\nJoin us from 5:30-7pm hosted at Source Allies. Food, drinks, and great conversation are included.",
       "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315907190/",
       "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr",
+      "address": "4501 NW Urbandale Dr, Urbandale",
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/1/a/f/600_535440431.jpeg",
@@ -45,7 +45,7 @@
       "description": "Pyowa returns on Tuesday, September 22nd from 5:30-7pm for a hands-on evening of Python coding with “Pybites Coding Exercises.”\n\nInstead of a traditional presentation, this meetup will give attendees time to work through coding exercises using Pybites, experiment with different approaches, and learn alongside other members of the local Python community.\n\nBring your laptop and work through challenges independently or pair with others! The evening is an opportunity to sharpen your skills, practice problem-solving, and learn from fellow developers.\n\nHosted in person at Source Allies. Food and drinks provided.",
       "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/316355128/",
       "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr",
+      "address": "4501 NW Urbandale Dr, Urbandale",
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/2/c/e/a/600_535931498.jpeg",
