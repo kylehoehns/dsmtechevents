@@ -24,6 +24,8 @@ test('the overview shows every day of a multi-day event, with its hours apart', 
   const row = page.locator('.overview li', { hasText: 'Test Conf 2026' });
   await expect(row.locator('.row-date')).toHaveText('Thu–Fri Oct 22–23');
   await expect(row.locator('.row-time')).toHaveText('8a–5p');
+  // Its poster prints THU 22 OCT big, so the time line adds only the last day.
+  await expect(page.locator('.poster-slide', { hasText: 'Test Conf 2026' }).locator('.time')).toHaveText('through Fri Oct 23 · 8a–5p');
 });
 
 test('drops events once they have ended', async ({ page }) => {

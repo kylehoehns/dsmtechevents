@@ -16,8 +16,11 @@ const isMeetup = e.url?.includes('meetup.com');
 const cta = isMeetup ? 'RSVP on Meetup' : 'RSVP & info';
 const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
 // Meetup photos come as small webp copies (see meetupPhoto). Most are 16:9 at
-// 600x338; width/height hold that shape until the image arrives.
+// 600x338; width/height hold that shape until the image arrives. Photos from
+// anywhere else come in any shape (Iowans of Things posts a 1400x400 banner),
+// so they get no size and take their own shape once loaded.
 const photo = e.photo;
+const size = photo?.large.includes('meetupstatic.com') ? { width: 600, height: 338 } : {};
 const thumbSrcset = photo && photo.small !== photo.large ? `${photo.small} 180w, ${photo.large} 600w` : undefined;
 // "Tomorrow" / "Tonight" as of the build, so the tag is in the page from the
 // start and nothing moves when app.js re-checks it against the real date.
@@ -44,7 +47,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
 
   {e.photo && (
     <div class="photo" aria-hidden="true">
-      <div class="ink"><img src={photo.large} srcset={thumbSrcset} sizes="160px" width="600" height="338" alt="" loading="lazy" decoding="async" /></div>
+      <div class="ink"><img src={photo.large} srcset={thumbSrcset} sizes="160px" {...size} alt="" loading="lazy" decoding="async" /></div>
     </div>
   )}
 
@@ -68,13 +71,14 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
     <h3 class="title">{e.url ? <a href={e.url} target="_blank" rel="noopener" data-click="title" aria-label={`${e.title} (opens in new tab)`}>{e.title}</a> : e.title}</h3>
     <p class="meta">
       <span class="sr-only">{weekday(e.start)} {month(e.start)} {day(e.start)}, </span>
-      <span class="time">{shortRange(e)}</span>
-      {' · '}
+      <span class="time" data-full={e.multiDay ? shortRange(e, { full: true }) : undefined}>{shortRange(e)}</span>
+      {/* No-break spaces keep "·" with the time and "@" with the venue on a narrow card. */}
+      {'\u00a0· '}
       {e.online
         ? <span class="tag-online">Online</span>
         : e.venue
-          ? <>@ <a class="map" href={mapUrl} data-q={mapQuery} data-click="map" target="_blank" rel="noopener"><span class="venue">{e.venue}</span>{e.address && <span class="addr">, {e.address}</span>}<span class="sr-only"> (opens map in new tab)</span></a></>
-          : <>@ Venue TBA</>}
+          ? <>{'@\u00a0'}<a class="map" href={mapUrl} data-q={mapQuery} data-click="map" target="_blank" rel="noopener"><span class="venue">{e.venue}</span>{e.address && <span class="addr">, {e.address}</span>}<span class="sr-only"> (opens map in new tab)</span></a></>
+          : '@\u00a0Venue TBA'}
       {e.hybrid && <> · <span class="tag-online">+ online</span></>}
     </p>
   </div>
@@ -87,7 +91,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
   {(e.description || e.photo) && (
     <div class="desc" id={descId} hidden>
       {/* Phones hide the photo square, so the full-size flyer lives here. */}
-      {e.photo && <img class="desc-photo" src={photo.large} width="600" height="338" alt={`Event image for ${e.title}`} loading="lazy" decoding="async" />}
+      {e.photo && <img class="desc-photo" src={photo.large} {...size} alt={`Event image for ${e.title}`} loading="lazy" decoding="async" />}
       {e.description && <Fragment set:html={formatDescription(e.description)} />}
     </div>
   )}

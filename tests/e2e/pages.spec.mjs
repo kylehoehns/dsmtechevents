@@ -46,7 +46,7 @@ test('a link to /groups/#id highlights that group', async ({ page }) => {
   const outline = (id) => page.locator(`article#${id}`).evaluate((el) => getComputedStyle(el).outlineStyle);
   expect(await outline('pyowa')).toBe('solid');
   expect(await outline('cijug')).toBe('none');
-  await page.locator('article#pyowa').getByRole('link', { name: 'See 1 upcoming from Pyowa' }).click();
+  await page.locator('article#pyowa').getByRole('link', { name: 'See events from Pyowa' }).click();
   await expect(page).toHaveURL(/\/\?group=pyowa$/);
 });
 
@@ -102,13 +102,17 @@ test('a group card catches up once its next event is over', async ({ page }) => 
   const card = page.locator('article#webgeeks');
   await expect(card.locator('.next:visible')).toContainText('Next: Wed Oct 14, Coding Dojo');
   await expect(card.locator('.last:visible')).toHaveText('Last event Oct 5 · 37 went');
-  await expect(card.getByRole('link', { name: 'See 1 upcoming from Web Geeks' })).toBeVisible();
+  // One label for the group's whole list (coming up and past); solid while something's coming up.
+  const see = card.getByRole('link', { name: 'See events from Web Geeks' });
+  await expect(see).toHaveCount(1);
+  await expect(see).toHaveText('See events from Web Geeks');
+  await expect(see).toHaveClass(/btn-solid/);
 
   await page.clock.runFor('15:00'); // left open past 7:30p
   await expect(card.locator('.next')).toHaveText("Nothing scheduledCheck their page for what's next.");
   await expect(card.locator('.last')).toHaveText('Last event Oct 14 · 12 went');
-  await expect(card.getByRole('link', { name: 'See past events from Web Geeks' })).toBeVisible();
-  await expect(card.getByRole('link', { name: 'See 1 upcoming from Web Geeks' })).toHaveCount(0);
+  await expect(see).toHaveCount(1);
+  await expect(see).toHaveClass(/btn-outline/);
   // Pyowa's lunch tomorrow is still next.
   await expect(page.locator('article#pyowa .next:visible')).toContainText('Python Office Hours');
 });

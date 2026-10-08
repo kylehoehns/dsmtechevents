@@ -38,9 +38,27 @@ test('picking a day lists that day\'s events', async ({ page }) => {
   // Both conference days show the conference.
   await page.getByRole('button', { name: 'Friday, October 23, 1 event' }).click();
   await expect(dayPanel(page)).toContainText('Test Conf 2026');
+  // The panel hides the card's date block, so the time line keeps the whole range.
+  await expect(dayPanel(page).locator('.time')).toHaveText('Thu–Fri Oct 22–23 · 8a–5p');
 
   await page.getByRole('button', { name: 'Monday, October 19, nothing scheduled' }).click();
   await expect(dayPanel(page)).toContainText('A quiet day');
+});
+
+test('the "Pick a day" hint goes once a day is picked', async ({ page }) => {
+  const hint = page.locator('.cal-key').getByText('Pick a day to see its events');
+  await page.goto('/?view=calendar');
+  await expect(hint).toBeVisible();
+  await page.getByRole('button', { name: 'Tuesday, October 20, 1 event' }).click();
+  await expect(dayPanel(page)).toContainText('Joint night - JVM vs. CLR');
+  await expect(hint).toHaveCount(0);
+  // Paging months doesn't bring it back.
+  await page.getByRole('button', { name: 'Next month' }).click();
+  await expect(hint).toHaveCount(0);
+  // A link to a day is a day already picked.
+  await page.goto('/?view=calendar&day=2026-10-22');
+  await expect(page.locator('.cal-key')).toBeVisible();
+  await expect(hint).toHaveCount(0);
 });
 
 test('arrow keys move between days and focus survives picking one', async ({ page }) => {

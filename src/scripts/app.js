@@ -131,8 +131,12 @@ const hostsOf = (el) => (el.dataset.groups ?? '').split(' ');
 
 // ---- search ----
 // Matches what a card says (title, hosts, venue, address, About text) plus
-// each host's short and full name. Every word typed must start a word in
-// there: "ai" finds "AI" but not "said". Built from the page on first use.
+// each host's short and full name. Built from the page on first use. Every
+// word typed must be found in there:
+// - A short word (under 4 characters) or one with ".", "#" or "+" must start
+//   a word: "ai" finds "AI" but not "said".
+// - A longer plain word may sit inside a word ("telemetry" finds
+//   "OpenTelemetry"), and a trailing "s" is dropped ("agents" finds "agent").
 // ".", "#" and "+" count as part of a word, so ".net" or "c#" don't match
 // "networking" or every "C"; the text is also kept without them, so "net"
 // still finds ".NET".
@@ -155,13 +159,14 @@ function haystack(id) {
   }
   return searchIndex.get(id) ?? '';
 }
+const loose = (w) => /^[\p{L}\p{N}]{4,}$/u.test(w); // a longer plain word: the looser rules above
 const found = (el) => {
   if (!state.q) return true;
   // Only emoji or punctuation ("🎉", "-", "..."): nothing to look for, so
   // nothing matches (every() on no words would match everything).
   const qw = queryWords(state.q);
   const hay = qw.length && haystack(el.dataset.id);
-  return qw.length > 0 && qw.every((w) => hay.includes(` ${w}`));
+  return qw.length > 0 && qw.every((w) => hay.includes(loose(w) ? w.replace(/s$/, '') : ` ${w}`));
 };
 const shows = (el) => matches(hostsOf(el)) && found(el);
 
@@ -252,6 +257,9 @@ function renderSide() {
 
 // ---- calendar ----
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// The key's "Pick a day" hint goes once a day has been picked (or a ?day=
+// link opened on one): its events are showing, so the hint has done its job.
+let dayPicked = !!state.day;
 const addMonths = (ym, n) => { const d = new Date(`${ym}-01T00:00:00Z`); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString().slice(0, 7); };
 const eventsOn = (key) => events
   .filter((e) => dayKey(e.start) <= key && key <= lastDay(e.start, e.end) && matches(e.groups))
@@ -317,7 +325,7 @@ function renderCalendar() {
       ${WEEKDAYS.map((d) => `<span class="weekday" aria-hidden="true">${d}</span>`).join('')}
       ${cells.join('')}
     </div>
-    <div class="cal-key"><span><i class="key-event"></i>Event</span><span><i class="key-headliner"></i>Conference</span><span>Pick a day to see its events</span></div>`;
+    <div class="cal-key"><span><i class="key-event"></i>Event</span><span><i class="key-headliner"></i>Conference</span>${dayPicked ? '' : '<span>Pick a day to see its events</span>'}</div>`;
   if (had?.dataset.month != null) $(`[data-month="${had.dataset.month}"]`, calView)?.focus({ preventScroll: true });
   else if (had?.dataset.day) $(`.day[data-day="${state.day}"]`, calView)?.focus({ preventScroll: true });
   renderDayPanel();
@@ -356,6 +364,10 @@ function renderDayPanel() {
     card.classList.remove('same-day', 'addr-seen');
     const tag = $('.when-tag', card);
     if (tag) tag.hidden = true;
+    // The panel hides the card's date block, so a conference's time line
+    // gives its whole range here ("Thu–Fri Oct 15–16", not "through Fri").
+    const time = $('.time[data-full]', card);
+    if (time) time.textContent = time.dataset.full;
     const desc = $('.desc', card);
     if (desc) { desc.id += '-day'; desc.hidden = true; $('.more', card)?.setAttribute('aria-controls', desc.id); }
     // Over (a past day, or earlier today): read it like Recent events does.
@@ -528,6 +540,7 @@ document.addEventListener('click', (ev) => {
   if (goto) {
     state.view = 'calendar';
     state.day = goto.dataset.goto;
+    dayPicked = true;
     state.month = state.day.slice(0, 7);
     render();
     // The mini calendar is hidden in calendar view; move focus to the same day.
@@ -551,6 +564,7 @@ document.addEventListener('click', (ev) => {
   const cell = t.closest('.day[data-day]');
   if (cell) {
     state.day = cell.dataset.day;
+    dayPicked = true;
     if (!state.day.startsWith(state.month)) state.month = state.day.slice(0, 7);
     render();
     announce(dayStatus());
@@ -643,7 +657,9 @@ async function toggleAbout(more) {
   card.dataset.animating = '1';
   try {
     if (open) {
-      if (fly) { big.loading = 'eager'; await big.decode().catch(() => {}); }
+      // A photo with no width/height (not from Meetup) has no shape until it
+      // loads; wait for it so the panel grows to its real height.
+      if (fly || (big && !big.hasAttribute('height'))) { big.loading = 'eager'; await big.decode().catch(() => {}); }
       const from = fly && thumb.getBoundingClientRect();
       set(true);
       // Measure where the photo lands before the panel starts growing: the
