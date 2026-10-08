@@ -45,7 +45,7 @@ for (const group of groups) {
     const { enrichError, ...result } = await fetchGroup(group);
     await fs.writeFile(path.join(cacheDir, `${group.id}.json`), JSON.stringify(result, null, 2) + '\n');
     const past = result.events.filter((e) => Date.parse(e.end) < Date.now()).length;
-    console.log(`✓ ${group.id}: ${result.events.length - past} upcoming, ${past} past${result.enriched ? '' : ' (no enrichment)'}`);
+    console.log(`✓ ${group.id}: ${result.events.length - past} upcoming, ${past} past${enrichError ? ' (no enrichment)' : ''}`);
     if (enrichError) report.problems.push({ id: group.id, name: group.name, kind: 'details', message: enrichError });
     else report.ok.push(group.id);
   } catch (err) {
@@ -83,7 +83,7 @@ async function fetchGroup(group) {
     const read = SOURCES[group.source];
     if (!read) throw new Error(`unknown source "${group.source}"`);
     const events = (await read(group, { get, now, since: cutoff })).filter((e) => Date.parse(e.end) >= cutoff);
-    fresh = { events, logo: group.logo ?? null, enriched: true };
+    fresh = { events, logo: group.logo ?? null };
   } else {
     fresh = await fetchFeed(group, now, cutoff);
   }
@@ -103,22 +103,21 @@ async function fetchFeed(group, now, cutoff) {
   let logo = null;
   let facts = {};
   let enrichError = null;
-  let enriched = false;
   if (slug) {
     try {
       const details = parseEventsPage(await get(meetupUrl(slug, 'events/')), slug);
       logo = details.logo;
       recent = enrich(upcoming, details, group, { now, cutoff });
       facts = { members: details.members, pastCount: details.pastCount };
-      enriched = true;
     } catch (err) {
       console.warn(`  ${group.id}: enrichment skipped (${err.message})`);
       enrichError = `Meetup events page: ${err.message}`;
     }
   }
 
-  // The feed's copy of an upcoming event wins over the page's.
-  return { events: [...recent, ...upcoming], logo, ...facts, enriched, enrichError };
+  // The feed's copy of an upcoming event wins over the page's. If the page
+  // failed, mergeCache keeps the page details from the previous run.
+  return { events: [...recent, ...upcoming], logo, ...facts, pageFailed: Boolean(enrichError), enrichError };
 }
 
 async function readCache(id) {
