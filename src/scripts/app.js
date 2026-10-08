@@ -14,6 +14,8 @@ const calView = $('#calendar-view');
 const dayPanel = $('#day-panel');
 const minical = $('#minical');
 const recent = $('#recent');
+const status = $('#status');
+const siteTitle = document.title;
 const now = Date.now();
 const today = dayKey(new Date().toISOString());
 const DAY = 86_400_000;
@@ -53,6 +55,9 @@ const state = {
   day: /^\d{4}-\d{2}-\d{2}$/.test(params.get('day') ?? '') ? params.get('day') : null,
 };
 state.month = (state.day ?? today).slice(0, 7);
+
+// Tell screen readers what a click changed. Never called on first load.
+function announce(text) { status.textContent = text; }
 
 function syncUrl() {
   const p = new URLSearchParams();
@@ -159,15 +164,18 @@ function renderCalendar() {
         : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : timeShort(e.start)}</i> ${escapeHtml(label(e))}</span>`;
     }).join('') + (list.length > 3 ? `<span class="more-n">+${list.length - 3} more</span>` : '');
     const dots = list.filter((e) => !e.featured).map(() => '<i class="dot"></i>').join('');
-    const aria = `${fullDate(`${key}T17:00:00Z`)}${list.length ? `, ${list.length} event${list.length > 1 ? 's' : ''}` : ', nothing scheduled'}`;
-    return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" aria-label="${aria}">
-      <span class="n">${Number(key.slice(8))}</span><span class="pills" aria-hidden="true">${pills}</span><span class="dots" aria-hidden="true">${dots}</span>
+    const name = `${fullDate(`${key}T17:00:00Z`)}${list.length ? `, ${list.length} event${list.length > 1 ? 's' : ''}` : ', nothing scheduled'}`;
+    // Only the selected day is in the tab order; arrow keys move between days.
+    return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}">
+      <span class="sr-only">${name}</span><span class="n" aria-hidden="true">${Number(key.slice(8))}</span><span class="pills" aria-hidden="true">${pills}</span><span class="dots" aria-hidden="true">${dots}</span>
     </button>`;
   });
   const [y] = state.month.split('-');
+  // Rebuilding the grid drops focus. Remember what had it and put it back.
+  const had = calView.contains(document.activeElement) ? document.activeElement : null;
   calView.innerHTML = `
     <div class="cal-head">
-      <h2>${monthLabel(state.month)}<span>${y}</span></h2>
+      <h2>${monthLabel(state.month)}<span> ${y}</span></h2>
       <div class="cal-nav">
         <button type="button" data-month="-1" aria-label="Previous month">←</button>
         <button type="button" data-month="0">Today</button>
@@ -179,6 +187,8 @@ function renderCalendar() {
       ${cells.join('')}
     </div>
     <div class="cal-key"><span><i class="k1"></i>Meetup</span><span><i class="k2"></i>Conference</span><span>Tap a day to see its events</span></div>`;
+  if (had?.dataset.month != null) $(`[data-month="${had.dataset.month}"]`, calView)?.focus({ preventScroll: true });
+  else if (had?.dataset.day) $(`.day[data-day="${state.day}"]`, calView)?.focus({ preventScroll: true });
   renderDayPanel();
 }
 
@@ -222,6 +232,9 @@ function renderMinical() {
 
 // ---- render ----
 function render() {
+  const viewName = state.view === 'calendar' ? 'Calendar' : '';
+  const groupName = state.group ? groups[state.group].short : '';
+  document.title = [groupName, viewName, siteTitle].filter(Boolean).join(' · ');
   for (const a of $$('.nav a[data-nav]')) {
     if (a.dataset.nav === state.view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   }
@@ -231,6 +244,15 @@ function render() {
   renderSide();
   syncUrl();
 }
+
+const visibleCount = () => $$('.show, .far > li', listView).filter((el) => !el.hidden && !el.closest('[hidden]')).length;
+const monthCount = () => events.filter((e) => e.start.startsWith(state.month) && matches(e.groups.join(' '))).length;
+function announceFilter() {
+  const who = state.group ? ` from ${groups[state.group].short}` : '';
+  if (state.view === 'list') { const n = visibleCount(); announce(`Showing ${n} ${n === 1 ? 'event' : 'events'}${who}`); }
+  else { const n = monthCount(); announce(`Calendar showing ${n} ${n === 1 ? 'event' : 'events'}${who} in ${monthLabel(state.month)}`); }
+}
+const dayStatus = () => { const n = eventsOn(state.day).length; return `${fullDate(`${state.day}T17:00:00Z`)}: ${n ? `${n} ${n === 1 ? 'event' : 'events'}` : 'nothing scheduled'}`; };
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -246,12 +268,21 @@ document.addEventListener('click', (ev) => {
     state.view = nav.dataset.nav;
     if (state.view === 'calendar') state.month = (state.day ?? today).slice(0, 7);
     render();
+    announce(state.view === 'calendar' ? `Calendar, ${monthLabel(state.month)} ${state.month.slice(0, 4)}` : 'Event list');
     scrollTo({ top: 0 });
     return;
   }
 
   const chip = t.closest('[data-chip]');
-  if (chip) { state.group = chip.dataset.chip; render(); return; }
+  if (chip) {
+    state.group = chip.dataset.chip;
+    // "Show all groups" lives in the note that this hides; land on the All chip.
+    const fromNote = !!chip.closest('#filter-note');
+    render();
+    if (fromNote) $('.chip[data-chip=""]').focus();
+    announceFilter();
+    return;
+  }
 
   const groupLink = t.closest('a[data-group]');
   if (groupLink && !ev.metaKey && !ev.ctrlKey) {
@@ -260,6 +291,7 @@ document.addEventListener('click', (ev) => {
     state.view = 'list';
     render();
     $('#filter').scrollIntoView({ block: 'start' });
+    announceFilter();
     return;
   }
 
@@ -287,6 +319,9 @@ document.addEventListener('click', (ev) => {
     state.day = goto.dataset.goto;
     state.month = state.day.slice(0, 7);
     render();
+    // The mini calendar is hidden in calendar view; move focus to the same day.
+    $(`.day[data-day="${state.day}"]`, calView)?.focus({ preventScroll: true });
+    announce(dayStatus());
     scrollTo({ top: 0 });
     return;
   }
@@ -297,6 +332,7 @@ document.addEventListener('click', (ev) => {
     state.month = step === 0 ? today.slice(0, 7) : addMonths(state.month, step);
     state.day = step === 0 ? today : null;
     render();
+    announce(`${monthLabel(state.month)} ${state.month.slice(0, 4)}`);
     return;
   }
 
@@ -305,8 +341,26 @@ document.addEventListener('click', (ev) => {
     state.day = cell.dataset.day;
     if (!state.day.startsWith(state.month)) state.month = state.day.slice(0, 7);
     render();
+    announce(dayStatus());
     if (matchMedia('(max-width: 1059px)').matches) dayPanel.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
   }
+});
+
+// Calendar grid keys: arrows move a day or a week, Home/End go to the ends of
+// the week. Enter/Space pick the day (they're buttons). Stops at the grid edge.
+calView.addEventListener('keydown', (ev) => {
+  const cell = ev.target.closest('.day[data-day]');
+  const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[ev.key];
+  if (!cell || ev.altKey || ev.ctrlKey || ev.metaKey || (step == null && ev.key !== 'Home' && ev.key !== 'End')) return;
+  ev.preventDefault();
+  const key = cell.dataset.day;
+  const dow = new Date(key).getUTCDay();
+  const to = step != null ? addDays(key, step) : addDays(key, ev.key === 'Home' ? -dow : 6 - dow);
+  const next = $(`.day[data-day="${to}"]`, calView);
+  if (!next) return;
+  cell.tabIndex = -1;
+  next.tabIndex = 0;
+  next.focus();
 });
 
 render();

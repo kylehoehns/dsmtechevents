@@ -11,6 +11,7 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
 ---
 <Layout title="Groups" nav="groups" updatedAt={updatedAt}
   blurb={`${groups.length} Des Moines tech groups. Pick one, show up, say hi.`}>
+  <h1 class="sr-only">Des Moines tech groups</h1>
   <div class="board">
     {sorted.map((g, i) => (
       <article class:list={['flyer', { 'has-logo': !!g.logo }]}>
@@ -20,16 +21,16 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
         <p class="tags">{g.tags.map((t: string) => <b>{t}</b>)}</p>
         <p class="next">
           {g.nextEvent
-            ? <><span class="nd">Next: {when(g.nextEvent)}</span><span class="nt">{g.nextEvent.title}</span>{g.nextEvent.online ? 'Online' : `@ ${g.nextEvent.venue ?? 'TBA'}`} · {g.nextEvent.allDay ? 'All day' : shortTime(g.nextEvent.start)}</>
+            ? <><span class="nd">Next: {when(g.nextEvent)}</span><span class="sr-only">, </span><span class="nt">{g.nextEvent.title}</span><span class="sr-only">, </span>{g.nextEvent.online ? 'Online' : `@ ${g.nextEvent.venue ?? 'TBA'}`} · {g.nextEvent.allDay ? 'All day' : shortTime(g.nextEvent.start)}</>
             : <><span class="nd idle">Nothing scheduled</span>Nothing posted yet. Check their page.</>}
         </p>
         {g.lastEvent && (
           <p class="last">Last event {month(g.lastEvent.start)} {day(g.lastEvent.start)}{g.lastEvent.going ? ` · ${g.lastEvent.going} went` : ''}</p>
         )}
         <div class="links">
-          {g.upcomingCount > 0 && <a class="primary" href={`/?group=${g.id}`}>{g.upcomingCount} {g.upcomingCount === 1 ? 'event' : 'events'}</a>}
-          {g.meetupUrl && <a href={g.meetupUrl} target="_blank" rel="noopener">Meetup ↗</a>}
-          {g.website && <a href={g.website} target="_blank" rel="noopener">Website ↗</a>}
+          {g.upcomingCount > 0 && <a class="primary" href={`/?group=${g.id}`}>{g.upcomingCount} {g.upcomingCount === 1 ? 'event' : 'events'}<span class="sr-only"> from {g.short}</span></a>}
+          {g.meetupUrl && <a href={g.meetupUrl} target="_blank" rel="noopener">Meetup<span class="sr-only"> page for {g.short}, opens in new tab</span> <span aria-hidden="true">↗</span></a>}
+          {g.website && <a href={g.website} target="_blank" rel="noopener">Website<span class="sr-only"> for {g.short}, opens in new tab</span> <span aria-hidden="true">↗</span></a>}
         </div>
       </article>
     ))}
