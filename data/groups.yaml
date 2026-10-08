@@ -101,6 +101,7 @@
   short: PMI
   source: pmi-chapter
   website: https://pmi-centraliowa.org/
+  logo: https://pmi-centraliowa.org/static/img/logo-login.jpg
 
 - id: techbrew
   name: Technology Association of Iowa

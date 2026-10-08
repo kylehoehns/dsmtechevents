@@ -8,6 +8,10 @@ const { groups, updatedAt } = loadData();
 // Alphabetical by the name on the card, so a group is easy to find.
 const sorted = [...groups].sort((a, b) => a.short.localeCompare(b.short, 'en', { sensitivity: 'base' }));
 const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
+// A group with no logo gets a monogram tile instead, so every card lines up:
+// "Iowans of Things" -> "IoT" (small joining words stay lowercase).
+const monogram = (name: string) => name.split(/\s+/).filter(Boolean)
+  .map((w) => (/^(of|the|and|&|for|in)$/i.test(w) ? w[0].toLowerCase() : w[0].toUpperCase())).join('').slice(0, 4);
 ---
 <Layout nav="groups" updatedAt={updatedAt}
   headTitle="Des Moines tech meetup groups · DSM Tech Events"
@@ -15,9 +19,11 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
   <h1 class="sr-only">Des Moines tech groups</h1>
   <div class="board">
     {sorted.map((g, i) => (
-      <article id={g.id} data-groups={g.id} class:list={['flyer', { 'has-logo': !!g.logo }]}>
+      <article id={g.id} data-groups={g.id} class="flyer has-logo">
         <div class="flyer-head">
-          {g.logo && <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />}
+          {g.logo
+            ? <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />
+            : <span class="logo-img logo-mono" aria-hidden="true">{monogram(g.short)}</span>}
           <h2>{g.short}{!g.showFullName && g.name !== g.short && <span class="sr-only"> ({g.name})</span>}</h2>
           {g.showFullName && <p class="full">{g.name}</p>}
           {(g.members || g.pastCount) && (
