@@ -487,13 +487,10 @@ function syncSearchBox() {
 // in there too. Without view transitions, or with reduced motion, it just runs.
 function transition(update, types) {
   if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return update();
-  const reprint = !types.includes('day');
-  if (reprint) document.documentElement.classList.add('reprint');
   let vt;
   try { vt = document.startViewTransition({ update, types }); } catch { vt = document.startViewTransition(update); }
   // A transition cut short (another click) rejects; that's fine, the update still ran.
-  const done = () => document.documentElement.classList.remove('reprint');
-  vt.finished.then(done, done);
+  vt.finished.catch(() => {});
   vt.ready.catch(() => {});
   vt.updateCallbackDone.catch(() => {});
 }
