@@ -3,6 +3,6 @@
   "logo": null,
   "lastMet": "2025-06-24T23:00:00.000Z",
   "events": [
-    { "id": "devopsdsm-online", "title": "Remote DevOps Chat", "start": "2026-10-28T00:00:00.000Z", "end": "2026-10-28T01:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/devopsdsm/events/1/", "online": true }
+    { "id": "devopsdsm-online", "title": "Remote DevOps Chat", "start": "2026-10-28T00:00:00.000Z", "end": "2026-10-28T01:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/devopsdsm/events/1/", "online": true, "image": "https://secure.meetupstatic.com/photos/event/4/5/6/highres_222.jpeg" }
   ]
 }
