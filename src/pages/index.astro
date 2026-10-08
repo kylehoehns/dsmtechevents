@@ -3,6 +3,7 @@ import OutArrow from '../components/OutArrow.astro';
 import Layout from '../layouts/Layout.astro';
 import EventCard from '../components/EventCard.astro';
 import { loadData } from '../lib/data.mjs';
+import { splitEvents } from '../lib/pool.mjs';
 import { eventJsonLd, websiteJsonLd, toScript } from '../lib/jsonld.mjs';
 import { dayKey, lastDay, weekday, day, month, shortTime, addDays, daysBetween, monthName, plural, countdown, dateRange, recentSummary } from '../lib/format.mjs';
 
@@ -10,17 +11,13 @@ const { events, upcoming, past, groups, byId, updatedAt } = loadData();
 
 // Section labels are relative to the build, which runs at least once a day
 // (see refresh.yml); the browser re-labels Today/Tonight/Tomorrow itself.
-const today = dayKey(Date.now());
+// Full rows through the end of next month, a compact set list after that.
+// Repeat dates and past events get their cards in the card pool (/cards/,
+// fetched by the calendar) instead: see lib/pool.mjs.
+const { today, listed, near, far } = splitEvents({ upcoming, past });
 const dow = new Date(`${today}T12:00:00Z`).getUTCDay();
 const thisWeekEnd = addDays(today, (7 - dow) % 7);
 const nextWeekEnd = addDays(thisWeekEnd, 7);
-// Full rows through the end of next month; anything later is a compact set list.
-const [ty, tm] = today.split('-').map(Number);
-const horizon = new Date(Date.UTC(ty, tm + 1, 0)).toISOString().slice(0, 10);
-
-const listed = upcoming.filter((e) => !e.repeat);
-const near = listed.filter((e) => dayKey(e.start) <= horizon);
-const far = listed.filter((e) => dayKey(e.start) > horizon);
 
 function sectionOf(key: string) {
   if (key <= thisWeekEnd) return 'This week';
@@ -34,10 +31,6 @@ for (const e of near) {
   if (sections.at(-1)?.title !== title) sections.push({ title, items: [] });
   sections.at(-1)!.items.push(e);
 }
-
-// Every event that doesn't get a full row in the list still needs a card for
-// the calendar's day panel.
-const pooled = [...upcoming.filter((e) => e.repeat), ...far, ...past];
 // Conferences get poster treatment only when they're close. Further out,
 // they're just a pink row at their date in the list. A poster stays up
 // until its conference is over.
@@ -51,12 +44,12 @@ const PAST_SHOWN = 3;
 
 const calendarData = {
   events: events.map((e) => ({
-    id: e.id, title: e.title, start: e.start, end: e.end, groups: e.groupIds, headliner: e.headliner, allDay: e.allDay,
+    id: e.id, title: e.title, url: e.url, start: e.start, end: e.end, groups: e.groupIds, headliner: e.headliner, allDay: e.allDay,
   })),
   groups: Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short, url: g.meetupUrl ?? g.website ?? null }])),
 };
-// Structured data for the events the list shows (not the hidden card pool,
-// which holds past events and repeat dates).
+// Structured data for the events the list shows (not the card pool, which
+// holds past events and repeat dates).
 const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).filter(Boolean)];
 ---
 <Layout updatedAt={updatedAt} search
@@ -157,10 +150,6 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
       </section>
     </aside>
   </div>
-
-  <template id="card-pool">
-    {pooled.map((e) => <EventCard event={e} byId={byId} />)}
-  </template>
 
   {/* toScript escapes "<", so an event title can't close this tag. */}
   <script type="application/json" id="calendar-data" set:html={toScript(calendarData)} />

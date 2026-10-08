@@ -87,9 +87,18 @@ load. Both sides import the same functions from `src/lib/format.mjs`. The
 browser also handles the group filter, the calendar view and the URL state.
 The `/tv/` page labels events in the browser and reloads itself hourly.
 
-`public/sw.js` is the service worker. Pages are network-first with a 3
-second fallback to the cached copy. CSS, JS and fonts are precached, and up
-to 60 Meetup photos are kept.
+Cards for events the list doesn't print in full (past events, repeat dates,
+far-off ones) live in `/cards/` (`src/pages/cards.astro`), not the home
+page. The calendar's day panel and search fetch it the first time they need
+it.
+
+`public/sw.js` is the service worker. Pages and `/cards/` are network-first
+with a 3 second fallback to the cached copy. CSS, JS and fonts are
+precached from a list of every file in `dist/_astro/`, which
+`scripts/sw-precache.mjs` writes into `dist/sw.js` at build time; the
+offline e2e project (`tests/e2e/offline.spec.mjs`) is the only one that
+lets the worker run. Up to 60 Meetup photos and the Groups page's
+Meetup-hosted logos are kept too.
 
 ## The cache stability rule
 

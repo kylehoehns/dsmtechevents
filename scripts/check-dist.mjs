@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { inlineScripts, scriptHash, scriptSrc, PLACEHOLDER } from './csp.mjs';
+import { assetList } from './sw-precache.mjs';
 
 const dist = path.resolve('dist');
 const pages = fs.readdirSync(dist, { recursive: true }).filter((f) => f.endsWith('.html')).map((f) => path.join(dist, f));
@@ -58,12 +59,32 @@ for (const file of pages) {
   }
 }
 
-// Page weight: the home page is the biggest (every card, plus hidden ones for
-// the calendar). Fail well before it gets slow on a phone.
+// Page weight: the home page is the biggest (a card for every event in the
+// list). The calendar's other cards (past events, repeat dates) are in the
+// card pool, cards/index.html, which the calendar fetches when first opened:
+// it gets the same budget, and the two together get one too, since a visit
+// to the calendar loads both. Fail well before either gets slow on a phone.
 const BUDGET_KB = 350;
+const kbOf = (rel) => fs.statSync(path.join(dist, rel)).size / 1024;
 for (const file of pages) {
   const kb = fs.statSync(file).size / 1024;
   if (kb > BUDGET_KB) problems.push(`${path.relative(dist, file)}: ${Math.round(kb)}KB of HTML, over the ${BUDGET_KB}KB budget`);
+}
+const POOL = path.join('cards', 'index.html');
+if (!fs.existsSync(path.join(dist, POOL))) problems.push(`${POOL}: missing (the calendar's day panel fetches it)`);
+else {
+  const both = kbOf('index.html') + kbOf(POOL);
+  if (both > BUDGET_KB * 1.5) problems.push(`index.html + ${POOL}: ${Math.round(both)}KB together, over the ${BUDGET_KB * 1.5}KB budget for a calendar visit`);
+}
+
+// Offline: sw.js must list every built CSS/JS/font file (scripts/sw-precache.mjs
+// fills it in), or a page loses its script or styles offline. Its pages must exist.
+const sw = fs.readFileSync(path.join(dist, 'sw.js'), 'utf8');
+const listed = JSON.parse(sw.match(/^const ASSETS = (\[.*\]);$/m)?.[1] ?? '[]');
+const missing = assetList(dist).filter((f) => !listed.includes(f));
+if (missing.length) problems.push(`sw.js: ${missing.length} built file(s) not in its ASSETS list (${missing.slice(0, 3).join(', ')}…)`);
+for (const page of JSON.parse(sw.match(/^const PAGES = (\[.*\]);$/m)?.[1].replaceAll("'", '"') ?? '[]')) {
+  if (!fs.existsSync(path.join(dist, page, 'index.html'))) problems.push(`sw.js: saves ${page} for offline, but the build has no such page`);
 }
 
 if (problems.length) {

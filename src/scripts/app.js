@@ -21,10 +21,33 @@ const siteName = document.querySelector('meta[property="og:site_name"]')?.conten
 const now = Date.now();
 const today = dayKey(now);
 
-// ---- cards: every event has one, in the list or in the hidden pool ----
+// ---- cards: every event has one, in the list or in the card pool ----
+// The pool (/cards/, built from the same EventCard) holds the cards the list
+// doesn't print: past events, repeat dates, far-off ones. It's fetched the
+// first time the calendar or a search needs it, not with the page.
 const cards = new Map();
 for (const el of $$('.show', listView)) cards.set(el.dataset.id, el);
-for (const el of $$('.show', $('#card-pool').content)) cards.set(el.dataset.id, el);
+let pool = null;
+let poolFailed = false;
+function loadPool() {
+  pool ??= fetch('/cards/')
+    .then((res) => { if (!res.ok) throw new Error(`card pool: ${res.status}`); return res.text(); })
+    .then((html) => {
+      for (const el of $$('.show', new DOMParser().parseFromString(html, 'text/html'))) {
+        if (!cards.has(el.dataset.id)) cards.set(el.dataset.id, document.adoptNode(el));
+      }
+      poolFailed = false;
+      searchIndex = null; // rebuild with the new cards
+      // Redraw only what was waiting on it (a redraw would close an open About).
+      if (state.view === 'calendar' && $('[aria-busy], .show:not([data-id])', dayPanel)) renderDayPanel();
+      else if (state.q) { listShown = renderList(); renderSide(); }
+    }, () => {
+      poolFailed = true;
+      pool = null; // try again next time
+      if (state.view === 'calendar') renderDayPanel();
+    });
+  return pool;
+}
 
 // The page is built ahead of time; drop anything that has ended since.
 for (const el of $$('#list-view [data-end], .poster[data-end]')) if (Date.parse(el.dataset.end) <= now) el.remove();
@@ -280,11 +303,25 @@ function renderDayPanel() {
     dayPanel.insertAdjacentHTML('beforeend', '<p class="none">Nothing on the books. Pick a day with a mark.</p>');
     return;
   }
+  // A card still on its way: say so for the moment it takes.
+  if (!poolFailed && list.some((e) => !cards.has(e.id))) {
+    loadPool();
+    dayPanel.insertAdjacentHTML('beforeend', '<p class="none" aria-busy="true">Loading events…</p>');
+    return;
+  }
   const ul = document.createElement('ul');
   ul.className = 'shows';
   for (const e of list) {
     const card = cards.get(e.id)?.cloneNode(true);
-    if (!card) continue;
+    if (!card) {
+      // The pool didn't load (offline before it was ever saved): the title,
+      // linked to the event's page, still says what was on.
+      const href = e.url ?? groups[e.groups[0]]?.url;
+      ul.insertAdjacentHTML('beforeend', `<li class="show"><div class="body"><h3 class="title">${href
+        ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(e.title)}<span class="sr-only"> (opens in new tab)</span></a>`
+        : escapeHtml(e.title)}</h3></div></li>`);
+      continue;
+    }
     card.hidden = false;
     card.classList.remove('same-day', 'addr-seen');
     const tag = $('.when-tag', card);
@@ -332,6 +369,8 @@ function render() {
   // CSS that reads it must agree with the hidden flags above.
   if (state.view === 'calendar') document.documentElement.dataset.view = 'calendar';
   else delete document.documentElement.dataset.view;
+  // The calendar and a search both read cards the list doesn't have.
+  if (state.view === 'calendar' || state.q) loadPool();
   if (state.view === 'list') { listShown = renderList(); renderMinical(); } else renderCalendar();
   renderSide();
   syncSearchBox();

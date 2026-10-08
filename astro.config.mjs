@@ -1,4 +1,5 @@
 import { defineConfig, fontProviders } from 'astro/config';
+import swPrecache from './scripts/sw-precache.mjs';
 
 // Fonts are self-hosted from the @fontsource packages: latin subset, woff2,
 // only the weights global.css uses. Astro copies them into /_astro/fonts/ and
@@ -29,6 +30,8 @@ const fontsource = (pkg, weights) => ({
 
 export default defineConfig({
   site: 'https://dsmtechevents.com',
+  // Lists every built CSS/JS/font file in dist/sw.js for offline use.
+  integrations: [swPrecache()],
   fonts: [
     { name: 'Big Shoulders Display', cssVariable: '--display', fallbacks: ['DSM Display fallback', 'Arial Narrow', 'Impact', 'sans-serif'], ...fontsource('big-shoulders-display', [800, 900]) },
     { name: 'IBM Plex Mono', cssVariable: '--mono', fallbacks: ['DSM Mono fallback', 'ui-monospace', 'Menlo', 'monospace'], ...fontsource('ibm-plex-mono', [400, 500, 600, 700]) },
