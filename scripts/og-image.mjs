@@ -11,16 +11,11 @@ import { Resvg } from '@resvg/resvg-js';
 
 const W = 1200;
 const H = 630;
-// Colors from global.css. The dark one is used: most chat apps are dark, and
-// the pink poster stands out more on it. `npm run og -- light` draws the other.
-const THEMES = {
-  light: { paper: '#f3ede1', ink: '#1d1b2b', rule: '#1d1b2b', onPink: '#1d1b2b', pink: '#ff4fa3', mis: '#ff4fa3', blue: '#0a6cc0', blend: 'multiply', tape: 'rgba(243, 237, 225, 0.8)' },
-  dark: { paper: '#1d1c22', ink: '#ece6da', rule: '#5d5966', onPink: '#1d1b2b', pink: '#e0609f', mis: '#c04f87', blue: '#93c2ff', blend: 'normal', tape: 'rgba(236, 230, 218, 0.55)' },
-};
-const theme = process.argv[2] ?? 'dark';
-const C = THEMES[theme];
+// The site's dark-mode colors (global.css): most chat apps are dark, and the
+// pink poster stands out on it.
+const C = { paper: '#1d1c22', ink: '#ece6da', rule: '#5d5966', onPink: '#1d1b2b', pink: '#e0609f', mis: '#c04f87', blue: '#93c2ff', blend: 'normal', tape: 'rgba(236, 230, 218, 0.55)' };
 // Chat apps cache preview images by URL, so a redesign gets a new file name.
-const OUT = process.argv[3] ?? 'public/og-image-dark.png';
+const OUT = 'public/og-image-dark.png';
 
 const h = (type, style, ...children) => ({ type, props: { style: { display: 'flex', ...style }, children: children.flat() } });
 // The site's misregistration: a pink copy printed a few pixels off, multiplied

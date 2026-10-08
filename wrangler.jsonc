@@ -5,9 +5,6 @@
   // GitHub Action (.github/workflows/refresh.yml, four times a day) does, and its commit
   // is what triggers a deploy. So what is live is always exactly what is in git.
   //
-  // Serves dsmtechevents.com. The old techdsm.com domain and its Worker are
-  // retired; nothing redirects from them.
-  //
   // Dashboard settings (Workers & Pages → dsmtechevents → Settings → Build).
   // The build command stays empty because both wrangler commands run `build`
   // below; filling it in just builds twice. Each PR branch gets a Preview

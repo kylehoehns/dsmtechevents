@@ -1,8 +1,8 @@
-// Build-time loader: merges the cached Meetup data (refreshed four times a day) with hand-added events.
+// Build-time loader: merges the cached events (refreshed four times a day) with hand-added events.
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
-import { meetupSlug, meetupPhoto } from './meetup.mjs';
+import { meetupSlug, meetupUrl, meetupPhoto } from './meetup.mjs';
 import { dayKey, lastDay, weekday, fmt } from './format.mjs';
 import { localToUtc } from './time.mjs';
 
@@ -15,10 +15,9 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
     const slug = meetupSlug(g.meetup);
     return {
       ...g,
-      meetupUrl: slug ? `https://www.meetup.com/${slug}/` : null,
+      meetupUrl: slug ? meetupUrl(slug) : null,
       logo: g.logo ?? cache.logo ?? null,
       fetchedAt: cache.fetchedAt ?? null,
-      typical: cache.typical ?? null,
       members: cache.members ?? null,
       pastCount: cache.pastCount ?? null,
       _events: cache.events.map((e) => ({ ...e, groupIds: [g.id], source: 'feed' })),
@@ -26,7 +25,7 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
   });
   const byId = Object.fromEntries(groups.map((g) => [g.id, g]));
 
-  const manual = readYaml('events.yaml').map((e, i) => {
+  const manual = readYaml('events.yaml').map((e) => {
     const startDate = String(e.start);
     const endDate = String(e.end ?? e.start);
     const allDay = !e.time;
@@ -41,7 +40,7 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
       venue: e.venue ?? null,
       address: e.address ?? null,
       description: e.description ?? '',
-      tags: e.tags ?? [],
+      tags: e.tags,
       groupIds: e.hosts ?? [],
       featured: !!e.featured,
       source: 'manual',
@@ -84,8 +83,6 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
     // ("Community Choice Convention Center" vs "...Credit Union Convention Center").
     const street = /^\s*(\d+\s+\S+(?:\s+\S+)?)/.exec(e.address ?? '')?.[1];
     e.venueKey = e.online ? 'online' : (street ?? e.venue ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() || null;
-    // A group's usual turnout, for "usually ~20" next to an early RSVP count.
-    e.typical = e.groupIds.length === 1 ? byId[e.groupIds[0]]?.typical ?? null : null;
   }
 
   // Repeating placeholders (same hosts + same title, e.g. a monthly meeting
@@ -129,7 +126,6 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
   const fetched = groups.map((g) => g.fetchedAt).filter(Boolean).sort();
   return { groups, byId, events, upcoming, past, updatedAt: fetched.at(-1) ?? new Date(now).toISOString() };
 }
-
 
 function longWeekday(iso) {
   return fmt({ weekday: 'long' }).format(new Date(iso));

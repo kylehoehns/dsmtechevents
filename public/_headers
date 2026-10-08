@@ -1,9 +1,12 @@
-# Pages and the service worker must never be held by a cache: the site changes
-# several times a day, and a stale sw.js can't be replaced by a newer one it never fetches.
+# Cloudflare already serves every file with max-age=0, must-revalidate. The
+# no-cache rules below spell it out for the pages that change several times a
+# day and for sw.js, which can't replace itself if a stale copy is held.
 #
 # CSP: Cloudflare Web Analytics loads its beacon from static.cloudflareinsights.com
 # and reports to cloudflareinsights.com. connect-src also covers fetch() inside
 # sw.js, which pulls Meetup event photos from secure.meetupstatic.com.
+# There is deliberately no default-src or img-src: event photos and logos come
+# from Meetup, group sites (iowansofthings.com) and TAI, and that list grows.
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin

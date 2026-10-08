@@ -95,7 +95,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 /* nav and the theme button share a row: right of the logo on desktop, under
    it on phones with the button at the far right */
 .mast-tools { display: flex; align-items: stretch; justify-content: space-between; gap: 10px; flex: 1 1 100%; }
-@media (min-width: 1140px) { .mast-tools { flex: 0 0 auto; } }
 .theme-btn {
   display: grid; place-items: center; width: 40px; padding: 0; margin-bottom: -2px; /* stretches to the nav boxes' height */
   background: var(--paper); border: 2px solid var(--line);
@@ -107,7 +106,7 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .mast-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
 /* Once both fit side by side (logo 794 + gap + nav 253 + padding), don't let a
    slightly wider fallback font push the nav under the logo while fonts load. */
-@media (min-width: 1140px) { .mast-row { flex-wrap: nowrap; } }
+@media (min-width: 1140px) { .mast-row { flex-wrap: nowrap; } .mast-tools { flex: 0 0 auto; } }
 .logo { display: block; text-decoration: none; line-height: 0.8; }
 .logo .mis {
   font: 900 clamp(40px, 13.4vw, 120px)/0.8 var(--display); text-transform: uppercase;
@@ -115,7 +114,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 }
 .logo .mis::before { transform: translate(5px, 4px); }
 .blurb { font-size: 15px; max-width: 52ch; margin: 0; }
-.blurb strong { background: var(--pink-fill); color: var(--on-pink); padding: 0 4px; font-weight: 600; }
 .nav { display: flex; flex-wrap: wrap; }
 .nav a {
   font: 800 20px/1 var(--display); text-transform: uppercase; text-decoration: none;
@@ -124,7 +122,7 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .nav a[aria-current="page"] { background: var(--ink); color: var(--paper); }
 
 /* ---------- headliners (conferences in the next 30 days) ----------
-   Phone: one slim strip each above the list, so this week stays on screen.
+   Phone: a swipeable row of compact posters above the list, so this week stays on screen.
    Desktop: small posters at the top of the side rail. */
 /* overflow-x: auto quietly makes the strip scrollable up/down too when the tape
    and tilted corners stick out, so a diagonal swipe wobbled it. Lock it to
@@ -133,9 +131,9 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .headliners::-webkit-scrollbar { display: none; }
 .headliners:has(.poster + .poster) { grid-auto-columns: 86%; }
 .headliners .poster { scroll-snap-align: start; }
-.poster { position: relative; display: block; color: var(--on-pink); background: var(--pink-fill); }
-.poster.blue { background: var(--blue-fill); color: var(--on-blue); }
-.strip-link { display: none; }
+/* every poster is taped up, each a little differently, so the stack looks hand-pinned */
+.poster { position: relative; display: block; color: var(--on-pink); background: var(--pink-fill); transform: rotate(-0.6deg); }
+.poster.blue { background: var(--blue-fill); color: var(--on-blue); transform: rotate(0.5deg); }
 .poster-full { display: block; position: relative; padding: 12px 14px 14px; height: 100%; }
 .poster .tape { position: absolute; top: -11px; left: 50%; width: 92px; height: 22px; margin-left: -46px; background: var(--tape); transform: rotate(-3deg); }
 .poster .bill { display: flex; justify-content: space-between; gap: 8px; font: 700 12px/1 var(--mono); border-bottom: 2px solid currentColor; padding-bottom: 7px; }
@@ -147,7 +145,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
    line instead of floating over it; if the two don't fit, it wraps below, still right-aligned */
 @media (max-width: 1059px) {
   .poster .where { display: none; }
-  .poster .go { font-size: 14px; padding: 6px 9px 5px; }
   .headliners .poster-full { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 24px; } /* room for the stamp's tilt */
   .headliners .poster-full > :is(.bill, h2, .when) { flex: 0 0 100%; }
   .headliners .poster-full > .when { flex-basis: auto; margin-right: 100%; }
@@ -162,9 +159,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 }
 .poster .stamp-days { position: absolute; right: 12px; bottom: 14px; white-space: nowrap; font: 400 17px/1 var(--marker); transform: rotate(6deg); }
 .poster :focus-visible { outline-color: currentColor; }
-/* every poster is taped up, each a little differently, so the stack looks hand-pinned */
-.poster { transform: rotate(-0.6deg); }
-.poster.blue { transform: rotate(0.5deg); }
 .poster.blue .tape { left: 34%; transform: rotate(4deg); }
 @media (min-width: 1060px) {
   .headliners { grid-auto-flow: row; grid-auto-columns: auto; overflow: visible; gap: 18px; padding: 10px 0 0; margin: 0; }
@@ -271,11 +265,8 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   grid-column: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;
   margin-top: 8px; padding-top: 8px; border-top: 1.5px dashed var(--rule-soft);
 }
-.going { font: 12.5px/1.2 var(--mono); }
-.going { word-spacing: calc(3px - 0.6em); } /* the space before "going" prints as the old 3px gap */
+.going { font: 12.5px/1.2 var(--mono); word-spacing: calc(3px - 0.6em); } /* the space before "going" prints as a 3px gap */
 .going b { font: 900 22px/1 var(--display); vertical-align: -2px; }
-.going .usually { color: var(--ink-soft); word-spacing: normal; }
-.show.headline .going .usually { color: inherit; }
 .rsvp {
   display: inline-flex; align-items: center; gap: 8px; font: 800 16px/1 var(--display); text-transform: uppercase;
   text-decoration: none; background: var(--ink); color: var(--paper); padding: 7px 10px 6px;
@@ -334,12 +325,11 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 
 /* ---------- set lists: far-future and past events ---------- */
 .setlist { list-style: none; margin: 0; padding: 0; font: 12.5px/1.4 var(--mono); }
-.setlist .tt { font: 500 14px/1.3 var(--sans); }
+.setlist .tt { display: block; font: 500 14px/1.3 var(--sans); }
 .setlist li { display: grid; grid-template-columns: 50px minmax(0, 1fr) auto; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--rule-soft); }
 .setlist .d { font-weight: 700; white-space: nowrap; }
 .setlist a { text-decoration: none; min-width: 0; }
 .setlist .g { display: block; font: 800 15px/1.1 var(--display); text-transform: uppercase; }
-.setlist .tt { display: block; }
 .setlist .v { display: block; color: var(--ink-soft); }
 .setlist .rr { display: inline-block; margin: 2px 0; font: 800 12.5px/1 var(--display); text-transform: uppercase; border: 1.5px solid var(--line); padding: 2px 5px 1px; }
 .setlist .n { white-space: nowrap; text-align: right; }
@@ -352,7 +342,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .recent li.extra { display: none; }
 .recent .setlist.open li.extra { display: grid; }
 .recent .all { margin-top: 10px; font: 800 15px/1 var(--display); text-transform: uppercase; background: transparent; border: 1.5px solid var(--line); padding: 6px 10px 5px; }
-@media (min-width: 1060px) { .recent { margin-top: 0; } }
 
 /* ---------- mini month (desktop rail) ---------- */
 .minical { border: 2px solid var(--line); padding: 10px 10px 8px; }
@@ -413,7 +402,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .day-panel h2 { font: 900 34px/0.9 var(--display); text-transform: uppercase; margin: 0 0 2px; }
 .day-panel .sub { font-size: 12.5px; margin: 0; }
 .day-panel .none { padding: 12px 0 16px; font-size: 13px; margin: 0; }
-@media (min-width: 1060px) { .day-panel { margin-top: 0; } }
 /* the panel heading already says the date; don't repeat it on every card */
 .day-panel .show { grid-template-columns: minmax(0, 1fr); }
 .day-panel .show .date { display: none; }
@@ -424,10 +412,9 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 @media (min-width: 640px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; } }
 @media (min-width: 1000px) { .board { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 1240px) { .board { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.flyer { position: relative; background: var(--sheet); border: 1.5px solid var(--line); padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px 12px; align-content: start; }
+.flyer { position: relative; scroll-margin-top: 16px; background: var(--sheet); border: 1.5px solid var(--line); padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px 12px; align-content: start; }
 .flyer.has-logo { grid-template-columns: 60px minmax(0, 1fr); }
 /* /groups/#pyowa-style links: make the card you landed on obvious */
-.flyer { scroll-margin-top: 16px; }
 .flyer:target { outline: 4px solid var(--pink-fill); outline-offset: 3px; }
 /* logos in their own colors: they're each group's identity, not ours to reprint */
 .flyer .logo-img { grid-row: span 3; width: 60px; height: 60px; object-fit: contain; background: #fff; border: 1.5px solid var(--line); padding: 3px; }
@@ -446,14 +433,13 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 /* ---------- misc pages ---------- */
 .page-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-top: 22px; border-bottom: 2px solid var(--line); padding-bottom: 4px; }
 .page-head h1 { font: 900 clamp(40px, 10vw, 64px)/0.85 var(--display); text-transform: uppercase; margin: 0; }
-.page-head p { margin: 0; font-size: 13px; }
 /* ---------- add your group ---------- */
 .add-page { max-width: 64ch; display: grid; gap: 22px; padding: 18px 0 8px; font-family: var(--sans); font-size: 15.5px; line-height: 1.55; }
 .add-page .lede { margin: 0; font-size: 17px; }
 .add-page h2 { margin: 0 0 6px; font: 900 24px/1 var(--display); text-transform: uppercase; }
 .add-page ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
 .add-page section > p { margin: 8px 0 0; }
-.add-page a { color: var(--link-t, var(--blue-t)); }
+.add-page a { color: var(--link-t); }
 .foot .fine a { color: inherit; }
 .email-box { background: var(--pink-fill); color: var(--on-pink); padding: 16px 18px 18px; transform: rotate(-0.4deg); }
 .email-box .address { margin: 6px 0 12px; font: 700 clamp(18px, 5vw, 26px)/1.2 var(--mono); overflow-wrap: anywhere; }
@@ -476,9 +462,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .foot :focus-visible { outline-color: var(--on-blue); }
 @media (min-width: 760px) { .foot .fine { text-align: right; } }
 
-/* updated-since-you-opened-it note */
-.refresh-note { position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 50; background: var(--ink); color: var(--paper); font: 600 12.5px/1 var(--mono); padding: 10px 14px; }
-
 /* iOS install hint */
 .install-hint {
   position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 60;
@@ -492,7 +475,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   *, *::before, *::after { transform: none !important; scroll-behavior: auto !important; }
   .mis::before { transform: translate(3px, 2px) !important; }
   .logo .mis::before { transform: translate(5px, 4px) !important; }
-  .refresh-note { transform: translateX(-50%) !important; }
 }
 
 /* Hover styles only where there's a real pointer. Phones keep :hover stuck on

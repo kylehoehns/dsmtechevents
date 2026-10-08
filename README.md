@@ -3,21 +3,22 @@
 https://dsmtechevents.com
 
 One place to see every upcoming Des Moines tech meetup, user group and
-conference. A static site on Cloudflare, refreshed four times a day from each group's Meetup
-calendar (and a couple of groups' own websites).
+conference. A static site on Cloudflare, refreshed four times a day from each
+group's Meetup calendar or, for groups not on Meetup, their own website.
 
 ## How it works
 
-1. `scripts/fetch-events.mjs` reads `data/groups.yaml`. For each group it pulls
-   the public Meetup iCal feed (`meetup.com/<group>/events/ical/`), plus venue,
-   photo and RSVP count from the group's events page. Results land in
-   `data/cache/<group>.json`.
+1. `scripts/fetch-events.mjs` reads `data/groups.yaml`. For a Meetup group it
+   pulls the public iCal feed (`meetup.com/<group>/events/ical/`), plus venue,
+   photo and RSVP count from the group's events page. Groups with `source:`
+   use a reader in `scripts/sources/` for their own site (SecDSM, PMI, TAI's
+   TechBrews, Iowans of Things). Results land in `data/cache/<group>.json`.
 2. If a feed fails, that group's previous cache file is kept, so a bad run
    never empties the site, and the other groups refresh as usual. The refresh
    workflow then opens a GitHub issue labeled `source-broken` for that group
    (`scripts/source-issues.mjs`): one per group, updated rather than duplicated
-   on later runs, and closed automatically once the group fetches cleanly. The cache is committed so builds work even if
-   Meetup is unreachable.
+   on later runs, and closed automatically once the group fetches cleanly. The
+   cache is committed so builds work even if a source is unreachable.
 3. `astro build` merges the cache with the hand-added events in
    `data/events.yaml` and writes static HTML to `dist/`.
 4. A GitHub Action (`.github/workflows/refresh.yml`) runs the fetch four
@@ -37,11 +38,14 @@ Otherwise, open a pull request:
 `meetup:`, and the group's own site into `website:` if it has one. Groups not
 on Meetup can use `ical:` with any public calendar feed. Groups with no feed
 at all can get a small reader in `scripts/sources/` that pulls events from
-their website (see `secdsm.mjs` and `pmi-chapter.mjs`), named with `source:`.
+their website (see `scripts/sources/`; `iowans-of-things.mjs` is a small one),
+named with `source:`. Each reader throws when the page doesn't look as
+expected, and has a test against a saved copy in `tests/fixtures/`.
 Anything else gets added by hand.
 
 **A one-off event** (conference, joint meetup): add it to `data/events.yaml`.
-`featured: true` pins it to the banner at the top.
+`featured: true` makes it a headliner: a pink row in the list, and a poster at
+the top (side rail on desktop) from 30 days out until it ends.
 
 ## Local development
 
@@ -58,7 +62,7 @@ npm run build    # what Cloudflare runs (no fetching, just the committed data)
 space or meetup venue: a "Coming up" overview, then one poster per event in
 the next three weeks with a QR code to its Meetup or conference page. It
 reloads itself hourly to pick up new events. ← → step through slides, space
-pauses. It isn't linked from the site and is kept out of search.
+pauses. The About page mentions it; it's kept out of search.
 
 ## Tests
 
@@ -68,7 +72,7 @@ npm test
 
 Node's built-in test runner, no extra packages. The tests in `tests/` cover the
 parts that break quietly: Des Moines time zones and daylight saving, reading
-Meetup's feed and events page, the SecDSM and PMI readers, merging with the
+Meetup's feed and events page, every website reader, merging with the
 previous cache, and the build-time rules (joint meetups, repeating series,
 hiding logo photos and repeated names, short addresses). They run on saved
 fixtures in `tests/fixtures/`, never the network.

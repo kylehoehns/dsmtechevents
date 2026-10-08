@@ -4,6 +4,9 @@ export function meetupSlug(value) {
   return /meetup\.com\/([^/?#]+)/.exec(value)?.[1] ?? value.replace(/\//g, '');
 }
 
+// https://www.meetup.com/<slug>/<path>, e.g. meetupUrl(slug, 'events/ical/').
+export const meetupUrl = (slug, path = '') => `https://www.meetup.com/${slug}/${path}`;
+
 // Meetup serves every photo in a few sizes, picked by the file-name prefix:
 // global_ is 180 wide, 600_ is 600 wide, and any of them comes as .webp by
 // changing the extension. (Other numeric prefixes like 200_ quietly return the

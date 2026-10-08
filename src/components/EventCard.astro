@@ -24,9 +24,6 @@ const whenTag = whenLabel(e.start, e.end);
 // Tapping the venue opens a map search (app.js switches it to Apple Maps on iPhones).
 const mapQuery = [e.venue, e.fullAddress ?? e.address ?? 'Des Moines, IA'].filter(Boolean).join(', ');
 const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
-// Typical turnout, only when today's count is well under it (RSVPs come in late).
-const upcoming = Date.parse(e.end) > Date.now();
-const typical = upcoming && e.typical && e.typical >= 5 && (e.going ?? 0) < e.typical * 0.75 ? (e.typical >= 10 ? Math.round(e.typical / 5) * 5 : e.typical) : null;
 ---
 <li
   class:list={['show', { headline: e.featured, 'has-photo': !!e.photo }]}
@@ -80,12 +77,7 @@ const typical = upcoming && e.typical && e.typical >= 5 && (e.going ?? 0) < e.ty
   </div>
 
   <div class="acts">
-    {(e.going > 0 || typical) && (
-      <span class="going">
-        {e.going > 0 && <><b>{e.going}</b> going</>}
-        {typical && <span class="usually">{e.going > 0 ? ' · ' : ''}usually ~{typical}</span>}
-      </span>
-    )}
+    {e.going > 0 && <span class="going"><b>{e.going}</b> going</span>}
     {e.url && <a class="rsvp" href={e.url} target="_blank" rel="noopener" aria-label={`${cta}: ${e.title} (opens in new tab)`}>{cta} <span aria-hidden="true">→</span></a>}
     {(e.description || e.photo) && <button type="button" class="more" aria-expanded="false" aria-controls={descId}>About<span class="sr-only"> {e.title}</span></button>}
   </div>

@@ -18,12 +18,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import YAML from 'yaml';
-import { meetupSlug } from '../src/lib/meetup.mjs';
+import { meetupSlug, meetupUrl } from '../src/lib/meetup.mjs';
 import secdsm from './sources/secdsm.mjs';
 import pmiChapter from './sources/pmi-chapter.mjs';
 import taiTechbrew from './sources/tai-techbrew.mjs';
 import iowansOfThings from './sources/iowans-of-things.mjs';
-import { parseFeed, parseEventsPage, enrich, mergeCache, typicalGoing } from './sources/meetup.mjs';
+import { parseFeed, parseEventsPage, enrich, mergeCache } from './sources/meetup.mjs';
 
 const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew, 'iowans-of-things': iowansOfThings };
 
@@ -79,23 +79,21 @@ async function fetchGroup(group) {
 // Meetup groups and plain iCal feeds.
 async function fetchFeed(group, now, cutoff) {
   const slug = meetupSlug(group.meetup);
-  const feedUrl = group.ical ?? (slug && `https://www.meetup.com/${slug}/events/ical/`);
+  const feedUrl = group.ical ?? (slug && meetupUrl(slug, 'events/ical/'));
   if (!feedUrl) throw new Error('needs a meetup, ical or source entry');
 
   const upcoming = parseFeed(await get(feedUrl), group, { slug, now });
 
   let recent = [];
   let logo = null;
-  let typical = null;
   let facts = {};
   let enrichError = null;
   let enriched = false;
   if (slug) {
     try {
-      const details = parseEventsPage(await get(`https://www.meetup.com/${slug}/events/`), slug);
+      const details = parseEventsPage(await get(meetupUrl(slug, 'events/')), slug);
       logo = details.logo;
       recent = enrich(upcoming, details, group, { now, cutoff });
-      typical = typicalGoing(details, now);
       facts = { members: details.members, pastCount: details.pastCount };
       enriched = true;
     } catch (err) {
@@ -105,7 +103,7 @@ async function fetchFeed(group, now, cutoff) {
   }
 
   // The feed's copy of an upcoming event wins over the page's.
-  return { events: [...recent, ...upcoming], logo, typical, ...facts, enriched, enrichError };
+  return { events: [...recent, ...upcoming], logo, ...facts, enriched, enrichError };
 }
 
 async function readCache(id) {

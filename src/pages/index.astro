@@ -7,8 +7,8 @@ import { dayKey, lastDay, weekday, day, month, shortTime, addDays, daysBetween, 
 
 const { events, upcoming, past, groups, byId, updatedAt } = loadData();
 
-// Section labels are relative to the build. Builds run daily, and the browser
-// re-labels "Tomorrow"/"Tonight" itself.
+// Section labels are relative to the build, which runs at least once a day
+// (see refresh.yml); the browser re-labels Today/Tonight/Tomorrow itself.
 const today = dayKey(Date.now());
 const dow = new Date(`${today}T12:00:00Z`).getUTCDay();
 const thisWeekEnd = addDays(today, (7 - dow) % 7);

@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
-export const LABEL = 'source-broken';
+const LABEL = 'source-broken';
 const tag = (id) => `(${id})`;
 
 // Decide what to do, given this run's report and the open source-broken issues
