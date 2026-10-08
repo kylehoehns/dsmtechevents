@@ -4,9 +4,8 @@ import { loadData } from '../lib/data.mjs';
 import { weekday, day, month, shortTime } from '../lib/format.mjs';
 
 const { groups, updatedAt } = loadData();
-// Groups with something on the books first, soonest first.
-const sorted = [...groups].sort((a, b) =>
-  (a.nextEvent?.start ?? '9999').localeCompare(b.nextEvent?.start ?? '9999') || a.short.localeCompare(b.short));
+// Alphabetical by the name on the card, so a group is easy to find.
+const sorted = [...groups].sort((a, b) => a.short.localeCompare(b.short, 'en', { sensitivity: 'base' }));
 const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
 ---
 <Layout nav="groups" updatedAt={updatedAt}
