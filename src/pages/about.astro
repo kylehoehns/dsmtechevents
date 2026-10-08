@@ -8,7 +8,7 @@ import { site } from '../lib/site.mjs';
 const { groups, updatedAt } = loadData();
 ---
 <Layout nav="about" updatedAt={updatedAt} headTitle="About · DSM Tech Events"
-  description="DSM Tech Events is one calendar of every public tech meetup, user group and conference in the Des Moines area, pulled from each group's own page four times a day.">
+  description="DSM Tech Events is one calendar of every public tech meetup, user group and conference in the Des Moines area, pulled automatically from each group's own page.">
   <div class="page-head"><h1>About</h1></div>
 
   <div class="add-page">
@@ -20,7 +20,7 @@ const { groups, updatedAt } = loadData();
     <section>
       <h2>How it works</h2>
       <ul>
-        <li>Events come straight from each group's Meetup page or website, four times a day. Conferences and one-off events are added by hand.</li>
+        <li>Events come straight from each group's Meetup page or website and update on their own. Conferences and one-off events are added by hand.</li>
         <li>We only point the way. You RSVP or register on the group's own page, and the group runs the event.</li>
         <li>We're not affiliated with any of the groups. If a listing looks wrong, the group's page is the one to trust. Let us know and we'll fix it.</li>
       </ul>

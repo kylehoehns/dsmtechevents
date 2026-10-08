@@ -19,7 +19,7 @@ members-only or invite-only events.
   [Add a group or event](https://github.com/kylehoehns/dsmtechevents/issues/new?template=add-listing.yml) form.
 
 **For a group on Meetup, the link is all we need.** The site reads every
-group's public Meetup calendar four times a day, so new events show up on
+group's public Meetup calendar every few hours, so new events show up on
 their own and fixes you make on Meetup carry over. Groups not on Meetup can
 send a website or public calendar (`.ics`) link. For a one-off event, send
 the date, time, venue and a sign-up link.
