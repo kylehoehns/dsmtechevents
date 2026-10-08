@@ -5,7 +5,7 @@ import secdsm from '../scripts/sources/secdsm.mjs';
 import pmiChapter from '../scripts/sources/pmi-chapter.mjs';
 import taiTechbrew from '../scripts/sources/tai-techbrew.mjs';
 import iowansOfThings from '../scripts/sources/iowans-of-things.mjs';
-import { decode, toText } from '../scripts/sources/html.mjs';
+import { decode, toText, httpUrl, safeLinks } from '../scripts/sources/html.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
 const serve = (body) => ({ get: async () => body });
@@ -156,4 +156,21 @@ test('secdsm says "at" inside a venue name written with "@"', async () => {
   const html = fixture('secdsm.html').replace('Example Hall', 'T12 Distillery @ The Foundry');
   const [e] = await secdsm({ id: 'secdsm', website: 'https://secdsm.org/' }, { get: async () => html });
   assert.equal(e.venue, 'T12 Distillery at The Foundry');
+});
+
+test('safeLinks keeps only http(s) event links and photos', () => {
+  assert.equal(httpUrl('https://www.meetup.com/pyowa/events/1/'), 'https://www.meetup.com/pyowa/events/1/');
+  assert.equal(httpUrl('HTTP://example.com/'), 'HTTP://example.com/');
+  for (const bad of ['javascript:alert(1)', ' JavaScript:alert(1)', 'data:text/html,hi', '//evil.example/', '/relative', null, undefined, 42]) assert.equal(httpUrl(bad), null, String(bad));
+
+  const group = { website: 'https://pyowa.org/' };
+  const [bad, good, noImage] = safeLinks([
+    { id: 'a', url: 'javascript:alert(1)', image: 'data:image/svg+xml,<svg/>' },
+    { id: 'b', url: 'https://example.com/e', image: 'https://example.com/p.jpg' },
+    { id: 'c', url: null },
+  ], group);
+  assert.deepEqual(bad, { id: 'a', url: 'https://pyowa.org/', image: null }, "a bad link falls back to the group's site");
+  assert.deepEqual(good, { id: 'b', url: 'https://example.com/e', image: 'https://example.com/p.jpg' });
+  assert.ok(!('image' in noImage), 'no image key is added, so cache files stay byte-stable');
+  assert.equal(safeLinks([{ id: 'd', url: 'javascript:x' }], { website: 'javascript:y' })[0].url, null);
 });

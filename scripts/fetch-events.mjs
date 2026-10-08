@@ -25,6 +25,7 @@ import taiTechbrew from './sources/tai-techbrew.mjs';
 import iowansOfThings from './sources/iowans-of-things.mjs';
 import { parseFeed, parseEventsPage, enrich, mergeCache } from './sources/meetup.mjs';
 import { updateArchive } from './archive.mjs';
+import { safeLinks } from './sources/html.mjs';
 
 const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew, 'iowans-of-things': iowansOfThings };
 
@@ -88,6 +89,7 @@ async function fetchGroup(group) {
     fresh = await fetchFeed(group, now, cutoff);
   }
 
+  fresh.events = safeLinks(fresh.events, group);
   return { ...mergeCache(await readCache(group.id), fresh, { now, cutoff }), enrichError: fresh.enrichError };
 }
 
