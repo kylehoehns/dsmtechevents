@@ -105,6 +105,13 @@ test('every hand-written event and group website link is a web address', async (
   for (const [name, url] of links) assert.match(String(url), /^https?:\/\//i, `${name}: ${url}`);
 });
 
+test('a Meetup group has one link to keep current: no website as well', async () => {
+  const YAML = (await import('yaml')).default;
+  const { readFileSync } = await import('node:fs');
+  const groups = YAML.parse(readFileSync(new URL('../data/groups.yaml', import.meta.url), 'utf8'));
+  for (const g of groups) assert.ok(!(g.meetup && g.website), `${g.id}: has both meetup and website`);
+});
+
 test('a quiet group (nothing coming up, no meetup in a year) is hidden but kept', () => {
   const ux = data.byId.uxdsm;
   assert.equal(ux.quiet, true);
