@@ -29,7 +29,7 @@ const health = (h: any) => !h ? ['unknown', 'Not checked yet']
   <div class="status-page">
     <p class="lede">
       Where each group's events come from, and whether the site could read them.
-      It checks every group four times a day{checkedOn && `, most recently on ${onDay(checkedOn)}`}.
+      Every group is checked automatically{checkedOn && `, most recently on ${onDay(checkedOn)}`}.
     </p>
 
     {/* A list, not a table: five columns don't fit a phone, and each line reads on its own. */}
