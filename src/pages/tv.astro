@@ -66,7 +66,7 @@ const slides = await Promise.all(events.map(async (e) => ({
             {e.going > 0 && <p class="going"><b>{e.going}</b> going</p>}
           </div>
           {(e.photo || qr) && (
-            <div class="side">
+            <div class="tv-side">
               {e.photo && <img class="tv-photo" src={e.photoSizes?.large ?? e.photo} alt="" />}
               {qr && (
                 <div class="qr">
@@ -135,8 +135,8 @@ const slides = await Promise.all(events.map(async (e) => ({
   .poster-slide.conf .info .where { color: inherit; }
   .info .going { margin: 2.5vh 0 0; font: 600 3vh/1 var(--mono); }
   .info .going b { font: 900 6vh/1 var(--display); vertical-align: -0.6vh; margin-right: 0.6vw; }
-  .side { display: flex; flex-direction: column; align-items: center; gap: 3vh; width: 28vw; }
-  .side .tv-photo { width: 100%; max-height: 38vh; object-fit: contain; border: 3px solid var(--ink); background: #000; transform: rotate(-1deg); }
+  .tv-side { display: flex; flex-direction: column; align-items: center; gap: 3vh; width: 28vw; }
+  .tv-side .tv-photo { width: 100%; max-height: 38vh; object-fit: contain; border: 3px solid var(--ink); background: #000; transform: rotate(-1deg); }
   .qr { display: flex; flex-direction: column; align-items: center; gap: 1vh; background: #f3ede1; color: #1d1b2b; padding: 1.6vh; }
   .qr-code svg { display: block; width: 20vh; height: 20vh; }
   .qr span { font: 900 2.6vh/1 var(--display); text-transform: uppercase; }
