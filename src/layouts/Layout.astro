@@ -15,12 +15,16 @@ const pageTitle = headTitle ?? (title ? `${title} · ${site.name}` : site.name);
 // Same time style as the event list: "Oct 8, 5:52a".
 const updated = updatedAt && `${month(updatedAt)} ${day(updatedAt)}, ${shortTime(updatedAt)}`;
 const canonical = new URL(Astro.url.pathname, site.url).href;
+// The commit Cloudflare built this page from (Workers Builds sets the
+// variable), so the refresh workflow can tell when its push is live.
+const build = process.env.WORKERS_CI_COMMIT_SHA;
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    {build && <meta name="build" content={build} />}
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}

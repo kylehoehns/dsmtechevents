@@ -58,6 +58,7 @@ jobs:
       # Build before committing, so data that breaks the site never gets pushed.
       - run: npm run build
       - name: commit changed event data
+        id: commit
         env:
           DEPLOY_KEY: ${{ secrets.REFRESH_DEPLOY_KEY }}
         run: |
@@ -88,3 +89,24 @@ jobs:
           # data commit on top instead of failing the push and losing the run.
           git pull --rebase --quiet
           git push
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      # The push only asks Cloudflare to deploy. Wait for the live home page to
+      # carry this commit (its <meta name="build">, which Cloudflare's build
+      # fills in from WORKERS_CI_COMMIT_SHA), or a later one, and fail the run
+      # if it hasn't after 10 minutes, so a failed deploy doesn't go unnoticed.
+      - name: check the push went live
+        if: steps.commit.outputs.sha
+        env:
+          SHA: ${{ steps.commit.outputs.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for _ in $(seq 20); do
+            sleep 30
+            live=$(curl -fsS "https://dsmtechevents.com/?deploy-check=$SHA" | grep -o '<meta name="build" content="[0-9a-f]*"' | grep -o '[0-9a-f]\{40\}' || true)
+            if [ "$live" = "$SHA" ]; then echo "Live: $live"; exit 0; fi
+            # A PR merged right after this push: its build carries ours too.
+            if [ -n "$live" ] && [ "$(gh api "repos/$GITHUB_REPOSITORY/compare/$SHA...$live" --jq .status 2>/dev/null)" = ahead ]; then echo "Live: $live (includes $SHA)"; exit 0; fi
+            echo "Live is ${live:-unknown}, waiting for $SHA"
+          done
+          echo "::error::$SHA was pushed but dsmtechevents.com still serves ${live:-an unknown build} after 10 minutes. Check Workers Builds in the Cloudflare dashboard."
+          exit 1
