@@ -84,7 +84,8 @@ export function liveLabel(e, now = Date.now()) {
   const mins = Math.ceil((Date.parse(e.start) - now) / 60_000);
   if (mins > 0 && mins <= 60) return `Starts in ${mins} min`;
   const at = e.allDay ? '' : ` at ${shortTime(e.start)}`;
-  return label ? `${label}${at}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}${at}`;
+  // Further out, the slide's big date already says when: say it once.
+  return label ? `${label}${at}` : '';
 }
 
 // Flyer-style times: "5:30p", "12p".

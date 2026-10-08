@@ -48,8 +48,9 @@
   animation: fx-register 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s backwards, fx-creep 5s ease-in-out 1.4s infinite alternate;
 }
 .tv[data-fx=print] .tv-logo::before { animation: fx-creep 7s ease-in-out infinite alternate; }
-@keyframes fx-register { from { transform: translate(-0.3em, 0.1em); } 55% { transform: translate(-1px, 0); } to { transform: translate(3px, 2px); } }
-@keyframes fx-creep { from { transform: translate(3px, 2px); } to { transform: translate(7px, -1px); } }
+/* In em, so the plate drifts the same amount relative to the type on a TV and on a phone. */
+@keyframes fx-register { from { transform: translate(-0.3em, 0.1em); } 55% { transform: translate(-0.01em, 0); } to { transform: translate(0.035em, 0.025em); } }
+@keyframes fx-creep { from { transform: translate(0.035em, 0.025em); } to { transform: translate(0.07em, -0.01em); } }
 
 /* halftone flashes on wet, then dries back to a hint in the top corner */
 .tv[data-fx=print] .slide::after {
