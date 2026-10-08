@@ -26,6 +26,7 @@ import iowansOfThings from './sources/iowans-of-things.mjs';
 import { parseFeed, parseEventsPage, enrich, mergeCache } from './sources/meetup.mjs';
 import { updateArchive } from './archive.mjs';
 import { safeLinks } from './sources/html.mjs';
+import { sourceStatus } from './source-status.mjs';
 
 const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew, 'iowans-of-things': iowansOfThings };
 
@@ -57,6 +58,12 @@ for (const group of groups) {
   await new Promise((r) => setTimeout(r, 500)); // be polite to Meetup
 }
 await fs.writeFile(path.join(root, 'fetch-report.json'), JSON.stringify(report, null, 2) + '\n');
+
+// The same facts, committed for the /status/ page (see source-status.mjs).
+const statusFile = path.join(cacheDir, 'status.json');
+const statusBefore = await fs.readFile(statusFile, 'utf8').catch(() => null);
+const status = JSON.stringify(sourceStatus(JSON.parse(statusBefore ?? '{}'), report, Date.now()), null, 2) + '\n';
+if (status !== statusBefore) await fs.writeFile(statusFile, status);
 
 // Every ended event also goes into data/archive/<year>.json, which keeps them
 // after they age out of the cache's 90 days.
