@@ -41,6 +41,12 @@ test('parseFeed rejects something that is not a calendar', () => {
   assert.throws(() => parseFeed('<html>Rate limited</html>', group, { now }), /did not return a calendar/);
 });
 
+test('parseFeed throws on an empty feed for a group that had events coming up', () => {
+  const empty = fixture('meetup-feed-empty.ics');
+  assert.throws(() => parseFeed(empty, group, { slug: 'iadnug', now, hadUpcoming: 2 }), /no upcoming events, but the last run had 2/);
+  assert.deepEqual(parseFeed(empty, group, { slug: 'iadnug', now }), [], 'a group with nothing scheduled before stays quiet');
+});
+
 test('parseEventsPage reads venue, photo, RSVPs and the group logo', () => {
   const { logo, events, members, pastCount, lastMet } = parseEventsPage(fixture('meetup-events-page.html'), 'iadnug');
   assert.equal(logo, 'https://secure.meetupstatic.com/photos/event/a/b/600_111.jpeg');
@@ -66,6 +72,10 @@ test('parseEventsPage reads venue, photo, RSVPs and the group logo', () => {
 
 test('parseEventsPage finds the group even when the URL differs in case', () => {
   assert.equal(parseEventsPage(fixture('meetup-events-page.html'), 'IADNUG').members, 1543);
+});
+
+test('parseEventsPage throws when the page has no entry for the group', () => {
+  assert.throws(() => parseEventsPage(fixture('meetup-events-page.html'), 'some-other-group'), /no Group entry for some-other-group/);
 });
 
 test('parseEventsPage fails loudly when Meetup changes the page', () => {

@@ -4,9 +4,13 @@ import { meetupUrl } from '../../src/lib/meetup.mjs';
 import { calendarEvents, isUpcoming, times, eventUrl } from './ical.mjs';
 
 // Upcoming events from an iCal feed (Meetup's or any public calendar).
-export function parseFeed(ics, group, { slug, now }) {
-  return calendarEvents(ics)
-    .filter((e) => isUpcoming(e, now))
+// `hadUpcoming`: how many upcoming events the last run found. A feed that
+// suddenly lists none is more likely broken than every event called off at
+// once, so it throws and the last good cache stays (with a source-broken issue).
+export function parseFeed(ics, group, { slug, now, hadUpcoming = 0 }) {
+  const events = calendarEvents(ics).filter((e) => isUpcoming(e, now));
+  if (!events.length && hadUpcoming) throw new Error(`feed lists no upcoming events, but the last run had ${hadUpcoming}`);
+  return events
     .map((e) => {
       const id = /^event_([^@]+)@/.exec(e.uid)?.[1] ?? e.uid;
       return {
@@ -54,16 +58,17 @@ export function parseEventsPage(html, slug) {
   }
   // Meetup's urlname can differ in case from the URL we have (ProductTank-Des-Moines-Ames).
   const group = Object.entries(state).find(([k, v]) => k.startsWith('Group:') && v.urlname?.toLowerCase() === slug.toLowerCase())?.[1];
+  if (!group) throw new Error(`no Group entry for ${slug} on page`);
   // Total past meetups lives under a key like events({"filter":{"status":["PAST"]},"first":1}).
-  const pastKey = group && Object.keys(group).find((k) => k.startsWith('events(') && k.includes('"status":["PAST"]') && !k.includes('DateTime'));
+  const pastKey = Object.keys(group).find((k) => k.startsWith('events(') && k.includes('"status":["PAST"]') && !k.includes('DateTime'));
   // When the group last met: its newest PAST event (cancelled ones don't
   // count). The page lists the last ten events however old they are, so this
   // reaches further back than the cache's 90 days. The site uses it to hide
   // quiet groups and to say "Back!" when one returns.
   const lastMet = [...events.values()].filter((e) => e.status === 'PAST').map((e) => e.start).sort().at(-1) ?? null;
   return {
-    logo: photo(group?.keyGroupPhoto),
-    members: group?.stats?.memberCounts?.all ?? null,
+    logo: photo(group.keyGroupPhoto),
+    members: group.stats?.memberCounts?.all ?? null,
     pastCount: (pastKey && group[pastKey]?.totalCount) ?? null,
     lastMet,
     events,
