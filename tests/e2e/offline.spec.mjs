@@ -1,11 +1,12 @@
 // Offline: the installed site keeps working with no network (public/sw.js).
 // Runs only in the "offline" project (playwright.config.mjs), the one that
 // lets the service worker run; every other test blocks it.
-import { test, expect } from './fixtures.mjs';
+import { test, expect, fakePhotos, PHOTOS } from './fixtures.mjs';
 
 test.beforeEach(async ({ context, baseURL }) => {
   // The shared fixture keeps the page off other hosts; keep the worker off them too.
   await context.route((url) => !url.href.startsWith(baseURL) && !url.protocol.startsWith('data'), (route) => route.abort());
+  await fakePhotos(context);
 });
 
 // The first visit installs the worker, which saves the site, then takes over the page.
@@ -66,4 +67,18 @@ test('visiting the home page again keeps the TV page\'s files', async ({ page, c
   await page.reload();
   await expectHomeWorks(page);
   await expectTvWorks(page);
+});
+
+// Neither page is opened online: the worker saved them on install, and their
+// images with them (lazy logos, photos on slides not showing yet).
+test('group logos and TV photos work offline without opening those pages first', async ({ page, context }) => {
+  await installWorker(page);
+  await goOffline(page, context);
+  await context.unroute(PHOTOS); // only what the worker saved can answer
+  const loaded = (img) => img.evaluate((el) => el.complete && el.naturalWidth > 0);
+
+  await page.goto('/groups/');
+  await expect.poll(() => loaded(page.locator('#aws .logo-img'))).toBe(true);
+  await page.goto('/tv/');
+  await expect.poll(() => loaded(page.locator('.tv-photo').first())).toBe(true);
 });

@@ -41,7 +41,7 @@ const health = (h: any) => !h ? ['unknown', 'Not checked yet']
           <li>
             <h2>{g.quiet ? g.short : <a href={`/groups/#${g.id}`}>{g.short}</a>}{g.quiet && <span class="quiet">Quiet</span>}</h2>
             <p class={`health ${kind}`}>{label}</p>
-            <p class="facts">{[source(g), g.fetchedAt && `changed ${date(g.fetchedAt)}`, `${g.upcomingCount} coming up`].filter(Boolean).join(' · ')}</p>
+            <p class="facts">{[source(g), g.fetchedAt && `changed ${date(g.fetchedAt)}`].filter(Boolean).join(' · ')} · {g.states.map((s: any) => <span {...s.attrs}>{s.count} coming up</span>)}</p>
           </li>
         );
       })}
@@ -63,6 +63,7 @@ const health = (h: any) => !h ? ['unknown', 'Not checked yet']
       </dl>
     </section>
   </div>
+  <script>import '../scripts/catch-up.js';</script>
 </Layout>
 
 <style>

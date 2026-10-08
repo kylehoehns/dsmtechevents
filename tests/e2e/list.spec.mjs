@@ -58,6 +58,17 @@ test('a page left showing re-checks once a minute', async ({ page }) => {
   await expect(row(page, 'Coding Dojo')).toHaveCount(0);
 });
 
+test('an event that ends while the page is open moves to Recent events', async ({ page }) => {
+  await page.clock.setSystemTime(new Date('2026-10-15T00:20:00Z')); // 7:20p
+  await page.goto('/');
+  const recent = page.getByRole('region', { name: 'Recent events' }).getByRole('listitem').filter({ hasText: 'Coding Dojo' });
+  await expect(recent).toHaveCount(0);
+  await page.clock.runFor('15:00');
+  await expect(row(page, 'Coding Dojo')).toHaveCount(0);
+  await expect(recent).toContainText('12 went');
+  await expect(page.locator('#recent-list li:not([hidden])').first()).toContainText('Coding Dojo');
+});
+
 test('headliner poster counts down to the conference', async ({ page }) => {
   await page.goto('/');
   const poster = page.getByRole('region', { name: 'Coming up soon' });

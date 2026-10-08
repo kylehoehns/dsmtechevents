@@ -5,7 +5,8 @@
 // on install, and anything else under /_astro/ is dropped once this worker
 // takes over. Served stale-while-revalidate.
 // Meetup event photos: their own small cache, oldest dropped past 60.
-// Group logos: saved whenever the Groups page loads online.
+// Group logos and the TV page's photos: saved with their page, on install and
+// whenever it loads online.
 // Bump VERSION to start every cache fresh; activate deletes the old ones.
 const VERSION = 'v5';
 const CACHE = `dsmtechevents-${VERSION}`;
@@ -18,9 +19,15 @@ const PHOTO_HOST = 'https://secure.meetupstatic.com';
 const PAGES = ['/', '/groups/', '/tv/', '/cards/'];
 // The build fills this in (scripts/sw-precache.mjs): every file in /_astro/.
 const ASSETS = [];
+// Images a saved page needs offline: <img class="..."> on it, and the cache they go in.
+const PAGE_IMAGES = { '/groups/': ['logo-img', LOGOS], '/tv/': ['tv-photo', IMAGES] };
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((cache) => cache.addAll([...PAGES, ...ASSETS])));
+  e.waitUntil(caches.open(CACHE).then(async (cache) => {
+    await cache.addAll([...PAGES, ...ASSETS]);
+    // Pages saved here may never be opened online, so save their images now too.
+    await Promise.all(Object.keys(PAGE_IMAGES).map(async (page) => saveImages(page, await (await cache.match(page)).text()).catch(() => {})));
+  }));
   self.skipWaiting();
 });
 
@@ -65,7 +72,7 @@ async function networkFirst(e) {
     ]);
     if (res.ok) {
       await cache.put(key, res.clone());
-      if (key === '/groups/') e.waitUntil(res.clone().text().then(saveLogos).catch(() => {}));
+      if (Object.hasOwn(PAGE_IMAGES, key)) e.waitUntil(res.clone().text().then((html) => saveImages(key, html)).catch(() => {}));
     }
     return res;
   } catch {
@@ -82,28 +89,32 @@ const offlinePage = () => new Response(
 );
 
 // The Groups page's logos load lazily, so most never would before going
-// offline; save them all when the page loads. Only Meetup-hosted ones: their
-// host sends CORS headers, so each download can be checked (a real image, not
-// an error page) and is stored at its real size. A group's own site may not
-// (that would mean an unreadable "opaque" copy, counted as ~7MB each against
-// the storage quota), and fetching it here would need its host in the CSP.
-// Logos the page no longer shows are dropped.
-async function saveLogos(html) {
+// offline, and the TV page's photos are on slides not showing yet; and a page
+// saved on install may never be opened online at all. So save a page's images
+// along with the page. Only Meetup-hosted ones: their host sends CORS headers,
+// so each download can be checked (a real image, not an error page) and is
+// stored at its real size. A group's own site may not (that would mean an
+// unreadable "opaque" copy, counted as ~7MB each against the storage quota),
+// and fetching it here would need its host in the CSP. Logos the page no
+// longer shows are dropped; photos share the photo cache's limit.
+async function saveImages(page, html) {
+  const [cls, name] = PAGE_IMAGES[page];
   const urls = [];
   for (const [tag] of html.matchAll(/<img\b[^>]*>/g)) {
-    const src = /\bclass="logo-img"/.test(tag) && tag.match(/\bsrc="([^"]+)"/)?.[1].replaceAll('&amp;', '&');
+    const src = tag.includes(`class="${cls}"`) && tag.match(/\bsrc="([^"]+)"/)?.[1].replaceAll('&amp;', '&');
     if (src?.startsWith(`${PHOTO_HOST}/`) && !urls.includes(src)) urls.push(src);
   }
   const keep = urls.slice(0, MAX_LOGOS);
-  const cache = await caches.open(LOGOS);
-  for (const k of await cache.keys()) if (!keep.includes(k.url)) await cache.delete(k);
+  const cache = await caches.open(name);
+  if (name === LOGOS) for (const k of await cache.keys()) if (!keep.includes(k.url)) await cache.delete(k);
   await Promise.all(keep.map(async (src) => {
     if (await cache.match(src)) return;
     try {
       const res = await fetch(src, { mode: 'cors', credentials: 'omit' });
       if (res.ok && res.headers.get('Content-Type')?.startsWith('image/')) await cache.put(src, res);
-    } catch {} // a missing logo now just means a missing logo offline
+    } catch {} // a missing image now just means a missing image offline
   }));
+  if (name === IMAGES) await trim(cache);
 }
 
 async function staleWhileRevalidate(req, name) {

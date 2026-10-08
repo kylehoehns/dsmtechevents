@@ -93,3 +93,30 @@ test('the footer links to the organizers page, which links the TV and print page
   await expect(page.getByRole('link', { name: 'The regular TV page' })).toHaveAttribute('href', '/tv/');
   await expect(page.getByRole('link', { name: 'Print a flyer' })).toHaveAttribute('href', '/print/');
 });
+
+// The pages are built in the morning; the Coding Dojo, Web Geeks' only
+// upcoming event, runs 5:30-7:30p.
+test('a group card catches up once its next event is over', async ({ page }) => {
+  await page.clock.setSystemTime(new Date('2026-10-15T00:20:00Z')); // 7:20p
+  await page.goto('/groups/');
+  const card = page.locator('article#webgeeks');
+  await expect(card.locator('.next:visible')).toContainText('Next: Wed Oct 14, Coding Dojo');
+  await expect(card.locator('.last:visible')).toHaveText('Last event Oct 5 · 37 went');
+  await expect(card.getByRole('link', { name: 'See 1 upcoming from Web Geeks' })).toBeVisible();
+
+  await page.clock.runFor('15:00'); // left open past 7:30p
+  await expect(card.locator('.next')).toHaveText("Nothing scheduledCheck their page for what's next.");
+  await expect(card.locator('.last')).toHaveText('Last event Oct 14 · 12 went');
+  await expect(card.getByRole('link', { name: 'See past events from Web Geeks' })).toBeVisible();
+  await expect(card.getByRole('link', { name: 'See 1 upcoming from Web Geeks' })).toHaveCount(0);
+  // Pyowa's lunch tomorrow is still next.
+  await expect(page.locator('article#pyowa .next:visible')).toContainText('Python Office Hours');
+});
+
+test('status counts catch up on a page opened the next day', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-10-15T14:00:00Z')); // Thursday 9am
+  await page.goto('/status/');
+  const count = (name) => page.locator('.sources li', { has: page.getByRole('heading', { name: new RegExp(`^${name}`) }) }).locator('.facts span:visible');
+  await expect(count('Web Geeks')).toHaveText('0 coming up');
+  await expect(count('Pyowa')).toHaveText('1 coming up');
+});

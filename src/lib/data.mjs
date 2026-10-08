@@ -6,6 +6,10 @@ import { meetupSlug, meetupUrl, meetupPhoto } from './meetup.mjs';
 import { dayKey, lastDay, weekday, fmt } from './format.mjs';
 import { localToUtc } from './time.mjs';
 
+// The site rebuilds at least once a day (refresh.yml), so a page can be up to
+// a day old. Pages print what they'll need when events ending this soon end.
+const CATCH_UP = 2 * 86_400_000;
+
 // Tests pass their own data folder and clock. The browser tests build the
 // whole site from a fixture folder by setting DSM_DATA_DIR (see
 // playwright.config.mjs); unset, it's the real data/.
@@ -28,7 +32,7 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   const archived = {};
   for (const r of archive) if (!(archived[r.group] >= r.start)) archived[r.group] = r.start;
   for (const g of groups) {
-    summarize(g, upcoming, past);
+    summarize(g, upcoming, past, now);
     markQuiet(g, archived[g.id], now);
   }
 
@@ -38,6 +42,8 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
     groups: groups.filter((g) => !g.quiet),
     allGroups: groups,
     byId, events, upcoming, past, archive,
+    // For Recent events on the home page, which adds each one once it's over.
+    endingSoon: upcoming.filter((e) => Date.parse(e.end) <= now + CATCH_UP),
     updatedAt: fetched.at(-1) ?? new Date(now).toISOString(),
     ...readStatus(dataDir, groups),
   };
@@ -180,7 +186,7 @@ function describe(e, byId) {
 function foldSeries(upcoming) {
   const series = new Map();
   for (const e of upcoming) {
-    const key = `${e.groupIds.join('+')}|${e.title.trim().toLowerCase()}`;
+    const key = seriesKey(e);
     if (!series.has(key)) series.set(key, []);
     series.get(key).push(e);
   }
@@ -198,15 +204,29 @@ function foldSeries(upcoming) {
   }
 }
 
+const seriesKey = (e) => `${e.groupIds.join('+')}|${e.title.trim().toLowerCase()}`;
 const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 // What the Groups page needs: next and last event, how many are coming up,
 // and which name and logo to show.
-function summarize(g, upcoming, past) {
-  g.nextEvent = upcoming.find((e) => e.groupIds.includes(g.id)) ?? null;
+function summarize(g, upcoming, past, now) {
+  const mine = upcoming.filter((e) => e.groupIds.includes(g.id));
+  g.nextEvent = mine[0] ?? null;
   // Matches the filter chip: a repeating series counts once, like its row.
-  g.upcomingCount = upcoming.filter((e) => !e.repeat && e.groupIds.includes(g.id)).length;
+  g.upcomingCount = mine.filter((e) => !e.repeat).length;
   g.lastEvent = past.find((e) => e.groupIds.includes(g.id)) ?? null;
+  // The Groups and Status pages print the group as it reads now, then as it
+  // will once each event ending in the next two days is over. `attrs` go on
+  // each state's elements: src/scripts/catch-up.js shows a state from its
+  // data-after until its data-end, so "Next: today" goes when today's ends.
+  g.states = [];
+  for (let i = 0, last = g.lastEvent, after; ; i++) {
+    const next = mine[i] ?? null;
+    const end = next && Date.parse(next.end) <= now + CATCH_UP ? next.end : undefined;
+    g.states.push({ next, last, count: new Set(mine.slice(i).map(seriesKey)).size, attrs: { 'data-after': after, 'data-end': end, hidden: !!after } });
+    if (!end) break;
+    [last, after] = [next, end];
+  }
   // Show the full name only when it adds something. "Web Geeks" / "DSM Web
   // Geeks" and "Data & Analytics" / "Des Moines Data & Analytics" say the
   // same thing twice; "IADNUG" / "Iowa .NET User Group" doesn't.
