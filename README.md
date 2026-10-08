@@ -61,7 +61,7 @@ No database, no accounts, no tracking cookies.
 
 ## How it works
 
-Four times a day, a GitHub Action visits every group's Meetup calendar (or
+Every few hours, a GitHub Action visits every group's Meetup calendar (or
 its website, for groups not on Meetup), saves what it finds to
 `data/cache/`, and commits it. That commit rebuilds and redeploys the site,
 so what's live always matches what's in git.

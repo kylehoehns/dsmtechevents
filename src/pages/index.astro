@@ -60,7 +60,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
 ---
 <Layout updatedAt={updatedAt} search
   headTitle="DSM Tech Events: Des Moines tech meetups and conferences"
-  description="Every upcoming Des Moines tech meetup, user group and conference in one list: Python, Java, .NET, AI, AWS, security, UX and more. Updated four times a day.">
+  description="Every upcoming Des Moines tech meetup, user group and conference in one list: Python, Java, .NET, AI, AWS, security, UX and more. Updated daily.">
   <script type="application/ld+json" set:html={toScript(structured)} />
   <h1 class="sr-only">Upcoming tech events in Des Moines</h1>
   <p class="sr-only" role="status" id="status"></p>
