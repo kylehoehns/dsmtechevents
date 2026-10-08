@@ -79,9 +79,9 @@ const speculation = JSON.stringify({
       // flashes up and then jumps away. app.js keeps this in sync after that.
       if (new URLSearchParams(location.search).get('view') === 'calendar') document.documentElement.dataset.view = 'calendar';
       // Page transitions (global.css): mark a Back/Forward to an earlier page
-      // so it wipes the other way, and reprint the logo as the page arrives.
-      // A transition the browser drops (the next page can't take part, or
-      // another click cuts it short) rejects its promises; that's fine.
+      // so it wipes the other way. A transition the browser drops (the next
+      // page can't take part, or another click cuts it short) rejects its
+      // promises; that's fine.
       const settle = (vt) => { for (const p of [vt.ready, vt.updateCallbackDone, vt.finished]) p.catch(() => {}); };
       addEventListener('pageswap', (e) => { if (e.viewTransition) settle(e.viewTransition); });
       addEventListener('pagereveal', (e) => {
@@ -89,9 +89,6 @@ const speculation = JSON.stringify({
         settle(e.viewTransition);
         const a = window.navigation && navigation.activation;
         if (a && a.navigationType === 'traverse' && a.from && a.entry.index < a.from.index) e.viewTransition.types.add('back');
-        document.documentElement.classList.add('reprint');
-        const done = () => document.documentElement.classList.remove('reprint');
-        e.viewTransition.finished.then(done, done);
       });
     </script>
     {!bare && <script type="speculationrules" is:inline set:html={speculation} />}

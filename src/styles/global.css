@@ -632,9 +632,8 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
    page through like a squeegee: it wipes in left to right, landing slightly
    off register before it settles, while the old page lifts away. Back wipes
    right to left. The masthead stays put, the current tab slides to its new
-   spot, the page title morphs, and the logo's pink plate jolts back into
-   register (.reprint, set by Layout.astro and app.js). Picking a calendar day
-   only swaps the day panel. Reduced motion, or a browser without view
+   spot, and the page title morphs. Picking a calendar day only swaps the day
+   panel. Reduced motion, or a browser without view
    transitions, just changes pages. */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; types: page; }
@@ -664,13 +663,6 @@ html:active-view-transition-type(day)::view-transition-new(root) { animation: no
   to { clip-path: inset(0); transform: none; }
 }
 @keyframes day-in { from { opacity: 0; transform: translateY(0.6rem) rotate(-0.4deg); } }
-/* the logo's pink plate lands off and snaps back into register */
-.reprint .logo .misprint::before { animation: plate-register 560ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-@keyframes plate-register {
-  from { transform: translate(-9px, 7px); }
-  45% { transform: translate(8px, 3px); }
-  to { transform: translate(5px, 4px); }
-}
 
 /* the copy of a photo that flies between the thumbnail and About (app.js) */
 .about-ghost { position: fixed; z-index: 60; margin: 0; transform-origin: 0 0; pointer-events: none; object-fit: contain; border: 1.5px solid var(--line); background: var(--paper); }
