@@ -1,5 +1,6 @@
 ---
-// Who runs this, how the listings get here, and what to do when one is wrong.
+// What the site is, where listings come from, how to fix or add one, the TV
+// and print versions, who's behind it, and privacy, in the order people wonder.
 // Linked from the footer, not the top nav.
 import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
@@ -18,23 +19,20 @@ const { groups, updatedAt } = loadData();
     </p>
 
     <section>
-      <h2>How it works</h2>
+      <h2>Where the listings come from</h2>
       <ul>
-        <li>Events come straight from each group's Meetup page or website and update on their own. Conferences and one-off events are added by hand.</li>
-        <li>We only point the way. You RSVP or register on the group's own page, and the group runs the event.</li>
-        <li>We're not affiliated with any of the groups. If a listing looks wrong, the group's page is the one to trust. Let us know and we'll fix it.</li>
+        <li>Each group's events come straight from its Meetup page or website and update on their own. Conferences and one-off events are added by hand.</li>
+        <li>The site only points the way: you RSVP or register on the group's own page, and the group runs the event.</li>
+        <li>It isn't affiliated with any of the groups. If a listing and the group's page disagree, trust the group's page.</li>
       </ul>
     </section>
-
     <section>
-      <h2>Who runs it</h2>
+      <h2>Spot a mistake, or want to be listed?</h2>
       <p>
-        Made by <a href="https://www.kylehoehns.com/">Kyle Hoehns</a>,
-        organizer of the <a href="https://www.cijug.net/">Central Iowa Java Users Group</a> and a frequent speaker at local user groups.
-        The code is <a href={site.repo}>open source on GitHub</a>.
+        Corrections, ideas or questions: <a href={`mailto:${site.email}`}>{site.email}</a>.
+        Run a group or an event that isn't here? <a href="/add/">Here's how to get it listed</a>.
       </p>
     </section>
-
     <section>
       <h2>Put it on a screen, or a wall</h2>
       <p>
@@ -43,18 +41,17 @@ const { groups, updatedAt } = loadData();
         Prefer paper? <a href="/print/">Print a flyer</a> of the next four weeks for a corkboard.
       </p>
     </section>
-
+    <section>
+      <h2>Who's behind it</h2>
+      <p>
+        Made by <a href="https://www.kylehoehns.com/">Kyle Hoehns</a>,
+        organizer of the <a href="https://www.cijug.net/">Central Iowa Java Users Group</a> and a frequent speaker at local user groups.
+        The code is <a href={site.repo}>open source on GitHub</a>.
+      </p>
+    </section>
     <section>
       <h2>Privacy</h2>
       <p>No accounts and no tracking cookies. Cloudflare Web Analytics counts visits, and the site counts which RSVP and event links get clicked, so groups can see how many people it sends them. Neither identifies anyone.</p>
-    </section>
-
-    <section>
-      <h2>Get in touch</h2>
-      <p>
-        Corrections, ideas or questions: <a href={`mailto:${site.email}`}>{site.email}</a>.
-        Want your group or event listed? <a href="/add/">Here's how</a>.
-      </p>
     </section>
   </div>
 </Layout>
