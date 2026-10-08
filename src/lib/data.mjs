@@ -110,7 +110,8 @@ export function manualEvent(e) {
   const endDate = String(e.end ?? e.start);
   const allDay = !e.time;
   return {
-    id: `manual-${slugify(e.title)}-${startDate}`,
+    // `id:` pins an event's id (shared /tv/?event= links use it) when its title changes.
+    id: e.id ?? `manual-${slugify(e.title)}-${startDate}`,
     title: e.title,
     start: localToUtc(startDate, e.time ?? '00:00'),
     end: localToUtc(endDate, e.endTime ?? (allDay ? '23:59' : e.time)),
