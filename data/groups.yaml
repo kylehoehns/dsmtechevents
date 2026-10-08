@@ -88,6 +88,7 @@
   short: SecDSM
   source: secdsm
   website: https://secdsm.org/
+  logo: https://secdsm.org/images/og-logo.png
 
 - id: iot
   name: Iowans of Things
