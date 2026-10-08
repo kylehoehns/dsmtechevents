@@ -9,7 +9,7 @@
     "fetch": "node scripts/fetch-events.mjs",
     "dev": "astro dev",
     "test": "node --test \"tests/**/*.test.mjs\"",
-    "build": "npm test && astro build",
+    "build": "npm test && astro build && node scripts/check-dist.mjs",
     "og": "node scripts/og-image.mjs",
     "icons": "node scripts/icons.mjs",
     "preview": "astro preview"
