@@ -142,11 +142,16 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .poster .when { display: inline-block; font: 900 22px/0.9 var(--display); text-transform: uppercase; margin: 0 0 10px; background: var(--on-pink); color: var(--pink-fill); padding: 4px 8px 2px; }
 .poster.blue .when { background: var(--on-blue); color: var(--blue-fill); }
 .poster .where { margin: 0 0 10px; font: 600 12.5px/1.35 var(--mono); }
-/* phones: the stamp sits in the line after the date instead of floating over the button */
+/* phones: the stamp goes bottom-right like on desktop, but on the button's
+   line instead of floating over it; if the two don't fit, it wraps below, still right-aligned */
 @media (max-width: 1059px) {
   .poster .where { display: none; }
   .poster .go { font-size: 14px; padding: 6px 9px 5px; }
-  .headliners .poster .stamp-days { position: static; display: inline-block; margin: 0 18px 10px 10px; vertical-align: 2px; }
+  .headliners .poster-full { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 24px; } /* room for the stamp's tilt */
+  .headliners .poster-full > :is(.bill, h2, .when) { flex: 0 0 100%; }
+  .headliners .poster-full > .when { flex-basis: auto; margin-right: 100%; }
+  .headliners .poster .go { order: 1; }
+  .headliners .poster .stamp-days { position: static; order: 2; margin: 10px 6px 4px auto; }
 }
 .poster .go { display: inline-block; font: 800 15px/1 var(--display); text-transform: uppercase; text-decoration: none; border: 2px solid currentColor; padding: 7px 11px 6px; }
 .poster .go:hover { background: var(--on-pink); color: var(--pink-fill); border-color: var(--on-pink); }
