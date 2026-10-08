@@ -456,6 +456,21 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .page-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-top: 22px; border-bottom: 2px solid var(--line); padding-bottom: 4px; }
 .page-head h1 { font: 900 clamp(40px, 10vw, 64px)/0.85 var(--display); text-transform: uppercase; margin: 0; }
 .page-head p { margin: 0; font-size: 13px; }
+/* ---------- add your group ---------- */
+.add-page { max-width: 64ch; display: grid; gap: 22px; padding: 18px 0 8px; font-family: var(--sans); font-size: 15.5px; line-height: 1.55; }
+.add-page .lede { margin: 0; font-size: 17px; }
+.add-page h2 { margin: 0 0 6px; font: 900 24px/1 var(--display); text-transform: uppercase; }
+.add-page ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.add-page section > p { margin: 8px 0 0; }
+.email-box { background: var(--pink-fill); color: var(--on-pink); padding: 16px 18px 18px; transform: rotate(-0.4deg); }
+.email-box .address { margin: 6px 0 12px; font: 700 clamp(18px, 5vw, 26px)/1.2 var(--mono); overflow-wrap: anywhere; }
+.email-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.email-actions a, .email-actions button { font: 800 16px/1 var(--display); text-transform: uppercase; text-decoration: none; border: 2px solid currentColor; padding: 8px 12px 7px; background: none; color: inherit; }
+.email-actions .primary { background: var(--on-pink); color: var(--pink-fill); border-color: var(--on-pink); }
+.email-actions .copied { font: 600 12.5px/1 var(--mono); }
+.email-box :focus-visible { outline-color: var(--on-pink); }
+.add-page .dev-note { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.add-page code { font: 13px var(--mono); background: var(--paper-2); padding: 0 4px; }
 .empty { padding: 16px 0; font-size: 13.5px; margin: 0; }
 
 /* ---------- footer ---------- */

@@ -1,0 +1,78 @@
+---
+// How to get a group or event listed. The footer's "Add your group" button
+// lands here, so nobody is surprised by their mail app opening.
+import Layout from '../layouts/Layout.astro';
+import { site } from '../lib/site.mjs';
+
+const subject = 'Add to DSM Tech Events';
+const body = [
+  'Group or event name:',
+  'Meetup link (or website / calendar link):',
+  'For a one-off event — date, time and venue:',
+  'Anything else we should know:',
+].join('\n\n');
+const mailto = `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+---
+<Layout nav="add" headTitle="Add your group · DSM Tech Events"
+  description="Get your Des Moines tech meetup, user group or conference listed on DSM Tech Events. Send us your Meetup link and we'll pull your events in automatically.">
+  <div class="page-head"><h1>Add your group</h1></div>
+
+  <div class="add-page">
+    <p class="lede">
+      DSM Tech Events lists public tech meetups, user groups and conferences in and around Des Moines.
+      We link to your Meetup page or site, and people sign up there, not here.
+    </p>
+
+    <section>
+      <h2>What fits</h2>
+      <ul>
+        <li>Tech-focused: software, data, security, product, design, hardware, and so on.</li>
+        <li>Open to the public. No members-only or invite-only events.</li>
+        <li>In the Des Moines area, or online and run by a local group.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>What to send</h2>
+      <ul>
+        <li>Your group or event's name.</li>
+        <li>Its Meetup link. Not on Meetup? A website or public calendar link works too.</li>
+        <li>For a one-off event like a conference: the date, time and venue.</li>
+      </ul>
+      <p>If you're on Meetup, that's all. New events are pulled in automatically four times a day.</p>
+    </section>
+
+    <section class="email-box" aria-labelledby="email-h">
+      <h2 id="email-h">Send it here</h2>
+      <p class="address"><span id="add-email">{site.email}</span></p>
+      <div class="email-actions">
+        <button type="button" class="copy" id="copy-email" data-copy={site.email}>Copy address</button>
+        <a class="primary" href={mailto}>Open in your email app <span aria-hidden="true">→</span></a>
+        <span class="copied" id="copied" role="status"></span>
+      </div>
+    </section>
+
+    <p class="dev-note">
+      Prefer GitHub? The site is open source. <a href={`${site.repo}#adding-things`}>Open a pull request</a> with your group in <code>data/groups.yaml</code>.
+    </p>
+  </div>
+</Layout>
+
+<script>
+  const btn = document.getElementById('copy-email') as HTMLButtonElement;
+  const note = document.getElementById('copied')!;
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copy!);
+      note.textContent = 'Copied';
+    } catch {
+      // No clipboard access: select the address so it can be copied by hand.
+      const range = document.createRange();
+      range.selectNodeContents(document.getElementById('add-email')!);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+      note.textContent = 'Selected. Copy it from here.';
+    }
+    setTimeout(() => { note.textContent = ''; }, 3000);
+  });
+</script>
