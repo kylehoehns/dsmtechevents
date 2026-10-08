@@ -1,0 +1,31 @@
+name: click report
+
+# Once a week, a summary of outbound clicks (which groups and events the site
+# sends people to) on the run's own page: open the latest run under Actions →
+# click report. Run it any time from there or with `gh workflow run click-report.yml`.
+# Needs the CF_ANALYTICS_TOKEN secret (Cloudflare "Account Analytics: Read").
+
+on:
+  schedule:
+    # Mondays 14:50 UTC (9:50am Des Moines in summer). Off the hour because
+    # GitHub runs on-the-hour schedules late.
+    - cron: '50 14 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: write the click report to this run's summary
+        env:
+          CF_ANALYTICS_TOKEN: ${{ secrets.CF_ANALYTICS_TOKEN }}
+        run: node scripts/click-report.mjs
