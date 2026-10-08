@@ -52,7 +52,7 @@ test.describe('iOS install hint', () => {
 
     // Scrolled to the bottom, every footer link can be tapped.
     await again.evaluate(() => scrollTo(0, document.body.scrollHeight));
-    for (const name of ['About this site', 'For organizers']) {
+    for (const name of ['About this site', 'Add your group or event']) {
       const clear = await again.getByRole('link', { name }).evaluate((a) => {
         const b = a.getBoundingClientRect();
         return a.contains(document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2));

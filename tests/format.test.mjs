@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween, liveLabel, lineup } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween, liveLabel, lineup, recentSummary } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
@@ -135,6 +135,8 @@ test('month and day names, and plurals', () => {
   assert.equal(dayName('2026-10-22'), 'Thursday, October 22');
   assert.equal(plural(1, 'event'), '1 event');
   assert.equal(plural(3, 'event'), '3 events');
+  assert.equal(recentSummary(12, 411), 'The last three months. 12 events, 411 people went.');
+  assert.equal(recentSummary(1, 1), 'The last three months. 1 event, 1 person went.');
   assert.equal(addDays('2026-11-01', 1), '2026-11-02');
   assert.equal(daysBetween('2026-10-31', '2026-11-02'), 2);
 });

@@ -67,7 +67,7 @@
   --fs-h-page: clamp(min(2.375rem, 14vw), 9.5vw, 4rem);  /* page titles, the footer's call to action */
   --fs-h-cal: clamp(min(2.75rem, 15vw), 11vw, 4.75rem);  /* the calendar's month */
   /* Oversize one-offs keep their own sizes: the logo, the date numerals,
-     poster and conference titles on desktop, the email address on /add/.
+     poster and conference titles on desktop, the email address on /organizers/.
      The logo (screen width) and date numerals (fixed column) stay in px. */
   color-scheme: light;
 }
@@ -555,7 +555,7 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 /* ---------- misc pages ---------- */
 .page-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-top: 22px; border-bottom: 2px solid var(--line); padding-bottom: 4px; }
 .page-head h1 { font: 900 var(--fs-h-page)/0.85 var(--display); text-transform: uppercase; margin: 0; }
-/* ---------- add your group ---------- */
+/* ---------- about and for organizers ---------- */
 .add-page { max-width: 64ch; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 18px 0 8px; font-family: var(--sans); font-size: var(--fs-body); line-height: 1.55; }
 .add-page .lede { margin: 0; font-size: var(--fs-lede); }
 .add-page h2 { margin: 0 0 6px; font: 900 var(--fs-title)/1 var(--display); text-transform: uppercase; }
@@ -569,7 +569,6 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 /* on the pink box: ink-on-pink buttons, outlined in the text color */
 .email-actions { --btn-line: currentColor; --btn-bg: var(--on-pink); --btn-fg: var(--pink-fill); }
 .email-actions .btn-outline { --btn-hover-bg: var(--on-pink); --btn-hover-fg: var(--pink-fill); }
-.email-actions .copied { font: 600 var(--fs-meta)/1 var(--mono); }
 .email-box :focus-visible { outline-color: var(--on-pink); }
 .badge-kit img { display: block; max-width: 100%; height: auto; }
 .snippet { margin-top: 10px; border: 1.5px solid var(--line); background: var(--paper-2); }
