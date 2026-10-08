@@ -33,7 +33,7 @@ const poster = h('div', { position: 'relative', flexDirection: 'column', width: 
   h('div', { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, opacity: 0.16, backgroundImage: `radial-gradient(circle, ${C.onPink} 2px, transparent 2.6px)`, backgroundSize: '9px 9px' }),
   h('div', { position: 'absolute', top: -16, left: 130, width: 100, height: 32, background: C.tape, transform: 'rotate(-4deg)' }),
   h('div', { justifyContent: 'space-between', paddingBottom: 10, borderBottom: `3px solid ${C.onPink}` },
-    mono(23, 700, 'Now showing'), mono(23, 700, 'Des Moines'),
+    mono(23, 700, "What's on"), mono(23, 700, 'Updated daily'),
   ),
   h('div', { flexDirection: 'column', marginTop: 16, gap: 6 },
     h('div', bill, 'Meetups'),
