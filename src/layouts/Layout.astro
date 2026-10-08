@@ -44,7 +44,7 @@ const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format
         </div>
         <a class="logo" href="/" aria-label={`${site.name} home`}><span class="mis" data-t={site.name}>{site.name}</span></a>
         <div class="mast-row">
-          <p class="blurb" set:html={blurb ?? 'Every tech meetup, user group and conference in Des Moines, on one sheet.'} />
+          {blurb ? <p class="blurb" set:html={blurb} /> : <span aria-hidden="true" />}
           {nav !== null && (
             <nav class="nav" aria-label="Main">
               <a href="/" data-nav="list" aria-current={nav === 'list' ? 'page' : undefined}>Events</a>

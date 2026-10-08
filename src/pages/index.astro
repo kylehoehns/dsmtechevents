@@ -56,9 +56,8 @@ const calendarData = {
   })),
   groups: Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short }])),
 };
-const blurb = 'Every tech meetup, user group and conference in Des Moines, on one sheet. Go to one.';
 ---
-<Layout updatedAt={updatedAt} blurb={blurb}>
+<Layout updatedAt={updatedAt}>
   <div class="layout">
     <div class="main">
       <section id="list-view" aria-label="Upcoming events">
