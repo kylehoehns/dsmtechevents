@@ -55,8 +55,16 @@ export function parseEventsPage(html, slug) {
       going: e.going?.totalCount ?? null,
     });
   }
-  const group = Object.entries(state).find(([k, v]) => k.startsWith('Group:') && v.urlname === slug)?.[1];
-  return { logo: photo(group?.keyGroupPhoto), events };
+  // Meetup's urlname can differ in case from the URL we have (ProductTank-Des-Moines-Ames).
+  const group = Object.entries(state).find(([k, v]) => k.startsWith('Group:') && v.urlname?.toLowerCase() === slug.toLowerCase())?.[1];
+  // Total past meetups lives under a key like events({"filter":{"status":["PAST"]},"first":1}).
+  const pastKey = group && Object.keys(group).find((k) => k.startsWith('events(') && k.includes('"status":["PAST"]') && !k.includes('DateTime'));
+  return {
+    logo: photo(group?.keyGroupPhoto),
+    members: group?.stats?.memberCounts?.all ?? null,
+    pastCount: (pastKey && group[pastKey]?.totalCount) ?? null,
+    events,
+  };
 }
 
 // The median RSVP count of a group's past events on its page (Meetup shows
@@ -95,8 +103,14 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
   for (const e of [...carried, ...fresh.events]) byId.set(e.id, { ...byId.get(e.id), ...e });
   const events = [...byId.values()].map(({ status, ...e }) => e).sort((a, b) => a.start.localeCompare(b.start));
 
-  const typical = fresh.typical ?? previous.typical; // left out when unknown, so files without it don't change
-  const result = { logo: fresh.logo ?? previous.logo ?? null, ...(typical != null && { typical }), enriched: fresh.enriched, events };
+  // Group facts from Meetup: kept from the last run if this one missed them,
+  // and left out when unknown so files without them don't change.
+  const facts = {};
+  for (const k of ['typical', 'usual', 'members', 'pastCount']) {
+    const v = fresh[k] ?? previous[k];
+    if (v != null) facts[k] = v;
+  }
+  const result = { logo: fresh.logo ?? previous.logo ?? null, ...facts, enriched: fresh.enriched, events };
   const { fetchedAt: before, ...previousResult } = previous;
   const unchanged = before && JSON.stringify(previousResult) === JSON.stringify(result);
   return { fetchedAt: unchanged ? before : fetchedAt, ...result };

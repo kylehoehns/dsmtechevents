@@ -72,7 +72,7 @@
 - id: uxdsm
   name: Experiencing UX - Central Iowa
   short: UX
-  meetup: https://www.meetup.com/experiencing-ux-dsm/
+  meetup: https://www.meetup.com/experiencing-ux/
   color: "#5f3dc4"
   tags: [ux, design]
 
@@ -89,6 +89,13 @@
   meetup: https://www.meetup.com/des-moines-data-analytics/
   color: "#e03131"
   tags: [data, analytics]
+
+- id: alf
+  name: Analytics Leadership Forum of Iowa
+  short: Analytics Leaders
+  meetup: https://www.meetup.com/analytics-leadership-forum-iowa/
+  color: "#9c36b5"
+  tags: [data, leadership]
 
 - id: azure
   name: Iowa Microsoft Azure User Group

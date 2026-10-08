@@ -20,7 +20,11 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
         <h2>{g.short}{!g.showFullName && <span class="sr-only"> ({g.name})</span>}</h2>
         {g.showFullName && <p class="full">{g.name}</p>}
         <p class="tags">{g.tags.map((t: string) => <b>{t}</b>)}</p>
-        <p class="next">
+        {(g.members || g.pastCount) && (
+          <p class="facts">{[g.members && `${g.members.toLocaleString('en-US')} members`, g.pastCount && `${g.pastCount} meetups`].filter(Boolean).join(' · ')}</p>
+        )}
+        {g.usual && <p class="usual"><span>Usually</span> {g.usual}</p>}
+        <p class:list={['next', { 'after-usual': !!g.usual }]}>
           {g.nextEvent
             ? <><span class="nd">Next: {when(g.nextEvent)}</span><span class="sr-only">, </span><span class="nt">{g.nextEvent.title}</span><span class="sr-only">, </span>{g.nextEvent.online ? 'Online' : `@ ${g.nextEvent.venue ?? 'TBA'}`} · {g.nextEvent.allDay ? 'All day' : shortTime(g.nextEvent.start)}</>
             : <><span class="nd idle">Nothing scheduled</span>Nothing posted yet. Check their page.</>}
