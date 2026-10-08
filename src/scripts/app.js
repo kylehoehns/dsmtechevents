@@ -3,7 +3,7 @@
 // the month calendar and the mini calendar in the side rail.
 // State lives in the URL (?view=calendar&group=cijug&day=2026-10-15) so any
 // view can be shared or bookmarked.
-import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown } from '../lib/format.mjs';
+import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, recentSummary } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -138,8 +138,14 @@ function renderSide() {
     li.hidden = !matches(hostsOf(li));
     if (!li.hidden) li.classList.toggle('extra', ++shown > limit);
   }
+  // The summary and the "All N" button count what the filter left.
+  const visible = $$('li:not([hidden])', list);
+  $('#recent-sub').textContent = recentSummary(visible.length, visible.reduce((n, li) => n + Number(li.dataset.going), 0));
   const all = $('#recent-all');
-  if (all) all.hidden = shown <= limit;
+  if (all) {
+    all.hidden = shown <= limit;
+    if (all.getAttribute('aria-expanded') !== 'true') all.textContent = `All ${shown} →`;
+  }
   recent.hidden = state.view === 'calendar' || shown === 0;
   minical.hidden = state.view === 'calendar';
   dayPanel.hidden = state.view !== 'calendar';

@@ -31,6 +31,8 @@ export const dayName = (key) => fullDate(`${key}T17:00:00Z`); // "Thursday, Octo
 // "October" or "October 2026" for a month key ("2026-10") or a day key.
 export const monthName = (key, withYear = false) => (withYear ? monthYear : monthLong).format(new Date(`${key.slice(0, 7)}-15T17:00:00Z`));
 export const plural = (n, word) => `${n} ${n === 1 ? word : `${word}s`}`;
+// The line under "Recently"; app.js redoes it when a group filter narrows the list.
+export const recentSummary = (events, rsvps) => `The last three months. ${plural(events, 'event')}, ${plural(rsvps, 'RSVP')}.`;
 // "Tonight" for something starting at 4pm or later, "Today" for a noon talk.
 export const todayWord = (iso) => (Number(hourFmt.format(new Date(iso))) >= 16 ? 'Tonight' : 'Today');
 
@@ -55,11 +57,18 @@ export function shortTime(iso) {
   return timeFmt.format(new Date(iso)).replace(':00', '').replace(/\s?AM$/, 'a').replace(/\s?PM$/, 'p');
 }
 
+// "Oct 15–16", or "Oct 30–Nov 2" across a month. Ends on lastDay(), so an
+// event ending at midnight doesn't gain a day.
+export function dateRange(start, end) {
+  const last = `${lastDay(start, end)}T17:00:00Z`;
+  return `${month(start)} ${day(start)}–${month(last) === month(start) ? '' : `${month(last)} `}${day(last)}`;
+}
+
 // "5:30p–7p", "Thu–Fri Oct 15–16 · 8a–5p", "All day".
 export function shortRange(e) {
-  if (e.allDay) return e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)} · All day` : 'All day';
+  if (e.allDay) return e.multiDay ? `${dateRange(e.start, e.end)} · All day` : 'All day';
   const t = `${shortTime(e.start)}–${shortTime(e.end)}`;
-  return e.multiDay ? `${weekday(e.start)}–${weekday(e.end)} ${month(e.start)} ${day(e.start)}–${day(e.end)} · ${t}` : t;
+  return e.multiDay ? `${weekday(e.start)}–${weekday(`${lastDay(e.start, e.end)}T17:00:00Z`)} ${dateRange(e.start, e.end)} · ${t}` : t;
 }
 
 export const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
