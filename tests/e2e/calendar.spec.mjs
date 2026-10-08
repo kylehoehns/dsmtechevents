@@ -62,6 +62,49 @@ test('arrow keys move between days and focus survives picking one', async ({ pag
   await expect(page.getByRole('status')).toHaveText('Thursday, October 22: 1 event');
 });
 
+test('the mini calendar is one tab stop; arrow keys move between its days', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the mini calendar is desktop only');
+  await page.goto('/');
+  const mini = page.getByRole('group', { name: 'October 2026' });
+  // Tab from the top of the page to the first link in the event list.
+  let presses = 0;
+  let minicalStops = 0;
+  while (presses < 80 && !(await page.evaluate(() => !!document.activeElement?.closest('#list-view')))) {
+    await page.keyboard.press('Tab');
+    presses++;
+    if (await page.evaluate(() => !!document.activeElement?.closest('.mini-grid'))) minicalStops++;
+  }
+  expect(minicalStops).toBe(1);
+  expect(presses).toBeLessThanOrEqual(15);
+
+  const today = mini.getByRole('button', { name: /^Wednesday, October 14,/ });
+  await today.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(mini.getByRole('button', { name: /^Thursday, October 15,/ })).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(mini.getByRole('button', { name: /^Thursday, October 22,/ })).toBeFocused();
+  await page.keyboard.press('Home');
+  await expect(mini.getByRole('button', { name: /^Sunday, October 18,/ })).toBeFocused();
+  await page.keyboard.press('ArrowUp');
+  await page.keyboard.press('ArrowUp');
+  await page.keyboard.press('ArrowUp');
+  await expect(mini.getByRole('button', { name: /^Sunday, October 4,/ })).toBeFocused();
+  // Stops at the edge of the month.
+  await page.keyboard.press('ArrowUp');
+  await expect(mini.getByRole('button', { name: /^Sunday, October 4,/ })).toBeFocused();
+  await page.keyboard.press('End');
+  const sat = mini.getByRole('button', { name: /^Saturday, October 10,/ });
+  await expect(sat).toBeFocused();
+  // The moved-to day is now the one tab stop.
+  await expect(mini.locator('button[tabindex="0"]')).toHaveCount(1);
+  await expect(sat).toHaveAttribute('tabindex', '0');
+
+  // Enter opens that day in the calendar, as a click does.
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/view=calendar&day=2026-10-10/);
+  await expect(page.locator('.day[data-day="2026-10-10"]')).toBeFocused();
+});
+
 // Plain Playwright here: blocking app.js on purpose logs a failed request,
 // which the shared fixture would count as a console error.
 plain('opening the calendar from another page never shows Events as the current tab', async ({ page }) => {

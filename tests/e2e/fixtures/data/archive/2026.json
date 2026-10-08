@@ -1,0 +1,22 @@
+[
+  {
+    "id": "cijug-old",
+    "group": "cijug",
+    "title": "Virtual threads in practice",
+    "start": "2026-04-15T22:30:00.000Z",
+    "end": "2026-04-16T00:00:00.000Z",
+    "venue": "Court Avenue Hub",
+    "going": 31,
+    "url": "https://www.meetup.com/central-iowa-java-users-group/events/old/"
+  },
+  {
+    "id": "cijug-past",
+    "group": "cijug",
+    "title": "Records and sealed types",
+    "start": "2026-10-01T22:30:00.000Z",
+    "end": "2026-10-02T00:00:00.000Z",
+    "venue": "Court Avenue Hub",
+    "going": 25,
+    "url": "https://www.meetup.com/central-iowa-java-users-group/events/2/"
+  }
+]

@@ -15,6 +15,7 @@ const dayPanel = $('#day-panel');
 const minical = $('#minical');
 const recent = $('#recent');
 const status = $('#status');
+const pastResults = $('#past-results');
 // A filtered view's title builds on the short name, not the long search title.
 const siteTitle = document.title;
 const siteName = document.querySelector('meta[property="og:site_name"]')?.content ?? siteTitle;
@@ -24,19 +25,27 @@ const today = dayKey(now);
 // ---- cards: every event has one, in the list or in the card pool ----
 // The pool (/cards/, built from the same EventCard) holds the cards the list
 // doesn't print: past events, repeat dates, far-off ones. It's fetched the
-// first time the calendar or a search needs it, not with the page.
+// first time the calendar or a search needs it, not with the page. It also
+// has a one-line row for every past event (archive included), which a search
+// shows in its Past section.
 const cards = new Map();
 for (const el of $$('.show', listView)) cards.set(el.dataset.id, el);
 let pool = null;
 let poolFailed = false;
+let poolReady = false;
 function loadPool() {
   pool ??= fetch('/cards/')
     .then((res) => { if (!res.ok) throw new Error(`card pool: ${res.status}`); return res.text(); })
     .then((html) => {
-      for (const el of $$('.show', new DOMParser().parseFromString(html, 'text/html'))) {
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      for (const el of $$('.show', doc)) {
         if (!cards.has(el.dataset.id)) cards.set(el.dataset.id, document.adoptNode(el));
       }
+      const rows = $$('#past > li', doc);
+      for (const li of rows) li.hidden = true;
+      $('ol', pastResults).replaceChildren(...rows.map((li) => document.adoptNode(li)));
       poolFailed = false;
+      poolReady = true;
       searchIndex = null; // rebuild with the new cards
       // Redraw only what was waiting on it (a redraw would close an open About).
       if (state.view === 'calendar' && $('[aria-busy], .show:not([data-id])', dayPanel)) renderDayPanel();
@@ -130,15 +139,19 @@ const hostsOf = (el) => (el.dataset.groups ?? '').split(' ');
 const fold = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’]/g, '').toLowerCase();
 const words = (s) => { const t = fold(s).replace(/[^\p{L}\p{N}.#+]+/gu, ' '); return ` ${t} ${t.replace(/[.#+]+/g, ' ')} `; };
 const queryWords = (q) => fold(q).split(/[^\p{L}\p{N}.#+]+/u).map((w) => w.replace(/\.+$/, '')).filter((w) => /[\p{L}\p{N}]/u.test(w));
+// A past event's row is indexed only when it has no card: the cache's past
+// events have one (with their About text), older archived ones don't.
 let searchIndex = null;
 function haystack(id) {
   if (!searchIndex) {
     searchIndex = new Map();
-    for (const [key, card] of cards) {
-      const names = hostsOf(card).flatMap((g) => groups[g] ? [groups[g].short, groups[g].name] : []);
-      const text = $$('.band, .series, .title, .venue, .addr, .tag-online, .desc', card).map((el) => el.textContent);
-      searchIndex.set(key, words([...names, ...text].join(' ')));
-    }
+    const index = (el, sel) => {
+      const names = hostsOf(el).flatMap((g) => groups[g] ? [groups[g].short, groups[g].name] : []);
+      const text = $$(sel, el).map((t) => t.textContent);
+      searchIndex.set(el.dataset.id, words([...names, ...text].join(' ')));
+    };
+    for (const card of cards.values()) index(card, '.band, .series, .title, .venue, .addr, .tag-online, .desc');
+    for (const li of $$('li', pastResults)) if (!searchIndex.has(li.dataset.id)) index(li, '.row-group, .row-title, .row-where');
   }
   return searchIndex.get(id) ?? '';
 }
@@ -153,7 +166,8 @@ const found = (el) => {
 const shows = (el) => matches(hostsOf(el)) && found(el);
 
 // ---- list ----
-// Returns how many events are showing.
+// Returns how many upcoming events are showing; pastShown counts the Past section.
+let pastShown = 0;
 function renderList() {
   let total = 0;
   for (const sec of $$('[data-sec]', listView)) {
@@ -165,10 +179,17 @@ function renderList() {
     const count = $('[data-count]', sec);
     count.textContent = $('.far', sec) ? `${n} on the books` : plural(n, 'event');
   }
+  // A search looks back too: past matches, newest first, under the upcoming ones.
+  pastShown = 0;
+  for (const li of $$('li', pastResults)) { li.hidden = !state.q || !found(li); if (!li.hidden) pastShown++; }
+  pastResults.hidden = pastShown === 0;
+  $('[data-count]', pastResults).textContent = plural(pastShown, 'event');
   const empty = $('#list-empty');
   empty.hidden = total > 0;
   if (!total && state.q) {
-    empty.innerHTML = `Nothing coming up matches '${escapeHtml(state.q)}'. <button type="button" class="btn btn-outline btn-small" data-clear-search>Clear search</button>`;
+    // Until the pool (and its past rows) is in, only upcoming events were searched.
+    const none = poolReady && !pastShown ? `Nothing matches '${escapeHtml(state.q)}', coming up or past.` : `Nothing coming up matches '${escapeHtml(state.q)}'.`;
+    empty.innerHTML = `${none} <button type="button" class="btn btn-outline btn-small" data-clear-search>Clear search</button>`;
   } else if (!total && state.group) {
     const g = groups[state.group];
     empty.innerHTML = `Nothing on the books for this group right now. ${g.url
@@ -209,7 +230,7 @@ function renderSide() {
   const limit = Number(list.dataset.shown);
   let shown = 0;
   for (const li of $$('li', list)) {
-    li.hidden = !shows(li);
+    li.hidden = !matches(hostsOf(li));
     if (!li.hidden) li.classList.toggle('extra', ++shown > limit);
   }
   // The summary and the "All N" button count what the filter left.
@@ -220,7 +241,8 @@ function renderSide() {
     all.hidden = shown <= limit;
     if (all.getAttribute('aria-expanded') !== 'true') all.textContent = `+ All ${shown}`;
   }
-  recent.hidden = state.view === 'calendar' || shown === 0;
+  // A search shows its past matches in the Past section instead.
+  recent.hidden = state.view === 'calendar' || shown === 0 || !!state.q;
   minical.hidden = state.view === 'calendar';
   dayPanel.hidden = state.view !== 'calendar';
 }
@@ -353,10 +375,11 @@ function renderMinical() {
     if (!key.startsWith(ym)) return '<span class="blank" aria-hidden="true"></span>';
     const list = eventsOn(key);
     const cls = [list.length ? 'has' : '', list.some((e) => e.headliner) ? 'headliner' : '', key === today ? 'today' : '', key < today ? 'past' : ''].filter(Boolean).join(' ');
-    return `<button type="button" class="${cls}" data-goto="${key}" aria-label="${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}">${Number(key.slice(8))}</button>`;
+    // One tab stop (today); arrow keys move between days, as in the big calendar.
+    return `<button type="button" class="${cls}" data-goto="${key}" tabindex="${key === today ? 0 : -1}" aria-label="${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}">${Number(key.slice(8))}</button>`;
   });
   minical.innerHTML = `<h2>${monthName(ym)} <a href="?view=calendar" data-nav="calendar">Full calendar</a></h2>
-    <div class="mini-grid">${WEEKDAYS.map((d) => `<span class="weekday" aria-hidden="true">${d[0]}</span>`).join('')}${cells.join('')}</div>`;
+    <div class="mini-grid" role="group" aria-label="${monthName(ym, true)}">${WEEKDAYS.map((d) => `<span class="weekday" aria-hidden="true">${d[0]}</span>`).join('')}${cells.join('')}</div>`;
 }
 
 // ---- render ----
@@ -376,7 +399,7 @@ function render() {
   else delete document.documentElement.dataset.view;
   // The calendar and a search both read cards the list doesn't have.
   if (state.view === 'calendar' || state.q) loadPool();
-  if (state.view === 'list') { listShown = renderList(); renderMinical(); } else renderCalendar();
+  if (state.view === 'list') { listShown = renderList(); renderMinical(); } else { pastResults.hidden = true; renderCalendar(); }
   renderSide();
   syncSearchBox();
   syncUrl();
@@ -385,9 +408,15 @@ function render() {
 const monthCount = () => events.filter((e) => dayKey(e.start).startsWith(state.month) && matches(e.groups)).length;
 function announceFilter() {
   const who = state.group ? ` from ${groups[state.group].short}` : '';
-  if (state.q) announce(listShown ? `Showing ${plural(listShown, 'event')} matching '${state.q}'` : `Nothing coming up matches '${state.q}'`);
+  if (state.q) announce(searchSummary());
   else if (state.view === 'list') announce(`Showing ${plural(listShown, 'event')}${who}`);
   else announce(`Calendar showing ${plural(monthCount(), 'event')}${who} in ${monthName(state.month)}`);
+}
+function searchSummary() {
+  const q = `'${state.q}'`;
+  if (listShown) return `Showing ${plural(listShown, 'event')} matching ${q}${pastShown ? `, plus ${plural(pastShown, 'past event')}` : ''}`;
+  if (pastShown) return `Nothing coming up matches ${q}. Showing ${plural(pastShown, 'past event')}`;
+  return poolReady ? `Nothing matches ${q}, coming up or past` : `Nothing coming up matches ${q}`;
 }
 const dayStatus = () => { const n = eventsOn(state.day).length; return `${dayName(state.day)}: ${n ? plural(n, 'event') : 'nothing scheduled'}`; };
 
@@ -526,22 +555,27 @@ document.addEventListener('click', (ev) => {
   }
 });
 
-// Calendar grid keys: arrows move a day or a week, Home/End go to the ends of
-// the week. Enter/Space pick the day (they're buttons). Stops at the grid edge.
-calView.addEventListener('keydown', (ev) => {
-  const cell = ev.target.closest('.day[data-day]');
-  const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[ev.key];
-  if (!cell || ev.altKey || ev.ctrlKey || ev.metaKey || (step == null && ev.key !== 'Home' && ev.key !== 'End')) return;
-  ev.preventDefault();
-  const key = cell.dataset.day;
-  const dow = new Date(key).getUTCDay();
-  const to = step != null ? addDays(key, step) : addDays(key, ev.key === 'Home' ? -dow : 6 - dow);
-  const next = $(`.day[data-day="${to}"]`, calView);
-  if (!next || next.disabled) return;
-  cell.tabIndex = -1;
-  next.tabIndex = 0;
-  next.focus();
-});
+// Calendar grid keys, for the month and the mini calendar: arrows move a day
+// or a week, Home/End go to the ends of the week. Enter/Space pick the day
+// (they're buttons). Stops at the grid edge. `attr` holds each day's date.
+function gridKeys(root, attr) {
+  root.addEventListener('keydown', (ev) => {
+    const cell = ev.target.closest(`button[${attr}]`);
+    const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[ev.key];
+    if (!cell || ev.altKey || ev.ctrlKey || ev.metaKey || (step == null && ev.key !== 'Home' && ev.key !== 'End')) return;
+    ev.preventDefault();
+    const key = cell.getAttribute(attr);
+    const dow = new Date(key).getUTCDay();
+    const to = step != null ? addDays(key, step) : addDays(key, ev.key === 'Home' ? -dow : 6 - dow);
+    const next = $(`button[${attr}="${to}"]`, root);
+    if (!next || next.disabled) return;
+    cell.tabIndex = -1;
+    next.tabIndex = 0;
+    next.focus();
+  });
+}
+gridKeys(calView, 'data-day');
+gridKeys(minical, 'data-goto');
 
 // Back/Forward: the URL changed under us, so read it again. The status line
 // says what is showing now, the same as a click would.

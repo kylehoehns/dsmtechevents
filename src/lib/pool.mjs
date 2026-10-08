@@ -17,3 +17,23 @@ export function splitEvents({ upcoming, past }, now = Date.now()) {
   const pooled = [...upcoming.filter((e) => e.repeat), ...far, ...past];
   return { today, listed, near, far, pooled };
 }
+
+// Every past event a search can find, newest first: the cache's recent ones
+// (about 90 days) plus older ones from the archive (data/archive/), which keeps
+// every ended event. The card pool prints them as one-line rows, so a search
+// can show a "Past" section without the home page carrying them.
+// Archive records are slim (one host each, no address or About text). A
+// joint meetup is one record per host, so those fold together like mergeJoint.
+export function pastEvents({ past, archive = [], byId }) {
+  const key = (e) => `${e.start}|${e.title.toLowerCase().replace(/\W+/g, '')}`;
+  const seen = new Set(past.flatMap((e) => [e.id, key(e)]));
+  const older = new Map();
+  for (const r of archive) {
+    if (seen.has(r.id) || seen.has(key(r))) continue;
+    const had = older.get(key(r));
+    if (had) { if (!had.groupIds.includes(r.group)) had.groupIds.push(r.group); continue; }
+    older.set(key(r), { id: r.id, title: r.title, start: r.start, end: r.end, venue: r.venue ?? null, online: !!r.online, going: r.going, url: r.url ?? null, groupIds: [r.group] });
+  }
+  for (const e of older.values()) e.hostsLabel = e.groupIds.map((id) => byId[id]?.short).filter(Boolean).join(' + ');
+  return [...past, ...older.values()].sort((a, b) => b.start.localeCompare(a.start));
+}
