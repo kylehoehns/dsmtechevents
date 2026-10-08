@@ -1,0 +1,49 @@
+name: Add a group or event
+description: Get a Des Moines tech meetup, user group, conference or one-off event listed.
+title: 'Add: '
+labels: [listing]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        DSM Tech Events lists public, community, tech events in and around Des Moines. We link to your page, and people sign up there.
+        If your group is on Meetup, its link is all we need: new events are pulled in automatically four times a day.
+  - type: input
+    id: name
+    attributes:
+      label: Group or event name
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Meetup link, or website / public calendar link
+      description: For a group, its Meetup page if it has one. Otherwise its website or a public calendar (.ics) link.
+      placeholder: https://www.meetup.com/your-group/
+    validations:
+      required: true
+  - type: textarea
+    id: one-off
+    attributes:
+      label: For a one-off event (conference, workshop, hack day)
+      description: Date, start and end time, venue and address, and a link where people sign up or learn more. Leave blank for a group.
+      placeholder: |
+        Date: 2026-11-07
+        Time: 8:00am to 5:00pm
+        Venue and address: ...
+        Sign-up link: https://...
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else we should know
+  - type: checkboxes
+    id: fits
+    attributes:
+      label: Does it fit?
+      options:
+        - label: It's open to the public. No members-only or invite-only events.
+          required: true
+        - label: It's a community event focused on tech (software, data, security, product, design, hardware and so on).
+          required: true
+        - label: It's in the Des Moines area, or online and run by a local group.
+          required: true

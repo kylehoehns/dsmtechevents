@@ -1,0 +1,29 @@
+name: Something's wrong with a listing
+description: An event or group on the site has the wrong time, place, link or name, or shouldn't be listed.
+title: 'Listing: '
+labels: [listing]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Most events come straight from each group's Meetup page or website, four times a day. If the details are wrong there, fixing them there fixes the site at the next refresh.
+  - type: input
+    id: which
+    attributes:
+      label: Which event or group?
+      placeholder: Pyowa, October meetup
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What's wrong?
+      description: What the site shows, and what it should show.
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link to the group's or event's own page
+      description: Where the right details are, so we can compare.
+      placeholder: https://www.meetup.com/your-group/events/...
