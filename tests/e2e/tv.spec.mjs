@@ -29,3 +29,14 @@ test('drops events once they have ended', async ({ page }) => {
   await expect(page.getByText('Coding Dojo')).toHaveCount(0);
   await expect(page.locator('.overview')).toContainText('Python Office Hours');
 });
+
+test('asks the browser to keep the screen awake, and again when the tab comes back', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__locks = 0;
+    Object.defineProperty(navigator, 'wakeLock', { value: { request: async () => { window.__locks++; return { release: async () => {} }; } } });
+  });
+  await page.goto('/tv/');
+  await expect.poll(() => page.evaluate(() => window.__locks)).toBe(1);
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+  await expect.poll(() => page.evaluate(() => window.__locks)).toBe(2);
+});
