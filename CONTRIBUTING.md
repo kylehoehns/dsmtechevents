@@ -49,12 +49,31 @@ npm test         # unit tests, on saved fixtures, no network
 npm run build    # tests, then astro build, then scripts/check-dist.mjs
 ```
 
+### Browser tests
+
+```sh
+npx playwright install chromium   # once
+npm run test:e2e
+```
+
+Playwright drives the built site in Chromium at desktop (1280×900) and phone
+(390×844) sizes, with axe accessibility checks on every page in light and
+dark. Any console error fails a test.
+
+The live data changes four times a day, so these tests never use it. They
+build their own copy of the site into `dist-e2e/` from
+`tests/e2e/fixtures/data/` (`DSM_DATA_DIR`), as if it were Wednesday
+Oct 14 2026, 9am (`FAKE_NOW` with `scripts/fake-now.mjs`), and set the
+browser's clock to the same moment. `playwright.config.mjs` does the build;
+`tests/e2e/fixtures.mjs` sets the clock. To test a new date-dependent case,
+add an event to the fixture data.
+
 ### Making a change
 
 1. Branch from `main` and open a pull request. Nobody pushes to `main`
    directly.
-2. The `test-and-build` check runs `npm run build`. A PR can merge only when
-   it's green.
+2. Two checks run: `test-and-build` (`npm run build`) and `e2e` (the browser
+   tests below). A PR can merge only when both are green.
 3. Each PR branch gets a preview at
    `<branch>-dsmtechevents.kyhoehns.workers.dev`. Merging deploys to
    dsmtechevents.com. Never deploy from your machine.

@@ -1,138 +1,126 @@
+<a href="https://dsmtechevents.com"><img src="public/og-image-dark.png" alt="DSM Tech Events: every Des Moines tech meetup, user group and conference in one place" width="100%"></a>
+
+<p align="center">
+  <a href="https://dsmtechevents.com"><strong>dsmtechevents.com</strong></a>
+  &nbsp;·&nbsp; <a href="https://dsmtechevents.com/add/">Add your group</a>
+  &nbsp;·&nbsp; <a href="docs/ARCHITECTURE.md">Architecture</a>
+  &nbsp;·&nbsp; <a href="CONTRIBUTING.md">Contributing</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/kylehoehns/dsmtechevents/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/kylehoehns/dsmtechevents/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/kylehoehns/dsmtechevents/actions/workflows/refresh.yml"><img alt="Event refresh" src="https://github.com/kylehoehns/dsmtechevents/actions/workflows/refresh.yml/badge.svg"></a>
+  <a href="https://github.com/kylehoehns/dsmtechevents/actions/workflows/links.yml"><img alt="Link check" src="https://github.com/kylehoehns/dsmtechevents/actions/workflows/links.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-ff4fa3"></a>
+</p>
+
 # DSM Tech Events
 
-https://dsmtechevents.com
-
 One place to see every upcoming Des Moines tech meetup, user group and
-conference. A static site on Cloudflare, refreshed four times a day from each
-group's Meetup calendar or, for groups not on Meetup, their own website.
+conference. It's a static site on Cloudflare that refreshes itself four times
+a day from each group's Meetup calendar or, for groups not on Meetup, their
+own website. Nobody has to keep it up to date by hand.
+
+It's a pointer, not a ticket booth: people find what's on here, then RSVP on
+the group's own page.
+
+<table>
+  <tr>
+    <td width="72%"><img src="docs/images/desktop-light.webp" alt="The event list on desktop, light theme: This week's events beside two conference posters"></td>
+    <td width="28%"><img src="docs/images/phone-dark.webp" alt="The event list on a phone, dark theme"></td>
+  </tr>
+</table>
+
+### What's in it
+
+| | What you get |
+|---|---|
+| **Event list** | This week, next week, the rest of the month and further out, with Today / Tonight / Tomorrow tags, joint meetups merged, and repeating series folded into one row. |
+| **Calendar** | A month grid with a day panel, fully keyboard-navigable. |
+| **Groups** | Every group with its next meetup, members and a link to its own page. |
+| **Headliners** | Conferences get a taped-up poster with a countdown. |
+| **Lobby TV** (`/tv/`) | A self-running slideshow for a screen at a coworking space or venue, with QR codes. Arrow keys step through it, space pauses. |
+| **Print flyer** (`/print/`) | One Letter page with tear-off tabs, for a real corkboard. |
+| **Light and dark**, offline, installable | A service worker keeps the last copy; it installs as an app. |
+
+<p align="center"><img src="docs/images/tv.webp" alt="The lobby TV overview slide: upcoming events in a table with a QR code" width="80%"></p>
+
+### At a glance
+
+```mermaid
+flowchart LR
+  G[data/groups.yaml] --> F[fetch-events<br/>4× a day]
+  M[Meetup iCal + events pages] --> F
+  W[Group websites] --> F
+  F --> C[data/cache/*.json<br/>committed to git]
+  E[data/events.yaml<br/>hand-added] --> B[astro build]
+  C --> B --> D[Static HTML on Cloudflare]
+```
+
+Astro · plain JavaScript · Node's test runner · Playwright + axe · Cloudflare Workers.
+No database, no accounts, no tracking cookies.
 
 ## How it works
 
-1. `scripts/fetch-events.mjs` reads `data/groups.yaml`. For a Meetup group it
-   pulls the public iCal feed (`meetup.com/<group>/events/ical/`), plus venue,
-   photo and RSVP count from the group's events page. Groups with `source:`
-   use a reader in `scripts/sources/` for their own site (SecDSM, PMI, TAI's
-   TechBrews, Iowans of Things). Results land in `data/cache/<group>.json`.
-2. If a feed fails, that group's previous cache file is kept, so a bad run
-   never empties the site, and the other groups refresh as usual. The refresh
-   workflow then opens a GitHub issue labeled `source-broken` for that group
-   (`scripts/source-issues.mjs`): one per group, updated rather than duplicated
-   on later runs, and closed automatically once the group fetches cleanly. The
-   cache is committed so builds work even if a source is unreachable.
-3. `astro build` merges the cache with the hand-added events in
-   `data/events.yaml` and writes static HTML to `dist/`.
-4. A GitHub Action (`.github/workflows/refresh.yml`) runs the fetch four
-   times a day (5:20am, 10:20am, 2:20pm and 6:20pm Des Moines summer time) and
-   commits `data/cache/` when anything changed. It also commits once a day no
-   matter what (`data/cache/built-on.txt`), because the "This week" headings
-   are set at build time. That push is what deploys the site, so the live site
-   always matches what's in git.
+Four times a day, a GitHub Action visits every group's Meetup calendar (or
+its website, for groups not on Meetup), saves what it finds to
+`data/cache/`, and commits it. That commit rebuilds and redeploys the site,
+so what's live always matches what's in git.
 
-## Adding things
+If a group's page breaks, the site keeps showing that group's last good
+events and opens a GitHub issue about it. Everyone else carries on as normal.
 
-Not into YAML? The site's [Add your group or event](https://dsmtechevents.com/add/) page
-explains what fits and has the email address (hello@dsmtechevents.com).
-Otherwise, open a pull request:
+The full tour, with a diagram, is in
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-**A group:** add an entry to `data/groups.yaml`. Paste the Meetup URL into
-`meetup:`, and the group's own site into `website:` if it has one. Groups not
-on Meetup can use `ical:` with any public calendar feed. Groups with no feed
-at all can get a small reader in `scripts/sources/` that pulls events from
-their website (see `scripts/sources/`; `iowans-of-things.mjs` is a small one),
-named with `source:`. Each reader throws when the page doesn't look as
-expected, and has a test against a saved copy in `tests/fixtures/`.
-Anything else gets added by hand.
+## Get your group or event listed
 
-**A one-off event** (conference, joint meetup): add it to `data/events.yaml`.
-`headliner: true` makes it a headliner: a pink row in the list, and a poster at
-the top (side rail on desktop) from 30 days out until it ends.
+The easiest way is the [Add your group or event](https://dsmtechevents.com/add/)
+page: it says what fits and has the email address (hello@dsmtechevents.com).
 
-## Local development
+Comfortable with GitHub? Open a pull request instead:
+
+- **A group:** add it to `data/groups.yaml` with its Meetup link (and website,
+  if it has one). New events then show up on their own.
+- **A one-off event**, like a conference: add it to `data/events.yaml`.
+  `headliner: true` gives it a poster at the top of the page.
+
+[CONTRIBUTING.md](CONTRIBUTING.md) has the details, including groups that
+aren't on Meetup.
+
+## Run it yourself
+
+You need Node 22 or newer.
 
 ```sh
 npm install
-npm run fetch    # pull fresh events into data/cache/
-npm run dev      # http://localhost:4321
-npm run build    # what Cloudflare runs (no fetching, just the committed data)
+npm run dev      # http://localhost:4321, using the events already in git
+npm run fetch    # optional: pull fresh events from every group
+npm test         # unit tests
+npm run test:e2e # browser tests (run `npx playwright install chromium` once)
 ```
 
-## Lobby TV
+The tests run on saved copies of each group's pages, never the live
+internet, so they give the same answer every time. The browser tests also
+check every page for accessibility problems in light and dark mode.
 
-`/tv/` is a full-screen, self-running version for a screen at a coworking
-space or meetup venue: a "Coming up" overview, then one poster per event in
-the next three weeks with a QR code to its Meetup or conference page. It
-reloads itself hourly to pick up new events. ← → step through slides, space
-pauses. The About page mentions it; it's kept out of search.
+## Where it runs
 
-## Tests
-
-```sh
-npm test
-```
-
-Node's built-in test runner, no extra packages. The tests in `tests/` cover the
-parts that break quietly: Des Moines time zones and daylight saving, reading
-Meetup's feed and events page, every website reader, merging with the
-previous cache, and the build-time rules (joint meetups, repeating series,
-hiding logo photos and repeated names, short addresses). They run on saved
-fixtures in `tests/fixtures/`, never the network.
-
-`npm run build` runs the tests first, so a failing test stops the build
-everywhere it runs: the `ci` check on pull requests, Cloudflare's deploy, and
-the event refresh. When a source's page changes, save a trimmed copy of the
-new page as a fixture and update the reader until the test passes.
-
-### Browser tests
-
-```sh
-npx playwright install chromium   # once
-npm run test:e2e
-```
-
-Playwright drives the built site in Chromium at desktop (1280×900) and phone
-(390×844) sizes: the list, the group filter and Back/Forward, the calendar
-and its keyboard controls, the About toggle, the theme button, the Groups,
-Add and TV pages, plus axe accessibility checks on every page in light and
-dark. Any console error fails a test.
-
-The live data changes four times a day, so these tests never use it. They
-build their own copy of the site into `dist-e2e/` from
-`tests/e2e/fixtures/data/` (`DSM_DATA_DIR`), as if it were Wednesday
-Oct 14 2026, 9am (`FAKE_NOW` with `scripts/fake-now.mjs`), and set the
-browser's clock to the same moment. `playwright.config.mjs` does the build
-and serves it with `astro preview`; `tests/e2e/fixtures.mjs` sets the clock.
-To test a new date-dependent case, add an event to the fixture data.
-
-They run as the `e2e` check on every pull request. `npm test` stays the fast
-unit suite and needs no browser.
-
-## Deploying
-
-Cloudflare Workers static assets, connected to `main` with Workers Builds.
-`wrangler.jsonc` holds the config and lists the dashboard build settings.
-Every push to `main` deploys, including the data refresh commits.
-
-`main` is protected by a GitHub ruleset: no direct pushes, no force pushes,
-and pull requests merge only after the `ci` check (`test-and-build`) passes.
-The refresh workflow is the one exception. It pushes event data with a deploy
-key (secret `REFRESH_DEPLOY_KEY`), and the ruleset lets deploy keys bypass it.
-To rotate the key, make a new one with `ssh-keygen -t ed25519`, add the public
-half under Settings → Deploy keys with write access, and replace the secret.
-
-To refresh events right away instead of waiting for the next scheduled run:
-
-```sh
-gh workflow run refresh.yml
-```
+Cloudflare hosts it as static files, and every merge to `main` deploys. Every
+pull request gets its own preview link. The only server code is a tiny
+Worker that counts clicks on outbound links, so groups can see how many
+people the site sends them. There are no accounts and no tracking cookies.
+See [docs/ANALYTICS.md](docs/ANALYTICS.md).
 
 ## More docs
 
 - [CONTRIBUTING.md](CONTRIBUTING.md): getting listed, and making a change
-- [AGENTS.md](AGENTS.md): house rules and known traps
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): the data flow, with a diagram
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how the pieces fit, and running it
 - [docs/decisions/](docs/decisions/): why it's built this way
 - [SECURITY.md](SECURITY.md): reporting a security problem
+- [AGENTS.md](AGENTS.md): notes for AI coding assistants working in this repo
 
 ## License
 
-MIT. See [LICENSE](LICENSE). Event details belong to the groups that post them; the site links to each group's own page.
+MIT. See [LICENSE](LICENSE). Event details belong to the groups that post
+them; the site links to each group's own page.
