@@ -133,13 +133,14 @@ function renderSide() {
   if (headliners) headliners.hidden = state.view === 'calendar' || $$('.poster', headliners).every((p) => p.hidden);
 
   const list = $('#recent-list');
+  const limit = Number(list.dataset.shown);
   let shown = 0;
   for (const li of $$('li', list)) {
     li.hidden = !matches(li.dataset.groups);
-    if (!li.hidden) li.classList.toggle('extra', ++shown > 8);
+    if (!li.hidden) li.classList.toggle('extra', ++shown > limit);
   }
   const all = $('#recent-all');
-  if (all) all.hidden = shown <= 8;
+  if (all) all.hidden = shown <= limit;
   recent.hidden = state.view === 'calendar' || shown === 0;
   minical.hidden = state.view === 'calendar';
   dayPanel.hidden = state.view !== 'calendar';
