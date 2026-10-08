@@ -1,7 +1,7 @@
 ---
 // What the site is, where listings come from, how to fix or add one, who's
 // behind it, and privacy, in the order people wonder. The TV and print
-// versions are on /organizers/, with one line pointing there.
+// versions are on /organizers/, linked from the "listed" section.
 // Linked from the footer, not the top nav.
 import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
@@ -30,10 +30,9 @@ const { updatedAt } = loadData();
       <h2>Spot a mistake, or want to be listed?</h2>
       <p>
         Corrections, ideas or questions: <a href={`mailto:${site.email}`}>{site.email}</a>.
-        Run a group or an event that isn't here? <a href="/organizers/">Here's how to get it listed</a>.
+        Run a group or an event that isn't here, or want this on a lobby TV or a corkboard? <a href="/organizers/">The organizers page</a> has you covered.
       </p>
     </section>
-    <p>Want this on a lobby TV or a corkboard? <a href="/organizers/">The organizers page</a> has you covered.</p>
     <section>
       <h2>Hi, I'm Kyle</h2>
       <p>
