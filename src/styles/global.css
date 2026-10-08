@@ -9,8 +9,17 @@
 /* Stand-ins drawn while the web fonts load: system fonts scaled to the same
    average width and line metrics (numbers from Astro's capsize fallback
    generator for these exact font files), so text barely moves on swap. Same
-   latin range as the real faces; see astro.config.mjs for why. */
-@font-face { font-family: "DSM Display fallback"; src: local("Arial Bold"); font-weight: 800 900; size-adjust: 78.1282%; ascent-override: 125.9469%; descent-override: 27.2629%; line-gap-override: 0%; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+   latin range as the real faces; see astro.config.mjs for why.
+   The display face is the exception. Capsize matches average lowercase width,
+   but this face only ever prints capitals and digits, and its 800 is narrower
+   than its 900. Matched that way the logo wrapped to two lines on a phone and
+   the nav pushed the icon buttons onto a row of their own until the font
+   arrived (CLS 0.3). So each weight is sized to the real face's capitals
+   (measured: 800 is 0.81-0.85 of Arial Bold's width, 900 is 0.87-0.91; the
+   lower end, so the stand-in is never the wider one), and the ascent and
+   descent are rescaled to keep the same line box. */
+@font-face { font-family: "DSM Display fallback"; src: local("Arial Bold"); font-weight: 800; size-adjust: 63.2838%; ascent-override: 155.49%; descent-override: 33.6579%; line-gap-override: 0%; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "DSM Display fallback"; src: local("Arial Bold"); font-weight: 900; size-adjust: 67.9715%; ascent-override: 144.7666%; descent-override: 31.3367%; line-gap-override: 0%; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "DSM Mono fallback"; src: local("Courier New"); font-weight: 400 700; size-adjust: 99.9837%; ascent-override: 102.5167%; descent-override: 27.5045%; line-gap-override: 0%; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "DSM Sans fallback"; src: local("Arial"); font-weight: 400 600; size-adjust: 101.1663%; ascent-override: 101.3184%; descent-override: 27.183%; line-gap-override: 0%; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "DSM Sans fallback"; src: local("Arial Bold"); font-weight: 700; size-adjust: 93.9622%; ascent-override: 109.0865%; descent-override: 29.2671%; line-gap-override: 0%; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
@@ -102,7 +111,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .skip:focus { position: fixed; top: 8px; left: 8px; width: auto; height: auto; overflow: visible; clip-path: none; z-index: 200; background: var(--ink); color: var(--paper); font: 600 var(--fs-meta)/1.2 var(--mono); padding: 8px 12px; text-decoration: none; }
-html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the iOS install hint */
+html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* keep focus out from under the iOS install hint */
 .wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 16px; }
 @media (min-width: 760px) { .wrap { padding: 0 32px; } }
 
@@ -219,6 +228,20 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   .headliners .poster .go { order: 1; }
   .headliners .poster .stamp-days { position: static; order: 2; margin: 10px 6px 4px auto; }
 }
+/* a phone on its side (short and not desktop-wide): the masthead already takes
+   half the height, so each poster shrinks to one line (title, dates, button,
+   stamp) and This week still shows on the first screen */
+@media (max-width: 1059px) and (max-height: 500px) {
+  .headliners { padding-top: 14px; }
+  .headliners .poster-full { flex-wrap: nowrap; align-items: center; column-gap: 12px; padding: 8px 12px; }
+  .headliners .poster .bill { display: none; }
+  .headliners .poster-full > :is(h2, .when) { flex: 0 1 auto; margin: 0; }
+  .headliners .poster h2 { font-size: var(--fs-title); min-width: 0; }
+  .headliners .poster .when { font-size: var(--fs-ui); white-space: nowrap; }
+  .headliners .poster .go { order: 0; flex: none; white-space: nowrap; }
+  .headliners .poster .stamp-days { margin: 0 4px 0 auto; }
+  .headliners .poster .tape { left: auto; right: 24%; margin-left: 0; } /* clear of the button */
+}
 /* the poster's button is outlined in the poster's own text color */
 .poster { --btn-line: currentColor; --btn-hover-bg: var(--on-pink); --btn-hover-fg: var(--pink-fill); }
 .poster.blue { --btn-hover-bg: var(--on-blue); --btn-hover-fg: var(--blue-fill); }
@@ -263,11 +286,15 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 
 /* Calendar view. Layout.astro sets data-view before first paint on
    ?view=calendar links, so the list never shows and then jumps away. Until
-   app.js draws the grid, hold roughly its height (a bit under) so the footer
-   doesn't move when it lands. */
+   app.js draws the grid, hold roughly the space it takes (a bit under) so the
+   footer doesn't jump when it lands. Below 1060px the day panel comes in under
+   the grid too, and the day picked first nearly always has an event, so hold
+   room for the grid (380-470px on a phone, 660 wider) plus a one-event panel
+   (about 220px). On desktop the panel goes in the side rail beside the grid. */
 [data-view="calendar"] :is(#list-view, #headliners, #minical, #recent) { display: none; }
-[data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 360px; }
-@media (min-width: 760px) { [data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 640px; } }
+[data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 600px; }
+@media (min-width: 760px) { [data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 860px; } }
+@media (min-width: 1060px) { [data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 650px; } }
 
 /* ---------- group filter note: only while filtered to one group ---------- */
 .filter { border-top: 2px solid var(--line); border-bottom: 2px solid var(--line); padding: 8px 0; }
@@ -434,6 +461,9 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 /* a segmented control: outline buttons sharing their borders */
 .cal-nav .btn { background: var(--paper); min-width: 44px; height: 40px; padding: 0 10px; margin-left: -2px; }
 @media (max-width: 359px) { .cal-nav .btn { min-width: 36px; height: 36px; padding: 0 7px; } }
+/* the arrow at either end of the data (app.js): still focusable, visibly off */
+.cal-nav .btn[aria-disabled="true"] { color: var(--ink-soft); cursor: default; }
+.day:disabled { cursor: default; }
 .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 2px solid var(--line); border-left: 2px solid var(--line); }
 .grid .weekday { font: 700 var(--fs-label)/1 var(--mono); text-transform: uppercase; padding: 6px 5px; border-right: 2px solid var(--line); border-bottom: 2px solid var(--line); background: var(--head-fill); color: #f3ede1; }
 .day {
@@ -561,6 +591,8 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   display: flex; gap: 12px; align-items: center; background: var(--ink); color: var(--paper); padding: 12px 14px; font-size: var(--fs-meta);
 }
 .install-hint button { border: 0; background: none; color: inherit; font-size: var(--fs-ui); padding: 4px; margin-left: auto; }
+/* while it shows, the footer ends the hint's height higher (Layout.astro measures it into --hint-h), so nothing stays under it */
+.has-hint .foot { padding-bottom: calc(32px + 12px + var(--hint-h, 84px) + env(safe-area-inset-bottom)); }
 
 /* the copy of a photo that flies between the thumbnail and About (app.js) */
 .about-ghost { position: fixed; z-index: 60; margin: 0; transform-origin: 0 0; pointer-events: none; object-fit: contain; border: 1.5px solid var(--line); background: var(--paper); }
@@ -577,6 +609,7 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   .nav a:hover:not([aria-current="page"]) { background: var(--pink-fill); color: var(--on-pink); }
   .btn-solid:hover { background: var(--btn-hover-bg, var(--blue-fill)); color: var(--btn-hover-fg, var(--on-blue)); border-color: var(--btn-hover-bg, var(--blue-fill)); }
   .btn-outline:hover { background: var(--btn-hover-bg, var(--pink-fill)); color: var(--btn-hover-fg, var(--on-pink)); border-color: var(--btn-hover-bg, var(--pink-fill)); }
+  .cal-nav .btn[aria-disabled="true"]:hover { background: var(--paper); color: var(--ink-soft); border-color: var(--line); }
   .band a:hover { color: var(--blue-t); text-decoration: underline; text-decoration-thickness: 2px; }
   .title a:hover { text-decoration: underline; text-underline-offset: 3px; }
   .meta a.map:hover .venue { text-decoration-style: solid; }
