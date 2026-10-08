@@ -1,0 +1,18 @@
+---
+// The card pool: a card for every event the home page's list doesn't print in
+// full (repeat dates, far-off events, past ones). The calendar's day panel
+// fetches it on first use (app.js), which keeps ~120KB of hidden cards out of
+// the home page; sw.js saves it for offline. Not a page for people: no
+// styles, kept out of search.
+import EventCard from '../components/EventCard.astro';
+import { loadData } from '../lib/data.mjs';
+import { splitEvents } from '../lib/pool.mjs';
+
+const data = loadData();
+const { pooled } = splitEvents(data);
+---
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Card pool</title></head>
+<body><ul>{pooled.map((e) => <EventCard event={e} byId={data.byId} />)}</ul></body>
+</html>
