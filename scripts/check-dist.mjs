@@ -87,6 +87,12 @@ for (const page of JSON.parse(sw.match(/^const PAGES = (\[.*\]);$/m)?.[1].replac
   if (!fs.existsSync(path.join(dist, page, 'index.html'))) problems.push(`sw.js: saves ${page} for offline, but the build has no such page`);
 }
 
+// security.txt is made at build time so its Expires (RFC 9116) stays about a year out.
+const securityTxt = path.join(dist, '.well-known', 'security.txt');
+const expires = fs.existsSync(securityTxt) && Date.parse(/^Expires: (.+)$/m.exec(fs.readFileSync(securityTxt, 'utf8'))?.[1]);
+if (!expires) problems.push('.well-known/security.txt: missing, or no Expires line');
+else if (expires < Date.now() + 300 * 86_400_000) problems.push(`.well-known/security.txt: Expires ${new Date(expires).toISOString()} is less than 300 days out`);
+
 if (problems.length) {
   console.error(`check-dist: ${problems.length} problem(s) in the built site:\n  ${problems.join('\n  ')}`);
   process.exit(1);

@@ -94,6 +94,21 @@ test('the footer links to the organizers page, which links the TV and print page
   await expect(page.getByRole('link', { name: 'Print a flyer' })).toHaveAttribute('href', '/print/');
 });
 
+test('the print flyer is kept out of search, like the TV and status pages', async ({ page }) => {
+  await page.goto('/print/');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+});
+
+test('security.txt expires a year after the build', async ({ request }) => {
+  const res = await request.get('/.well-known/security.txt');
+  expect(res.ok()).toBe(true);
+  const text = await res.text();
+  // The fixture site is built as of Oct 14 2026 (fake-now).
+  expect(text).toContain('Expires: 2027-10-14T00:00:00.000Z');
+  expect(text).toContain('Contact: mailto:hello@dsmtechevents.com');
+  expect(text).toContain('Policy: https://github.com/kylehoehns/dsmtechevents/blob/main/SECURITY.md');
+});
+
 // The pages are built in the morning; the Coding Dojo, Web Geeks' only
 // upcoming event, runs 5:30-7:30p.
 test('a group card catches up once its next event is over', async ({ page }) => {

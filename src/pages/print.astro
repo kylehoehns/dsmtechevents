@@ -25,7 +25,7 @@ const qr = await QRCode.toString(site.url, { type: 'svg', margin: 0, errorCorrec
 const siteHost = new URL(site.url).host;
 const span = rows.length ? `${month(rows[0].start)} ${day(rows[0].start)} – ${month(rows.at(-1).start)} ${day(rows.at(-1).start)}` : monthName(new Date().toISOString(), true);
 ---
-<Layout bare headTitle={`Printable flyer · ${site.name}`} description="A one-page flyer of upcoming Des Moines tech meetups to print and pin up.">
+<Layout bare noindex headTitle={`Printable flyer · ${site.name}`} description="A one-page flyer of upcoming Des Moines tech meetups to print and pin up.">
   <main class="print-page">
     <nav class="print-tools" aria-label="Flyer">
       <a href="/">← Back to events</a>
