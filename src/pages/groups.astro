@@ -19,7 +19,6 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
         {g.logo && <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />}
         <h2>{g.short}{!g.showFullName && <span class="sr-only"> ({g.name})</span>}</h2>
         {g.showFullName && <p class="full">{g.name}</p>}
-        <p class="tags">{g.tags.map((t: string) => <b>{t}</b>)}</p>
         {(g.members || g.pastCount) && (
           <p class="facts">{[g.members && `${g.members.toLocaleString('en-US')} members`, g.pastCount && `${g.pastCount} meetups`].filter(Boolean).join(' · ')}</p>
         )}

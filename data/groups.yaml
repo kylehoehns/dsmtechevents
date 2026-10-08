@@ -11,28 +11,24 @@
 #   website:  (optional) the group's own homepage, shown next to the Meetup link
 #   logo:     (optional) image URL, for groups whose logo isn't read from Meetup
 #   color:    accent color for this group's events
-#   tags:     topics, used for the filter chips
 
 - id: cijug
   name: Central Iowa Java Users Group
   short: CIJUG
   meetup: https://www.meetup.com/central-iowa-java-users-group/
   color: "#e76f00"
-  tags: [java, jvm]
 
 - id: pyowa
   name: Iowa Python User Group
   short: Pyowa
   meetup: https://www.meetup.com/pyowa-iowa-python-user-group/
   color: "#3776ab"
-  tags: [python]
 
 - id: iadnug
   name: Iowa .NET User Group
   short: IADNUG
   meetup: https://www.meetup.com/iadnug/
   color: "#7a4bd6"
-  tags: [dotnet]
 
 - id: webgeeks
   name: DSM Web Geeks
@@ -40,77 +36,66 @@
   meetup: https://www.meetup.com/des-moines-web-geeks/
   website: https://www.dsmwebgeeks.com/
   color: "#d6336c"
-  tags: [web]
 
 - id: devopsdsm
   name: DevOpsDSM
   short: DevOps
   meetup: https://www.meetup.com/devopsdsm/
   color: "#2b8a3e"
-  tags: [devops, cloud]
 
 - id: aws
   name: AWS Des Moines
   short: AWS
   meetup: https://www.meetup.com/aws-user-group-des-moines/
   color: "#f59f00"
-  tags: [cloud, aws]
 
 - id: dsmai
   name: Des Moines Artificial Intelligence Group
   short: DSM AI
   meetup: https://www.meetup.com/des-moines-artificial-intelligence-group/
   color: "#0c8599"
-  tags: [ai, data]
 
 - id: producttank
   name: ProductTank Des Moines/Ames
   short: ProductTank
   meetup: https://www.meetup.com/producttank-des-moines-ames/
   color: "#c2255c"
-  tags: [product]
 
 - id: uxdsm
   name: Experiencing UX - Central Iowa
   short: UX
   meetup: https://www.meetup.com/experiencing-ux/
   color: "#5f3dc4"
-  tags: [ux, design]
 
 - id: mobile
   name: Des Moines Mobile Developers
   short: Mobile
   meetup: https://www.meetup.com/des-moines-mobile-developers/
   color: "#1971c2"
-  tags: [mobile]
 
 - id: dsmdata
   name: Des Moines Data & Analytics
   short: Data
   meetup: https://www.meetup.com/des-moines-data-analytics/
   color: "#e03131"
-  tags: [data, analytics]
 
 - id: alf
   name: Analytics Leadership Forum of Iowa
   short: Analytics Leaders
   meetup: https://www.meetup.com/analytics-leadership-forum-iowa/
   color: "#9c36b5"
-  tags: [data, leadership]
 
 - id: azure
   name: Iowa Microsoft Azure User Group
   short: Azure
   meetup: https://www.meetup.com/iowa-microsoft-azure-user-group/
   color: "#0078d4"
-  tags: [cloud, azure]
 
 - id: idpa
   name: Iowa Data Professionals Association - Des Moines
   short: IDPA
   meetup: https://www.meetup.com/dsmsql/
   color: "#6741d9"
-  tags: [data, sql]
 
 - id: secdsm
   name: SecDSM
@@ -118,7 +103,6 @@
   source: secdsm
   website: https://secdsm.org/
   color: "#12b886"
-  tags: [security]
 
 - id: iot
   name: Iowans of Things
@@ -126,7 +110,6 @@
   source: iowans-of-things
   website: https://iowansofthings.com/
   color: "#f08c00"
-  tags: [embedded, hardware]
 
 - id: pmi
   name: PMI Central Iowa Chapter
@@ -134,7 +117,6 @@
   source: pmi-chapter
   website: https://pmi-centraliowa.org/
   color: "#1864ab"
-  tags: [product, project-management]
 
 - id: techbrew
   name: TAI TechBrew
@@ -143,4 +125,3 @@
   website: https://www.technologyiowa.org/events/calendar/techbrews/
   logo: https://www.technologyiowa.org/wp-content/uploads/2025/06/cropped-tai-avatar-1080x1080-1.png
   color: "#9c6644"
-  tags: [networking]
