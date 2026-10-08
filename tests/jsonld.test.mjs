@@ -45,3 +45,8 @@ test('a conference with no host group has no organizer', () => {
 test('toScript keeps </script> in a description from closing the tag', () => {
   assert.ok(!toScript({ d: '</script><b>' }).includes('</script>'));
 });
+
+test('the description is plain text, without Markdown bold or heading marks', () => {
+  const ld = eventJsonLd({ ...base, venue: 'Source Allies', description: '## Agenda\n**6:00** Pizza\n***\n# Speakers\nC# and **F#**' }, byId);
+  assert.equal(ld.description, 'Agenda 6:00 Pizza Speakers C# and F#');
+});

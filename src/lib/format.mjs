@@ -113,11 +113,15 @@ export function shortRange(e) {
 export const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 // Meetup descriptions are loose Markdown. Handle the common bits safely:
-// paragraphs, line breaks, **bold**, [links](url), bare URLs, and "## headings".
+// paragraphs, line breaks, **bold**, [links](url), bare URLs, "## headings",
+// and *** / --- rule lines (dropped; they only separate paragraphs).
 export function formatDescription(text = '') {
   return escapeHtml(text)
     .replace(/\\([*_#\[\]()-])/g, '$1')
+    .replace(/^[ \t]*([-*_])(?:[ \t]*\1){2,}[ \t]*$/gm, '') // a *** / --- / ___ rule line: a paragraph break
     .split(/\n{2,}/)
+    .map((para) => para.trim())
+    .filter(Boolean)
     .map((para) => {
       let html = para
         .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" rel="noopener" target="_blank">$1<span class="sr-only"> (opens in new tab)</span></a>')

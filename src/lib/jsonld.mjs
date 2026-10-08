@@ -41,7 +41,8 @@ export function eventJsonLd(e, byId) {
     location,
     image: [e.image ?? hosts[0]?.logo ?? new URL('/og-image-dark.png', site.url).href],
   };
-  if (e.description) ld.description = e.description.replace(/\s+/g, ' ').trim().slice(0, 300);
+  // Plain text: no Markdown **bold** or ## heading marks.
+  if (e.description) ld.description = e.description.replace(/\*{2,}|^[ \t]*#{1,6}[ \t]+/gm, '').replace(/\s+/g, ' ').trim().slice(0, 300);
   if (hosts.length) ld.organizer = hosts.map((g) => ({ '@type': 'Organization', name: g.name, url: g.meetupUrl ?? g.website }));
   return ld;
 }

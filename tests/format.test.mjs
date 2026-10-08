@@ -195,3 +195,8 @@ test('lineup reads bold "time · title — speaker" lines', () => {
   assert.deepEqual(lineup('Talk schedule pending.'), []);
   assert.deepEqual(lineup(undefined), []);
 });
+
+test('formatDescription drops *** / --- / ___ rule lines instead of printing them', () => {
+  assert.equal(formatDescription('One\n***\nTwo\n\n- - -\n\nThree\n___'), '<p>One</p><p>Two</p><p>Three</p>');
+  assert.equal(formatDescription('**Agenda**\n- Pizza'), '<p><strong>Agenda</strong><br>- Pizza</p>', 'a list dash is not a rule');
+});
