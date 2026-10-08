@@ -4,7 +4,7 @@ import { Font } from 'astro:assets';
 import { site } from '../lib/site.mjs';
 
 // headTitle replaces the whole <title> (for search); title gets " · DSM Tech Events".
-interface Props { title?: string; headTitle?: string; description?: string; noindex?: boolean; nav?: 'list' | 'calendar' | 'groups' | null; updatedAt?: string; blurb?: string }
+interface Props { title?: string; headTitle?: string; description?: string; noindex?: boolean; nav?: 'list' | 'calendar' | 'groups' | 'add' | null; updatedAt?: string; blurb?: string }
 const { title, headTitle, description = site.tagline, noindex = false, nav = 'list', updatedAt, blurb } = Astro.props;
 const pageTitle = headTitle ?? (title ? `${title} · ${site.name}` : site.name);
 const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-US', { timeZone: site.timeZone, ...opts });
@@ -86,13 +86,12 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
 
     <footer class="foot">
       <div class="wrap">
+        {nav !== 'add' ? (
         <div>
-          <p class="big"><a href={`mailto:${site.email}?subject=${encodeURIComponent('Add to DSM Tech Events')}`}>Add your group →</a></p>
-          <p style="margin-top:10px">
-            Run a tech meetup or conference in central Iowa? Email <a href={`mailto:${site.email}`}>{site.email}</a>,
-            or <a href={site.repo + '#adding-things'}>open a pull request</a> if that's more your speed.
-          </p>
+          <p class="big"><a href="/add/">Add your group →</a></p>
+          <p style="margin-top:10px">Run a tech meetup or conference in central Iowa? Here's how to get it listed.</p>
         </div>
+        ) : <div />}
         <div class="fine">
           {updated && <p>Last updated {updated}.</p>}
           <p>All times Central.</p>

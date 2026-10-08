@@ -29,8 +29,9 @@ calendar (and a couple of groups' own websites).
 
 ## Adding things
 
-Not into YAML? Email hello@dsmtechevents.com with the group or event and it
-will get added. Otherwise, open a pull request:
+Not into YAML? The site's [Add your group](https://dsmtechevents.com/add/) page
+explains what fits and has the email address (hello@dsmtechevents.com).
+Otherwise, open a pull request:
 
 **A group:** add an entry to `data/groups.yaml`. Paste the Meetup URL into
 `meetup:`, and the group's own site into `website:` if it has one. Groups not
