@@ -350,7 +350,7 @@ const eventData = {
   // Event mode (?event=<id>) swaps in that event's slides, or, for an id
   // that isn't on the calendar, puts a notice in front of the regular ones.
   const mode = params.has('event')
-    ? eventMode(document.querySelector<HTMLElement>('.tv-stage')!, JSON.parse(document.getElementById('tv-data')!.textContent!), params)
+    ? eventMode(document.querySelector<HTMLElement>('.tv-stage')!, JSON.parse(document.getElementById('tv-data')!.textContent!), params, location.hash.slice(1))
     : null;
 
   // The page is built ahead of time: drop anything that has ended, and label
@@ -417,7 +417,8 @@ const eventData = {
 
   function next() {
     // Reload between slides once an hour, to pick up new events. reload()
-    // keeps the address, so event mode's ?event=…&slides=… comes back as is.
+    // keeps the whole address, so event mode's ?event=…&slides=… and the
+    // host's #welcome=… fragment come back as is.
     if (Date.now() - loadedAt > RELOAD_MS && index === slides.length - 1) return location.reload();
     // refresh() may remove ended slides, so step from where the current one
     // ends up rather than by position (which would skip a slide).

@@ -4,7 +4,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from './fixtures.mjs';
 
-const PAGES = ['/', '/?view=calendar', '/groups/', '/about/', '/add/', '/organizers/', '/status/', '/tv/', '/tv/?event=webgeeks-tonight&welcome=Hi&agenda=Pizza|Talks&wifi=Guest&note=Hello&slides=event,welcome,agenda,wifi,note,next-group,next-all', '/print/', '/404'];
+const PAGES = ['/', '/?view=calendar', '/groups/', '/about/', '/add/', '/organizers/', '/status/', '/tv/', '/tv/?event=cijug-joint&slides=event,welcome,agenda,wifi,note,next-group,next-all#welcome=Welcome%20to%20CIJUG!&agenda=Pizza|Talks&wifi=Guest&wifipass=example-password&note=Hello', '/print/', '/404'];
 
 for (const colorScheme of ['light', 'dark']) {
   test.describe(`${colorScheme} mode`, () => {

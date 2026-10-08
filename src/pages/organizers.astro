@@ -92,6 +92,7 @@ const snippets = [
                   <div class="slide-fields wifi-fields">
                     <p class="field"><label for="f-wifi">Network name</label><input id="f-wifi" data-field="wifi" maxlength={CAPS.wifi} autocomplete="off" spellcheck="false" /></p>
                     <p class="field"><label for="f-wifipass">Password (blank for an open network)</label><input id="f-wifipass" data-field="wifipass" maxlength={CAPS.wifipass} autocomplete="off" spellcheck="false" /></p>
+                    <p class="slide-note">Use a guest network: the password shows on the screen. Your text stays in the link (after the #), which is never sent to our server.</p>
                   </div>
                 )}
                 {s.kind === 'note' && (
@@ -200,7 +201,7 @@ const snippets = [
     const order = rows().filter((r) => box(r).checked && (!TEXT_SLIDES.includes(r.dataset.kind!) || hasText(r.dataset.kind!))).map((r) => r.dataset.kind!);
     for (const k of TEXT_SLIDES) if (!order.includes(k)) { fields[k] = ''; if (k === 'wifi') fields.wifipass = ''; }
     const group = order.includes('next-group') && groupSel.selectedIndex > 0 ? groupSel.value : '';
-    const url = tvUrl(location.origin, { event: eventSel.value, order, fields, group }) + (plain.checked ? '&fx=off' : '');
+    const url = tvUrl(location.origin, { event: eventSel.value, order, fields, group, plain: plain.checked });
     urlEl.textContent = url;
     open.href = url;
   }

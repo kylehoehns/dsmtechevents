@@ -21,6 +21,14 @@
 /
   Cache-Control: no-cache
 
+# The lobby TV runs no analytics. Its event mode keeps the host's text
+# (Wi-Fi password included) in the URL's #fragment; Cloudflare's beacon is
+# the one script that could read it and send it on. This second policy is
+# joined to the one above, and a browser enforces both, so it only narrows:
+# no cloudflareinsights script or connection on /tv/.
+/tv/
+  Content-Security-Policy: script-src 'self' 'inline-script-hashes'; connect-src 'self'
+
 # The workers.dev address serves the same site; keep it out of search results.
 https://dsmtechevents.kyhoehns.workers.dev/*
   X-Robots-Tag: noindex

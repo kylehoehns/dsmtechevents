@@ -30,12 +30,24 @@ test('readTvParams: agenda splits on | or new lines, at most 8 items', () => {
   assert.equal(readTvParams(`agenda=${Array(12).fill('a').join('|')}`).text.agenda.length, 8);
 });
 
-test('tvUrl writes a readable link that reads back the same', () => {
-  const url = tvUrl('https://dsmtechevents.com', { event: 'cijug-1', order: ['event', 'wifi', 'next-all'], fields: { wifi: 'Guest Net', wifipass: 'a&b=c', welcome: '' } });
-  assert.equal(url, 'https://dsmtechevents.com/tv/?event=cijug-1&slides=event,wifi,next-all&wifi=Guest%20Net&wifipass=a%26b%3Dc');
-  const back = readTvParams(new URL(url).searchParams);
+test('readTvParams: host text comes from the fragment, falling back to the query for older links', () => {
+  const { order, text } = readTvParams('slides=event,welcome,wifi', 'welcome=From%20the%20hash&wifi=Guest');
+  assert.deepEqual(order, ['event', 'welcome', 'wifi']);
+  assert.equal(text.welcome, 'From the hash');
+  assert.equal(readTvParams('welcome=Old&wifi=Q', 'welcome=New').text.welcome, 'New');
+  assert.equal(readTvParams('welcome=Old&wifi=Q', 'welcome=New').text.wifi, 'Q');
+  // slides and group are only read from the query
+  assert.deepEqual(readTvParams('', 'slides=next-group').order, ['event', 'next-all']);
+});
+
+test('tvUrl puts the host text after #, and it reads back the same', () => {
+  const url = tvUrl('https://dsmtechevents.com', { event: 'cijug-1', order: ['event', 'wifi', 'next-all'], fields: { wifi: 'Guest Net', wifipass: 'a&b=c', welcome: '' }, group: 'cijug', plain: true });
+  assert.equal(url, 'https://dsmtechevents.com/tv/?event=cijug-1&slides=event,wifi,next-all&group=cijug&fx=off#wifi=Guest%20Net&wifipass=a%26b%3Dc');
+  const u = new URL(url);
+  const back = readTvParams(u.searchParams, u.hash.slice(1));
   assert.deepEqual(back.order, ['event', 'wifi', 'next-all']);
   assert.equal(back.text.wifipass, 'a&b=c');
+  assert.equal(tvUrl('https://dsmtechevents.com', { event: 'cijug-1', order: ['event'] }), 'https://dsmtechevents.com/tv/?event=cijug-1&slides=event');
 });
 
 test('wifiCode escapes the special characters', () => {

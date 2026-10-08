@@ -11,7 +11,10 @@
 // takes no sign-ups, stores nothing, and the page stays noindex.
 //
 // Host text comes from the URL, so it only ever reaches the page through
-// textContent (or a data-t attribute for the misprint), never as HTML.
+// textContent (or a data-t attribute for the misprint), never as HTML. It is
+// read from the fragment (after #), which never reaches a server; nothing
+// here logs it or sends it anywhere, and the bare layout has no click
+// beacon. public/_headers keeps Cloudflare's analytics script off /tv/.
 import { weekday, day, month, shortRange, todayWord, liveLabel } from '../lib/format.mjs';
 import { readTvParams, wifiCode } from '../lib/tv-slides.mjs';
 
@@ -186,13 +189,13 @@ function goneSlide(site: string) {
   return s;
 }
 
-export function eventMode(stage: HTMLElement, data: TvData, params: URLSearchParams, now = Date.now()) {
+export function eventMode(stage: HTMLElement, data: TvData, params: URLSearchParams, fragment = '', now = Date.now()) {
   const e = data.events.find((x) => x.id === params.get('event'));
   if (!e || Date.parse(e.end) + CLOSING_MS <= now) {
     stage.prepend(goneSlide(data.site));
     return null;
   }
-  const { order, text, group: asked } = readTvParams(params);
+  const { order, text, group: asked } = readTvParams(params, fragment);
   const group = e.groups.includes(asked) ? asked : e.groups[0];
   const from = `From ${todayWord(e.start).toLowerCase()}'s host`;
   const updates: ((now: number) => void)[] = [];
