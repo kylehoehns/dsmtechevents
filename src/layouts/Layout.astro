@@ -10,7 +10,6 @@ const pageTitle = headTitle ?? (title ? `${title} · ${site.name}` : site.name);
 const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-US', { timeZone: site.timeZone, ...opts });
 const updated = updatedAt && fmt({ month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(updatedAt));
 const canonical = new URL(Astro.url.pathname, site.url).href;
-const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format(new Date());
 ---
 <!doctype html>
 <html lang="en">
@@ -56,20 +55,24 @@ const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format
     <a class="sr-only skip" href="#main">Skip to events</a>
     <header class="mast">
       <div class="wrap">
-        <div class="mast-top">
-          <span><b>Des Moines, IA</b> · 515 · {builtOn}</span>
-          <button type="button" class="theme-btn" id="theme-btn">Theme: auto</button>
-        </div>
         <div class="mast-body">
           <div class="mast-row">
             <a class="logo" href="/" aria-label={`${site.name} home`}><span class="mis" data-t={site.name}>{site.name}</span></a>
-            {nav !== null && (
-            <nav class="nav" aria-label="Main">
-              <a href="/" data-nav="list" aria-current={nav === 'list' ? 'page' : undefined}>Events</a>
-              <a href="/?view=calendar" data-nav="calendar" aria-current={nav === 'calendar' ? 'page' : undefined}>Calendar</a>
-              <a href="/groups/" data-nav="groups" aria-current={nav === 'groups' ? 'page' : undefined}>Groups</a>
-            </nav>
-            )}
+            <div class="mast-tools">
+              {nav !== null && (
+              <nav class="nav" aria-label="Main">
+                <a href="/" data-nav="list" aria-current={nav === 'list' ? 'page' : undefined}>Events</a>
+                <a href="/?view=calendar" data-nav="calendar" aria-current={nav === 'calendar' ? 'page' : undefined}>Calendar</a>
+                <a href="/groups/" data-nav="groups" aria-current={nav === 'groups' ? 'page' : undefined}>Groups</a>
+              </nav>
+              )}
+              {/* Icon follows <html data-theme> in CSS, so it's right before any script runs. */}
+              <button type="button" class="theme-btn" id="theme-btn" aria-label="Theme: auto" title="Theme: auto">
+                <svg class="i-auto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2.2" /><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" /></svg>
+                <svg class="i-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor" /><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></svg>
+                <svg class="i-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z" fill="currentColor" /></svg>
+              </button>
+            </div>
           </div>
           {blurb && <p class="blurb" set:html={blurb} />}
         </div>
@@ -109,11 +112,16 @@ const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format
 
       // Theme: auto (follow the device) -> light -> dark -> auto.
       const themeBtn = document.getElementById('theme-btn')!;
-      const showTheme = () => { themeBtn.textContent = `Theme: ${store.get('theme') ?? 'auto'}`; };
+      const showTheme = () => {
+        const label = `Theme: ${store.get('theme') ?? 'auto'}`;
+        themeBtn.setAttribute('aria-label', label);
+        themeBtn.title = label;
+      };
       themeBtn.addEventListener('click', () => {
-        const next = ({ light: 'dark', dark: null } as Record<string, string | null>)[store.get('theme') ?? ''] ?? 'light';
-        store.set('theme', next);
-        if (next) document.documentElement.dataset.theme = next; else delete document.documentElement.dataset.theme;
+        const modes = ['auto', 'light', 'dark'];
+        const next = modes[(modes.indexOf(store.get('theme') ?? 'auto') + 1) % modes.length];
+        store.set('theme', next === 'auto' ? null : next);
+        if (next === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = next;
         showTheme();
       });
       showTheme();
