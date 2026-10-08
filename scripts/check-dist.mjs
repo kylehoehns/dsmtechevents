@@ -4,6 +4,9 @@
 // Glued words: Astro drops the line break between text and a tag on another
 // source line, so "the\n<a>" renders as "the<a>" and "</a>\nfull" as
 // "</a>full". Both have shipped once; this catches the next one.
+//
+// Titles: Slack's link preview shows "&" as a literal "&amp;", so titles and
+// share text say "and".
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -21,6 +24,10 @@ for (const file of pages) {
   }
   for (const m of html.matchAll(/<\/a>([A-Za-z0-9])/g)) {
     problems.push(`${rel}: a link runs into text: "</a>${html.slice(m.index + 4, m.index + 34).replace(/\s+/g, ' ')}…"`);
+  }
+  // Slack's link preview shows "&amp;" literally, so no "&" in what it shows.
+  for (const m of raw.matchAll(/<title>([^<]*)<\/title>|<meta property="og:(?:title|description)" content="([^"]*)"/g)) {
+    if ((m[1] ?? m[2]).includes('&amp;')) problems.push(`${rel}: "&" in the title or share text (Slack shows it as &amp;): ${m[1] ?? m[2]}`);
   }
   // Structured data must parse, or search engines drop it silently.
   for (const m of raw.matchAll(/<script type="application\/(?:ld\+)?json"[^>]*>([\s\S]*?)<\/script>/g)) {
