@@ -39,9 +39,17 @@ export const recentSummary = (events, went) => `The last three months. ${plural(
 // "Tonight" for something starting at 4pm or later, "Today" for a noon talk.
 export const todayWord = (iso) => (Number(hourFmt.format(new Date(iso))) >= 16 ? 'Tonight' : 'Today');
 
-// The tag on an event row: "Happening now", "Today"/"Tonight", "Tomorrow" or
-// nothing. The build prints it for the day it ran and the browser re-checks,
-// so both must call this.
+// "In 25 min" in the hour before something starts, else ''. The minutes, not
+// a vague "soon", so you can tell whether you'll make it.
+export function startsIn(start, now = Date.now()) {
+  const mins = Math.ceil((Date.parse(start) - now) / 60_000);
+  return mins > 0 && mins <= 60 ? `In ${mins} min` : '';
+}
+
+// The tag on an event row: "Happening now", "In 25 min" (the last hour),
+// "Today"/"Tonight", "Tomorrow" or nothing. The build prints it for the day it
+// ran and the browser re-checks (once a minute while the page is open), so
+// both must call this.
 export function whenLabel(start, end, now = Date.now(), { multiDay = false, allDay = false } = {}) {
   const today = dayKey(now);
   const last = lastDay(start, end);
@@ -55,22 +63,26 @@ export function whenLabel(start, end, now = Date.now(), { multiDay = false, allD
     if (multiDay && !allDay && Date.parse(start) <= now) {
       const opens = Date.parse(localToUtc(today, hhmm.format(new Date(start))));
       const closes = Date.parse(localToUtc(addDays(today, daysBetween(last, dayKey(end))), hhmm.format(new Date(end))));
-      if (now < opens) return todayWord(new Date(opens).toISOString());
+      if (now < opens) return startsIn(new Date(opens).toISOString(), now) || todayWord(new Date(opens).toISOString());
       if (now > closes) return today < last ? 'Tomorrow' : '';
     }
-    return Date.parse(start) <= now ? 'Happening now' : todayWord(start);
+    return Date.parse(start) <= now ? 'Happening now' : startsIn(start, now) || todayWord(start);
   }
   return daysBetween(today, dayKey(start)) === 1 ? 'Tomorrow' : '';
 }
 
-// The stamp on a headliner poster: "8 days out", "Tomorrow", "Today", "Happening now".
+// The stamp on a headliner poster: "8 days out", "Tomorrow", "Today",
+// "In 25 min", "Happening now".
 // Once it has started it follows whenLabel(), so a conference's poster says
 // "Tomorrow" overnight between its days, like its row does.
 export function countdown(start, end, now = Date.now(), opts = {}) {
   if (Date.parse(start) <= now) {
     const label = whenLabel(start, end, now, opts);
+    if (label.startsWith('In ')) return label; // between a conference's days
     return { Tomorrow: 'Tomorrow', Today: 'Today', Tonight: 'Today' }[label] ?? 'Happening now';
   }
+  const soon = startsIn(start, now);
+  if (soon) return soon;
   const n = daysBetween(dayKey(now), dayKey(start));
   return n <= 0 ? 'Today' : n === 1 ? 'Tomorrow' : `${n} days out`;
 }
@@ -82,8 +94,8 @@ export function liveLabel(e, now = Date.now()) {
   if (Date.parse(e.end) <= now) return '';
   const label = whenLabel(e.start, e.end, now, e);
   if (label === 'Happening now') return label;
-  const mins = Math.ceil((Date.parse(e.start) - now) / 60_000);
-  if (mins > 0 && mins <= 60) return `Starts in ${mins} min`;
+  // The slide says it in full: "Starts in 25 min".
+  if (label.startsWith('In ')) return `Starts in${label.slice(2)}`;
   const at = e.allDay ? '' : ` at ${shortTime(e.start)}`;
   // Further out, the slide's big date already says when: say it once.
   return label ? `${label}${at}` : '';
