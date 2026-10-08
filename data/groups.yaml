@@ -9,6 +9,7 @@
 #   source:   (optional) for groups with no feed: the name of a reader in
 #             scripts/sources/ that pulls events from their own website
 #   website:  (optional) the group's own homepage, shown next to the Meetup link
+#   logo:     (optional) image URL, for groups whose logo isn't read from Meetup
 #   color:    accent color for this group's events
 #   tags:     topics, used for the filter chips
 
@@ -126,3 +127,12 @@
   website: https://pmi-centraliowa.org/
   color: "#1864ab"
   tags: [product, project-management]
+
+- id: techbrew
+  name: TAI TechBrew
+  short: TechBrew
+  source: tai-techbrew
+  website: https://www.technologyiowa.org/events/calendar/techbrews/
+  logo: https://www.technologyiowa.org/wp-content/uploads/2025/06/cropped-tai-avatar-1080x1080-1.png
+  color: "#9c6644"
+  tags: [networking]
