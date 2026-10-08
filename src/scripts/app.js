@@ -1,236 +1,311 @@
-// Events page behavior: list/calendar toggle, group filter,
-// relative "Today" labels, and the calendar grid. State lives in the URL
-// (?view=calendar&group=cijug&month=2026-11) so views can be shared.
+// Events page behavior: list/calendar views, the group filter, relative
+// labels ("Tomorrow", "8 days out"), squashing repeated dates and addresses,
+// the month calendar and the mini calendar in the side rail.
+// State lives in the URL (?view=calendar&group=cijug&day=2026-10-15) so any
+// view can be shared or bookmarked.
 import { dayKey, fullDate } from '../lib/format.mjs';
 
-const { events, groups } = JSON.parse(document.getElementById('calendar-data').textContent);
-const listView = document.getElementById('list-view');
-const calView = document.getElementById('calendar-view');
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+const { events, groups } = JSON.parse($('#calendar-data').textContent);
+const listView = $('#list-view');
+const calView = $('#calendar-view');
+const dayPanel = $('#day-panel');
+const minical = $('#minical');
+const recent = $('#recent');
 const now = Date.now();
 const today = dayKey(new Date().toISOString());
+const DAY = 86_400_000;
+const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / DAY);
 
-// Every event has one card in the list (upcoming or past). The calendar's day
-// panel shows copies of those same cards, so keep a handle on each one.
-const cards = new Map([...listView.querySelectorAll('.event')].map((c) => [c.dataset.id, c]));
+// ---- cards: every event has one, in the list or in the hidden pool ----
+const cards = new Map();
+for (const el of $$('.show', listView)) cards.set(el.dataset.id, el);
+for (const el of $$('.show', $('#card-pool').content)) cards.set(el.dataset.id, el);
 
-// The list's upcoming section is built nightly, so drop cards that have ended
-// since the build. The calendar can still show them, marked as past.
-document.querySelectorAll('[data-end]').forEach((el) => {
-  if (new Date(el.dataset.end).getTime() <= now) {
-    el.remove();
-    el.classList.add('is-past');
-  }
-});
+// The page is built ahead of time; drop anything that has ended since.
+for (const el of $$('[data-end]', listView)) if (Date.parse(el.dataset.end) <= now) el.remove();
+for (const el of $$('.poster[data-end]')) if (Date.parse(el.dataset.end) <= now) el.remove();
 
+// ---- relative labels ----
+function relLabel(startIso, endIso) {
+  const start = dayKey(startIso), end = dayKey(endIso);
+  if (start <= today && today <= end) return Date.parse(startIso) <= now ? 'Happening now' : 'Tonight';
+  const n = daysBetween(today, start);
+  return n === 1 ? 'Tomorrow' : '';
+}
+for (const el of $$('.show', listView)) {
+  const label = relLabel(el.dataset.start, el.dataset.end);
+  const tag = $('.when-tag', el);
+  if (label && tag) { tag.textContent = label; tag.hidden = false; }
+}
+for (const el of $$('.countdown[data-start]')) {
+  const n = daysBetween(today, dayKey(el.dataset.start));
+  el.textContent = n <= 0 ? 'Happening now' : n === 1 ? 'Tomorrow' : `${n} days out`;
+}
+
+// ---- state ----
 const params = new URLSearchParams(location.search);
-const storage = {
-  get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
-  set: (k, v) => { try { localStorage.setItem(k, v); } catch {} },
-};
 const state = {
-  view: params.get('view') ?? storage.get('view') ?? (matchMedia('(min-width: 900px)').matches ? 'calendar' : 'list'),
+  view: params.get('view') === 'calendar' ? 'calendar' : 'list',
   group: groups[params.get('group')] ? params.get('group') : '',
-  month: params.get('month') ?? today.slice(0, 7),
-  day: null,
+  day: /^\d{4}-\d{2}-\d{2}$/.test(params.get('day') ?? '') ? params.get('day') : null,
 };
-
-const matches = (groupIds) => !state.group || groupIds.includes(state.group);
+state.month = (state.day ?? today).slice(0, 7);
 
 function syncUrl() {
   const p = new URLSearchParams();
-  p.set('view', state.view);
+  if (state.view === 'calendar') p.set('view', 'calendar');
   if (state.group) p.set('group', state.group);
-  if (state.view === 'calendar' && state.month !== today.slice(0, 7)) p.set('month', state.month);
+  if (state.view === 'calendar' && state.day) p.set('day', state.day);
   history.replaceState(null, '', p.size ? `?${p}` : location.pathname);
 }
+const matches = (groupsAttr) => !state.group || (groupsAttr ?? '').split(' ').includes(state.group);
 
-function render() {
-  document.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.view === state.view)));
-
-  const banner = document.getElementById('active-group');
-  banner.hidden = !state.group;
-  if (state.group) banner.querySelector('strong').textContent = groups[state.group].name;
-
-  listView.hidden = state.view !== 'list';
-  calView.hidden = state.view !== 'calendar';
-  state.view === 'list' ? renderList() : renderCalendar();
-  syncUrl();
-}
-
-// ---- List ---------------------------------------------------------------
-
+// ---- list ----
 function renderList() {
-  let any = false;
-  document.querySelectorAll('.feature').forEach((el) => {
-    el.hidden = !matches(el.dataset.groups.split(' '));
-  });
-  const past = listView.querySelector('.past-events');
-  if (past) {
-    let visible = 0;
-    past.querySelectorAll('.event').forEach((card) => {
-      card.hidden = !matches(card.dataset.groups.split(' '));
-      if (!card.hidden) visible++;
-    });
-    past.hidden = visible === 0;
+  let anyVisible = false;
+  for (const sec of $$('[data-sec]', listView)) {
+    const items = $$('.show, .far > li', sec);
+    let n = 0;
+    for (const el of items) { el.hidden = !matches(el.dataset.groups); if (!el.hidden) n++; }
+    sec.hidden = n === 0;
+    anyVisible ||= n > 0;
+    const count = $('[data-count]', sec);
+    count.textContent = $('.far', sec) ? `${n} on the books` : `${n} ${n === 1 ? 'show' : 'shows'}`;
   }
-  listView.querySelectorAll('.month').forEach((month) => {
-    let visible = 0;
-    month.querySelectorAll('.event').forEach((card) => {
-      const show = matches(card.dataset.groups.split(' '));
-      card.hidden = !show;
-      if (show) visible++;
-    });
-    month.hidden = visible === 0;
-    any ||= visible > 0;
-  });
-  listView.querySelector('.empty').hidden = any;
+  $('#list-empty').hidden = anyVisible;
+  squashRepeats();
 }
 
-function relativeLabel(startIso, endIso) {
-  const start = dayKey(startIso);
-  const end = dayKey(endIso);
-  if (start <= today && today <= end) return new Date(startIso).getTime() <= now ? 'Happening now' : 'Today';
-  const days = Math.round((Date.parse(start) - Date.parse(today)) / 86_400_000);
-  if (days === 1) return 'Tomorrow';
-  if (days < 7) return 'This week';
-  return '';
+// Don't print what the row above just said: the date for a second event on
+// the same day, the street address for a venue already shown.
+function squashRepeats() {
+  const seenVenues = new Set();
+  let prevDay = null;
+  for (const el of $$('.show', listView)) {
+    if (el.hidden || el.closest('[hidden]')) continue;
+    el.classList.toggle('same-day', el.dataset.day === prevDay && el.previousElementSibling != null);
+    prevDay = el.dataset.day;
+    const v = el.dataset.venue;
+    el.classList.toggle('addr-seen', !!v && seenVenues.has(v));
+    if (v) seenVenues.add(v);
+  }
 }
 
-listView.querySelectorAll('.event:not(.is-past)').forEach((card) => {
-  const label = relativeLabel(card.dataset.start, card.dataset.end);
-  const el = card.querySelector('.when');
-  if (label) { el.textContent = label; el.classList.add('on'); }
-});
+// ---- side rail: filter, recent, headliners ----
+function renderSide() {
+  for (const c of $$('.chip')) c.setAttribute('aria-pressed', String(c.dataset.chip === state.group));
+  const note = $('#filter-note');
+  note.hidden = !state.group;
+  if (state.group) note.innerHTML = `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <button type="button" data-chip="">Show all groups</button>`;
 
-// ---- Calendar -----------------------------------------------------------
+  for (const p of $$('.poster')) p.hidden = !!state.group && !matches(p.dataset.groups);
+  // The calendar already shows conference days in pink; skip the posters there.
+  const headliners = $('#headliners');
+  if (headliners) headliners.hidden = state.view === 'calendar' || $$('.poster', headliners).every((p) => p.hidden);
 
+  const list = $('#recent-list');
+  let shown = 0;
+  for (const li of $$('li', list)) {
+    li.hidden = !matches(li.dataset.groups);
+    if (!li.hidden) li.classList.toggle('extra', ++shown > 8);
+  }
+  const all = $('#recent-all');
+  if (all) all.hidden = shown <= 8;
+  recent.hidden = state.view === 'calendar' || shown === 0;
+  minical.hidden = state.view === 'calendar';
+  dayPanel.hidden = state.view !== 'calendar';
+}
+
+// ---- calendar ----
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-// Plain calendar-date math in UTC, so the viewer's time zone never shifts a day.
-const addDays = (key, n) => new Date(Date.parse(key) + n * 86_400_000).toISOString().slice(0, 10);
-const addMonths = (ym, n) => {
-  const d = new Date(`${ym}-01T00:00:00Z`);
-  d.setUTCMonth(d.getUTCMonth() + n);
-  return d.toISOString().slice(0, 7);
-};
-const monthName = (ym) => new Date(`${ym}-15T12:00:00Z`).toLocaleString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const addDays = (key, n) => new Date(Date.parse(key) + n * DAY).toISOString().slice(0, 10);
+const addMonths = (ym, n) => { const d = new Date(`${ym}-01T00:00:00Z`); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString().slice(0, 7); };
+const monthLabel = (ym) => new Date(`${ym}-15T12:00:00Z`).toLocaleString('en-US', { month: 'long', timeZone: 'UTC' });
+const timeShort = (iso) => new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit' })
+  .format(new Date(iso)).replace(':00', '').replace(/\s?AM$/, 'a').replace(/\s?PM$/, 'p');
+const eventsOn = (key) => events
+  .filter((e) => dayKey(e.start) <= key && key <= dayKey(e.end) && matches(e.groups.join(' ')))
+  .sort((a, b) => a.start.localeCompare(b.start));
+const label = (e) => e.groups.length ? e.groups.map((id) => groups[id]?.short).join(' + ') : e.title.replace(/\s+20\d\d$/, '');
 
-function eventsOn(key) {
-  return events.filter((e) => dayKey(e.start) <= key && key <= dayKey(e.end) && matches(e.groups));
+function monthCells(ym) {
+  const first = `${ym}-01`;
+  const start = addDays(first, -new Date(first).getUTCDay());
+  const next = `${addMonths(ym, 1)}-01`;
+  const weeks = Math.ceil(daysBetween(start, next) / 7);
+  return Array.from({ length: weeks * 7 }, (_, i) => addDays(start, i));
+}
+
+function pickDay(ym) {
+  const keys = monthCells(ym).filter((k) => k.startsWith(ym));
+  if (today.startsWith(ym) && eventsOn(today).length) return today;
+  const pastMonth = ym < today.slice(0, 7);
+  return keys.find((k) => (pastMonth || k >= today) && eventsOn(k).length) ?? (today.startsWith(ym) ? today : keys[0]);
 }
 
 function renderCalendar() {
-  const first = `${state.month}-01`;
-  const gridStart = addDays(first, -new Date(first).getUTCDay());
-  const nextMonth = `${addMonths(state.month, 1)}-01`;
-  const weeks = Math.ceil((Date.parse(nextMonth) - Date.parse(gridStart)) / (7 * 86_400_000));
-
-  if (!state.day || !state.day.startsWith(state.month)) {
-    // Select today if it's in view, otherwise the next day with something on
-    // (or, for a past month, its first day with something on).
-    const pastMonth = state.month < today.slice(0, 7);
-    let pick = null;
-    for (let d = first; d < nextMonth; d = addDays(d, 1)) {
-      if ((pastMonth || d >= today) && eventsOn(d).length) { pick = d; break; }
-    }
-    state.day = today.startsWith(state.month) && eventsOn(today).length ? today : pick;
-  }
-
-  const cells = [];
-  for (let i = 0; i < weeks * 7; i++) {
-    const key = addDays(gridStart, i);
+  if (!state.day || !state.day.startsWith(state.month)) state.day = pickDay(state.month);
+  const cells = monthCells(state.month).map((key) => {
     const list = eventsOn(key);
-    const classes = ['day'];
-    if (!key.startsWith(state.month)) classes.push('outside');
-    if (key === today) classes.push('today');
-    if (key < today) classes.push('past');
-    if (key === state.day) classes.push('selected');
-    if (list.length) classes.push('has-events');
+    const conf = list.some((e) => e.featured);
+    const cls = ['day', key.startsWith(state.month) ? '' : 'outside', key < today ? 'past' : '', key === today ? 'today' : '', list.length ? 'has' : '', conf ? 'conf' : ''].filter(Boolean).join(' ');
     const pills = list.slice(0, 3).map((e) => {
-      const g = groups[e.groups[0]];
-      const label = g ? `${g.short}: ${e.title}` : e.title;
-      const ended = Date.parse(e.end) < now;
-      return `<span class="pill${e.featured ? ' featured' : ''}${ended ? ' ended' : ''}" style="--c:${g?.color ?? 'var(--accent)'}" title="${escapeHtml(label)}">${escapeHtml(label)}</span>`;
-    }).join('');
-    const more = list.length > 3 ? `<span class="more">+${list.length - 3} more</span>` : '';
-    const dots = list.map((e) => `<i style="--c:${groups[e.groups[0]]?.color ?? 'var(--accent)'}"></i>`).join('');
-    const label = `${fullDate(`${key}T12:00:00Z`)}${list.length ? `, ${list.length} event${list.length > 1 ? 's' : ''}` : ''}`;
-    cells.push(`<button type="button" class="${classes.join(' ')}" data-key="${key}" aria-label="${label}">
-      <span class="n">${Number(key.slice(8))}</span>
-      <span class="pills">${pills}${more}</span>
-      <span class="dots">${dots}</span>
-    </button>`);
-  }
-
+      const ended = Date.parse(e.end) < now ? ' ended' : '';
+      return e.featured
+        ? `<span class="pill c${ended}" title="${escapeHtml(e.title)}">${escapeHtml(label(e))}</span>`
+        : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : timeShort(e.start)}</i> ${escapeHtml(label(e))}</span>`;
+    }).join('') + (list.length > 3 ? `<span class="more-n">+${list.length - 3} more</span>` : '');
+    const dots = list.filter((e) => !e.featured).map(() => '<i class="dot"></i>').join('');
+    const aria = `${fullDate(`${key}T17:00:00Z`)}${list.length ? `, ${list.length} event${list.length > 1 ? 's' : ''}` : ', nothing scheduled'}`;
+    return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" aria-label="${aria}">
+      <span class="n">${Number(key.slice(8))}</span><span class="pills" aria-hidden="true">${pills}</span><span class="dots" aria-hidden="true">${dots}</span>
+    </button>`;
+  });
+  const [y] = state.month.split('-');
   calView.innerHTML = `
     <div class="cal-head">
-      <h2>${monthName(state.month)}</h2>
+      <h2>${monthLabel(state.month)}<span>${y}</span></h2>
       <div class="cal-nav">
-        <button type="button" data-nav="-1" aria-label="Previous month">‹</button>
-        <button type="button" data-nav="0">Today</button>
-        <button type="button" data-nav="1" aria-label="Next month">›</button>
+        <button type="button" data-month="-1" aria-label="Previous month">←</button>
+        <button type="button" data-month="0">Today</button>
+        <button type="button" data-month="1" aria-label="Next month">→</button>
       </div>
     </div>
-    <div class="cal-grid" role="grid">
-      ${WEEKDAYS.map((d) => `<span class="wd">${d}</span>`).join('')}
+    <div class="grid" role="group" aria-label="${monthLabel(state.month)} ${y}">
+      ${WEEKDAYS.map((d) => `<span class="wd" aria-hidden="true">${d}</span>`).join('')}
       ${cells.join('')}
     </div>
-    <div class="day-panel" aria-live="polite"></div>`;
-  fillDayPanel(calView.querySelector('.day-panel'), state.day);
+    <div class="cal-key"><span><i class="k1"></i>Meetup</span><span><i class="k2"></i>Conference</span><span>Tap a day to see its shows</span></div>`;
+  renderDayPanel();
 }
 
-function fillDayPanel(panel, key) {
-  if (!key) {
-    panel.innerHTML = `<p class="muted">Nothing on the calendar this month${state.group ? ' for this group' : ''}.</p>`;
-    return;
-  }
-  const list = eventsOn(key);
-  panel.innerHTML = `<h3>${fullDate(`${key}T12:00:00Z`)}</h3>`;
+function renderDayPanel() {
+  const list = eventsOn(state.day);
+  const n = daysBetween(today, state.day);
+  const rel = n === 0 ? ' · today' : n === 1 ? ' · tomorrow' : '';
+  dayPanel.innerHTML = `<h2>${fullDate(`${state.day}T17:00:00Z`)}</h2>
+    <p class="sub">${list.length ? `${list.length} ${list.length === 1 ? 'show' : 'shows'}` : 'A quiet day'}${rel}</p>`;
   if (!list.length) {
-    panel.insertAdjacentHTML('beforeend', '<p class="muted">No events this day.</p>');
+    dayPanel.insertAdjacentHTML('beforeend', '<p class="none">Nothing on the books. Pick a day with a mark.</p>');
     return;
   }
-  const wrap = document.createElement('div');
-  wrap.className = 'events';
+  const ul = document.createElement('ul');
+  ul.className = 'shows';
   for (const e of list) {
     const card = cards.get(e.id)?.cloneNode(true);
     if (!card) continue;
     card.hidden = false;
-    wrap.append(card);
+    card.classList.remove('same-day', 'addr-seen');
+    const tag = $('.when-tag', card);
+    if (tag) tag.hidden = true;
+    const desc = $('.desc', card);
+    if (desc) { desc.id += '-day'; desc.hidden = true; $('.more', card)?.setAttribute('aria-controls', desc.id); }
+    ul.append(card);
   }
-  panel.append(wrap);
+  dayPanel.append(ul);
+}
+
+function renderMinical() {
+  const ym = today.slice(0, 7);
+  const cells = monthCells(ym).map((key) => {
+    if (!key.startsWith(ym)) return '<span class="blank" aria-hidden="true"></span>';
+    const list = eventsOn(key);
+    const cls = [list.length ? 'has' : '', list.some((e) => e.featured) ? 'conf' : '', key === today ? 'today' : '', key < today ? 'past' : ''].filter(Boolean).join(' ');
+    return `<button type="button" class="${cls}" data-goto="${key}" aria-label="${fullDate(`${key}T17:00:00Z`)}, ${list.length || 'no'} event${list.length === 1 ? '' : 's'}">${Number(key.slice(8))}</button>`;
+  });
+  minical.innerHTML = `<h2>${monthLabel(ym)} <a href="?view=calendar" data-nav="calendar">Full calendar</a></h2>
+    <div class="mini-grid">${WEEKDAYS.map((d) => `<span class="wd" aria-hidden="true">${d[0]}</span>`).join('')}${cells.join('')}</div>`;
+}
+
+// ---- render ----
+function render() {
+  for (const a of $$('.nav a[data-nav]')) {
+    if (a.dataset.nav === state.view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  }
+  listView.hidden = state.view !== 'list';
+  calView.hidden = state.view !== 'calendar';
+  if (state.view === 'list') { renderList(); renderMinical(); } else renderCalendar();
+  renderSide();
+  syncUrl();
 }
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 }
 
-// ---- Events -------------------------------------------------------------
+// ---- events ----
+document.addEventListener('click', (ev) => {
+  const t = ev.target;
 
-document.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => {
-  state.view = b.dataset.view;
-  storage.set('view', state.view);
-  render();
-}));
-
-document.querySelector('#active-group button').addEventListener('click', () => {
-  state.group = '';
-  render();
-});
-
-calView.addEventListener('click', (ev) => {
-  const nav = ev.target.closest('[data-nav]');
+  const nav = t.closest('[data-nav="list"], [data-nav="calendar"]');
   if (nav) {
-    const n = Number(nav.dataset.nav);
-    state.month = n === 0 ? today.slice(0, 7) : addMonths(state.month, n);
-    state.day = n === 0 ? today : null;
-    return render();
-  }
-  const cell = ev.target.closest('.day');
-  if (cell) {
-    if (!cell.dataset.key.startsWith(state.month)) state.month = cell.dataset.key.slice(0, 7);
-    state.day = cell.dataset.key;
+    ev.preventDefault();
+    state.view = nav.dataset.nav;
+    if (state.view === 'calendar') state.month = (state.day ?? today).slice(0, 7);
     render();
-    if (matchMedia('(max-width: 640px)').matches) calView.querySelector('.day-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    scrollTo({ top: 0 });
+    return;
+  }
+
+  const chip = t.closest('[data-chip]');
+  if (chip) { state.group = chip.dataset.chip; render(); return; }
+
+  const groupLink = t.closest('a[data-group]');
+  if (groupLink && !ev.metaKey && !ev.ctrlKey) {
+    ev.preventDefault();
+    state.group = groupLink.dataset.group;
+    state.view = 'list';
+    render();
+    $('#filter').scrollIntoView({ block: 'start' });
+    return;
+  }
+
+  const more = t.closest('.more');
+  if (more) {
+    const desc = $('.desc', more.closest('.show'));
+    const open = more.getAttribute('aria-expanded') !== 'true';
+    more.setAttribute('aria-expanded', String(open));
+    desc.hidden = !open;
+    return;
+  }
+
+  const all = t.closest('#recent-all');
+  if (all) {
+    const open = all.getAttribute('aria-expanded') !== 'true';
+    all.setAttribute('aria-expanded', String(open));
+    $('#recent-list').classList.toggle('open', open);
+    all.textContent = open ? 'Fewer ↑' : `All ${$$('#recent-list li:not([hidden])').length} →`;
+    return;
+  }
+
+  const goto = t.closest('[data-goto]');
+  if (goto) {
+    state.view = 'calendar';
+    state.day = goto.dataset.goto;
+    state.month = state.day.slice(0, 7);
+    render();
+    scrollTo({ top: 0 });
+    return;
+  }
+
+  const monthBtn = t.closest('[data-month]');
+  if (monthBtn) {
+    const step = Number(monthBtn.dataset.month);
+    state.month = step === 0 ? today.slice(0, 7) : addMonths(state.month, step);
+    state.day = step === 0 ? today : null;
+    render();
+    return;
+  }
+
+  const cell = t.closest('.day[data-day]');
+  if (cell) {
+    state.day = cell.dataset.day;
+    if (!state.day.startsWith(state.month)) state.month = state.day.slice(0, 7);
+    render();
+    if (matchMedia('(max-width: 1059px)').matches) dayPanel.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
   }
 });
 

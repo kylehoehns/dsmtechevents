@@ -2,10 +2,12 @@
 import '../styles/global.css';
 import { site } from '../lib/site.mjs';
 
-interface Props { title?: string; active?: 'events' | 'groups'; updatedAt?: string }
-const { title, active = 'events', updatedAt } = Astro.props;
+interface Props { title?: string; nav?: 'list' | 'calendar' | 'groups' | null; updatedAt?: string; blurb?: string }
+const { title, nav = 'list', updatedAt, blurb } = Astro.props;
 const pageTitle = title ? `${title} · ${site.name}` : site.name;
-const updated = updatedAt && new Intl.DateTimeFormat('en-US', { timeZone: site.timeZone, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(updatedAt));
+const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-US', { timeZone: site.timeZone, ...opts });
+const updated = updatedAt && fmt({ month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(updatedAt));
+const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format(new Date());
 ---
 <!doctype html>
 <html lang="en">
@@ -19,36 +21,56 @@ const updated = updatedAt && new Intl.DateTimeFormat('en-US', { timeZone: site.t
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-    <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#121316" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f3ede1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141217" media="(prefers-color-scheme: dark)" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="DSM Tech" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Permanent+Marker&display=swap" />
+    <script is:inline>
+      // Apply a saved light/dark choice before first paint. No choice = follow the device.
+      try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}
+    </script>
   </head>
   <body>
-    <header class="site-header">
-      <div class="wrap header-inner">
-        <a class="brand" href="/">
-          <img src="/icons/icon.svg" alt="" width="28" height="28" />
-          <span>{site.name}</span>
-        </a>
-        <nav class="nav">
-          <a href="/" aria-current={active === 'events' ? 'page' : undefined}>Events</a>
-          <a href="/groups/" aria-current={active === 'groups' ? 'page' : undefined}>Groups</a>
-        </nav>
+    <a class="sr-only" href="#main">Skip to events</a>
+    <header class="mast">
+      <div class="wrap">
+        <div class="mast-top">
+          <span><b>Des Moines, IA</b> · 515 · {builtOn}</span>
+          <button type="button" class="theme-btn" id="theme-btn" aria-label="Color theme">Theme: auto</button>
+        </div>
+        <a class="logo" href="/" aria-label={`${site.name} home`}><span class="mis" data-t={site.name}>{site.name}</span></a>
+        <div class="mast-row">
+          <p class="blurb" set:html={blurb ?? 'Every tech meetup, user group and conference in Des Moines, on one sheet.'} />
+          {nav !== null && (
+            <nav class="nav" aria-label="Main">
+              <a href="/" data-nav="list" aria-current={nav === 'list' ? 'page' : undefined}>Shows</a>
+              <a href="/?view=calendar" data-nav="calendar" aria-current={nav === 'calendar' ? 'page' : undefined}>Calendar</a>
+              <a href="/groups/" data-nav="groups" aria-current={nav === 'groups' ? 'page' : undefined}>Groups</a>
+            </nav>
+          )}
+        </div>
       </div>
     </header>
 
-    <main class="wrap">
+    <main class="wrap" id="main">
       <slot />
     </main>
 
-    <footer class="site-footer wrap">
-      <p>
-        Events refresh nightly from each group's Meetup page.
-        {updated && <> Last updated {updated}.</>}
-      </p>
-      <p>Run a group or an event? <a href={site.repo}>Add it on GitHub</a>.</p>
+    <footer class="foot">
+      <div class="wrap">
+        <div>
+          <p class="big"><a href={site.repo + '#adding-things'}>Add your group →</a></p>
+          <p style="margin-top:10px">Run a tech meetup in central Iowa? Get it on the sheet.</p>
+        </div>
+        <div class="fine">
+          <p>Pulled from each group's Meetup page and site, every night.{updated && <> Last change {updated}.</>}</p>
+          <p>All times Central. Made in Des Moines for whoever shows up.</p>
+        </div>
+      </div>
     </footer>
 
     <div class="install-hint" id="install-hint" hidden>
@@ -57,22 +79,38 @@ const updated = updatedAt && new Intl.DateTimeFormat('en-US', { timeZone: site.t
     </div>
 
     <script>
-      if ('serviceWorker' in navigator && import.meta.env.PROD) {
-        navigator.serviceWorker.register('/sw.js');
-      }
+      const store = {
+        get: (k: string) => { try { return localStorage.getItem(k); } catch { return null; } },
+        set: (k: string, v: string | null) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} },
+      };
+
+      // Theme: auto (follow the device) -> light -> dark -> auto.
+      const themeBtn = document.getElementById('theme-btn')!;
+      const showTheme = () => { themeBtn.textContent = `Theme: ${store.get('theme') ?? 'auto'}`; };
+      themeBtn.addEventListener('click', () => {
+        const next = ({ light: 'dark', dark: null } as Record<string, string | null>)[store.get('theme') ?? ''] ?? 'light';
+        store.set('theme', next);
+        if (next) document.documentElement.dataset.theme = next; else delete document.documentElement.dataset.theme;
+        showTheme();
+      });
+      showTheme();
+
+      if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('/sw.js');
+
+      // An installed app can be resumed days later without reloading. If the page
+      // is over an hour old when it comes back, reload it so events and the
+      // "Tomorrow" labels are current.
+      const loadedAt = Date.now();
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && Date.now() - loadedAt > 60 * 60 * 1000) location.reload();
+      });
 
       // iOS has no install prompt, so show a one-time hint in Safari.
-      const hint = document.getElementById('install-hint');
-      const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const hint = document.getElementById('install-hint')!;
       const standalone = matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
-      let dismissed = false;
-      try { dismissed = localStorage.getItem('install-hint') === 'dismissed'; } catch {}
-      if (hint && isIos && !standalone && !dismissed) {
+      if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !standalone && store.get('install-hint') !== 'dismissed') {
         hint.hidden = false;
-        hint.querySelector('button')?.addEventListener('click', () => {
-          hint.hidden = true;
-          try { localStorage.setItem('install-hint', 'dismissed'); } catch {}
-        });
+        hint.querySelector('button')!.addEventListener('click', () => { hint.hidden = true; store.set('install-hint', 'dismissed'); });
       }
     </script>
   </body>

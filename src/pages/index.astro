@@ -2,85 +2,157 @@
 import Layout from '../layouts/Layout.astro';
 import EventCard from '../components/EventCard.astro';
 import { loadData } from '../lib/data.mjs';
-import { site } from '../lib/site.mjs';
-import { monthKey, monthLabel, fullDate, timeRange, day, month } from '../lib/format.mjs';
+import { dayKey, weekday, day, month, shortTime } from '../lib/format.mjs';
 
 const { events, upcoming, past, groups, byId, updatedAt } = loadData();
 
-const months = new Map<string, typeof events>();
-for (const e of upcoming) {
-  const key = monthKey(e.start);
-  if (!months.has(key)) months.set(key, []);
-  months.get(key)!.push(e);
+// Section labels are relative to the build. Builds run daily, and the browser
+// re-labels "Tomorrow"/"Tonight" itself.
+const today = dayKey(new Date().toISOString());
+const addDays = (key: string, n: number) => new Date(Date.parse(key) + n * 86_400_000).toISOString().slice(0, 10);
+const dow = new Date(`${today}T12:00:00Z`).getUTCDay();
+const thisWeekEnd = addDays(today, (7 - dow) % 7);
+const nextWeekEnd = addDays(thisWeekEnd, 7);
+const monthName = (key: string, withYear: boolean) =>
+  new Date(`${key.slice(0, 7)}-15T12:00:00Z`).toLocaleString('en-US', { month: 'long', year: withYear ? 'numeric' : undefined, timeZone: 'UTC' });
+// Full rows through the end of next month; anything later is a compact set list.
+const [ty, tm] = today.split('-').map(Number);
+const horizon = new Date(Date.UTC(ty, tm + 1, 0)).toISOString().slice(0, 10);
+
+const listed = upcoming.filter((e) => !e.repeat);
+const near = listed.filter((e) => dayKey(e.start) <= horizon);
+const far = listed.filter((e) => dayKey(e.start) > horizon);
+
+function sectionOf(key: string) {
+  if (key <= thisWeekEnd) return 'This week';
+  if (key <= nextWeekEnd) return 'Next week';
+  if (key.slice(0, 7) === today.slice(0, 7)) return `Rest of ${monthName(key, false)}`;
+  return monthName(key, key.slice(0, 4) !== today.slice(0, 4));
 }
-const featured = upcoming.filter((e) => e.featured);
+const sections: { title: string; items: typeof near }[] = [];
+for (const e of near) {
+  const title = sectionOf(dayKey(e.start));
+  if (sections.at(-1)?.title !== title) sections.push({ title, items: [] });
+  sections.at(-1)!.items.push(e);
+}
 
-// Lean copy of the events for the calendar grid, which renders in the browser.
-// The day panel under it reuses the list's event cards, matched by id.
-const calendarData = events.map((e) => ({
-  id: e.id, title: e.title, start: e.start, end: e.end, groups: e.groupIds, featured: e.featured,
-}));
-const groupData = Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short, color: g.color }]));
+// Every event that doesn't get a full row in the list still needs a card for
+// the calendar's day panel.
+const pooled = [...upcoming.filter((e) => e.repeat), ...far, ...past];
+// Conferences get poster treatment only when they're close. Further out,
+// they're just a pink row at their date in the list.
+const HEADLINER_DAYS = 30;
+const daysOutOf = (e: any) => Math.round((Date.parse(dayKey(e.start)) - Date.parse(today)) / 86_400_000);
+const featured = upcoming.filter((e) => e.featured && daysOutOf(e) <= HEADLINER_DAYS);
+const daysOut = daysOutOf;
+
+const counts = Object.fromEntries(groups.map((g) => [g.id, listed.filter((e) => e.groupIds.includes(g.id)).length]));
+const filterGroups = [...groups].sort((a, b) => counts[b.id] - counts[a.id] || a.short.localeCompare(b.short));
+const PAST_SHOWN = 8;
+
+const calendarData = {
+  events: events.map((e) => ({
+    id: e.id, title: e.title, start: e.start, end: e.end, groups: e.groupIds, featured: e.featured, allDay: e.allDay,
+  })),
+  groups: Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short }])),
+};
+const blurb = `Every tech meetup, user group and conference in Des Moines, on one sheet. <strong>${listed.length} shows on the books</strong> from ${groups.length} groups. Go to one.`;
 ---
-<Layout updatedAt={updatedAt}>
-  <section class="intro">
-    <h1>What's happening in <span>Des Moines tech</span></h1>
-    <p>{site.tagline}</p>
-  </section>
-
-  {featured.length > 0 && (
-    <section class="featured-strip" aria-label="Featured events">
-      {featured.map((e) => (
-        <a class="feature" href={e.url} target="_blank" rel="noopener" data-end={e.end} data-groups={e.groupIds.join(' ')}>
-          <span class="feature-label">{e.tags.includes('conference') ? 'Conference' : 'Featured'}</span>
-          <strong>{e.title}</strong>
-          <span>{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : fullDate(e.start)}{e.venue && ` · ${e.venue}`}</span>
-        </a>
-      ))}
-    </section>
-  )}
-
-  <div class="toolbar" id="toolbar">
-    <div class="segmented" role="tablist" aria-label="View">
-      <button type="button" role="tab" data-view="list" aria-selected="true">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" /></svg>
-        List
-      </button>
-      <button type="button" role="tab" data-view="calendar" aria-selected="false">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>
-        Calendar
-      </button>
-    </div>
-  </div>
-
-  <div class="active-group" id="active-group" hidden>
-    Showing events from <strong></strong>
-    <button type="button" class="link-btn">Show all groups</button>
-  </div>
-
-  <section id="list-view" class="list-view" aria-label="Upcoming events">
-    {[...months].map(([key, list]) => (
-      <section class="month" data-month={key}>
-        <h2 class="month-label">{monthLabel(list[0].start)}</h2>
-        <div class="events">
-          {list.map((e) => <EventCard event={e} byId={byId} />)}
-        </div>
+<Layout updatedAt={updatedAt} blurb={blurb}>
+  <div class="layout">
+    <div class="main">
+      <section id="list-view" aria-label="Upcoming shows">
+        {sections.map((s) => (
+          <section class="sec" data-sec>
+            <div class="sec-head"><h2>{s.title}</h2><span class="count" data-count>{s.items.length} {s.items.length === 1 ? 'show' : 'shows'}</span></div>
+            <ul class="shows">{s.items.map((e) => <EventCard event={e} byId={byId} />)}</ul>
+          </section>
+        ))}
+        {far.length > 0 && (
+          <section class="sec" data-sec>
+            <div class="sec-head"><h2>Further out</h2><span class="count" data-count>{far.length} on the books</span></div>
+            <ol class="setlist far">
+              {far.map((e) => (
+                <li data-groups={e.groupIds.join(' ')} data-end={e.end}>
+                  <span class="d">{month(e.start)} {day(e.start)}</span>
+                  <a href={e.url} target="_blank" rel="noopener">
+                    <span class="g">{e.groupIds.map((id) => byId[id]?.short).join(' + ') || 'Conference'}</span>
+                    {e.series && <span class="rr">{e.series.rule} · {e.series.count} dates</span>}
+                    <span class="tt">{e.title}</span>
+                    <span class="v">{e.allDay ? 'All day' : shortTime(e.start)} · {e.online ? 'Online' : `@ ${e.venue ?? 'TBA'}`}</span>
+                  </a>
+                  <span class="n">{e.going ? <><b>{e.going}</b> going</> : ''}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+        <p class="empty" id="list-empty" hidden>Nothing on the books for this group right now. Check their page for what's next.</p>
       </section>
-    ))}
-    <p class="empty" hidden>No upcoming events for this group.</p>
 
-    {past.length > 0 && (
-      <details class="past-events">
-        <summary>Recent events <span class="muted">· last 3 months</span></summary>
-        <div class="events">
-          {past.map((e) => <EventCard event={e} byId={byId} past />)}
+      <section id="calendar-view" aria-label="Calendar" hidden></section>
+    </div>
+
+    <aside class="side" aria-label="Filter and recent events">
+      {featured.length > 0 && (
+        <section class="headliners" id="headliners" aria-label="Coming up soon">
+          {featured.map((e, i) => (
+            <article class:list={['poster', i % 2 ? 'blue' : 'taped']} data-end={e.end} data-groups={e.groupIds.join(' ')}>
+              <div class="poster-full">
+                <span class="halftone" aria-hidden="true" />
+                {i % 2 === 0 && <span class="tape" aria-hidden="true" />}
+                <div class="bill"><span>Headliner</span><span>{e.multiDay ? 'Two days' : 'One day'}</span></div>
+                <h2>{e.title}</h2>
+                <p class="when">{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
+                <span class="stamp-days countdown" data-start={e.start}>{daysOut(e)} days out</span>
+                <p class="where">{e.venue}{e.address && <><br />{e.address}</>}</p>
+                <a class="go" href={e.url} target="_blank" rel="noopener">{e.multiDay ? 'Tickets & lineup' : 'Register'} →</a>
+              </div>
+            </article>
+          ))}
+        </section>
+      )}
+
+      <div class="filter" id="filter">
+        <h2>Pick a group</h2>
+        <div class="chips" role="group" aria-label="Filter by group">
+          <button type="button" class="chip" data-chip="" aria-pressed="true">All groups <span class="n">{listed.length}</span></button>
+          {filterGroups.map((g) => (
+            <button type="button" class:list={['chip', { idle: !counts[g.id] }]} data-chip={g.id} aria-pressed="false" title={g.name}>{g.short} <span class="n">{counts[g.id]}</span></button>
+          ))}
         </div>
-      </details>
-    )}
-  </section>
+        <p class="filter-note" id="filter-note" hidden></p>
+      </div>
 
-  <section id="calendar-view" class="calendar-view" aria-label="Calendar" hidden></section>
+      <section class="day-panel" id="day-panel" aria-live="polite" hidden></section>
 
-  <script type="application/json" id="calendar-data" set:html={JSON.stringify({ events: calendarData, groups: groupData })} />
-  <script>import "../scripts/app.js";</script>
+      <section class="minical" id="minical" aria-label="This month"></section>
+
+      <section class="recent" id="recent" aria-labelledby="recent-h">
+        <h2 id="recent-h">Recent shows</h2>
+        <p class="sub">The last three months. {past.length} events, {past.reduce((n, e) => n + (e.going ?? 0), 0)} RSVPs.</p>
+        <ol class="setlist" id="recent-list">
+          {past.map((e, i) => (
+            <li class:list={{ extra: i >= PAST_SHOWN }} data-groups={e.groupIds.join(' ')}>
+              <span class="d">{month(e.start)} {day(e.start)}</span>
+              <a href={e.url} target="_blank" rel="noopener">
+                <span class="g">{e.groupIds.map((id) => byId[id]?.short).join(' + ')}</span>
+                <span class="tt">{e.title}</span>
+                <span class="v">{e.online ? 'Online' : `@ ${e.venue ?? ''}`}</span>
+              </a>
+              <span class="n">{e.going ? <><b>{e.going}</b> went</> : ''}</span>
+            </li>
+          ))}
+        </ol>
+        {past.length > PAST_SHOWN && <button type="button" class="all" id="recent-all" aria-expanded="false">All {past.length} →</button>}
+      </section>
+    </aside>
+  </div>
+
+  <template id="card-pool">
+    {pooled.map((e) => <EventCard event={e} byId={byId} />)}
+  </template>
+
+  <script type="application/json" id="calendar-data" set:html={JSON.stringify(calendarData)} />
+  <script>import '../scripts/app.js';</script>
 </Layout>

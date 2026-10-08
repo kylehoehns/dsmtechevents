@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 import { meetupSlug } from './meetup.mjs';
-import { dayKey } from './format.mjs';
+import { dayKey, weekday } from './format.mjs';
 import { localToUtc } from './time.mjs';
 
 const dataDir = path.resolve('data');
@@ -70,8 +70,47 @@ export function loadData() {
   const upcoming = events.filter((e) => Date.parse(e.end) >= now);
   const past = events.filter((e) => Date.parse(e.end) < now).reverse();
 
+  // Only show a photo when it says something: Meetup often fills an event's
+  // photo with the group's logo, which would repeat the group's name.
+  const photoId = (url) => /_(\d+)\.\w+$/.exec(url ?? '')?.[1] ?? url;
+  for (const e of events) {
+    const logos = e.groupIds.map((id) => photoId(byId[id]?.logo)).filter(Boolean);
+    e.photo = e.image && !logos.includes(photoId(e.image)) ? e.image : null;
+    e.venueKey = e.online ? 'online' : (e.venue ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() || null;
+  }
+
+  // Repeating placeholders (same hosts + same title, e.g. a monthly meeting
+  // posted a year ahead) collapse into their next date plus a series summary.
+  const series = new Map();
+  for (const e of upcoming) {
+    const key = `${e.groupIds.join('+')}|${e.title.trim().toLowerCase()}`;
+    if (!series.has(key)) series.set(key, []);
+    series.get(key).push(e);
+  }
+  for (const list of series.values()) {
+    if (list.length < 2) continue;
+    const nth = (x) => Math.ceil(Number(dayKey(x.start).slice(8)) / 7);
+    const same = list.every((x) => nth(x) === nth(list[0]) && weekday(x.start) === weekday(list[0].start));
+    const ord = ['', '1st', '2nd', '3rd', '4th', '5th'][nth(list[0])];
+    const last = list.at(-1);
+    list[0].series = {
+      count: list.length,
+      rule: same ? `Every ${ord} ${longWeekday(list[0].start)}` : 'Repeats',
+      until: new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', year: 'numeric' }).format(new Date(last.start)),
+    };
+    for (const x of list.slice(1)) x.repeat = true;
+  }
+
+  const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
   for (const g of groups) {
     g.nextEvent = upcoming.find((e) => e.groupIds.includes(g.id)) ?? null;
+    g.upcomingCount = upcoming.filter((e) => e.groupIds.includes(g.id)).length;
+    g.lastEvent = past.find((e) => e.groupIds.includes(g.id)) ?? null;
+    // Show the full name only when it adds something. "Web Geeks" / "DSM Web
+    // Geeks" says the same thing twice; "Data" / "Des Moines Data & Analytics"
+    // and "IADNUG" / "Iowa .NET User Group" don't.
+    const [short, full] = [squash(g.short), squash(g.name)];
+    g.showFullName = !(full.includes(short) && short.length >= full.length * 0.6);
     delete g._events;
   }
 
@@ -79,6 +118,10 @@ export function loadData() {
   return { groups, byId, events, upcoming, past, updatedAt: fetched.at(-1) ?? new Date().toISOString() };
 }
 
+
+function longWeekday(iso) {
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', weekday: 'long' }).format(new Date(iso));
+}
 
 function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

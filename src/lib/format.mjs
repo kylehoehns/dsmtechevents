@@ -23,6 +23,18 @@ export function time(iso) {
   return timeFmt.format(new Date(iso)).replace(':00', '').replace(' ', ' ');
 }
 
+// Flyer-style times: "5:30p", "12p".
+export function shortTime(iso) {
+  return timeFmt.format(new Date(iso)).replace(':00', '').replace(/\s?AM$/, 'a').replace(/\s?PM$/, 'p');
+}
+
+// "5:30p–7p", "Thu–Fri Oct 15–16 · 8a–5p", "All day".
+export function shortRange(e) {
+  if (e.allDay) return e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)} · All day` : 'All day';
+  const t = `${shortTime(e.start)}–${shortTime(e.end)}`;
+  return e.multiDay ? `${weekday(e.start)}–${weekday(e.end)} ${month(e.start)} ${day(e.start)}–${day(e.end)} · ${t}` : t;
+}
+
 export function timeRange(e) {
   if (e.allDay) return e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)} · All day` : 'All day';
   const t = `${time(e.start)} – ${time(e.end)}`;
