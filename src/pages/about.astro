@@ -1,6 +1,7 @@
 ---
-// What the site is, where listings come from, how to fix or add one, the TV
-// and print versions, who's behind it, and privacy, in the order people wonder.
+// What the site is, where listings come from, how to fix or add one, who's
+// behind it, and privacy, in the order people wonder. The TV and print
+// versions are on /organizers/, with one line pointing there.
 // Linked from the footer, not the top nav.
 import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
@@ -21,7 +22,7 @@ const { updatedAt } = loadData();
       <h2>Where the listings come from</h2>
       <ul>
         <li>Each group's events come straight from its Meetup page or website and update on their own (<a href="/status/">see each source's status</a>). Conferences and one-off events are added by hand.</li>
-        <li>The site only points the way: you RSVP or register on the group's own page, and the group runs the event.</li>
+        <li>The site only points the way: you RSVP on the group's own page, and the group runs the event.</li>
         <li>It isn't affiliated with any of the groups. If a listing and the group's page disagree, trust the group's page.</li>
       </ul>
     </section>
@@ -29,18 +30,10 @@ const { updatedAt } = loadData();
       <h2>Spot a mistake, or want to be listed?</h2>
       <p>
         Corrections, ideas or questions: <a href={`mailto:${site.email}`}>{site.email}</a>.
-        Run a group or an event that isn't here? <a href="/add/">Here's how to get it listed</a>.
+        Run a group or an event that isn't here? <a href="/organizers/">Here's how to get it listed</a>.
       </p>
     </section>
-    <section>
-      <h2>Put it on a screen, or a wall</h2>
-      <p>
-        Have a TV in your office, coworking space or meetup venue?
-        Open <a href="/tv/">dsmtechevents.com/tv</a> full screen. It rotates through what's coming up, each with a QR code to sign up, and keeps itself current.
-        Prefer paper? <a href="/print/">Print a flyer</a> of the next four weeks for a corkboard.
-        Hosting a meetup? <a href="/organizers/">The organizers page</a> puts just your event on the screen, with a countdown and what's next.
-      </p>
-    </section>
+    <p>Want this on a lobby TV or a corkboard? <a href="/organizers/">The organizers page</a> has you covered.</p>
     <section>
       <h2>Hi, I'm Kyle</h2>
       <p>

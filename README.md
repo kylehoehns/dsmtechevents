@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://dsmtechevents.com"><strong>dsmtechevents.com</strong></a>
-  &nbsp;·&nbsp; <a href="https://dsmtechevents.com/add/">Add your group</a>
+  &nbsp;·&nbsp; <a href="https://dsmtechevents.com/organizers/">Add your group</a>
   &nbsp;·&nbsp; <a href="docs/ARCHITECTURE.md">Architecture</a>
   &nbsp;·&nbsp; <a href="CONTRIBUTING.md">Contributing</a>
 </p>
@@ -77,7 +77,7 @@ The full tour, with a diagram, is in
 
 ## Get your group or event listed
 
-The easiest way is the [Add your group or event](https://dsmtechevents.com/add/)
+The easiest way is the [For organizers](https://dsmtechevents.com/organizers/)
 page: it says what fits and has the email address (hello@dsmtechevents.com).
 
 Comfortable with GitHub? Open a pull request instead:
