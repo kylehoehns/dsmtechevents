@@ -205,9 +205,9 @@ function renderCalendar() {
     <div class="cal-head">
       <h2>${monthName(state.month)}<span> ${y}</span></h2>
       <div class="cal-nav">
-        <button type="button" data-month="-1" aria-label="Previous month">←</button>
-        <button type="button" data-month="0">Today</button>
-        <button type="button" data-month="1" aria-label="Next month">→</button>
+        <button type="button" class="btn btn-outline" data-month="-1" aria-label="Previous month">←</button>
+        <button type="button" class="btn btn-outline" data-month="0">Today</button>
+        <button type="button" class="btn btn-outline" data-month="1" aria-label="Next month">→</button>
       </div>
     </div>
     <div class="grid" role="group" aria-label="${monthName(state.month, true)}">

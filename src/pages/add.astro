@@ -56,8 +56,8 @@ const snippets = [
       <h2 id="email-h">Send it here</h2>
       <p class="address"><span id="add-email">{site.email}</span></p>
       <div class="email-actions">
-        <button type="button" class="copy" id="copy-email" data-copy={site.email}>Copy address</button>
-        <a class="primary" href={mailto}>Open in your email app <span aria-hidden="true">→</span></a>
+        <button type="button" class="copy btn btn-outline" id="copy-email" data-copy={site.email}>Copy address</button>
+        <a class="primary btn btn-solid" href={mailto}>Open in your email app <span aria-hidden="true">→</span></a>
         <span class="copied" id="copied" role="status"></span>
       </div>
     </section>
@@ -70,7 +70,7 @@ const snippets = [
         <div class="snippet">
           <div class="snippet-head">
             <b>{sn.label}</b>
-            <button type="button" data-copy-from={`snippet-${i}`}>Copy</button>
+            <button type="button" class="btn btn-solid btn-small" data-copy-from={`snippet-${i}`}>Copy</button>
           </div>
           <pre><code id={`snippet-${i}`}>{sn.code}</code></pre>
         </div>
