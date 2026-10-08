@@ -183,7 +183,7 @@ test('liveLabel (the event-mode TV stamp) counts down, then says Happening now, 
   assert.equal(liveLabel(e, Date.parse('2026-10-22T22:05:00Z')), 'Starts in 25 min');
   assert.equal(liveLabel(e, Date.parse('2026-10-22T23:00:00Z')), 'Happening now');
   assert.equal(liveLabel(e, Date.parse('2026-10-23T00:00:00Z')), '');
-  assert.equal(liveLabel(e, Date.parse('2026-10-18T15:00:00Z')), 'Thu Oct 22 at 5:30p');
+  assert.equal(liveLabel(e, Date.parse('2026-10-18T15:00:00Z')), '', 'days out: the big date already says when');
 });
 
 test('lineup reads bold "time · title — speaker" lines', () => {
