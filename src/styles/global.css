@@ -255,8 +255,10 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .title a { text-decoration: none; }
 .meta { margin: 0; font: 13px/1.45 var(--mono); }
 .meta .time { font-weight: 700; }
-.meta .addr { color: var(--ink-soft); }
-.meta a.map { color: inherit; text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.meta .addr { color: var(--ink-soft); font-size: 14px; }
+/* The venue reads as words, not code: body font, a size up, underline on the name only. */
+.meta a.map { font: 500 15px/1.4 var(--sans); color: inherit; text-decoration: none; }
+.meta a.map .venue { text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .meta .tag-online { font-weight: 600; background: var(--paper-2); padding: 0 4px; }
 .show.addr-seen .meta .addr { display: none; }
 
@@ -494,7 +496,7 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   .chip:hover:not([aria-pressed="true"]) .chip-count { color: var(--on-pink); }
   .band a:hover { color: var(--blue-t); text-decoration: underline; text-decoration-thickness: 2px; }
   .title a:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .meta a.map:hover { text-decoration-style: solid; }
+  .meta a.map:hover .venue { text-decoration-style: solid; }
   .rsvp:hover { background: var(--blue-fill); color: var(--on-blue); }
   .setlist a:hover .row-title { text-decoration: underline; }
   .recent .all:hover { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
