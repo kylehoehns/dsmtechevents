@@ -8,18 +8,19 @@ const subject = 'Add to DSM Tech Events';
 const body = [
   'Group or event name:',
   'Meetup link (or website / calendar link):',
-  'For a one-off event — date, time and venue:',
+  'For a one-off event — date, time, venue and sign-up link:',
   'Anything else we should know:',
 ].join('\n\n');
 const mailto = `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 ---
-<Layout nav="add" headTitle="Add your group · DSM Tech Events"
-  description="Get your Des Moines tech meetup, user group or conference listed on DSM Tech Events. Send us your Meetup link and we'll pull your events in automatically.">
-  <div class="page-head"><h1>Add your group</h1></div>
+<Layout nav="add" headTitle="Add your group or event · DSM Tech Events"
+  description="Get your Des Moines tech meetup, user group, conference or one-off event listed on DSM Tech Events. Send us your Meetup link, or the details of a single event.">
+  <div class="page-head"><h1>Add your group or event</h1></div>
 
   <div class="add-page">
     <p class="lede">
       DSM Tech Events lists public tech meetups, user groups and conferences in and around Des Moines.
+      One-off events are welcome too: a conference, a workshop, a hack day.
       We link to your Meetup page or site, and people sign up there, not here.
     </p>
 
@@ -36,10 +37,10 @@ const mailto = `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body
       <h2>What to send</h2>
       <ul>
         <li>Your group or event's name.</li>
-        <li>Its Meetup link. Not on Meetup? A website or public calendar link works too.</li>
-        <li>For a one-off event like a conference: the date, time and venue.</li>
+        <li>For a group: its Meetup link. Not on Meetup? A website or public calendar link works too.</li>
+        <li>For a one-off event: the date, time, venue, and a link where people can sign up or learn more.</li>
       </ul>
-      <p>If you're on Meetup, that's all. New events are pulled in automatically four times a day.</p>
+      <p>If your group is on Meetup, that's all. New events are pulled in automatically four times a day.</p>
     </section>
 
     <section class="email-box" aria-labelledby="email-h">
@@ -53,7 +54,7 @@ const mailto = `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body
     </section>
 
     <p class="dev-note">
-      Prefer GitHub? The site is open source. <a href={`${site.repo}#adding-things`}>Open a pull request</a> with your group in <code>data/groups.yaml</code>.
+      Prefer GitHub? The site is open source. <a href={`${site.repo}#adding-things`}>Open a pull request</a> with your group in <code>data/groups.yaml</code> or your event in <code>data/events.yaml</code>.
     </p>
   </div>
 </Layout>
