@@ -5,6 +5,7 @@ import YAML from 'yaml';
 import { meetupSlug, meetupPhoto } from './meetup.mjs';
 import { dayKey, weekday } from './format.mjs';
 import { localToUtc } from './time.mjs';
+import { usualNight } from './pattern.mjs';
 
 // Tests pass their own data folder and clock.
 export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = {}) {
@@ -20,6 +21,11 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
       logo: g.logo ?? cache.logo ?? null,
       fetchedAt: cache.fetchedAt ?? null,
       typical: cache.typical ?? null,
+      members: cache.members ?? null,
+      pastCount: cache.pastCount ?? null,
+      // Meetup groups get this from their page's longer history; others from
+      // what's in the cache (past 90 days plus upcoming).
+      usual: cache.usual ?? usualNight(cache.events.map((e) => e.start)),
       _events: cache.events.map((e) => ({ ...e, groupIds: [g.id], source: 'feed' })),
     };
   });

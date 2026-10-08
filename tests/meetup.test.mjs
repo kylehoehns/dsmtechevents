@@ -42,8 +42,10 @@ test('parseFeed rejects something that is not a calendar', () => {
 });
 
 test('parseEventsPage reads venue, photo, RSVPs and the group logo', () => {
-  const { logo, events } = parseEventsPage(fixture('meetup-events-page.html'), 'iadnug');
+  const { logo, events, members, pastCount } = parseEventsPage(fixture('meetup-events-page.html'), 'iadnug');
   assert.equal(logo, 'https://secure.meetupstatic.com/photos/event/a/b/600_111.jpeg');
+  assert.equal(members, 1543);
+  assert.equal(pastCount, 120, 'the all-time PAST count, not the dated 10-event window');
 
   const online = events.get('300000001');
   assert.equal(online.venue, 'Online');
@@ -59,6 +61,10 @@ test('parseEventsPage reads venue, photo, RSVPs and the group logo', () => {
   assert.equal(inPerson.start, '2026-09-15T23:00:00.000Z');
 
   assert.equal(events.get('299999991').hybrid, true);
+});
+
+test('parseEventsPage finds the group even when the URL differs in case', () => {
+  assert.equal(parseEventsPage(fixture('meetup-events-page.html'), 'IADNUG').members, 1543);
 });
 
 test('parseEventsPage fails loudly when Meetup changes the page', () => {
@@ -123,4 +129,6 @@ test('mergeCache keeps the typical turnout and leaves it out when unknown', () =
   assert.equal(mergeCache(previous, { events: [], enriched: true }, { now, cutoff, fetchedAt: 'NOW' }).fetchedAt, 'THEN');
   assert.equal(mergeCache(previous, { events: [], typical: 22, enriched: true }, { now, cutoff, fetchedAt: 'NOW' }).typical, 22);
   assert.ok(!('typical' in mergeCache({ events: [] }, { events: [], enriched: true }, { now, cutoff })));
+  const facts = mergeCache({ events: [], members: 300 }, { events: [], members: 326, pastCount: 19, usual: '4th Tue · 5:30p', enriched: true }, { now, cutoff });
+  assert.deepEqual([facts.members, facts.pastCount, facts.usual], [326, 19, '4th Tue · 5:30p']);
 });
