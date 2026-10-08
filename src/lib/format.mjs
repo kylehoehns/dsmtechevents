@@ -74,6 +74,19 @@ export function countdown(start, end, now = Date.now(), opts = {}) {
   return n <= 0 ? 'Today' : n === 1 ? 'Tomorrow' : `${n} days out`;
 }
 
+// The stamp on the event-mode TV slide (/tv/?event=): "Starts in 25 min" in
+// the last hour, "Tonight at 6p" / "Tomorrow at 6p" from whenLabel(), the
+// date further out, "Happening now" while it's on, and '' once it's over.
+export function liveLabel(e, now = Date.now()) {
+  if (Date.parse(e.end) <= now) return '';
+  const label = whenLabel(e.start, e.end, now, e);
+  if (label === 'Happening now') return label;
+  const mins = Math.ceil((Date.parse(e.start) - now) / 60_000);
+  if (mins > 0 && mins <= 60) return `Starts in ${mins} min`;
+  const at = e.allDay ? '' : ` at ${shortTime(e.start)}`;
+  return label ? `${label}${at}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}${at}`;
+}
+
 // Flyer-style times: "5:30p", "12p".
 export function shortTime(iso) {
   return timeFmt.format(new Date(iso)).replace(':00', '').replace(/\s?AM$/, 'a').replace(/\s?PM$/, 'p');
@@ -114,4 +127,16 @@ export function formatDescription(text = '') {
       return `<p>${html.replace(/\n/g, '<br>')}</p>`;
     })
     .join('');
+}
+
+// The talk lineup in a description, when it has one: SecDSM lists its talks
+// as bold "7:00 PM · Title" lines followed by "— Speaker".
+// [{ time: '7p', title, speaker }], or [] when there's no lineup.
+const TALK = /^\*\*\s*(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m\.?\s*[·•|–—-]\s*(.+?)\s*\*\*\s*(?:[—–-]\s*(.+?))?\s*$/gim;
+export function lineup(text = '') {
+  return [...String(text ?? '').replace(/\\([*_#\[\]()-])/g, '$1').matchAll(TALK)].map(([, h, m, ap, title, speaker]) => ({
+    time: `${Number(h)}${m && m !== '00' ? `:${m}` : ''}${ap.toLowerCase()}`,
+    title,
+    speaker: speaker ?? '',
+  }));
 }

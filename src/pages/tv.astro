@@ -7,14 +7,20 @@
 // to its Meetup (or conference) page. ← → step, space pauses.
 // Each change is screen-printed in (src/styles/tv-fx.css). Reduced motion,
 // or ?fx=off for a TV stick too slow for it, gets a plain swap.
+//
+// Event mode, /tv/?event=<id>, shows ONE event for a host's lobby screen,
+// with the host's own slides (src/scripts/tv-event.ts; /organizers/ builds
+// the link). It runs in the browser from the event data embedded below.
+// noindex covers it too: it's a screen display that points out, not a page.
 import QRCode from 'qrcode';
 import Layout from '../layouts/Layout.astro';
 import '../styles/tv-fx.css';
 import { loadData } from '../lib/data.mjs';
-import { weekday, day, month, shortRange, shortTime, dateRange, lastDay } from '../lib/format.mjs';
+import { weekday, day, month, shortRange, shortTime, dateRange, lastDay, lineup, DAY } from '../lib/format.mjs';
+import { toScript } from '../lib/jsonld.mjs';
 import { site } from '../lib/site.mjs';
 
-const { upcoming, byId } = loadData();
+const { upcoming, events: all, allGroups } = loadData();
 const DAYS = 21;
 const SHOWN = 10;
 const horizon = Date.now() + DAYS * 86_400_000;
@@ -25,12 +31,26 @@ const events = (soon.length >= 3 ? soon : upcoming.filter((e) => !e.repeat)).sli
 // On the overview slide: one code to the whole site.
 const siteQr = await QRCode.toString(site.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#1d1b2b', light: '#0000' } });
 
+const whereOf = (e) => (e.online ? 'Online' : [e.venue, e.address].filter(Boolean).join(' · ') || 'Venue TBA');
 const slides = await Promise.all(events.map(async (e) => ({
   e,
   hosts: e.hostsLabel,
-  where: e.online ? 'Online' : [e.venue, e.address].filter(Boolean).join(' · ') || 'Venue TBA',
+  where: whereOf(e),
   qr: e.url ? await QRCode.toString(e.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#1d1b2b', light: '#0000' } }) : null,
 })));
+
+// Event mode's data: every upcoming event, plus any that ended in the last
+// day (a screen reloading just after its event gets the closing slide, not
+// "not on the calendar"). The browser filters by the real clock.
+const eventData = {
+  site: site.url,
+  groups: Object.fromEntries(allGroups.map((g) => [g.id, g.short])),
+  events: all.filter((e) => Date.parse(e.end) > Date.now() - DAY).map((e) => ({
+    id: e.id, title: e.title, start: e.start, end: e.end, allDay: !!e.allDay, multiDay: !!e.multiDay, repeat: !!e.repeat,
+    hosts: e.hostsLabel, groups: e.groupIds, where: whereOf(e), url: e.url ?? null, photo: e.photo?.large ?? null,
+    talks: lineup(e.description),
+  })),
+};
 ---
 <Layout bare noindex headTitle={`TV · ${site.name}`}>
   <div class="tv" id="tv">
@@ -96,6 +116,8 @@ const slides = await Promise.all(events.map(async (e) => ({
 
     <div class="tv-progress"><span id="tv-bar"></span></div>
   </div>
+  {/* toScript escapes "<", so an event title can't close this tag. */}
+  <script type="application/json" id="tv-data" set:html={toScript(eventData)} />
 </Layout>
 
 <style is:global>
@@ -158,6 +180,81 @@ const slides = await Promise.all(events.map(async (e) => ({
   .qr-code svg { display: block; width: 20vh; height: 20vh; }
   .qr span { font: 900 2.6vh/1 var(--display); text-transform: uppercase; }
 
+  /* ---- Event mode (/tv/?event=, src/scripts/tv-event.ts): one event as a
+     gig poster, then the host's slides and what's next. Same flyer inks. */
+  .ev-slide { align-items: center; gap: 4vw; padding: 3vh 0; }
+  .ev-slide .qr-code { width: 22vh; height: 22vh; } /* holds the space while the code draws */
+  .ev-slide .qr-code svg { width: 100%; height: 100%; }
+  .ev-slide .qr-big .qr-code { width: 34vh; height: 34vh; }
+  .ev-slide .qr-big span { font-size: 3vh; max-width: 34vh; text-align: center; line-height: 1.1; }
+  .ev-slide .site-qr .qr-code { width: 13vh; height: 13vh; }
+  .ev-kicker { margin: 0 0 2vh; font: 700 2.8vh/1 var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue); }
+  .ev-kicker::before { content: ""; display: inline-block; width: 4vw; height: 0.6vh; margin-right: 1vw; vertical-align: middle; background: var(--pink); }
+  .ev-title { margin: 0; font: 900 11vh/0.85 var(--display); text-transform: uppercase; }
+  .ev-huge { margin: 0 0 3vh; font: 900 17vh/0.82 var(--display); text-transform: uppercase; color: var(--ink); }
+
+  /* the event: date, words, photo + QR */
+  .ev-event .date-block .num { font-size: 34vh; }
+  .ev-stamp { margin-top: 2vh; font: 400 4.4vh/1.05 var(--marker); text-align: center; background: var(--pink); color: #1d1b2b; padding: 1vh 1.2vw 0.6vh; transform: rotate(-3deg); max-width: 18vw; }
+  .ev-stamp:empty { display: none; }
+  .ev-stamp.live { background: var(--blue); }
+  .ev-event .info .hosts { font-size: 7vh; }
+  .ev-event .info h2 { font-size: 7.4vh; }
+  .ev-event .info.has-lineup h2 { font-size: 5.6vh; margin-bottom: 1.6vh; -webkit-line-clamp: 4; }
+  .ev-event .info .time { font-size: 4.4vh; }
+  .ev-lineup { list-style: none; margin: 3vh 0 0; padding: 2vh 0 0; border-top: 3px solid #5d5966; display: grid; gap: 1.4vh; }
+  .ev-lineup { grid-template-columns: auto 1fr; column-gap: 1.6vw; }
+  .ev-lineup li { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: baseline; }
+  .ev-lineup .lt-time { font: 700 3vh/1 var(--mono); color: var(--blue); }
+  .ev-lineup .lt-title { font: 600 3.4vh/1.2 var(--sans); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ev-event .tv-side { width: auto; min-width: 26vh; max-width: 30vw; }
+  .ev-event .tv-side .qr-code { width: 26vh; height: 26vh; }
+  .ev-event .tv-side .tv-photo { max-height: 30vh; }
+  .ev-slide > .qr { flex: none; align-self: center; }
+
+  /* closing, "watch for the next one", and the not-on-the-calendar notice */
+  .ev-closing, .ev-gone { justify-content: space-between; }
+  .ev-closing-text { flex: 1; min-width: 0; }
+  .ev-closing-text .hosts { margin: 0 0 1vh; font: 900 5vh/1 var(--display); text-transform: uppercase; color: var(--pink); }
+  .ev-closing-text .where { margin: 0; font: 600 3.6vh/1.3 var(--sans); color: var(--soft); }
+  .ev-gone .ev-title { font-size: 9vh; margin-bottom: 3vh; text-wrap: balance; }
+
+  /* host slides */
+  .ev-host-body { flex: 1; min-width: 0; align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+  .ev-welcome-text { margin: 0; font: 900 15vh/0.88 var(--display); text-transform: uppercase; text-wrap: balance; overflow-wrap: anywhere; }
+  .ev-welcome-text.long { font-size: 10vh; }
+  .ev-note-text { margin: 0; font: 600 5vh/1.3 var(--sans); white-space: pre-line; overflow-wrap: anywhere; max-width: 70vw; }
+  .ev-agenda-list { list-style: none; margin: 4vh 0 0; padding: 0; display: grid; gap: 1.6vh; }
+  .ev-agenda-list li { display: grid; grid-template-columns: 6vw 1fr; align-items: baseline; padding-bottom: 1.4vh; border-bottom: 2px dashed #5d5966; }
+  .ev-agenda-list .ag-n { font: 900 4.4vh/1 var(--display); color: var(--pink); }
+  .ev-agenda-list .ag-text { font: 600 4.2vh/1.15 var(--sans); overflow-wrap: anywhere; }
+  .ev-agenda-list.many { gap: 1vh; margin-top: 3vh; }
+  .ev-agenda-list.many li { padding-bottom: 0.8vh; }
+  .ev-agenda-list.many .ag-text { font-size: 3.2vh; }
+  .ev-wifi-list { margin: 5vh 0 0; display: grid; grid-template-columns: auto 1fr; gap: 3vh 3vw; align-items: baseline; }
+  .ev-wifi-list dt { font: 700 3vh/1 var(--mono); text-transform: uppercase; color: var(--soft); }
+  .ev-wifi-list dd { margin: 0; font: 700 8vh/1.05 var(--mono); color: var(--ink); overflow-wrap: anywhere; }
+  .ev-wifi-list dd + dt + dd { color: var(--blue); }
+  .ev-wifi-list dd.none { color: var(--soft); font-size: 5vh; }
+
+  /* Up next: a setlist of dates */
+  .ev-next-all { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 3vh; padding-top: 3vh; }
+  .ev-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 3vw; }
+  .ev-next-all .ev-title { font-size: 9vh; }
+  .ev-next { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.6vh; }
+  .ev-next li { display: grid; grid-template-columns: 15vw 16vw 1fr; gap: 2vw; align-items: baseline; padding-bottom: 1.4vh; border-bottom: 2px dashed #5d5966; }
+  .ev-next .row-date { font: 700 3.2vh/1 var(--mono); color: var(--blue); }
+  .ev-next .row-group { font: 900 4vh/1 var(--display); text-transform: uppercase; color: var(--pink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ev-next .row-title { font: 600 3.6vh/1.15 var(--sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* the host group's next meetup, as a poster */
+  .ev-next-group .ev-head { flex: 1; flex-direction: column; align-items: stretch; gap: 0; min-width: 0; }
+  .ev-next-group .ev-head > .ev-closing-text { margin-top: 2vh; }
+  .ev-next-group .ev-kicker { font-size: 4vh; }
+  .ev-poster { display: flex; align-items: center; gap: 4vw; }
+  .ev-poster .date-block .num { font-size: 30vh; }
+  .ev-next-group .info h2 { font-size: 7.4vh; }
+
   .tv-progress { height: 6px; background: #2c2a33; margin-top: 1.4vh; }
   .tv-progress span { display: block; height: 100%; width: 0; background: var(--pink); }
   .tv-progress span.run { animation: tv-bar linear forwards; }
@@ -203,6 +300,29 @@ const slides = await Promise.all(events.map(async (e) => ({
     .qr { padding: 2vw; }
     .qr-code svg { width: 30vw; height: 30vw; }
     .qr span { font-size: 3.6vw; }
+
+    /* event mode stacks the same way */
+    .ev-slide, .ev-poster { flex-direction: column; align-items: stretch; justify-content: center; gap: 3vh; }
+    .ev-slide .qr { align-self: center; }
+    .ev-slide .qr-code, .ev-slide .qr-big .qr-code, .ev-event .tv-side .qr-code { width: 30vw; height: 30vw; }
+    .ev-event .tv-side { max-width: none; }
+    .ev-event .date-block .num, .ev-poster .date-block .num { font-size: 26vw; }
+    .ev-stamp { margin: 0; font-size: 5vw; max-width: none; }
+    .ev-event .info .hosts { font-size: 8vw; }
+    .ev-event .info h2, .ev-next-group .info h2, .ev-event .info.has-lineup h2 { font-size: 7vw; }
+    .ev-lineup li { grid-template-columns: 14vw 1fr; }
+    .ev-lineup .lt-time, .ev-lineup .lt-title { font-size: 3.6vw; }
+    .ev-title, .ev-next-all .ev-title, .ev-gone .ev-title { font-size: 10vw; }
+    .ev-huge { font-size: 14vw; }
+    .ev-welcome-text { font-size: 12vw; }
+    .ev-welcome-text.long { font-size: 8vw; }
+    .ev-note-text { font-size: 5vw; max-width: none; }
+    .ev-agenda-list .ag-n { font-size: 5vw; }
+    .ev-agenda-list .ag-text, .ev-agenda-list.many .ag-text { font-size: 4.4vw; }
+    .ev-wifi-list dd { font-size: 8vw; }
+    .ev-next li { grid-template-columns: auto minmax(0, 1fr); gap: 0.6vh 3vw; }
+    .ev-next .row-date, .ev-next .row-group { font-size: 3.6vw; }
+    .ev-next .row-title { grid-column: 1 / -1; font-size: 4vw; white-space: normal; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -213,6 +333,7 @@ const slides = await Promise.all(events.map(async (e) => ({
 
 <script>
   import { fmt, whenLabel } from '../lib/format.mjs';
+  import { eventMode } from '../scripts/tv-event';
 
   const SLIDE_MS = 12_000;
   const RELOAD_MS = 60 * 60 * 1000;
@@ -224,6 +345,13 @@ const slides = await Promise.all(events.map(async (e) => ({
   const bar = document.getElementById('tv-bar')!;
   const clock = document.getElementById('tv-clock')!;
   const clockFmt = fmt({ weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const params = new URLSearchParams(location.search);
+
+  // Event mode (?event=<id>) swaps in that event's slides, or, for an id
+  // that isn't on the calendar, puts a notice in front of the regular ones.
+  const mode = params.has('event')
+    ? eventMode(document.querySelector<HTMLElement>('.tv-stage')!, JSON.parse(document.getElementById('tv-data')!.textContent!), params)
+    : null;
 
   // The page is built ahead of time: drop anything that has ended, and label
   // today's and tomorrow's events.
@@ -238,13 +366,14 @@ const slides = await Promise.all(events.map(async (e) => ({
       tag.textContent = label;
       tag.hidden = !label;
     }
-    const empty = document.querySelector<HTMLElement>('.tv-empty')!;
-    empty.hidden = !!document.querySelector('.overview li');
+    mode?.update(now);
+    const empty = document.querySelector<HTMLElement>('.overview .tv-empty');
+    if (empty) empty.hidden = !!document.querySelector('.overview li');
     clock.textContent = clockFmt.format(new Date());
   }
 
   // Screen-print transitions, unless motion is reduced or ?fx=off.
-  const fx = new URLSearchParams(location.search).get('fx') !== 'off' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'print' : '';
+  const fx = params.get('fx') !== 'off' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'print' : '';
   if (fx) {
     document.getElementById('tv')!.dataset.fx = fx;
     document.querySelectorAll<HTMLElement>('.slide').forEach((s, n) => {
@@ -276,17 +405,19 @@ const slides = await Promise.all(events.map(async (e) => ({
       leaving = window.setTimeout(() => prev.classList.remove('was-on'), 1600);
     }
     slides.forEach((s, n) => s.classList.toggle('is-on', n === index));
-    // Restart the progress bar.
+    // Restart the progress bar. Event mode's event slide stays up longer.
+    const dwell = Number(slides[index].dataset.dwell) || SLIDE_MS;
     bar.classList.remove('run');
     void bar.offsetWidth;
-    bar.style.animationDuration = `${SLIDE_MS}ms`;
+    bar.style.animationDuration = `${dwell}ms`;
     if (!paused) bar.classList.add('run');
     clearTimeout(timer);
-    if (!paused) timer = window.setTimeout(next, SLIDE_MS);
+    if (!paused) timer = window.setTimeout(next, dwell);
   }
 
   function next() {
-    // Reload between slides once an hour, to pick up new events.
+    // Reload between slides once an hour, to pick up new events. reload()
+    // keeps the address, so event mode's ?event=…&slides=… comes back as is.
     if (Date.now() - loadedAt > RELOAD_MS && index === slides.length - 1) return location.reload();
     // refresh() may remove ended slides, so step from where the current one
     // ends up rather than by position (which would skip a slide).
@@ -301,7 +432,8 @@ const slides = await Promise.all(events.map(async (e) => ({
     else if (e.key === 'ArrowLeft') show(index - 1);
     else if (e.key === ' ') { paused = !paused; show(index); e.preventDefault(); }
   });
-  setInterval(() => { clock.textContent = clockFmt.format(new Date()); }, 15_000);
+  // The clock, and event mode's countdown, tick between slide changes too.
+  setInterval(() => { clock.textContent = clockFmt.format(new Date()); mode?.update(Date.now()); }, 15_000);
   show(0);
 
   // Keep the screen from dimming or sleeping while the page is up (a laptop
