@@ -59,6 +59,18 @@ export function parseEventsPage(html, slug) {
   return { logo: photo(group?.keyGroupPhoto), events };
 }
 
+// The median RSVP count of a group's past events on its page (Meetup shows
+// about 10). Null with fewer than 4, so one or two nights don't set it.
+export function typicalGoing(details, now) {
+  const counts = [...details.events.values()]
+    .filter((e) => Date.parse(e.end) < now && e.status !== 'CANCELLED' && e.going > 0)
+    .map((e) => e.going)
+    .sort((a, b) => a - b);
+  if (counts.length < 4) return null;
+  const mid = counts.length >> 1;
+  return counts.length % 2 ? counts[mid] : Math.round((counts[mid - 1] + counts[mid]) / 2);
+}
+
 // Fill in the feed's upcoming events from the page, and pick up the page's
 // recent past events, which the feed doesn't include.
 export function enrich(upcoming, details, group, { now, cutoff }) {
@@ -83,7 +95,8 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
   for (const e of [...carried, ...fresh.events]) byId.set(e.id, { ...byId.get(e.id), ...e });
   const events = [...byId.values()].map(({ status, ...e }) => e).sort((a, b) => a.start.localeCompare(b.start));
 
-  const result = { logo: fresh.logo ?? previous.logo ?? null, enriched: fresh.enriched, events };
+  const typical = fresh.typical ?? previous.typical; // left out when unknown, so files without it don't change
+  const result = { logo: fresh.logo ?? previous.logo ?? null, ...(typical != null && { typical }), enriched: fresh.enriched, events };
   const { fetchedAt: before, ...previousResult } = previous;
   const unchanged = before && JSON.stringify(previousResult) === JSON.stringify(result);
   return { fetchedAt: unchanged ? before : fetchedAt, ...result };

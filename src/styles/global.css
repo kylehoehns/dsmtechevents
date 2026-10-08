@@ -264,6 +264,8 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .meta { margin: 0; font: 13px/1.45 var(--mono); }
 .meta .t { font-weight: 700; }
 .meta .addr { color: var(--ink-soft); }
+.meta a.map { color: inherit; text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.meta a.map:hover { text-decoration-style: solid; }
 .meta .tag-online { font-weight: 600; background: var(--paper-2); padding: 0 4px; }
 .show.addr-seen .meta .addr { display: none; }
 
@@ -275,6 +277,8 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .going { font: 12.5px/1.2 var(--mono); }
 .going { word-spacing: calc(3px - 0.6em); } /* the space before "going" prints as the old 3px gap */
 .going b { font: 900 22px/1 var(--display); vertical-align: -2px; }
+.going .usually { color: var(--ink-soft); word-spacing: normal; }
+.show.headline .going .usually { color: inherit; }
 .rsvp {
   display: inline-flex; align-items: center; gap: 8px; font: 800 16px/1 var(--display); text-transform: uppercase;
   text-decoration: none; background: var(--ink); color: var(--paper); padding: 7px 10px 6px;

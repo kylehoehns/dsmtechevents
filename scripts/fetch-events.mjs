@@ -21,7 +21,7 @@ import YAML from 'yaml';
 import { meetupSlug } from '../src/lib/meetup.mjs';
 import secdsm from './sources/secdsm.mjs';
 import pmiChapter from './sources/pmi-chapter.mjs';
-import { parseFeed, parseEventsPage, enrich, mergeCache } from './sources/meetup.mjs';
+import { parseFeed, parseEventsPage, enrich, mergeCache, typicalGoing } from './sources/meetup.mjs';
 
 const SOURCES = { secdsm, 'pmi-chapter': pmiChapter };
 
@@ -77,12 +77,14 @@ async function fetchFeed(group, now, cutoff) {
 
   let recent = [];
   let logo = null;
+  let typical = null;
   let enriched = false;
   if (slug) {
     try {
       const details = parseEventsPage(await get(`https://www.meetup.com/${slug}/events/`), slug);
       logo = details.logo;
       recent = enrich(upcoming, details, group, { now, cutoff });
+      typical = typicalGoing(details, now);
       enriched = true;
     } catch (err) {
       console.warn(`  ${group.id}: enrichment skipped (${err.message})`);
@@ -90,7 +92,7 @@ async function fetchFeed(group, now, cutoff) {
   }
 
   // The feed's copy of an upcoming event wins over the page's.
-  return { events: [...recent, ...upcoming], logo, enriched };
+  return { events: [...recent, ...upcoming], logo, typical, enriched };
 }
 
 async function readCache(id) {

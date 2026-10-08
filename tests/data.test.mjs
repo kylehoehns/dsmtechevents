@@ -61,3 +61,9 @@ test('shortAddress drops the Des Moines ending but keeps suburbs', () => {
   assert.equal(shortAddress('9131 Northpark Dr, Johnston, IA 50131-1234'), '9131 Northpark Dr, Johnston');
   assert.equal(shortAddress(undefined), null);
 });
+
+test('two spellings of one venue at the same street address count as one venue', () => {
+  const keys = data.events.filter((e) => e.address?.startsWith('4501 NW Urbandale')).map((e) => e.venueKey);
+  assert.ok(keys.length >= 2);
+  assert.equal(new Set(keys).size, 1);
+});

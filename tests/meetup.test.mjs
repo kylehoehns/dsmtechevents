@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { meetupSlug, meetupPhoto } from '../src/lib/meetup.mjs';
-import { parseFeed, parseEventsPage, enrich, mergeCache, formatAddress, cleanDescription } from '../scripts/sources/meetup.mjs';
+import { parseFeed, parseEventsPage, enrich, mergeCache, typicalGoing, formatAddress, cleanDescription } from '../scripts/sources/meetup.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
 const group = { id: 'iadnug', name: 'Iowa .NET User Group' };
@@ -105,4 +105,22 @@ test('formatAddress and cleanDescription', () => {
   assert.equal(formatAddress(null), null);
   assert.equal(cleanDescription('Pyowa\r\nHello', 'Pyowa'), 'Hello');
   assert.equal(cleanDescription('Hello', 'Pyowa'), 'Hello');
+});
+
+test('typicalGoing is the median of past RSVP counts, once there are enough', () => {
+  const page = (counts) => ({ events: new Map(counts.map((going, i) => [String(i), { end: '2026-09-01T00:00:00Z', going, status: 'PAST' }])) });
+  assert.equal(typicalGoing(page([12, 20, 15]), now), null, 'fewer than 4 nights');
+  assert.equal(typicalGoing(page([11, 28, 15, 20, 131]), now), 20, 'one huge night does not skew it');
+  assert.equal(typicalGoing(page([10, 20, 30, 40]), now), 25);
+  const withCancelled = page([10, 20, 30, 40]);
+  withCancelled.events.set('x', { end: '2026-09-01T00:00:00Z', going: 500, status: 'CANCELLED' });
+  withCancelled.events.set('y', { end: '2026-12-01T00:00:00Z', going: 500, status: 'ACTIVE' });
+  assert.equal(typicalGoing(withCancelled, now), 25, 'cancelled and upcoming events are ignored');
+});
+
+test('mergeCache keeps the typical turnout and leaves it out when unknown', () => {
+  const previous = { fetchedAt: 'THEN', logo: null, typical: 18, enriched: true, events: [] };
+  assert.equal(mergeCache(previous, { events: [], enriched: true }, { now, cutoff, fetchedAt: 'NOW' }).fetchedAt, 'THEN');
+  assert.equal(mergeCache(previous, { events: [], typical: 22, enriched: true }, { now, cutoff, fetchedAt: 'NOW' }).typical, 22);
+  assert.ok(!('typical' in mergeCache({ events: [] }, { events: [], enriched: true }, { now, cutoff })));
 });

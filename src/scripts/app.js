@@ -3,7 +3,7 @@
 // the month calendar and the mini calendar in the side rail.
 // State lives in the URL (?view=calendar&group=cijug&day=2026-10-15) so any
 // view can be shared or bookmarked.
-import { dayKey, fullDate } from '../lib/format.mjs';
+import { dayKey, fullDate, todayWord } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -33,7 +33,7 @@ for (const el of $$('.poster[data-end]')) if (Date.parse(el.dataset.end) <= now)
 // ---- relative labels ----
 function relLabel(startIso, endIso) {
   const start = dayKey(startIso), end = dayKey(endIso);
-  if (start <= today && today <= end) return Date.parse(startIso) <= now ? 'Happening now' : 'Tonight';
+  if (start <= today && today <= end) return Date.parse(startIso) <= now ? 'Happening now' : start === today ? todayWord(startIso) : 'Today';
   const n = daysBetween(today, start);
   return n === 1 ? 'Tomorrow' : '';
 }
@@ -49,6 +49,11 @@ for (const el of $$('.show', listView)) {
 for (const el of $$('.countdown[data-start]')) {
   const n = daysBetween(today, dayKey(el.dataset.start));
   el.textContent = Date.parse(el.dataset.start) <= now ? 'Happening now' : n <= 0 ? 'Today' : n === 1 ? 'Tomorrow' : `${n} days out`;
+}
+
+// Venue links open Google Maps; on iPhones and iPads, Apple Maps instead.
+if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes('Macintosh') && navigator.maxTouchPoints > 1)) {
+  for (const a of $$('a.map[data-q]')) a.href = `https://maps.apple.com/?q=${encodeURIComponent(a.dataset.q)}`;
 }
 
 // ---- state ----
