@@ -21,3 +21,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # The share image, icons and badge come from scripts the build doesn't
+      # run, so a dependency update could break them unnoticed. Run them here
+      # (the output isn't committed).
+      - name: image scripts still run
+        run: npm run og && npm run icons

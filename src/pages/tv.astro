@@ -19,6 +19,9 @@ const soon = upcoming.filter((e) => !e.repeat && Date.parse(e.start) < horizon);
 // Always show something, even in a quiet stretch.
 const events = (soon.length >= 3 ? soon : upcoming.filter((e) => !e.repeat)).slice(0, SHOWN);
 
+// On the overview slide: one code to the whole site.
+const siteQr = await QRCode.toString(site.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#1d1b2b', light: '#0000' } });
+
 const slides = await Promise.all(events.map(async (e) => ({
   e,
   hosts: e.groupIds.map((id: string) => byId[id]?.short).filter(Boolean).join(' w/ ') || (e.featured ? 'Conference' : 'Community event'),
@@ -36,7 +39,13 @@ const slides = await Promise.all(events.map(async (e) => ({
 
     <div class="tv-stage">
       <section class="slide overview is-on">
-        <h1 class="mis" data-t="Coming up">Coming up</h1>
+        <div class="overview-head">
+          <h1 class="mis" data-t="Coming up">Coming up</h1>
+          <div class="qr site-qr">
+            <div class="qr-code" set:html={siteQr} />
+            <span>Every event</span>
+          </div>
+        </div>
         <p class="tv-empty" hidden>Nothing on the calendar right now. New events show up here as groups post them.</p>
         <ol>
           {slides.slice(0, 7).map(({ e, hosts }) => (
@@ -106,6 +115,8 @@ const slides = await Promise.all(events.map(async (e) => ({
   .slide.is-on { opacity: 1; }
 
   .overview { flex-direction: column; gap: 2vh; padding-top: 3vh; }
+  .overview-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 3vw; }
+  .site-qr .qr-code svg { width: 13vh; height: 13vh; }
   .overview h1 { margin: 0; font: 900 9vh/0.85 var(--display); text-transform: uppercase; color: var(--ink); }
   .tv-empty { margin: 0; font: 600 3.4vh/1.3 var(--sans); color: var(--soft); }
   .overview ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.4vh; }

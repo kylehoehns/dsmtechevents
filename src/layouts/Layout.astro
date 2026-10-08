@@ -97,6 +97,7 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
         <div class="fine">
           {updated && <p>Last updated {updated}.</p>}
           <p>All times Central. <a href="/about/">About this site</a></p>
+          <button type="button" class="install-app" id="install-app" hidden>Install as an app</button>
         </div>
       </div>
     </footer>
@@ -136,6 +137,20 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
       const loadedAt = Date.now();
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible' && Date.now() - loadedAt > 60 * 60 * 1000) location.reload();
+      });
+
+      // Android Chrome offers to install the site as an app; keep that offer
+      // and put it behind a button in the footer instead of a pop-up.
+      const installBtn = document.getElementById('install-app') as HTMLButtonElement;
+      let installOffer: any = null;
+      window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installOffer = e; installBtn.hidden = false; });
+      window.addEventListener('appinstalled', () => { installBtn.hidden = true; installOffer = null; });
+      installBtn.addEventListener('click', async () => {
+        if (!installOffer) return;
+        installOffer.prompt();
+        await installOffer.userChoice;
+        installOffer = null;
+        installBtn.hidden = true;
       });
 
       // iOS has no install prompt, so show a one-time hint in Safari.
