@@ -58,7 +58,7 @@ jobs:
           # group posted anything. Recording the Des Moines date makes the
           # first run each day commit.
           TZ=America/Chicago date +%F > data/cache/built-on.txt
-          git add data/cache
+          git add data/cache data/archive
           if git diff --cached --quiet; then
             echo "No event changes."
             exit 0
