@@ -29,25 +29,25 @@ const logo = { fontFamily: 'Display', fontWeight: 900, fontSize: 172, lineHeight
 const bill = { fontFamily: 'Display', fontWeight: 900, fontSize: 54, lineHeight: 0.86, textTransform: 'uppercase' };
 
 // A taped-up pink poster, like the headliner on the events page.
-const poster = h('div', { position: 'relative', flexDirection: 'column', width: 360, padding: '20px 24px 24px', background: C.pink, color: C.onPink, transform: 'rotate(2.5deg)' },
+const poster = h('div', { position: 'relative', flexDirection: 'column', width: 380, padding: '20px 24px 24px', background: C.pink, color: C.onPink, transform: 'rotate(2.5deg)' },
   h('div', { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, opacity: 0.16, backgroundImage: `radial-gradient(circle, ${C.onPink} 2px, transparent 2.6px)`, backgroundSize: '9px 9px' }),
   h('div', { position: 'absolute', top: -16, left: 130, width: 100, height: 32, background: C.tape, transform: 'rotate(-4deg)' }),
   h('div', { justifyContent: 'space-between', paddingBottom: 10, borderBottom: `3px solid ${C.onPink}` },
-    mono(19, 700, 'Now showing'), mono(19, 700, 'Des Moines'),
+    mono(23, 700, 'Now showing'), mono(23, 700, 'Des Moines'),
   ),
   h('div', { flexDirection: 'column', marginTop: 16, gap: 6 },
     h('div', bill, 'Meetups'),
     h('div', bill, 'User groups'),
     h('div', bill, 'Conferences'),
   ),
-  h('div', { marginTop: 18, alignSelf: 'flex-start', background: C.onPink, color: C.pink, fontFamily: 'Display', fontWeight: 900, fontSize: 30, textTransform: 'uppercase', padding: '6px 12px 3px' }, 'All in one place'),
+  h('div', { marginTop: 18, alignSelf: 'flex-start', background: C.onPink, color: C.pink, fontFamily: 'Display', fontWeight: 900, fontSize: 34, textTransform: 'uppercase', padding: '6px 12px 3px' }, 'All in one place'),
 );
 
 const card = h('div', { width: W, height: H, flexDirection: 'column', background: C.paper, color: C.ink, padding: '34px 56px 0' },
   // masthead strip
   h('div', { justifyContent: 'space-between', alignItems: 'flex-end', paddingBottom: 10, borderBottom: `3px solid ${C.rule}` },
-    h('div', { gap: 0 }, mono(26, 700, 'Des Moines, IA'), mono(26, 400, '\u00a0· 515')),
-    mono(26, 700, 'dsmtechevents.com', { color: C.blue }),
+    h('div', { gap: 0 }, mono(30, 700, 'Des Moines, IA'), mono(30, 400, '\u00a0· 515')),
+    mono(30, 700, 'dsmtechevents.com', { color: C.blue }),
   ),
   h('div', { flex: 1, justifyContent: 'space-between', alignItems: 'center', paddingRight: 14 },
     h('div', { flexDirection: 'column', position: 'relative' },
@@ -74,5 +74,7 @@ const svg = await satori(card, {
     { name: 'Mono', data: font('ibm-plex-mono', 700), weight: 700 },
   ],
 });
-fs.writeFileSync(OUT, new Resvg(svg).render().asPng());
+// Rendered at 2× (2400×1260): Slack, iMessage and LinkedIn show previews on
+// high-resolution screens, where a 1200px image is stretched and looks soft.
+fs.writeFileSync(OUT, new Resvg(svg, { fitTo: { mode: 'width', value: W * 2 } }).render().asPng());
 console.log(`wrote ${OUT}`);
