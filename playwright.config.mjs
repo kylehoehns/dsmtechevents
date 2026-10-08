@@ -29,8 +29,10 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    { name: 'desktop', use: { browserName: 'chromium', viewport: { width: 1280, height: 900 } } },
-    { name: 'phone', use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 } },
+    { name: 'desktop', testIgnore: /offline/, use: { browserName: 'chromium', viewport: { width: 1280, height: 900 } } },
+    { name: 'phone', testIgnore: /offline/, use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 } },
+    // The one place sw.js runs: offline.spec.mjs checks the site works with no network.
+    { name: 'offline', testMatch: /offline/, use: { browserName: 'chromium', viewport: { width: 1280, height: 900 }, serviceWorkers: 'allow' } },
   ],
   webServer: {
     command: `node --import ./scripts/fake-now.mjs node_modules/astro/bin/astro.mjs build --outDir dist-e2e --silent && node scripts/csp.mjs dist-e2e && node node_modules/astro/bin/astro.mjs preview --outDir dist-e2e --port ${port} --ignore-lock`,
