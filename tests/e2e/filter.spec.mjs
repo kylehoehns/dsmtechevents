@@ -81,3 +81,31 @@ test("one group's view shows its whole past from the archive, in place of Recent
   await page.getByRole('button', { name: 'Show all groups' }).click();
   await expect(past).toBeHidden();
 });
+
+test("a group's Past section stays out of the calendar, even once the card pool is in", async ({ page }) => {
+  await page.goto('/?view=calendar&group=cijug');
+  // The pool's past rows have arrived (they're what Past lists).
+  await expect(page.locator('#past-results li[data-groups~="cijug"]').first()).toBeAttached();
+  await expect(page.locator('#past-results')).toBeHidden();
+  await page.locator('.nav a[data-nav="list"]').first().click();
+  await expect(page.getByRole('region', { name: 'Past' })).toBeVisible();
+});
+
+// Coding Dojo, Web Geeks' only upcoming event, runs 5:30-7:30p (00:30Z) on the build day.
+test("an event that ends while its group's view is open moves to Past", async ({ page }) => {
+  await page.goto('/?group=webgeeks');
+  const row = page.locator('#past-results li[data-id="webgeeks-tonight"]');
+  await expect(row).toBeAttached();
+  await expect(row).toBeHidden();
+  await page.clock.setSystemTime(new Date('2026-10-15T00:40:00Z')); // 7:40p
+  await page.clock.runFor(60_000); // the page re-checks once a minute
+  await expect(list(page).getByRole('heading', { name: /^Coding Dojo/ })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Past' }).getByRole('listitem').filter({ hasText: 'Coding Dojo' }).first()).toBeVisible();
+  await expect(row).toBeVisible();
+});
+
+test('opened after it ended, a group view lists the event under Past', async ({ page }) => {
+  await page.clock.setSystemTime(new Date('2026-10-15T00:40:00Z'));
+  await page.goto('/?group=webgeeks');
+  await expect(page.locator('#past-results li[data-id="webgeeks-tonight"]')).toBeVisible();
+});
