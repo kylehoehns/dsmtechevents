@@ -61,7 +61,7 @@ const calendarData = {
 // which holds past events and repeat dates).
 const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).filter(Boolean)];
 ---
-<Layout updatedAt={updatedAt}
+<Layout updatedAt={updatedAt} search
   headTitle="DSM Tech Events: Des Moines tech meetups and conferences"
   description="Every upcoming Des Moines tech meetup, user group and conference in one list: Python, Java, .NET, AI, AWS, security, UX and more. Updated four times a day.">
   <script type="application/ld+json" set:html={toScript(structured)} />

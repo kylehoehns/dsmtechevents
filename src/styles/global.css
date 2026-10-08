@@ -111,14 +111,18 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 
 /* ---------- masthead ---------- */
 .mast { padding-top: calc(12px + env(safe-area-inset-top)); }
-/* nav and the theme button share a row: right of the logo on desktop, under
-   it on phones with the button at the far right */
+/* nav and the icon buttons (search, theme) share a row: right of the logo on
+   desktop, under it on phones with the buttons at the far right */
 .mast-tools { display: flex; align-items: stretch; justify-content: space-between; gap: 10px; flex: 1 1 100%; }
-.theme-btn {
+.mast-btns { display: flex; align-items: stretch; }
+.icon-btn {
   display: grid; place-items: center; width: 40px; min-height: 40px; padding: 0; margin-bottom: -2px; /* stretches to the nav boxes' height */
   background: var(--paper); border: 2px solid var(--line);
 }
-.theme-btn svg { width: 22px; height: 22px; display: none; }
+.icon-btn + .icon-btn { margin-left: -2px; } /* shared border, like the nav boxes */
+.icon-btn svg { width: 22px; height: 22px; }
+.icon-btn[aria-expanded="true"] { background: var(--ink); color: var(--paper); }
+.theme-btn svg { display: none; }
 :root:not([data-theme]) .theme-btn .i-auto, [data-theme="light"] .theme-btn .i-light, [data-theme="dark"] .theme-btn .i-dark { display: block; }
 /* logo and nav share one row on desktop; the nav wraps under the logo on phones */
 .mast-body { display: grid; gap: 10px; padding: 14px 0 12px; border-bottom: 6px double var(--line); }
@@ -139,6 +143,18 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   padding: 8px 12px 7px; border: 2px solid var(--line); margin: 0 -2px -2px 0; background: var(--paper);
 }
 .nav a[aria-current="page"] { background: var(--ink); color: var(--paper); }
+
+/* search (events page): opens under the nav from the magnifier button; app.js runs it */
+.search { display: flex; }
+.search input {
+  flex: 1; min-width: 0; height: 44px; padding: 0 12px; margin: 0; border: 2px solid var(--line); border-radius: 0;
+  background: var(--sheet); color: var(--ink); font: 600 var(--fs-ui)/1 var(--mono); -webkit-appearance: none; appearance: none;
+}
+.search input:focus-visible { outline-offset: -5px; } /* inside the border, clear of the × */
+.search input::placeholder { color: var(--ink-soft); opacity: 1; }
+.search input::-webkit-search-cancel-button { display: none; } /* our own × clears and closes */
+.search .btn { width: 44px; margin-left: -2px; padding: 0; font-size: var(--fs-title); background: var(--paper); }
+.empty .btn { margin-left: 6px; vertical-align: baseline; }
 
 /* ---------- buttons ----------
    One shape for every action. Solid is the main action on a card or page,
@@ -530,7 +546,7 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 /* Hover styles only where there's a real pointer. Phones keep :hover stuck on
    whatever was last tapped (a group name stayed blue and underlined). */
 @media (hover: hover) {
-  .theme-btn:hover { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
+  .icon-btn:hover { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
   .nav a:hover:not([aria-current="page"]) { background: var(--pink-fill); color: var(--on-pink); }
   .btn-solid:hover { background: var(--btn-hover-bg, var(--blue-fill)); color: var(--btn-hover-fg, var(--on-blue)); border-color: var(--btn-hover-bg, var(--blue-fill)); }
   .btn-outline:hover { background: var(--btn-hover-bg, var(--pink-fill)); color: var(--btn-hover-fg, var(--on-pink)); border-color: var(--btn-hover-bg, var(--pink-fill)); }
