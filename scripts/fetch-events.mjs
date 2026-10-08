@@ -22,9 +22,10 @@ import { meetupSlug } from '../src/lib/meetup.mjs';
 import secdsm from './sources/secdsm.mjs';
 import pmiChapter from './sources/pmi-chapter.mjs';
 import taiTechbrew from './sources/tai-techbrew.mjs';
+import iowansOfThings from './sources/iowans-of-things.mjs';
 import { parseFeed, parseEventsPage, enrich, mergeCache, typicalGoing } from './sources/meetup.mjs';
 
-const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew };
+const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew, 'iowans-of-things': iowansOfThings };
 
 const root = path.resolve(import.meta.dirname, '..');
 const cacheDir = path.join(root, 'data/cache');

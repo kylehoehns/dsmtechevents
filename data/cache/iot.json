@@ -1,0 +1,20 @@
+{
+  "fetchedAt": "2026-10-08T04:14:00.274Z",
+  "logo": null,
+  "enriched": true,
+  "events": [
+    {
+      "id": "iot-ff-october-2026",
+      "sourceId": "ff-october-2026",
+      "title": "Firmware Fellowship - October 2026",
+      "start": "2026-10-09T00:00:00.000Z",
+      "end": "2026-10-09T01:00:00.000Z",
+      "allDay": false,
+      "url": "https://iowansofthings.com/ff-october-2026",
+      "description": "Join us for Firmware Fellowship for our summer series! This technical discussion series focuses on embedded firmware development best practices and provides a forum for developers to share expertise and learn from each other. We meet in a casual setting to share what we know and to learn from you! Don’t be afraid to join us, there won’t be any pop quizzes!\n\nCome nerd out with us on October 8th! We’ll be doing an open-source project review for a hydrostat controller project. You are welcome to bring your current projects, in any state of completion to share!\n\nLearn more and register…",
+      "venue": "Area515, Des Moines Maker Space",
+      "address": "108 Jefferson Avenue, Des Moines, IA 50314",
+      "image": "https://iowansofthings.com/assets/images/banner_firmware_fellowship_2026_10.png"
+    }
+  ]
+}

@@ -120,6 +120,14 @@
   color: "#12b886"
   tags: [security]
 
+- id: iot
+  name: Iowans of Things
+  short: Iowans of Things
+  source: iowans-of-things
+  website: https://iowansofthings.com/
+  color: "#f08c00"
+  tags: [embedded, hardware]
+
 - id: pmi
   name: PMI Central Iowa Chapter
   short: PMI
