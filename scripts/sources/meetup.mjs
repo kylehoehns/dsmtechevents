@@ -67,18 +67,6 @@ export function parseEventsPage(html, slug) {
   };
 }
 
-// The median RSVP count of a group's past events on its page (Meetup shows
-// about 10). Null with fewer than 4, so one or two nights don't set it.
-export function typicalGoing(details, now) {
-  const counts = [...details.events.values()]
-    .filter((e) => Date.parse(e.end) < now && e.status !== 'CANCELLED' && e.going > 0)
-    .map((e) => e.going)
-    .sort((a, b) => a - b);
-  if (counts.length < 4) return null;
-  const mid = counts.length >> 1;
-  return counts.length % 2 ? counts[mid] : Math.round((counts[mid - 1] + counts[mid]) / 2);
-}
-
 // Fill in the feed's upcoming events from the page, and pick up the page's
 // recent past events, which the feed doesn't include.
 // The feed stays the source for an upcoming event's title, time and link; the
@@ -115,7 +103,7 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
   // Group facts from Meetup: kept from the last run if this one missed them,
   // and left out when unknown so files without them don't change.
   const facts = {};
-  for (const k of ['typical', 'members', 'pastCount']) {
+  for (const k of ['members', 'pastCount']) {
     const v = fresh[k] ?? previous[k];
     if (v != null) facts[k] = v;
   }

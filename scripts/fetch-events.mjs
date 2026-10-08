@@ -23,7 +23,7 @@ import secdsm from './sources/secdsm.mjs';
 import pmiChapter from './sources/pmi-chapter.mjs';
 import taiTechbrew from './sources/tai-techbrew.mjs';
 import iowansOfThings from './sources/iowans-of-things.mjs';
-import { parseFeed, parseEventsPage, enrich, mergeCache, typicalGoing } from './sources/meetup.mjs';
+import { parseFeed, parseEventsPage, enrich, mergeCache } from './sources/meetup.mjs';
 
 const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew, 'iowans-of-things': iowansOfThings };
 
@@ -86,7 +86,6 @@ async function fetchFeed(group, now, cutoff) {
 
   let recent = [];
   let logo = null;
-  let typical = null;
   let facts = {};
   let enrichError = null;
   let enriched = false;
@@ -95,7 +94,6 @@ async function fetchFeed(group, now, cutoff) {
       const details = parseEventsPage(await get(`https://www.meetup.com/${slug}/events/`), slug);
       logo = details.logo;
       recent = enrich(upcoming, details, group, { now, cutoff });
-      typical = typicalGoing(details, now);
       facts = { members: details.members, pastCount: details.pastCount };
       enriched = true;
     } catch (err) {
@@ -105,7 +103,7 @@ async function fetchFeed(group, now, cutoff) {
   }
 
   // The feed's copy of an upcoming event wins over the page's.
-  return { events: [...recent, ...upcoming], logo, typical, ...facts, enriched, enrichError };
+  return { events: [...recent, ...upcoming], logo, ...facts, enriched, enrichError };
 }
 
 async function readCache(id) {

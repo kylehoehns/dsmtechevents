@@ -18,7 +18,6 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
       meetupUrl: slug ? `https://www.meetup.com/${slug}/` : null,
       logo: g.logo ?? cache.logo ?? null,
       fetchedAt: cache.fetchedAt ?? null,
-      typical: cache.typical ?? null,
       members: cache.members ?? null,
       pastCount: cache.pastCount ?? null,
       _events: cache.events.map((e) => ({ ...e, groupIds: [g.id], source: 'feed' })),
@@ -84,8 +83,6 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
     // ("Community Choice Convention Center" vs "...Credit Union Convention Center").
     const street = /^\s*(\d+\s+\S+(?:\s+\S+)?)/.exec(e.address ?? '')?.[1];
     e.venueKey = e.online ? 'online' : (street ?? e.venue ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() || null;
-    // A group's usual turnout, for "usually ~20" next to an early RSVP count.
-    e.typical = e.groupIds.length === 1 ? byId[e.groupIds[0]]?.typical ?? null : null;
   }
 
   // Repeating placeholders (same hosts + same title, e.g. a monthly meeting
