@@ -1,5 +1,7 @@
 // Checks the outbound links people click that can rot: each group's `meetup:`
-// and `website:` in data/groups.yaml and each event's `url:` in
+// and `website:` in data/groups.yaml, the `logo:` image for groups not on
+// Meetup (we load it from their site, so a redesign can break it), and each
+// event's `url:` in
 // data/events.yaml. (Meetup event links come from the feed four times a day,
 // so they are not checked here.)
 //
@@ -29,6 +31,7 @@ export function collectLinks(groups, events) {
   for (const g of groups ?? []) {
     add(g.meetup, `groups.yaml: ${g.id} meetup`);
     add(g.website, `groups.yaml: ${g.id} website`);
+    add(g.logo, `groups.yaml: ${g.id} logo`);
   }
   for (const e of events ?? []) add(e.url, `events.yaml: ${e.title}`);
   return [...links].map(([url, where]) => ({ url, where }));
