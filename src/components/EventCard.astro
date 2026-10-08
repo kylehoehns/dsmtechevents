@@ -14,6 +14,16 @@ const lead = hosts[0];
 const isMeetup = e.url?.includes('meetup.com');
 const cta = isMeetup ? 'RSVP on Meetup' : e.featured ? 'Tickets & info' : 'Details';
 const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
+// Meetup photos come as small webp copies (see meetupPhoto). Most are 16:9 at
+// 600x338; width/height hold that shape until the image arrives.
+const photo = e.photoSizes ?? { small: e.photo, large: e.photo };
+const thumbSrcset = e.photoSizes ? `${photo.small} 180w, ${photo.large} 600w` : undefined;
+// "Tomorrow" / "Tonight" as of the build, so the tag is in the page from the
+// start and nothing moves when app.js re-checks it against the real date.
+const today = dayKey(new Date().toISOString());
+const startDay = dayKey(e.start);
+const tomorrow = dayKey(new Date(Date.now() + 86_400_000).toISOString());
+const whenTag = startDay <= today && today <= dayKey(e.end) ? 'Tonight' : startDay === tomorrow ? 'Tomorrow' : '';
 ---
 <li
   class:list={['show', { headline: e.featured, 'has-photo': !!e.photo }]}
@@ -32,12 +42,12 @@ const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
 
   {e.photo && (
     <div class="photo" aria-hidden="true">
-      <div class="ink"><img src={e.photo} alt="" loading="lazy" decoding="async" /></div>
+      <div class="ink"><img src={photo.large} srcset={thumbSrcset} sizes="160px" width="600" height="338" alt="" loading="lazy" decoding="async" /></div>
     </div>
   )}
 
   <div class="body">
-    <span class="when-tag" hidden></span>
+    <span class="when-tag" hidden={!whenTag}>{whenTag}</span>
     <p class="band">
       {hosts.length
         ? hosts.map((g: any, i: number) => (
@@ -72,7 +82,7 @@ const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
   {(e.description || e.photo) && (
     <div class="desc" id={descId} hidden>
       {/* Phones hide the photo square, so the full-size flyer lives here. */}
-      {e.photo && <img class="desc-photo" src={e.photo} alt={`Event image for ${e.title}`} loading="lazy" decoding="async" />}
+      {e.photo && <img class="desc-photo" src={photo.large} width="600" height="338" alt={`Event image for ${e.title}`} loading="lazy" decoding="async" />}
       {e.description && <Fragment set:html={formatDescription(e.description)} />}
     </div>
   )}

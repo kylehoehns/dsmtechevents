@@ -54,7 +54,7 @@ const calendarData = {
   events: events.map((e) => ({
     id: e.id, title: e.title, start: e.start, end: e.end, groups: e.groupIds, featured: e.featured, allDay: e.allDay,
   })),
-  groups: Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short }])),
+  groups: Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short, url: g.meetupUrl ?? g.website ?? null }])),
 };
 ---
 <Layout updatedAt={updatedAt}>

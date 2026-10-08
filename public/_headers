@@ -1,10 +1,14 @@
 # Pages and the service worker must never be held by a cache: the site changes
 # every night, and a stale sw.js can't be replaced by a newer one it never fetches.
+#
+# CSP: Cloudflare Web Analytics loads its beacon from static.cloudflareinsights.com
+# and reports to cloudflareinsights.com. connect-src also covers fetch() inside
+# sw.js, which pulls Meetup event photos from secure.meetupstatic.com.
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
-  Content-Security-Policy: script-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
+  Content-Security-Policy: script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com https://secure.meetupstatic.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
   Strict-Transport-Security: max-age=31536000
 
 /

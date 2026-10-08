@@ -6,6 +6,15 @@
    so they read the same in both themes. Ink used as text uses --pink-t/--blue-t,
    which lighten on black stock. */
 
+/* Stand-ins drawn while the web fonts load: system fonts scaled to the same
+   average width and line metrics (numbers from Astro's capsize fallback
+   generator for these exact font files), so text barely moves on swap. Same
+   latin range as the real faces; see astro.config.mjs for why. */
+@font-face { font-family: "DSM Display fallback"; src: local("Arial Bold"); font-weight: 800 900; size-adjust: 78.1282%; ascent-override: 125.9469%; descent-override: 27.2629%; line-gap-override: 0%; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "DSM Mono fallback"; src: local("Courier New"); font-weight: 400 700; size-adjust: 99.9837%; ascent-override: 102.5167%; descent-override: 27.5045%; line-gap-override: 0%; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "DSM Sans fallback"; src: local("Arial"); font-weight: 400 600; size-adjust: 101.1663%; ascent-override: 101.3184%; descent-override: 27.183%; line-gap-override: 0%; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "DSM Sans fallback"; src: local("Arial Bold"); font-weight: 700; size-adjust: 93.9622%; ascent-override: 109.0865%; descent-override: 29.2671%; line-gap-override: 0%; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
 :root {
   --paper: #f3ede1;
   --paper-2: #ebe3d3;
@@ -26,10 +35,7 @@
   --mis-blend: multiply;
   --tape: rgba(243, 237, 225, 0.72);
   --grain-alpha: 0.09;
-  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --marker: "Permanent Marker", "Comic Sans MS", cursive;
+  /* --display, --mono, --sans and --marker (font stacks) come from <Font /> in Layout.astro */
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -100,6 +106,9 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 /* logo and nav share one row on desktop; the nav wraps under the logo on phones */
 .mast-body { display: grid; gap: 10px; padding: 14px 0 12px; border-bottom: 6px double var(--line); }
 .mast-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+/* Once both fit side by side (logo 794 + gap + nav 253 + padding), don't let a
+   slightly wider fallback font push the nav under the logo while fonts load. */
+@media (min-width: 1140px) { .mast-row { flex-wrap: nowrap; } }
 .logo { display: block; text-decoration: none; line-height: 0.8; }
 .logo .mis {
   font: 900 clamp(40px, 13.4vw, 120px)/0.8 var(--display); text-transform: uppercase;
@@ -176,6 +185,14 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   .side > .recent { grid-row: 5; margin-top: 22px; }
   .layout:not(:has(#headliners:not([hidden]))) .lead > .minical { margin-top: 0; }
 }
+
+/* Calendar view. Layout.astro sets data-view before first paint on
+   ?view=calendar links, so the list never shows and then jumps away. Until
+   app.js draws the grid, hold roughly its height (a bit under) so the footer
+   doesn't move when it lands. */
+[data-view="calendar"] :is(#list-view, #headliners, #minical, #recent) { display: none; }
+[data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 360px; }
+@media (min-width: 760px) { [data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 640px; } }
 
 /* ---------- group filter: chip strip on phone, a list on desktop ---------- */
 .filter { border-top: 2px solid var(--line); border-bottom: 2px solid var(--line); padding: 8px 0; }
