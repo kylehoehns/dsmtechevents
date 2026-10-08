@@ -3,15 +3,16 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import { inlineScripts, scriptHash, scriptSrc } from '../scripts/csp.mjs';
 
-test('inlineScripts finds the scripts a browser runs, not data blocks or files', () => {
+test('inlineScripts finds the scripts CSP checks (speculation rules too), not data blocks or files', () => {
   const html = `
     <script>a()</script>
     <script type="module">b()</script>
+    <script type="speculationrules">{"prefetch":[]}</script>
     <script type="application/ld+json">{"x":1}</script>
     <script type="application/json" id="calendar-data">{}</script>
     <script type="module" src="/_astro/x.js"></script>
     <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{}'></script>`;
-  assert.deepEqual(inlineScripts(html), ['a()', 'b()']);
+  assert.deepEqual(inlineScripts(html), ['a()', 'b()', '{"prefetch":[]}']);
 });
 
 test('scriptHash is the CSP sha256 source of the exact script text', () => {

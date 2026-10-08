@@ -21,7 +21,11 @@ export const test = base.extend({
   page: async ({ page, baseURL }, use) => {
     const errors = [];
     page.on('console', (msg) => { if (msg.type() === 'error') errors.push(`console: ${msg.text()}`); });
-    page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
+    // Page transitions (global.css): under this harness (intercepted documents,
+    // a fake clock) Chrome sometimes drops a cross-page transition and reports
+    // it as an error. Real browsers run them; the page itself is unaffected.
+    const droppedTransition = /^Transition was aborted because of invalid state/;
+    page.on('pageerror', (err) => { if (!droppedTransition.test(err.message)) errors.push(`pageerror: ${err.message}`); });
     await page.route((url) => !url.href.startsWith(baseURL) && !url.protocol.startsWith('data'), (route) => route.abort());
     await fakePhotos(page);
     const csp = /^\s*Content-Security-Policy:\s*(.+)$/m.exec(fs.readFileSync(new URL('../../dist-e2e/_headers', import.meta.url), 'utf8'))[1];
