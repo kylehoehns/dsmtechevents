@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, formatDescription } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, formatDescription, todayWord } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 
 test('dates are Des Moines dates, not UTC dates', () => {
@@ -50,4 +50,10 @@ test('formatDescription only links http(s) URLs', () => {
 
 test('formatDescription turns blank lines into paragraphs and ## into headings', () => {
   assert.equal(formatDescription('One\ntwo\n\n## Agenda\nTalks'), '<p>One<br>two</p><h4>Agenda</h4><p>Talks</p>');
+});
+
+test('todayWord says Tonight only for events starting at 4pm or later', () => {
+  assert.equal(todayWord('2026-10-08T17:00:00.000Z'), 'Today'); // noon
+  assert.equal(todayWord('2026-10-22T22:30:00.000Z'), 'Tonight'); // 5:30pm
+  assert.equal(todayWord('2026-10-22T21:00:00.000Z'), 'Tonight'); // 4pm
 });

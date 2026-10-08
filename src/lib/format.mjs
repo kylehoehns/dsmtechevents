@@ -10,6 +10,7 @@ const timeFmt = fmt({ hour: 'numeric', minute: '2-digit' });
 const longDate = fmt({ weekday: 'long', month: 'long', day: 'numeric' });
 const monthYear = fmt({ month: 'long', year: 'numeric' });
 const keyFmt = new Intl.DateTimeFormat('en-CA', { timeZone: TZ });
+const hourFmt = fmt({ hour: 'numeric', hourCycle: 'h23' });
 
 export const dayKey = (iso) => keyFmt.format(new Date(iso)); // "2026-10-22"
 export const weekday = (iso) => weekdayShort.format(new Date(iso));
@@ -18,6 +19,8 @@ export const day = (iso) => dayNum.format(new Date(iso));
 export const fullDate = (iso) => longDate.format(new Date(iso));
 export const monthLabel = (iso) => monthYear.format(new Date(iso));
 export const monthKey = (iso) => dayKey(iso).slice(0, 7);
+// "Tonight" for something starting at 4pm or later, "Today" for a noon talk.
+export const todayWord = (iso) => (Number(hourFmt.format(new Date(iso))) >= 16 ? 'Tonight' : 'Today');
 
 export function time(iso) {
   return timeFmt.format(new Date(iso)).replace(':00', '').replace(' ', ' ');
