@@ -13,7 +13,10 @@ calendar (and a couple of groups' own websites).
    photo and RSVP count from the group's events page. Results land in
    `data/cache/<group>.json`.
 2. If a feed fails, that group's previous cache file is kept, so a bad run
-   never empties the site. The cache is committed so builds work even if
+   never empties the site, and the other groups refresh as usual. The refresh
+   workflow then opens a GitHub issue labeled `source-broken` for that group
+   (`scripts/source-issues.mjs`): one per group, updated rather than duplicated
+   on later runs, and closed automatically once the group fetches cleanly. The cache is committed so builds work even if
    Meetup is unreachable.
 3. `astro build` merges the cache with the hand-added events in
    `data/events.yaml` and writes static HTML to `dist/`.

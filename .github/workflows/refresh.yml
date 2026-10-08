@@ -21,6 +21,7 @@ on:
 # REFRESH_DEPLOY_KEY secret; the public half is under Settings → Deploy keys.
 permissions:
   contents: read
+  issues: write # source-issues.mjs opens/closes "Source broken" issues
 
 concurrency:
   group: refresh
@@ -39,6 +40,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run fetch
+      # One GitHub issue per group that failed (updated, not duplicated, on
+      # later runs; closed when it works again). A problem here never stops
+      # the refresh: the failed group just keeps its last events.
+      - name: report broken sources
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/source-issues.mjs
       # Build before committing, so data that breaks the site never gets pushed.
       - run: npm run build
       - name: commit changed event data
