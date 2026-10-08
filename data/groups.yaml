@@ -8,14 +8,15 @@
 #             or to override the Meetup feed
 #   source:   (optional) for groups with no feed: the name of a reader in
 #             scripts/sources/ that pulls events from their own website
-#   website:  (optional) the group's own homepage, shown next to the Meetup link
+#   website:  for groups not on Meetup only: their own site, where their events
+#             are read from and where their link goes. A Meetup group gets one
+#             link, its Meetup page, so there's one address to keep current.
 #   logo:     (optional) image URL, for groups whose logo isn't read from Meetup
 
 - id: cijug
   name: Central Iowa Java Users Group
   short: CIJUG
   meetup: https://www.meetup.com/central-iowa-java-users-group/
-  website: https://www.cijug.net/
 
 - id: pyowa
   name: Iowa Python User Group
@@ -31,7 +32,6 @@
   name: DSM Web Geeks
   short: Web Geeks
   meetup: https://www.meetup.com/des-moines-web-geeks/
-  website: https://www.dsmwebgeeks.com/
 
 - id: devopsdsm
   name: DevOpsDSM
