@@ -15,7 +15,7 @@ const monogram = (name: string) => name.split(/\s+/).filter(Boolean)
 ---
 <Layout nav="groups" updatedAt={updatedAt}
   headTitle="Des Moines tech meetup groups · DSM Tech Events"
-  description={`${groups.length} Des Moines and central Iowa tech user groups, including ${groups.slice(0, 5).map((g) => g.name).join(', ')} and more, with each one's next meetup.`}>
+  description={`${groups.length} Des Moines and central Iowa tech user groups: Python, Java, .NET, AI, AWS, security, UX and more, with each one's next meetup.`}>
   <h1 class="sr-only">Des Moines tech groups</h1>
   <div class="board">
     {sorted.map((g, i) => (
