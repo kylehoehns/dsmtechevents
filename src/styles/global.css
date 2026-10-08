@@ -390,7 +390,7 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   .day .pills { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
   .pill { display: block; font: 600 11px/1.25 var(--mono); padding: 2px 4px; background: var(--blue-fill); color: var(--on-blue); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pill i { font-style: normal; }
-  .pill.c { background: var(--on-pink); color: var(--pink-fill); font-weight: 700; }
+  .pill.conf { background: var(--on-pink); color: var(--pink-fill); font-weight: 700; }
   .day .more-n { font-size: 11px; color: var(--ink-soft); }
 }
 .cal-key { display: flex; gap: 16px; flex-wrap: wrap; font: 12px/1.3 var(--mono); margin-top: 8px; }

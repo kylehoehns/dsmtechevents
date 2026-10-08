@@ -75,29 +75,33 @@ function syncUrl() {
   else history.replaceState(null, '', url);
   synced = key;
 }
-const matches = (groupsAttr) => !state.group || (groupsAttr ?? '').split(' ').includes(state.group);
+// Does an event hosted by these groups pass the group filter?
+const matches = (ids) => !state.group || ids.includes(state.group);
+const hostsOf = (el) => (el.dataset.groups ?? '').split(' ');
 
 // ---- list ----
+// Returns how many events are showing.
 function renderList() {
-  let anyVisible = false;
+  let total = 0;
   for (const sec of $$('[data-sec]', listView)) {
     const items = $$('.show, .far > li', sec);
     let n = 0;
-    for (const el of items) { el.hidden = !matches(el.dataset.groups); if (!el.hidden) n++; }
+    for (const el of items) { el.hidden = !matches(hostsOf(el)); if (!el.hidden) n++; }
     sec.hidden = n === 0;
-    anyVisible ||= n > 0;
+    total += n;
     const count = $('[data-count]', sec);
-    count.textContent = $('.far', sec) ? `${n} on the books` : `${plural(n, 'event')}`;
+    count.textContent = $('.far', sec) ? `${n} on the books` : plural(n, 'event');
   }
   const empty = $('#list-empty');
-  empty.hidden = anyVisible;
-  if (!anyVisible && state.group) {
+  empty.hidden = total > 0;
+  if (!total && state.group) {
     const g = groups[state.group];
     empty.innerHTML = `Nothing on the books for this group right now. ${g.url
       ? `Check <a href="${escapeHtml(g.url)}" target="_blank" rel="noopener">their page<span class="sr-only"> (opens in new tab)</span></a> for what's next.`
       : 'Check their page for what\'s next.'}`;
   }
   squashRepeats();
+  return total;
 }
 
 // Don't print what the row above just said: the date for a second event on
@@ -122,7 +126,7 @@ function renderSide() {
   note.hidden = !state.group;
   if (state.group) note.innerHTML = `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <button type="button" data-chip="">Show all groups</button>`;
 
-  for (const p of $$('.poster')) p.hidden = !!state.group && !matches(p.dataset.groups);
+  for (const p of $$('.poster')) p.hidden = !!state.group && !matches(hostsOf(p));
   // The calendar already shows conference days in pink; skip the posters there.
   const headliners = $('#headliners');
   if (headliners) headliners.hidden = state.view === 'calendar' || $$('.poster', headliners).every((p) => p.hidden);
@@ -131,7 +135,7 @@ function renderSide() {
   const limit = Number(list.dataset.shown);
   let shown = 0;
   for (const li of $$('li', list)) {
-    li.hidden = !matches(li.dataset.groups);
+    li.hidden = !matches(hostsOf(li));
     if (!li.hidden) li.classList.toggle('extra', ++shown > limit);
   }
   const all = $('#recent-all');
@@ -145,7 +149,7 @@ function renderSide() {
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const addMonths = (ym, n) => { const d = new Date(`${ym}-01T00:00:00Z`); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString().slice(0, 7); };
 const eventsOn = (key) => events
-  .filter((e) => dayKey(e.start) <= key && key <= lastDay(e.start, e.end) && matches(e.groups.join(' ')))
+  .filter((e) => dayKey(e.start) <= key && key <= lastDay(e.start, e.end) && matches(e.groups))
   .sort((a, b) => a.start.localeCompare(b.start));
 const label = (e) => e.groups.length ? e.groups.map((id) => groups[id]?.short).join(' + ') : e.title.replace(/\s+20\d\d$/, '');
 
@@ -164,25 +168,28 @@ function pickDay(ym) {
   return keys.find((k) => (pastMonth || k >= today) && eventsOn(k).length) ?? (today.startsWith(ym) ? today : keys[0]);
 }
 
+// One day of the month grid: a button with the date, up to three event pills
+// (dots on a phone) and a spoken summary.
+function dayCell(key) {
+  const list = eventsOn(key);
+  const cls = ['day', key.startsWith(state.month) ? '' : 'outside', key < today ? 'past' : '', key === today ? 'today' : '', list.length ? 'has' : '', list.some((e) => e.featured) ? 'conf' : ''].filter(Boolean).join(' ');
+  const pills = list.slice(0, 3).map((e) => {
+    const ended = Date.parse(e.end) < now ? ' ended' : '';
+    return e.featured
+      ? `<span class="pill conf${ended}" title="${escapeHtml(e.title)}">${escapeHtml(label(e))}</span>`
+      : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : shortTime(e.start)}</i> ${escapeHtml(label(e))}</span>`;
+  }).join('') + (list.length > 3 ? `<span class="more-n">+${list.length - 3} more</span>` : '');
+  const dots = list.filter((e) => !e.featured).map(() => '<i class="dot"></i>').join('');
+  const name = `${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}`;
+  // Only the selected day is in the tab order; arrow keys move between days.
+  return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}">
+    <span class="sr-only">${name}</span><span class="n" aria-hidden="true">${Number(key.slice(8))}</span><span class="pills" aria-hidden="true">${pills}</span><span class="dots" aria-hidden="true">${dots}</span>
+  </button>`;
+}
+
 function renderCalendar() {
   if (!state.day || !state.day.startsWith(state.month)) state.day = pickDay(state.month);
-  const cells = monthCells(state.month).map((key) => {
-    const list = eventsOn(key);
-    const conf = list.some((e) => e.featured);
-    const cls = ['day', key.startsWith(state.month) ? '' : 'outside', key < today ? 'past' : '', key === today ? 'today' : '', list.length ? 'has' : '', conf ? 'conf' : ''].filter(Boolean).join(' ');
-    const pills = list.slice(0, 3).map((e) => {
-      const ended = Date.parse(e.end) < now ? ' ended' : '';
-      return e.featured
-        ? `<span class="pill c${ended}" title="${escapeHtml(e.title)}">${escapeHtml(label(e))}</span>`
-        : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : shortTime(e.start)}</i> ${escapeHtml(label(e))}</span>`;
-    }).join('') + (list.length > 3 ? `<span class="more-n">+${list.length - 3} more</span>` : '');
-    const dots = list.filter((e) => !e.featured).map(() => '<i class="dot"></i>').join('');
-    const name = `${dayName(key)}${list.length ? `, ${list.length} event${list.length > 1 ? 's' : ''}` : ', nothing scheduled'}`;
-    // Only the selected day is in the tab order; arrow keys move between days.
-    return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}">
-      <span class="sr-only">${name}</span><span class="n" aria-hidden="true">${Number(key.slice(8))}</span><span class="pills" aria-hidden="true">${pills}</span><span class="dots" aria-hidden="true">${dots}</span>
-    </button>`;
-  });
+  const cells = monthCells(state.month).map(dayCell);
   const [y] = state.month.split('-');
   // Rebuilding the grid drops focus. Remember what had it and put it back.
   const had = calView.contains(document.activeElement) ? document.activeElement : null;
@@ -210,7 +217,7 @@ function renderDayPanel() {
   const n = daysBetween(today, state.day);
   const rel = n === 0 ? ' · today' : n === 1 ? ' · tomorrow' : '';
   dayPanel.innerHTML = `<h2>${dayName(state.day)}</h2>
-    <p class="sub">${list.length ? `${plural(list.length, 'event')}` : 'A quiet day'}${rel}</p>`;
+    <p class="sub">${list.length ? plural(list.length, 'event') : 'A quiet day'}${rel}</p>`;
   if (!list.length) {
     dayPanel.insertAdjacentHTML('beforeend', '<p class="none">Nothing on the books. Pick a day with a mark.</p>');
     return;
@@ -237,13 +244,14 @@ function renderMinical() {
     if (!key.startsWith(ym)) return '<span class="blank" aria-hidden="true"></span>';
     const list = eventsOn(key);
     const cls = [list.length ? 'has' : '', list.some((e) => e.featured) ? 'conf' : '', key === today ? 'today' : '', key < today ? 'past' : ''].filter(Boolean).join(' ');
-    return `<button type="button" class="${cls}" data-goto="${key}" aria-label="${dayName(key)}, ${list.length || 'no'} event${list.length === 1 ? '' : 's'}">${Number(key.slice(8))}</button>`;
+    return `<button type="button" class="${cls}" data-goto="${key}" aria-label="${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'no events'}">${Number(key.slice(8))}</button>`;
   });
   minical.innerHTML = `<h2>${monthName(ym)} <a href="?view=calendar" data-nav="calendar">Full calendar</a></h2>
     <div class="mini-grid">${WEEKDAYS.map((d) => `<span class="wd" aria-hidden="true">${d[0]}</span>`).join('')}${cells.join('')}</div>`;
 }
 
 // ---- render ----
+let listShown = 0;
 function render() {
   const viewName = state.view === 'calendar' ? 'Calendar' : '';
   const groupName = state.group ? groups[state.group].short : '';
@@ -257,19 +265,18 @@ function render() {
   // CSS that reads it must agree with the hidden flags above.
   if (state.view === 'calendar') document.documentElement.dataset.view = 'calendar';
   else delete document.documentElement.dataset.view;
-  if (state.view === 'list') { renderList(); renderMinical(); } else renderCalendar();
+  if (state.view === 'list') { listShown = renderList(); renderMinical(); } else renderCalendar();
   renderSide();
   syncUrl();
 }
 
-const visibleCount = () => $$('.show, .far > li', listView).filter((el) => !el.hidden && !el.closest('[hidden]')).length;
-const monthCount = () => events.filter((e) => dayKey(e.start).startsWith(state.month) && matches(e.groups.join(' '))).length;
+const monthCount = () => events.filter((e) => dayKey(e.start).startsWith(state.month) && matches(e.groups)).length;
 function announceFilter() {
   const who = state.group ? ` from ${groups[state.group].short}` : '';
-  if (state.view === 'list') { const n = visibleCount(); announce(`Showing ${plural(n, 'event')}${who}`); }
-  else { const n = monthCount(); announce(`Calendar showing ${plural(n, 'event')}${who} in ${monthName(state.month)}`); }
+  if (state.view === 'list') announce(`Showing ${plural(listShown, 'event')}${who}`);
+  else announce(`Calendar showing ${plural(monthCount(), 'event')}${who} in ${monthName(state.month)}`);
 }
-const dayStatus = () => { const n = eventsOn(state.day).length; return `${dayName(state.day)}: ${n ? `${plural(n, 'event')}` : 'nothing scheduled'}`; };
+const dayStatus = () => { const n = eventsOn(state.day).length; return `${dayName(state.day)}: ${n ? plural(n, 'event') : 'nothing scheduled'}`; };
 
 // ---- events ----
 document.addEventListener('click', (ev) => {
