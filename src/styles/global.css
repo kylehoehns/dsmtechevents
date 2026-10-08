@@ -437,6 +437,9 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 @media (min-width: 1240px) { .board { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .flyer { position: relative; background: var(--sheet); border: 1.5px solid var(--line); padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px 12px; align-content: start; }
 .flyer.has-logo { grid-template-columns: 60px minmax(0, 1fr); }
+/* /groups/#pyowa-style links: make the card you landed on obvious */
+.flyer { scroll-margin-top: 16px; }
+.flyer:target { outline: 4px solid var(--pink-fill); outline-offset: 3px; }
 /* logos in their own colors: they're each group's identity, not ours to reprint */
 .flyer .logo-img { grid-row: span 3; width: 60px; height: 60px; object-fit: contain; background: #fff; border: 1.5px solid var(--line); padding: 3px; }
 .flyer h2 { margin: 0; font: 900 28px/0.9 var(--display); text-transform: uppercase; overflow-wrap: anywhere; }
