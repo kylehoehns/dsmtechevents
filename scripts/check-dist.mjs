@@ -7,8 +7,12 @@
 //
 // Titles: Slack's link preview shows "&" as a literal "&amp;", so titles and
 // share text say "and".
+//
+// CSP: every inline script must have its hash in dist/_headers (written by
+// scripts/csp.mjs), or the browser refuses to run it.
 import fs from 'node:fs';
 import path from 'node:path';
+import { inlineScripts, scriptHash, scriptSrc, PLACEHOLDER } from './csp.mjs';
 
 const dist = path.resolve('dist');
 const pages = fs.readdirSync(dist, { recursive: true }).filter((f) => f.endsWith('.html')).map((f) => path.join(dist, f));
@@ -35,6 +39,22 @@ for (const file of pages) {
   // Structured data must parse, or search engines drop it silently.
   for (const m of raw.matchAll(/<script type="application\/(?:ld\+)?json"[^>]*>([\s\S]*?)<\/script>/g)) {
     try { JSON.parse(m[1]); } catch (err) { problems.push(`${rel}: embedded JSON doesn't parse (${err.message})`); }
+  }
+}
+
+// Inline scripts the CSP doesn't allow would be blocked in production only
+// (the dev server sends no _headers), so check them here.
+const headers = fs.readFileSync(path.join(dist, '_headers'), 'utf8');
+const policies = scriptSrc(headers);
+if (!policies.length) problems.push('_headers: no Content-Security-Policy with a script-src');
+if (headers.includes(PLACEHOLDER)) problems.push(`_headers: ${PLACEHOLDER} was not replaced (run scripts/csp.mjs after astro build)`);
+if (policies.some((p) => p.includes("'unsafe-inline'"))) problems.push("_headers: script-src allows 'unsafe-inline'");
+// Cloudflare ignores a _headers line over 2,000 characters.
+for (const line of headers.split('\n')) if (line.length > 2000) problems.push(`_headers: a ${line.length}-character line (Cloudflare's limit is 2,000): ${line.slice(0, 40)}…`);
+for (const file of pages) {
+  for (const body of inlineScripts(fs.readFileSync(file, 'utf8'))) {
+    const hash = scriptHash(body);
+    if (!policies.every((p) => p.includes(hash))) problems.push(`${path.relative(dist, file)}: inline script with no CSP hash (${hash}): ${body.trim().slice(0, 50)}…`);
   }
 }
 
