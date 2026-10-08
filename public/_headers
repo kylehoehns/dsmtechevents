@@ -13,6 +13,7 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
   Content-Security-Policy: script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com https://secure.meetupstatic.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
   Strict-Transport-Security: max-age=31536000
+  Cross-Origin-Opener-Policy: same-origin
 
 /
   Cache-Control: no-cache

@@ -30,6 +30,9 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={`${site.name}: meetups, user groups and conferences in Des Moines, Iowa`} />
     <meta name="twitter:card" content="summary_large_image" />
+    {/* Event photos come from Meetup; start that connection early. The service
+        worker fetches them anonymously (CORS), hence crossorigin. */}
+    <link rel="preconnect" href="https://secure.meetupstatic.com" crossorigin />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
     <link rel="icon" href="/icons/icon-32.png" type="image/png" sizes="32x32" />
