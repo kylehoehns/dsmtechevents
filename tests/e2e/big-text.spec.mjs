@@ -13,7 +13,6 @@ const VIEWS = [
   ['/?view=calendar', (page) => page.getByRole('button', { name: /^Thursday, October 22,/ }).click()],
   ['/groups/', null],
   ['/about/', null],
-  ['/add/', null],
   ['/organizers/', null],
   ['/status/', null],
   ['/404', null],

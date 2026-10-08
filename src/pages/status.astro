@@ -1,7 +1,8 @@
 ---
 // Where each group's events come from and whether the latest refresh could
-// read them. Linked from /about/; kept out of search engines (noindex, and not
-// in the sitemap), since it's for the curious and for the groups themselves.
+// read them. Linked from /about/ and /organizers/; kept out of search engines
+// (noindex, and not in the sitemap), since it's for the curious and for the
+// groups themselves.
 //
 // Health is data/cache/status.json, which the refresh writes and commits
 // (scripts/source-status.mjs): only groups that failed are in it. Quiet groups
@@ -52,11 +53,11 @@ const health = (h: any) => !h ? ['unknown', 'Not checked yet']
         <dt>Healthy</dt>
         <dd>The latest check read the group's page without an error.</dd>
         <dt>Partial</dt>
-        <dd>Its events came in, but the extra details from its Meetup events page (venue, photo, RSVPs) didn't.</dd>
+        <dd>Its events came in, but the extra details from its Meetup events page (venue, photo, how many are going) didn't.</dd>
         <dt>Failing</dt>
         <dd>Its page couldn't be read, so the site is showing the events it had from the last good check. Each one has an <a href={`${site.repo}/issues?q=label%3Asource-broken`}>open issue on GitHub</a> until it's fixed.</dd>
         <dt>Changed</dt>
-        <dd>When that group's listing here last changed: a new event, a new time, a new RSVP count. Not when it was last checked.</dd>
+        <dd>When that group's listing here last changed: a new event, a new time, more people going. Not when it was last checked.</dd>
         <dt>Quiet</dt>
         <dd>Nothing coming up and no meetup in the past year. Quiet groups are hidden from the other pages and come back on their own when they post an event.</dd>
       </dl>

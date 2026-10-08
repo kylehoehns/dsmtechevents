@@ -90,7 +90,8 @@ The `/tv/` page labels events in the browser and reloads itself hourly.
 Cards for events the list doesn't print in full (past events, repeat dates,
 far-off ones) live in `/cards/` (`src/pages/cards.astro`), not the home
 page. The calendar's day panel and search fetch it the first time they need
-it.
+it. It also holds a one-line row for every past event, the archive
+included, which a search shows in its "Past" section.
 
 `public/sw.js` is the service worker. Pages and `/cards/` are network-first
 with a 3 second fallback to the cached copy. CSS, JS and fonts are

@@ -34,7 +34,8 @@ export const dayName = (key) => fullDate(`${key}T17:00:00Z`); // "Thursday, Octo
 export const monthName = (key, withYear = false) => (withYear ? monthYear : monthLong).format(new Date(`${key.slice(0, 7)}-15T17:00:00Z`));
 export const plural = (n, word) => `${n} ${n === 1 ? word : `${word}s`}`;
 // The line under "Recently"; app.js redoes it when a group filter narrows the list.
-export const recentSummary = (events, rsvps) => `The last three months. ${plural(events, 'event')}, ${plural(rsvps, 'RSVP')}.`;
+// "411 people went" matches the "18 went" on each row.
+export const recentSummary = (events, went) => `The last three months. ${plural(events, 'event')}, ${went} ${went === 1 ? 'person' : 'people'} went.`;
 // "Tonight" for something starting at 4pm or later, "Today" for a noon talk.
 export const todayWord = (iso) => (Number(hourFmt.format(new Date(iso))) >= 16 ? 'Tonight' : 'Today');
 

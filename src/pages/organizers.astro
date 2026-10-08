@@ -1,14 +1,25 @@
 ---
-// For group organizers and hosts: the tools in one place. Getting listed
-// stays on /add/ (where the footer's call to action goes), so it's a pointer
-// here. "Put your event on a screen" makes a /tv/?event=… link (the event
-// mode in src/scripts/tv-event.ts); nothing is stored.
+// For group organizers and hosts, in one place: getting listed first (the
+// footer's call to action lands here; /add/ redirects here too, see
+// public/_redirects), then the tools. "Put your event on a screen" makes a
+// /tv/?event=… link (the event mode in src/scripts/tv-event.ts); nothing is
+// stored.
 import Layout from '../layouts/Layout.astro';
 import { site } from '../lib/site.mjs';
 import { loadData } from '../lib/data.mjs';
 import { weekday, month, day } from '../lib/format.mjs';
 
 const { upcoming, updatedAt } = loadData();
+
+// The "Open in your email app" button starts the email with what we need.
+const subject = 'Add to DSM Tech Events';
+const body = [
+  'Group or event name:',
+  'Meetup link (or website / calendar link):',
+  'For a one-off event — date, time, venue and RSVP link:',
+  'Anything else we should know:',
+].join('\n\n');
+const mailto = `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 // Every upcoming event, by date. The browser drops any that have ended since the build.
 const choices = upcoming.map((e) => ({
   id: e.id,
@@ -27,16 +38,45 @@ const snippets = [
 ];
 ---
 <Layout nav="organizers" updatedAt={updatedAt} headTitle="For organizers · DSM Tech Events"
-  description="Tools for Des Moines tech meetup organizers and hosts: get listed, check your listing, put your event on the venue's TV, and a badge for your site.">
+  description="Get your Des Moines tech meetup, user group, conference or one-off event listed on DSM Tech Events, then put your event on the venue's TV and add a badge to your site.">
   <div class="page-head"><h1>For organizers</h1></div>
 
   <div class="add-page">
-    <p class="lede">Run a group or host an event? Here's what the site can do for you. It's all free, and none of it needs an account.</p>
+    <p class="lede">Run a group or host an event? Here's how to get it listed, and what the site can do for you after that. None of it needs an account.</p>
 
     <section>
       <h2>Get listed</h2>
-      <p>If your group is on Meetup, send us the link once and new events show up on their own. <a href="/add/">Here's how to get listed</a>.</p>
+      <p>The site lists public tech meetups, user groups and conferences in and around Des Moines. One-off events are welcome too: a conference, a workshop, a hack day. We link to your Meetup page or site, and people RSVP there, not here.</p>
+      <p>What fits:</p>
+      <ul>
+        <li>Tech-focused: software, data, security, product, design, hardware, and so on.</li>
+        <li>Open to the public. No members-only or invite-only events.</li>
+        <li>In the Des Moines area, or online and run by a local group.</li>
+      </ul>
     </section>
+
+    <section>
+      <h2>What to send</h2>
+      <ul>
+        <li>Your group or event's name.</li>
+        <li>For a group: its Meetup link. Not on Meetup? A website or public calendar link works too.</li>
+        <li>For a one-off event: the date, time, venue, and a link where people can RSVP or learn more.</li>
+      </ul>
+      <p>If your group is on Meetup, that's all. New events show up on their own.</p>
+    </section>
+
+    <section class="email-box" aria-labelledby="email-h">
+      <h2 id="email-h">Send it here</h2>
+      <p class="address"><span id="add-email">{site.email}</span></p>
+      <div class="email-actions">
+        <button type="button" class="btn btn-outline" data-copy-from="add-email">Copy address</button>
+        <a class="primary btn btn-solid" href={mailto}>Open in your email app <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <p class="dev-note">
+      Prefer GitHub? The site is open source. <a href={`${site.repo}#get-your-group-or-event-listed`}>Open a pull request</a> with your group in <code>data/groups.yaml</code> or your event in <code>data/events.yaml</code>.
+    </p>
 
     <section>
       <h2>Is your listing working?</h2>

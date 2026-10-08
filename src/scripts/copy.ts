@@ -1,4 +1,4 @@
-// Copy buttons (/add/ and /organizers/). Without clipboard access, select
+// Copy buttons (/organizers/). Without clipboard access, select
 // the text on the page instead, so it can be copied by hand.
 export async function copyText(text: string, shown: HTMLElement) {
   try {

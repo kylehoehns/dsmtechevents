@@ -13,7 +13,7 @@ members-only or invite-only events.
 
 **How to ask**, whichever is easier:
 
-- Email hello@dsmtechevents.com. The [Add page](https://dsmtechevents.com/add/)
+- Email hello@dsmtechevents.com. The [For organizers page](https://dsmtechevents.com/organizers/)
   lists what to send and has a fill-in email.
 - Open an issue with the
   [Add a group or event](https://github.com/kylehoehns/dsmtechevents/issues/new?template=add-listing.yml) form.
@@ -22,9 +22,9 @@ members-only or invite-only events.
 group's public Meetup calendar every few hours, so new events show up on
 their own and fixes you make on Meetup carry over. Groups not on Meetup can
 send a website or public calendar (`.ics`) link. For a one-off event, send
-the date, time, venue and a sign-up link.
+the date, time, venue and an RSVP link.
 
-People sign up on your page, not ours. The site only links to it.
+People RSVP on your page, not ours. The site only links to it.
 
 Something wrong with a listing? Use the
 [listing form](https://github.com/kylehoehns/dsmtechevents/issues/new?template=fix-listing.yml), or fix it on

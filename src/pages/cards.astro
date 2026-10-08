@@ -4,15 +4,33 @@
 // fetches it on first use (app.js), which keeps ~120KB of hidden cards out of
 // the home page; sw.js saves it for offline. Not a page for people: no
 // styles, kept out of search.
+//
+// It also holds a one-line row for every past event, archive included, which
+// a search shows in its "Past" section (app.js).
 import EventCard from '../components/EventCard.astro';
 import { loadData } from '../lib/data.mjs';
-import { splitEvents } from '../lib/pool.mjs';
+import { splitEvents, pastEvents } from '../lib/pool.mjs';
+import { dayKey, month, day } from '../lib/format.mjs';
 
 const data = loadData();
-const { pooled } = splitEvents(data);
+const { pooled, today } = splitEvents(data);
+const pastRows = pastEvents(data);
+const year = (e) => (dayKey(e.start).slice(0, 4) === today.slice(0, 4) ? '' : `, ${dayKey(e.start).slice(0, 4)}`);
 ---
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Card pool</title></head>
-<body><ul>{pooled.map((e) => <EventCard event={e} byId={data.byId} />)}</ul></body>
+<body><ul>{pooled.map((e) => <EventCard event={e} byId={data.byId} />)}</ul>
+<ol id="past">{pastRows.map((e) => (
+  <li data-groups={e.groupIds.join(' ')} data-id={e.id}>
+    <span class="row-date">{month(e.start)} {day(e.start)}{year(e)}</span>
+    <a href={e.url ?? data.byId[e.groupIds[0]]?.meetupUrl} target="_blank" rel="noopener" data-click="past">
+      <span class="row-group">{e.hostsLabel}</span>
+      <span class="row-title">{e.title}</span>
+      <span class="row-where">{e.online ? 'Online' : e.venue ? `@ ${e.venue}` : ''}</span>
+      <span class="sr-only"> (opens in new tab)</span>
+    </a>
+    <span class="row-going">{e.going ? <><b>{e.going}</b> went</> : ''}</span>
+  </li>
+))}</ol></body>
 </html>

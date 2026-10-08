@@ -52,7 +52,7 @@ test.describe('iOS install hint', () => {
 
     // Scrolled to the bottom, every footer link can be tapped.
     await again.evaluate(() => scrollTo(0, document.body.scrollHeight));
-    for (const name of ['About this site', 'For organizers']) {
+    for (const name of ['About this site', 'Add your group or event']) {
       const clear = await again.getByRole('link', { name }).evaluate((a) => {
         const b = a.getBoundingClientRect();
         return a.contains(document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2));
@@ -128,11 +128,11 @@ for (const q of ['🎉', '"', '-', '...']) {
   test(`searching only "${q}" finds nothing and says so`, async ({ page }) => {
     await page.goto(`/?q=${encodeURIComponent(q)}`);
     await expect(page.locator('#list-empty')).toBeVisible();
-    await expect(page.locator('#list-empty')).toContainText('Nothing coming up matches');
+    await expect(page.locator('#list-empty')).toContainText('coming up or past');
     await expect(page.locator('#list-view .show:visible')).toHaveCount(0);
 
     await page.locator('#q').fill(`${q}${q}`);
-    await expect(page.getByRole('status')).toHaveText(`Nothing coming up matches '${q}${q}'`);
+    await expect(page.getByRole('status')).toHaveText(`Nothing matches '${q}${q}', coming up or past`);
   });
 }
 

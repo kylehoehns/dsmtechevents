@@ -78,7 +78,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
                 <p class="when">{e.multiDay ? dateRange(e.start, e.end) : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
                 <span class="stamp-days countdown" data-start={e.start} data-end={e.end} data-days={e.multiDay && !e.allDay ? '' : undefined}>{countdown(e.start, e.end, Date.now(), e)}</span>
                 <p class="where">{e.venue}{e.address && <><br />{e.address}</>}</p>
-                <a class="go btn btn-outline" href={e.url} target="_blank" rel="noopener" data-click="poster">Tickets & info<span class="sr-only">: {e.title} (opens in new tab)</span> <OutArrow /></a>
+                <a class="go btn btn-outline" href={e.url} target="_blank" rel="noopener" data-click="poster">RSVP & info<span class="sr-only">: {e.title} (opens in new tab)</span> <OutArrow /></a>
               </div>
             </article>
           ))}
@@ -124,6 +124,13 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
           </section>
         )}
         <p class="empty" id="list-empty" hidden>Nothing on the books for this group right now. Check their page for what's next.</p>
+      </section>
+
+      {/* A search's past matches, newest first. The rows come with the card
+          pool (/cards/), which a search fetches, so they cost the page nothing. */}
+      <section class="sec past-results" id="past-results" aria-labelledby="past-h" hidden>
+        <div class="sec-head"><h2 id="past-h">Past</h2><span class="count" data-count></span></div>
+        <ol class="setlist far"></ol>
       </section>
 
       <section id="calendar-view" aria-label="Calendar" hidden></section>
