@@ -44,7 +44,7 @@ export default async function secdsm(group, { get }) {
       sourceId: date,
       title,
       start: localToUtc(date, doors),
-      end: localToUtc(date, '20:30'),
+      end: new Date(Date.parse(localToUtc(date, doors)) + 150 * 60_000).toISOString(), // they run about 2½ hours
       allDay: false,
       url: new URL('/#schedule', base).href,
       description,

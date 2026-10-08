@@ -81,8 +81,17 @@ export function typicalGoing(details, now) {
 
 // Fill in the feed's upcoming events from the page, and pick up the page's
 // recent past events, which the feed doesn't include.
+// The feed stays the source for an upcoming event's title, time and link; the
+// page only adds these. An event the page says is cancelled is dropped even if
+// the feed still lists it.
+const FROM_PAGE = ['venue', 'address', 'online', 'hybrid', 'image', 'going', 'description'];
 export function enrich(upcoming, details, group, { now, cutoff }) {
-  for (const ev of upcoming) Object.assign(ev, details.events.get(ev.sourceId) ?? {});
+  for (let i = upcoming.length - 1; i >= 0; i--) {
+    const page = details.events.get(upcoming[i].sourceId);
+    if (!page) continue;
+    if (page.status === 'CANCELLED') { upcoming.splice(i, 1); continue; }
+    for (const k of FROM_PAGE) if (page[k] !== undefined && page[k] !== '') upcoming[i][k] = page[k];
+  }
   const recent = [];
   for (const [id, ev] of details.events) {
     const end = Date.parse(ev.end);

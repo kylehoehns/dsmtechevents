@@ -48,7 +48,7 @@ test('hand-added events use Des Moines time and span days', () => {
 test('groups know their next event, upcoming count and last event', () => {
   const g = data.byId.webgeeks;
   assert.equal(g.nextEvent.title, 'Hacktoberfest');
-  assert.equal(g.upcomingCount, 4);
+  assert.equal(g.upcomingCount, 2, 'Hacktoberfest + the monthly series, counted once like its row and chip');
   assert.equal(g.lastEvent.title, 'Spring recap');
   assert.equal(data.byId.cijug.logo, null);
   assert.equal(data.updatedAt, '2026-10-07T15:20:00.000Z', 'newest fetch time across groups');
@@ -59,6 +59,8 @@ test('shortAddress drops the Des Moines ending but keeps suburbs', () => {
   assert.equal(shortAddress('555 17th Street,, Des Moines'), '555 17th Street');
   assert.equal(shortAddress('111 S 11th St, Ste 100, West Des Moines, IA 50265'), '111 S 11th St, Ste 100, West Des Moines');
   assert.equal(shortAddress('9131 Northpark Dr, Johnston, IA 50131-1234'), '9131 Northpark Dr, Johnston');
+  assert.equal(shortAddress('22 9th Street, Des Moines, IA'), '22 9th Street', 'no ZIP');
+  assert.equal(shortAddress('1055 SW Prairie Trail Pkwy, Ankeny, Iowa'), '1055 SW Prairie Trail Pkwy, Ankeny');
   assert.equal(shortAddress(undefined), null);
 });
 

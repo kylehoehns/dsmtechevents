@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import EventCard from '../components/EventCard.astro';
 import { loadData } from '../lib/data.mjs';
 import { eventJsonLd, websiteJsonLd, toScript } from '../lib/jsonld.mjs';
-import { dayKey, weekday, day, month, shortTime, addDays, daysBetween, monthName, plural, countdown } from '../lib/format.mjs';
+import { dayKey, lastDay, weekday, day, month, shortTime, addDays, daysBetween, monthName, plural, countdown } from '../lib/format.mjs';
 
 const { events, upcoming, past, groups, byId, updatedAt } = loadData();
 
@@ -41,6 +41,8 @@ const pooled = [...upcoming.filter((e) => e.repeat), ...far, ...past];
 // they're just a pink row at their date in the list. A poster stays up
 // until its conference is over.
 const HEADLINER_DAYS = 30;
+const DAYS_WORD = ['One', 'Two', 'Three', 'Four', 'Five'];
+const conferenceLength = (e: any) => { const n = daysBetween(dayKey(e.start), lastDay(e.start, e.end)) + 1; return `${DAYS_WORD[n - 1] ?? n}-day conference`; };
 const featured = upcoming.filter((e) => e.featured && daysBetween(today, dayKey(e.start)) <= HEADLINER_DAYS);
 
 const counts = Object.fromEntries(groups.map((g) => [g.id, listed.filter((e) => e.groupIds.includes(g.id)).length]));
@@ -77,7 +79,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
               <div class="poster-full">
                 <span class="halftone" aria-hidden="true" />
                 <span class="tape" aria-hidden="true" />
-                <div class="bill"><span>Headliner</span><span>{e.multiDay ? 'Two-day conference' : 'One-day conference'}</span></div>
+                <div class="bill"><span>Headliner</span><span>{conferenceLength(e)}</span></div>
                 <h2>{e.title}</h2>
                 <p class="when">{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
                 <span class="stamp-days countdown" data-start={e.start}>{countdown(e.start)}</span>
@@ -167,6 +169,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
     {pooled.map((e) => <EventCard event={e} byId={byId} />)}
   </template>
 
-  <script type="application/json" id="calendar-data" set:html={JSON.stringify(calendarData)} />
+  {/* toScript escapes "<", so an event title can't close this tag. */}
+  <script type="application/json" id="calendar-data" set:html={toScript(calendarData)} />
   <script>import '../scripts/app.js';</script>
 </Layout>

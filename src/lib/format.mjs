@@ -16,6 +16,10 @@ const hourFmt = fmt({ hour: 'numeric', hourCycle: 'h23' });
 
 export const DAY = 86_400_000;
 export const dayKey = (when) => keyFmt.format(new Date(when)); // "2026-10-22"; takes an ISO string or a timestamp
+// The last day an event is on. An event ending at midnight ends the day before.
+export const lastDay = (start, end) => dayKey(Math.max(Date.parse(start), Date.parse(end) - 1));
+// A real calendar date in YYYY-MM-DD form (rejects 2026-13-45 and 2026-02-30).
+export const isDayKey = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s ?? '') && !Number.isNaN(Date.parse(s)) && new Date(Date.parse(s)).toISOString().startsWith(s);
 export const weekday = (iso) => weekdayShort.format(new Date(iso));
 export const month = (iso) => monthShort.format(new Date(iso));
 export const day = (iso) => dayNum.format(new Date(iso));
@@ -35,7 +39,7 @@ export const todayWord = (iso) => (Number(hourFmt.format(new Date(iso))) >= 16 ?
 // so both must call this.
 export function whenLabel(start, end, now = Date.now()) {
   const today = dayKey(now);
-  if (dayKey(start) <= today && today <= dayKey(end)) return Date.parse(start) <= now ? 'Happening now' : todayWord(start);
+  if (dayKey(start) <= today && today <= lastDay(start, end)) return Date.parse(start) <= now ? 'Happening now' : todayWord(start);
   return daysBetween(today, dayKey(start)) === 1 ? 'Tomorrow' : '';
 }
 

@@ -3,7 +3,7 @@
 // the month calendar and the mini calendar in the side rail.
 // State lives in the URL (?view=calendar&group=cijug&day=2026-10-15) so any
 // view can be shared or bookmarked.
-import { dayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown } from '../lib/format.mjs';
+import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -49,8 +49,10 @@ const state = {};
 function readUrl() {
   const params = new URLSearchParams(location.search);
   state.view = params.get('view') === 'calendar' ? 'calendar' : 'list';
-  state.group = groups[params.get('group')] ? params.get('group') : '';
-  state.day = /^\d{4}-\d{2}-\d{2}$/.test(params.get('day') ?? '') ? params.get('day') : null;
+  // Ignore unknown groups (and inherited names like ?group=constructor) and
+  // dates that don't exist, rather than rendering an empty or broken page.
+  state.group = Object.hasOwn(groups, params.get('group') ?? '') ? params.get('group') : '';
+  state.day = isDayKey(params.get('day')) ? params.get('day') : null;
   state.month = (state.day ?? today).slice(0, 7);
 }
 readUrl();
@@ -143,7 +145,7 @@ function renderSide() {
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const addMonths = (ym, n) => { const d = new Date(`${ym}-01T00:00:00Z`); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString().slice(0, 7); };
 const eventsOn = (key) => events
-  .filter((e) => dayKey(e.start) <= key && key <= dayKey(e.end) && matches(e.groups.join(' ')))
+  .filter((e) => dayKey(e.start) <= key && key <= lastDay(e.start, e.end) && matches(e.groups.join(' ')))
   .sort((a, b) => a.start.localeCompare(b.start));
 const label = (e) => e.groups.length ? e.groups.map((id) => groups[id]?.short).join(' + ') : e.title.replace(/\s+20\d\d$/, '');
 
@@ -261,7 +263,7 @@ function render() {
 }
 
 const visibleCount = () => $$('.show, .far > li', listView).filter((el) => !el.hidden && !el.closest('[hidden]')).length;
-const monthCount = () => events.filter((e) => e.start.startsWith(state.month) && matches(e.groups.join(' '))).length;
+const monthCount = () => events.filter((e) => dayKey(e.start).startsWith(state.month) && matches(e.groups.join(' '))).length;
 function announceFilter() {
   const who = state.group ? ` from ${groups[state.group].short}` : '';
   if (state.view === 'list') { const n = visibleCount(); announce(`Showing ${plural(n, 'event')}${who}`); }
