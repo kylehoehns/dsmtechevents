@@ -1,0 +1,50 @@
+---
+// Who runs this, how the listings get here, and what to do when one is wrong.
+// Linked from the footer, not the top nav.
+import Layout from '../layouts/Layout.astro';
+import { loadData } from '../lib/data.mjs';
+import { site } from '../lib/site.mjs';
+
+const { groups, updatedAt } = loadData();
+---
+<Layout nav="about" updatedAt={updatedAt} headTitle="About · DSM Tech Events"
+  description="DSM Tech Events is one calendar of every public tech meetup, user group and conference in the Des Moines area, pulled from each group's own page four times a day.">
+  <div class="page-head"><h1>About</h1></div>
+
+  <div class="add-page">
+    <p class="lede">
+      DSM Tech Events puts every public tech meetup, user group and conference in the Des Moines area on one calendar,
+      so you don't have to check {groups.length} different pages to find out what's on this week.
+    </p>
+
+    <section>
+      <h2>How it works</h2>
+      <ul>
+        <li>Events come straight from each group's Meetup page or website, four times a day. Conferences and one-off events are added by hand.</li>
+        <li>We only point the way. You RSVP or register on the group's own page, and the group runs the event.</li>
+        <li>We're not affiliated with any of the groups. If a listing looks wrong, the group's page is the one to trust. Let us know and we'll fix it.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Who runs it</h2>
+      <p>
+        Made by <a href="https://github.com/kylehoehns">Kyle Hoehns</a>, a Des Moines user group organizer.
+        The code is <a href={site.repo}>open source on GitHub</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Privacy</h2>
+      <p>No accounts and no tracking cookies. Cloudflare Web Analytics counts visits without identifying anyone.</p>
+    </section>
+
+    <section>
+      <h2>Get in touch</h2>
+      <p>
+        Corrections, ideas or questions: <a href={`mailto:${site.email}`}>{site.email}</a>.
+        Want your group or event listed? <a href="/add/">Here's how</a>.
+      </p>
+    </section>
+  </div>
+</Layout>
