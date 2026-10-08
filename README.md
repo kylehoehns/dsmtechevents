@@ -72,6 +72,13 @@ Cloudflare Workers static assets, connected to `main` with Workers Builds.
 `wrangler.jsonc` holds the config and lists the dashboard build settings.
 Every push to `main` deploys, including the data refresh commits.
 
+`main` is protected by a GitHub ruleset: no direct pushes, no force pushes,
+and pull requests merge only after the `ci` check (`test-and-build`) passes.
+The refresh workflow is the one exception. It pushes event data with a deploy
+key (secret `REFRESH_DEPLOY_KEY`), and the ruleset lets deploy keys bypass it.
+To rotate the key, make a new one with `ssh-keygen -t ed25519`, add the public
+half under Settings → Deploy keys with write access, and replace the secret.
+
 To refresh events right away instead of waiting for the next scheduled run:
 
 ```sh
