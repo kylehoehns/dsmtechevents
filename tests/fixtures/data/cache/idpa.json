@@ -1,0 +1,10 @@
+{
+  "fetchedAt": "2026-10-06T10:20:00.000Z",
+  "logo": null,
+  "lastMet": "2025-09-08T23:00:00.000Z",
+  "enriched": true,
+  "events": [
+    { "id": "idpa-1", "title": "IDPA is back: SQL Server 2025", "start": "2026-10-26T23:00:00.000Z", "end": "2026-10-27T01:00:00.000Z", "allDay": false, "venue": "Online", "online": true },
+    { "id": "idpa-2", "title": "IDPA November", "start": "2026-11-09T23:30:00.000Z", "end": "2026-11-10T01:00:00.000Z", "allDay": false, "venue": "Online", "online": true }
+  ]
+}

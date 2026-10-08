@@ -104,3 +104,46 @@ test('every hand-written event and group website link is a web address', async (
   assert.ok(links.length > 3);
   for (const [name, url] of links) assert.match(String(url), /^https?:\/\//i, `${name}: ${url}`);
 });
+
+test('a quiet group (nothing coming up, no meetup in a year) is hidden but kept', () => {
+  const ux = data.byId.uxdsm;
+  assert.equal(ux.quiet, true);
+  assert.equal(ux.lastMet, '2024-08-28T23:00:00.000Z', 'from the Meetup page, via the cache');
+  assert.ok(!data.groups.includes(ux), 'not listed');
+  assert.ok(data.allGroups.includes(ux), 'still there for /status/');
+  assert.equal(ux.returning, false);
+});
+
+test('a group that met recently but has nothing scheduled stays listed', () => {
+  const azure = data.byId.azure;
+  assert.equal(azure.lastMet, '2026-07-22T17:00:00.000Z', 'only the archive knows this one');
+  assert.equal(azure.quiet, false);
+  assert.ok(data.groups.includes(azure));
+});
+
+test('a quiet group that posts an event is listed and marked "Back!" on that event only', () => {
+  const idpa = data.byId.idpa;
+  assert.deepEqual([idpa.quiet, idpa.returning], [false, true]);
+  assert.deepEqual(find('IDPA is back: SQL Server 2025').back, ['idpa']);
+  assert.equal(find('IDPA November').back, undefined, 'not the one after');
+  // Once that event is over, lastMet catches up and the tag goes away.
+  const later = loadData({ dataDir, now: Date.parse('2026-10-28T12:00:00Z') });
+  assert.equal(later.byId.idpa.returning, false);
+});
+
+test('an ordinary group is neither quiet nor returning', () => {
+  const g = data.byId.webgeeks;
+  assert.deepEqual([g.quiet, g.returning], [false, false]);
+  assert.deepEqual(data.events.filter((e) => e.back).map((e) => e.title), ['IDPA is back: SQL Server 2025']);
+});
+
+test('source health comes from status.json; no file means not checked yet', () => {
+  assert.deepEqual(data.byId.idpa.health, { kind: 'details', since: '2026-10-03' });
+  assert.deepEqual(data.byId.webgeeks.health, { kind: 'ok' });
+  assert.equal(data.checkedOn, '2026-10-07');
+  const dir = mkdtempSync(path.join(tmpdir(), 'dsm-'));
+  cpSync(dataDir, dir, { recursive: true, filter: (f) => !/status\.json|built-on/.test(f) });
+  const bare = loadData({ dataDir: dir, now });
+  assert.equal(bare.byId.webgeeks.health, null);
+  assert.equal(bare.checkedOn, null);
+});

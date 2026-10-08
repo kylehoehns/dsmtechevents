@@ -24,10 +24,62 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
 
   for (const e of events) describe(e, byId);
   foldSeries(upcoming);
-  for (const g of groups) summarize(g, upcoming, past);
+  const archived = lastArchived(dataDir);
+  for (const g of groups) {
+    summarize(g, upcoming, past);
+    markQuiet(g, archived[g.id], now);
+  }
 
   const fetched = groups.map((g) => g.fetchedAt).filter(Boolean).sort();
-  return { groups, byId, events, upcoming, past, updatedAt: fetched.at(-1) ?? new Date(now).toISOString() };
+  return {
+    // Quiet groups are hidden everywhere but /status/; they come back on their own.
+    groups: groups.filter((g) => !g.quiet),
+    allGroups: groups,
+    byId, events, upcoming, past,
+    updatedAt: fetched.at(-1) ?? new Date(now).toISOString(),
+    ...readStatus(dataDir, groups),
+  };
+}
+
+// The newest archived event for each group. The archive (data/archive/) has
+// every ended event since the site launched; the cache only keeps 90 days.
+function lastArchived(dataDir) {
+  const dir = path.join(dataDir, 'archive');
+  const last = {};
+  if (!fs.existsSync(dir)) return last;
+  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('.json'))) {
+    for (const r of JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'))) {
+      if (!(last[r.group] >= r.start)) last[r.group] = r.start;
+    }
+  }
+  return last;
+}
+
+const YEAR = 365 * 86_400_000;
+
+// A group is quiet when nothing is coming up and it hasn't met in a year
+// (or we know of no meeting at all). It's returning when its next event is
+// its first in over a year: "Back!" shows on that event and the group's card
+// until the event ends, when lastMet catches up with it.
+function markQuiet(g, archived, now) {
+  // lastMet comes from the Meetup events page, which reaches back past our own
+  // records; the cache's recent past events and the archive cover the rest.
+  g.lastMet = [g.lastMet, archived, g.lastEvent?.start].filter(Boolean).sort().at(-1) ?? null;
+  g.quiet = !g.nextEvent && !(g.lastMet && now - Date.parse(g.lastMet) < YEAR);
+  g.returning = !!(g.nextEvent && g.lastMet && Date.parse(g.nextEvent.start) - Date.parse(g.lastMet) > YEAR);
+  if (g.returning) g.nextEvent.back = [...(g.nextEvent.back ?? []), g.id];
+}
+
+// Source health from data/cache/status.json, which the refresh writes: each
+// group that failed on the latest run, how, and since which day. No file means
+// no refresh has checked yet, so health is unknown rather than "fine".
+// built-on.txt is the Des Moines date of the latest refresh.
+function readStatus(dataDir, groups) {
+  const read = (f) => { try { return fs.readFileSync(path.join(dataDir, 'cache', f), 'utf8'); } catch { return null; } };
+  const status = read('status.json');
+  const problems = status ? JSON.parse(status) : null;
+  for (const g of groups) g.health = problems ? (problems[g.id] ?? { kind: 'ok' }) : null;
+  return { checkedOn: read('built-on.txt')?.trim() || null };
 }
 
 // A group from groups.yaml plus what the refresh cached for it.
@@ -42,6 +94,7 @@ function readGroup(g, dataDir) {
     fetchedAt: cache.fetchedAt ?? null,
     members: cache.members ?? null,
     pastCount: cache.pastCount ?? null,
+    lastMet: cache.lastMet ?? null,
     _events: cache.events.map((e) => ({ ...e, groupIds: [g.id], source: 'feed' })),
   };
 }

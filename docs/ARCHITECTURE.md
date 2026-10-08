@@ -105,7 +105,7 @@ Meetup-hosted logos are kept too.
 A cache file must not change unless an event changed (the archive follows
 the same rule). `mergeCache()` in
 `scripts/sources/meetup.mjs` keeps the old `fetchedAt` when nothing else
-moved, and optional facts (`members`, `pastCount`) are left out when unknown
+moved, and optional facts (`members`, `pastCount`, `lastMet`) are left out when unknown
 rather than written as `null`. If a file changed on every run, every
 refresh would commit and redeploy the site four times a day for nothing.
 
