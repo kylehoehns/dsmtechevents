@@ -301,7 +301,10 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   .title { font-size: 18px; }
   .acts, .desc { grid-column: 2 / -1; }
   .show.has-photo .acts { grid-column: 2; }
-  .show.has-photo .desc-photo { display: none; } /* the thumbnail is already showing it */
+  .show.has-photo:not(.open) .desc-photo { display: none; } /* the thumbnail is already showing it */
+  /* open: the photo moves from the right column into the About section (app.js animates it) */
+  .show.has-photo.open { grid-template-columns: 70px minmax(0, 1fr); }
+  .show.has-photo.open .photo { display: none; }
 }
 
 /* conference rows: a solid pink slab */
@@ -465,6 +468,8 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 }
 .install-hint button { border: 0; background: none; color: inherit; font-size: 16px; padding: 4px; margin-left: auto; }
 
+::view-transition-group(about-photo) { animation-duration: 0.35s; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.2s; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transform: none !important; scroll-behavior: auto !important; }
   .mis::before { transform: translate(3px, 2px) !important; }

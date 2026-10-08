@@ -322,10 +322,7 @@ document.addEventListener('click', (ev) => {
 
   const more = t.closest('.more');
   if (more) {
-    const desc = $('.desc', more.closest('.show'));
-    const open = more.getAttribute('aria-expanded') !== 'true';
-    more.setAttribute('aria-expanded', String(open));
-    desc.hidden = !open;
+    toggleAbout(more);
     return;
   }
 
@@ -400,3 +397,32 @@ addEventListener('popstate', () => {
 });
 
 render();
+
+// About: on desktop the photo on the right grows into the About section and
+// shrinks back when it closes. Both images get the same view-transition name
+// for the swap, and the browser animates one into the other. Browsers without
+// view transitions, phones (no thumbnail) and reduced motion just toggle.
+function toggleAbout(more) {
+  const card = more.closest('.show');
+  const desc = $('.desc', card);
+  const open = more.getAttribute('aria-expanded') !== 'true';
+  const apply = () => {
+    more.setAttribute('aria-expanded', String(open));
+    desc.hidden = !open;
+    card.classList.toggle('open', open);
+  };
+  const thumb = $('.photo img', card);
+  const big = $('.desc-photo', card);
+  const animate = document.startViewTransition && thumb?.offsetParent && big
+    && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!animate) return apply();
+
+  const [from, to] = open ? [thumb, big] : [big, thumb];
+  from.style.viewTransitionName = 'about-photo';
+  const swap = document.startViewTransition(() => {
+    from.style.viewTransitionName = '';
+    apply();
+    to.style.viewTransitionName = 'about-photo';
+  });
+  swap.finished.finally(() => { to.style.viewTransitionName = ''; });
+}
