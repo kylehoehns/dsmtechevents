@@ -21,7 +21,10 @@ test('a meetup posted by two groups shows once, with both hosts', () => {
 
 test('a photo is shown only when it is not just the group logo', () => {
   assert.equal(find('Hacktoberfest').photo, null, 'same photo id as the Web Geeks logo');
-  assert.equal(find('Joint Night: JVM vs CLR').photo, 'https://secure.meetupstatic.com/photos/event/a/b/600_888.jpeg');
+  assert.deepEqual(find('Joint Night: JVM vs CLR').photo, {
+    small: 'https://secure.meetupstatic.com/photos/event/a/b/global_888.webp',
+    large: 'https://secure.meetupstatic.com/photos/event/a/b/600_888.webp',
+  }, 'Meetup photos get their small webp copies');
 });
 
 test('the full group name shows only when it adds something', () => {

@@ -67,7 +67,7 @@ const slides = await Promise.all(events.map(async (e) => ({
           </div>
           {(e.photo || qr) && (
             <div class="tv-side">
-              {e.photo && <img class="tv-photo" src={e.photoSizes?.large ?? e.photo} alt="" />}
+              {e.photo && <img class="tv-photo" src={e.photo.large} alt="" />}
               {qr && (
                 <div class="qr">
                   <div class="qr-code" set:html={qr} />

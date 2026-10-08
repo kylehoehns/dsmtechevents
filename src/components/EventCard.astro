@@ -16,8 +16,8 @@ const cta = isMeetup ? 'RSVP on Meetup' : e.featured ? 'Tickets & info' : 'Detai
 const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
 // Meetup photos come as small webp copies (see meetupPhoto). Most are 16:9 at
 // 600x338; width/height hold that shape until the image arrives.
-const photo = e.photoSizes ?? { small: e.photo, large: e.photo };
-const thumbSrcset = e.photoSizes ? `${photo.small} 180w, ${photo.large} 600w` : undefined;
+const photo = e.photo;
+const thumbSrcset = photo && photo.small !== photo.large ? `${photo.small} 180w, ${photo.large} 600w` : undefined;
 // "Tomorrow" / "Tonight" as of the build, so the tag is in the page from the
 // start and nothing moves when app.js re-checks it against the real date.
 const whenTag = whenLabel(e.start, e.end);

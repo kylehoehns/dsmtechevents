@@ -1,24 +1,20 @@
 // Reading Meetup data, with no network calls, so tests can feed it saved pages.
 // fetch-events.mjs does the fetching and hands the text to these.
-import ical from 'node-ical';
 import { meetupUrl } from '../../src/lib/meetup.mjs';
+import { calendarEvents, isUpcoming, times, eventUrl } from './ical.mjs';
 
 // Upcoming events from an iCal feed (Meetup's or any public calendar).
 export function parseFeed(ics, group, { slug, now }) {
-  if (!ics.includes('BEGIN:VCALENDAR')) throw new Error('feed did not return a calendar');
-  return Object.values(ical.sync.parseICS(ics))
-    .filter((e) => e.type === 'VEVENT' && e.status !== 'CANCELLED')
-    .filter((e) => (e.end ?? e.start).getTime() >= now)
+  return calendarEvents(ics)
+    .filter((e) => isUpcoming(e, now))
     .map((e) => {
       const id = /^event_([^@]+)@/.exec(e.uid)?.[1] ?? e.uid;
       return {
         id: `${group.id}-${id}`,
         sourceId: id,
         title: e.summary?.trim(),
-        start: e.start.toISOString(),
-        end: (e.end ?? e.start).toISOString(),
-        allDay: e.datetype === 'date',
-        url: slug ? meetupUrl(slug, `events/${id}/`) : (e.url?.val ?? e.url ?? group.website),
+        ...times(e),
+        url: slug ? meetupUrl(slug, `events/${id}/`) : (eventUrl(e) ?? group.website),
         description: cleanDescription(e.description, group.name),
         venue: e.location || null,
       };
