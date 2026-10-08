@@ -165,6 +165,8 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .btn { display: inline-block; font: 800 var(--fs-ui)/1 var(--display); text-transform: uppercase; text-decoration: none; padding: 6px 10px 5px; border: 2px solid; }
 .btn-solid { background: var(--btn-bg, var(--ink)); color: var(--btn-fg, var(--paper)); border-color: var(--btn-bg, var(--ink)); }
 .btn-outline { background: none; color: inherit; border-color: var(--btn-line, var(--line)); }
+/* The outbound arrow on buttons (OutArrow.astro): sits on the cap height, same weight as the text. */
+.out-arrow { display: inline-block; width: 0.7em; height: 0.7em; vertical-align: 0.02em; flex: none; }
 .btn-small { font-size: var(--fs-small); padding: 5px 8px 4px; }
 
 /* ---------- headliners (conferences in the next 30 days) ----------
