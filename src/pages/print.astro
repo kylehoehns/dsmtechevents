@@ -1,0 +1,125 @@
+---
+// A printable flyer of the next four weeks, for a coffee-shop or coworking
+// corkboard: black ink on one letter page, a QR code to the site, and
+// tear-off tabs. On screen it shows the same sheet with a Print button.
+import QRCode from 'qrcode';
+import Layout from '../layouts/Layout.astro';
+import { loadData } from '../lib/data.mjs';
+import { weekday, day, month, shortTime, monthName, lastDay } from '../lib/format.mjs';
+import { site } from '../lib/site.mjs';
+
+const { upcoming, byId } = loadData();
+const DAYS = 28;
+const MAX = 11; // what fits above the QR code and tear-off tabs on one page
+const horizon = Date.now() + DAYS * 86_400_000;
+// Dates matter on paper, so every date of a repeating meetup gets its line.
+const rows = upcoming.filter((e) => Date.parse(e.start) < horizon).slice(0, MAX);
+const more = upcoming.filter((e) => Date.parse(e.start) < horizon).length - rows.length;
+const hosts = (e: any) => e.groupIds.map((id: string) => byId[id]?.short).filter(Boolean).join(' w/ ');
+// The label before the title: the hosts, plus "conference" for headliners.
+const label = (e: any) => [hosts(e), e.featured && 'conference'].filter(Boolean).join(' · ') || 'Community';
+// The date column carries the dates, so this is only the hours.
+const hours = (e: any) => (e.allDay ? 'All day' : `${shortTime(e.start)}–${shortTime(e.end)}`);
+// "Oct 15–16" for a multi-day event.
+const dates = (e: any) => { const end = `${lastDay(e.start, e.end)}T17:00:00Z`; return e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(end)}` : `${month(e.start)} ${day(e.start)}`; };
+const where = (e: any) => (e.online ? 'Online' : e.venue ?? 'Venue TBA');
+const qr = await QRCode.toString(site.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#000000', light: '#0000' } });
+const siteHost = new URL(site.url).host;
+const span = rows.length ? `${month(rows[0].start)} ${day(rows[0].start)} – ${month(rows.at(-1).start)} ${day(rows.at(-1).start)}` : monthName(new Date().toISOString(), true);
+---
+<Layout bare headTitle={`Printable flyer · ${site.name}`} description="A one-page flyer of upcoming Des Moines tech meetups to print and pin up.">
+  <div class="print-page">
+    <nav class="print-tools" aria-label="Flyer">
+      <a href="/">← Back to events</a>
+      <button type="button" id="print-btn">Print this flyer</button>
+      <span>Letter size, black and white. Pin it up somewhere techies get coffee.</span>
+    </nav>
+
+    <article class="sheet">
+      <header class="sheet-head">
+        <p class="kicker">Des Moines tech meetups · {span}</p>
+        <h1>{site.name}</h1>
+        <p class="lede">Free, public meetups for developers, data people, designers and the tech-curious. Show up, say hi.</p>
+      </header>
+
+      {rows.length > 0 ? (
+        <ol class="lineup">
+          {rows.map((e) => (
+            <li class:list={{ conf: e.featured }} data-end={e.end}>
+              <span class="d"><b>{weekday(e.start)}</b> {dates(e)}</span>
+              <span class="t">{hours(e)}</span>
+              <span class="what"><b>{label(e)}</b> {e.title}</span>
+              <span class="w">{where(e)}</span>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p class="lede">A quiet stretch: nothing posted for the next four weeks yet.</p>
+      )}
+
+      <footer class="sheet-foot">
+        <div class="qr" set:html={qr} />
+        <p>
+          <b>{more > 0 ? `+ ${more} more, and every group` : 'Every group, every date'}:</b>
+          <span class="url">{siteHost}</span>
+          RSVP on each group's own page. Updated four times a day.
+        </p>
+      </footer>
+
+      <div class="tabs" aria-hidden="true">
+        {Array.from({ length: 8 }, () => <span>{siteHost}</span>)}
+      </div>
+    </article>
+  </div>
+</Layout>
+
+<style is:global>
+  html:has(.print-page) { background: #e9e6ef; }
+  .print-page { padding: 24px 16px 48px; color: #000; font-family: var(--sans); }
+  .print-tools { max-width: 8.5in; margin: 0 auto 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; font: 600 13px/1.3 var(--mono); }
+  .print-tools a { color: inherit; }
+  .print-tools button { font: 800 16px/1 var(--display); text-transform: uppercase; background: #000; color: #fff; border: 0; padding: 9px 14px 8px; cursor: pointer; }
+  .print-tools span { color: #4a4657; }
+
+  .sheet { position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 8.5in; max-width: 100%; min-height: 11in; margin: 0 auto; padding: 0.5in 0.55in 1.5in; background: #fff; box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18); }
+  .sheet-head { border-bottom: 6px double #000; padding-bottom: 12px; }
+  .kicker { margin: 0 0 6px; font: 700 13px/1.2 var(--mono); text-transform: uppercase; letter-spacing: 0.06em; }
+  .sheet h1 { margin: 0; font: 900 72px/0.82 var(--display); text-transform: uppercase; }
+  .lede { margin: 10px 0 0; font-size: 15px; line-height: 1.4; max-width: 46em; }
+
+  .lineup { list-style: none; margin: 14px 0 0; padding: 0; }
+  .lineup li { display: grid; grid-template-columns: 1.15in 0.95in 1fr; grid-template-areas: 'd t what' 'd t w'; column-gap: 12px; padding: 7px 0; border-bottom: 1.5px dashed #000; break-inside: avoid; }
+  .lineup .d { grid-area: d; font: 900 20px/1 var(--display); text-transform: uppercase; }
+  .lineup .t { grid-area: t; font: 700 13px/1.4 var(--mono); }
+  .lineup .what { grid-area: what; font-size: 14.5px; line-height: 1.3; }
+  .lineup .what b { font: 900 16px/1 var(--display); text-transform: uppercase; margin-right: 4px; }
+  .lineup .w { grid-area: w; font: 500 12px/1.4 var(--mono); }
+  .lineup li.conf { border-bottom-style: solid; border-bottom-width: 3px; }
+
+  .sheet-foot { margin-top: auto; padding-top: 14px; display: flex; align-items: center; gap: 16px; font-size: 14px; line-height: 1.4; }
+  .sheet-foot .qr svg { display: block; width: 0.95in; height: 0.95in; }
+  .sheet-foot .url { display: block; font: 900 28px/1 var(--display); text-transform: uppercase; }
+
+  /* tear-off tabs along the bottom edge */
+  .tabs { position: absolute; left: 0.3in; right: 0.3in; bottom: 0; height: 1.3in; display: grid; grid-template-columns: repeat(8, 1fr); border-top: 1.5px dashed #000; }
+  .tabs span { display: flex; align-items: center; justify-content: center; border-left: 1.5px dashed #000; writing-mode: vertical-rl; transform: rotate(180deg); font: 700 12px/1 var(--mono); }
+  .tabs span:first-child { border-left: 0; }
+
+  @media (max-width: 8.6in) { .sheet { min-height: 0; } .sheet h1 { font-size: 48px; } .lineup li { grid-template-columns: 1fr; grid-template-areas: 'd' 't' 'what' 'w'; } }
+
+  @page { size: letter; margin: 0; }
+  @media print {
+    html:has(.print-page) { background: #fff; }
+    .print-page { padding: 0; }
+    .print-tools { display: none; }
+    .sheet { width: 8.5in; height: 11in; min-height: 0; box-shadow: none; overflow: hidden; }
+  }
+</style>
+
+<script>
+  // Built ahead of time: drop anything that has already ended.
+  for (const li of document.querySelectorAll<HTMLElement>('.lineup li[data-end]')) {
+    if (Date.parse(li.dataset.end!) <= Date.now()) li.remove();
+  }
+  document.getElementById('print-btn')!.addEventListener('click', () => window.print());
+</script>
