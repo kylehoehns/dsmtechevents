@@ -3,7 +3,7 @@
 // Our CSS, JS and fonts: precached on install, so an offline page is styled.
 // Meetup event photos: their own small cache, oldest dropped past 60.
 // Bump VERSION to start every cache fresh; activate deletes the old ones.
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = `dsmtechevents-${VERSION}`;
 const IMAGES = `dsmtechevents-images-${VERSION}`;
 const MAX_IMAGES = 60;
