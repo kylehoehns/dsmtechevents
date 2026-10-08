@@ -6,7 +6,9 @@ import { month, day, shortTime } from '../lib/format.mjs';
 
 // headTitle replaces the whole <title> (for search); title gets " · DSM Tech Events".
 // bare: just the page itself (fonts and head, no masthead, footer or their scripts), for /tv/.
-// search: the events page's search button and box (app.js runs them).
+// search: the events page's search button and box (app.js runs them). Every
+// other page gets the same button as a link to /?search, so the nav row never
+// shifts between pages and search works from anywhere.
 interface Props { bare?: boolean; search?: boolean; title?: string; headTitle?: string; description?: string; noindex?: boolean; nav?: 'list' | 'calendar' | 'groups' | 'add' | 'about' | null; updatedAt?: string; blurb?: string }
 const { bare = false, search = false, title, headTitle, description = site.tagline, noindex = false, nav = 'list', updatedAt, blurb } = Astro.props;
 const pageTitle = headTitle ?? (title ? `${title} · ${site.name}` : site.name);
@@ -75,10 +77,14 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
               </nav>
               )}
               <div class="mast-btns">
-              {search && (
+              {search ? (
               <button type="button" class="icon-btn" id="search-btn" aria-label="Search events" title="Search events" aria-expanded="false" aria-controls="search">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.2" fill="none" stroke="currentColor" stroke-width="2.6" /><path d="M15.2 15.2l5.6 5.6" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" /></svg>
               </button>
+              ) : (
+              <a class="icon-btn" href="/?search" aria-label="Search events" title="Search events">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.2" fill="none" stroke="currentColor" stroke-width="2.6" /><path d="M15.2 15.2l5.6 5.6" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" /></svg>
+              </a>
               )}
               {/* Icon follows <html data-theme> in CSS, so it's right before any script runs. */}
               <button type="button" class="icon-btn theme-btn" id="theme-btn" aria-label="Theme: auto" title="Theme: auto">
