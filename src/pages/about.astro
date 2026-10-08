@@ -6,7 +6,7 @@ import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
 import { site } from '../lib/site.mjs';
 
-const { groups, updatedAt } = loadData();
+const { updatedAt } = loadData();
 ---
 <Layout nav="about" updatedAt={updatedAt} headTitle="About · DSM Tech Events"
   description="DSM Tech Events is one calendar of every public tech meetup, user group and conference in the Des Moines area, pulled automatically from each group's own page.">
@@ -14,8 +14,7 @@ const { groups, updatedAt } = loadData();
 
   <div class="add-page">
     <p class="lede">
-      DSM Tech Events puts every public tech meetup, user group and conference in the Des Moines area on one calendar,
-      so you don't have to check {groups.length} different pages to find out what's on this week.
+      DSM Tech Events puts every public tech meetup, user group and conference in the Des Moines area on one calendar.
     </p>
 
     <section>
@@ -42,11 +41,12 @@ const { groups, updatedAt } = loadData();
       </p>
     </section>
     <section>
-      <h2>Who's behind it</h2>
+      <h2>Hi, I'm Kyle</h2>
       <p>
-        Made by <a href="https://www.kylehoehns.com/">Kyle Hoehns</a>,
-        organizer of the <a href="https://www.cijug.net/">Central Iowa Java Users Group</a> and a frequent speaker at local user groups.
-        The code is <a href={site.repo}>open source on GitHub</a>.
+        I organize the <a href="https://www.cijug.net/">Central Iowa Java Users Group</a>, speak at meetups around town, and am apparently now the person who maintains a calendar.
+        Des Moines has an awesome tech community, and this is my attempt to make it easier to jump into.
+        If it helps you meet someone, learn something, or finally go to that meetup you keep meaning to try, it's done its job.
+        (More about me at <a href="https://www.kylehoehns.com/">kylehoehns.com</a>.)
       </p>
     </section>
     <section>
