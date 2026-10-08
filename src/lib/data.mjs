@@ -62,6 +62,7 @@ export function loadData() {
     .map((e) => ({
       ...e,
       multiDay: e.multiDay ?? dayKey(e.start) !== dayKey(e.end),
+      address: shortAddress(e.address),
       tags: [...new Set([...(e.tags ?? []), ...e.groupIds.flatMap((id) => byId[id]?.tags ?? [])])],
     }))
     .sort((a, b) => a.start.localeCompare(b.start));
@@ -125,6 +126,17 @@ export function loadData() {
 
 function longWeekday(iso) {
   return new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', weekday: 'long' }).format(new Date(iso));
+}
+
+// Every event is around Des Moines, so ", Des Moines, IA 50309" says nothing
+// and makes the row wrap. Keep suburbs ("West Des Moines", "Johnston").
+function shortAddress(a) {
+  if (!a) return a ?? null;
+  return a
+    .replace(/,+/g, ',')
+    .replace(/,?\s*(IA|Iowa)\s*\d{5}(-\d{4})?\s*$/i, '')
+    .replace(/,\s*Des Moines\s*$/i, '')
+    .trim();
 }
 
 function slugify(s) {

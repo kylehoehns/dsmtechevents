@@ -16,10 +16,16 @@
   tags: [conference]
   featured: true
 
-- title: Iowa Code Camp
-  url: https://iowacodecamp.com/
+- title: Iowa Code Camp 2026
+  url: https://www.tickettailor.com/events/iowacodecamp/2402912
   start: 2026-11-07
-  venue: Ankeny, IA
-  description: One-day conference for software developers — front-end frameworks, cloud infrastructure, databases, and working on engineering teams.
+  time: "08:00"
+  endTime: "17:00"
+  venue: FFA Enrichment Center, DMACC Ankeny
+  address: 1055 SW Prairie Trail Pkwy, Ankeny, IA 50023
+  description: |-
+    Free, one-day, in-person conference for software developers: front-end frameworks, cloud infrastructure, databases, and working on engineering teams. Running since 2008, with about 240 people at each Des Moines-area camp.
+
+    More at https://iowacodecamp.com/
   tags: [conference]
   featured: true
