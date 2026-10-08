@@ -46,6 +46,15 @@ test('headliner poster counts down to the conference', async ({ page }) => {
   await expect(poster).toContainText('Oct 22–23');
 });
 
+test('overnight between conference days, the poster stamp agrees with the row', async ({ page }) => {
+  // Thu Oct 22, 9pm: day one (8a–5p) is over, day two is tomorrow.
+  await page.clock.setFixedTime(new Date('2026-10-23T02:00:00Z'));
+  await page.goto('/');
+  const poster = page.getByRole('region', { name: 'Coming up soon' });
+  await expect(poster.locator('.countdown')).toHaveText('Tomorrow');
+  await expect(row(page, 'Test Conf 2026').getByText('Tomorrow', { exact: true })).toBeVisible();
+});
+
 test('a venue already listed above drops its street address', async ({ page }) => {
   await page.goto('/');
   // Both are at Source Allies; only the first row prints the address.

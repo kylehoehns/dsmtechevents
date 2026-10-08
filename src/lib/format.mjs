@@ -1,6 +1,7 @@
 // Date and text formatting shared by the build and the browser.
 // Everything displays in Des Moines time, wherever the viewer is.
 import { site } from './site.mjs';
+import { localToUtc } from './time.mjs';
 
 export const fmt = (opts) => new Intl.DateTimeFormat('en-US', { timeZone: site.timeZone, ...opts });
 
@@ -13,6 +14,7 @@ const monthLong = fmt({ month: 'long' });
 const monthYear = fmt({ month: 'long', year: 'numeric' });
 const keyFmt = new Intl.DateTimeFormat('en-CA', { timeZone: site.timeZone });
 const hourFmt = fmt({ hour: 'numeric', hourCycle: 'h23' });
+const hhmm = fmt({ hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }); // "08:00", for localToUtc
 
 export const DAY = 86_400_000;
 export const dayKey = (when) => keyFmt.format(new Date(when)); // "2026-10-22"; takes an ISO string or a timestamp
@@ -46,9 +48,12 @@ export function whenLabel(start, end, now = Date.now(), { multiDay = false, allD
     // A timed conference over several days runs its hours each day (8a-5p
     // twice), not straight through the night: overnight it's "Tomorrow", the
     // next morning "Today", and "Happening now" only during the hours.
+    // Each day's hours are wall-clock times, so they hold across a DST switch
+    // (adding 24h would shift them an hour). An end at midnight closes at the
+    // midnight after each day.
     if (multiDay && !allDay && Date.parse(start) <= now) {
-      const opens = Date.parse(start) + daysBetween(dayKey(start), today) * DAY;
-      const closes = Date.parse(end) - daysBetween(today, last) * DAY;
+      const opens = Date.parse(localToUtc(today, hhmm.format(new Date(start))));
+      const closes = Date.parse(localToUtc(addDays(today, daysBetween(last, dayKey(end))), hhmm.format(new Date(end))));
       if (now < opens) return todayWord(new Date(opens).toISOString());
       if (now > closes) return today < last ? 'Tomorrow' : '';
     }
@@ -58,8 +63,13 @@ export function whenLabel(start, end, now = Date.now(), { multiDay = false, allD
 }
 
 // The stamp on a headliner poster: "8 days out", "Tomorrow", "Today", "Happening now".
-export function countdown(start, now = Date.now()) {
-  if (Date.parse(start) <= now) return 'Happening now';
+// Once it has started it follows whenLabel(), so a conference's poster says
+// "Tomorrow" overnight between its days, like its row does.
+export function countdown(start, end, now = Date.now(), opts = {}) {
+  if (Date.parse(start) <= now) {
+    const label = whenLabel(start, end, now, opts);
+    return { Tomorrow: 'Tomorrow', Today: 'Today', Tonight: 'Today' }[label] ?? 'Happening now';
+  }
   const n = daysBetween(dayKey(now), dayKey(start));
   return n <= 0 ? 'Today' : n === 1 ? 'Tomorrow' : `${n} days out`;
 }
@@ -76,11 +86,14 @@ export function dateRange(start, end) {
   return `${month(start)} ${day(start)}–${month(last) === month(start) ? '' : `${month(last)} `}${day(last)}`;
 }
 
+// "Thu–Fri Oct 15–16".
+export const dayRange = (start, end) => `${weekday(start)}–${weekday(`${lastDay(start, end)}T17:00:00Z`)} ${dateRange(start, end)}`;
+
 // "5:30p–7p", "Thu–Fri Oct 15–16 · 8a–5p", "All day".
 export function shortRange(e) {
   if (e.allDay) return e.multiDay ? `${dateRange(e.start, e.end)} · All day` : 'All day';
   const t = `${shortTime(e.start)}–${shortTime(e.end)}`;
-  return e.multiDay ? `${weekday(e.start)}–${weekday(`${lastDay(e.start, e.end)}T17:00:00Z`)} ${dateRange(e.start, e.end)} · ${t}` : t;
+  return e.multiDay ? `${dayRange(e.start, e.end)} · ${t}` : t;
 }
 
 export const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);

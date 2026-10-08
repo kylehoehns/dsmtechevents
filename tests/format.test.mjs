@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, dateRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
@@ -76,11 +76,57 @@ test('whenLabel: one rule for the build, the browser and the TV page', () => {
 });
 
 test('countdown on headliner posters', () => {
-  const start = '2026-10-15T13:00:00.000Z';
-  assert.equal(countdown(start, Date.parse('2026-10-07T15:00:00Z')), '8 days out');
-  assert.equal(countdown(start, Date.parse('2026-10-14T15:00:00Z')), 'Tomorrow');
-  assert.equal(countdown(start, Date.parse('2026-10-15T05:30:00Z')), 'Today', 'just after midnight');
-  assert.equal(countdown(start, Date.parse('2026-10-15T15:00:00Z')), 'Happening now');
+  const [start, end] = ['2026-10-15T13:00:00.000Z', '2026-10-15T22:00:00.000Z'];
+  assert.equal(countdown(start, end, Date.parse('2026-10-07T15:00:00Z')), '8 days out');
+  assert.equal(countdown(start, end, Date.parse('2026-10-14T15:00:00Z')), 'Tomorrow');
+  assert.equal(countdown(start, end, Date.parse('2026-10-15T05:30:00Z')), 'Today', 'just after midnight');
+  assert.equal(countdown(start, end, Date.parse('2026-10-15T15:00:00Z')), 'Happening now');
+});
+
+test('the poster stamp agrees with the row for a multi-day conference', () => {
+  // Tech Fuse: Oct 15–16, 8a–5p.
+  const [start, end] = ['2026-10-15T13:00:00.000Z', '2026-10-16T22:00:00.000Z'];
+  const stamp = (iso, opts = { multiDay: true }) => countdown(start, end, Date.parse(iso), opts);
+  assert.equal(stamp('2026-10-07T15:00:00Z'), '8 days out');
+  assert.equal(stamp('2026-10-15T05:30:00Z'), 'Today', 'day one, just after midnight');
+  assert.equal(stamp('2026-10-15T15:00:00Z'), 'Happening now', 'day one, 10am');
+  assert.equal(stamp('2026-10-16T02:00:00Z'), 'Tomorrow', 'day one, 9pm');
+  assert.equal(stamp('2026-10-16T12:00:00Z'), 'Today', 'day two, 7am');
+  assert.equal(stamp('2026-10-16T17:00:00Z'), 'Happening now', 'day two, noon');
+  assert.equal(stamp('2026-10-16T02:00:00Z', {}), 'Happening now', 'without the flag it runs straight through');
+});
+
+test('a multi-day conference keeps its local hours across daylight saving', () => {
+  // Sat Oct 31 – Mon Nov 2, 8a–5p. Clocks fall back early on Sun Nov 1.
+  const fall = [localToUtc('2026-10-31', '08:00'), localToUtc('2026-11-02', '17:00')];
+  const atFall = (iso) => whenLabel(...fall, Date.parse(iso), { multiDay: true });
+  assert.equal(atFall('2026-11-01T13:30:00Z'), 'Today', 'Sun 7:30am CST, before the doors');
+  assert.equal(atFall('2026-11-01T14:30:00Z'), 'Happening now', 'Sun 8:30am CST');
+  assert.equal(atFall('2026-11-01T22:30:00Z'), 'Happening now', 'Sun 4:30pm CST');
+  assert.equal(atFall('2026-11-01T23:30:00Z'), 'Tomorrow', 'Sun 5:30pm CST');
+  assert.equal(atFall('2026-11-02T13:30:00Z'), 'Today', 'Mon 7:30am CST');
+  assert.equal(atFall('2026-11-02T14:30:00Z'), 'Happening now', 'Mon 8:30am CST');
+  // Sat Mar 13 – Mon Mar 15 2027, 8a–5p. Clocks spring forward early on Sun Mar 14.
+  const spring = [localToUtc('2027-03-13', '08:00'), localToUtc('2027-03-15', '17:00')];
+  const atSpring = (iso) => whenLabel(...spring, Date.parse(iso), { multiDay: true });
+  assert.equal(atSpring('2027-03-13T22:30:00Z'), 'Happening now', 'Sat 4:30pm CST');
+  assert.equal(atSpring('2027-03-14T12:30:00Z'), 'Today', 'Sun 7:30am CDT');
+  assert.equal(atSpring('2027-03-14T13:30:00Z'), 'Happening now', 'Sun 8:30am CDT');
+  assert.equal(atSpring('2027-03-15T13:30:00Z'), 'Happening now', 'Mon 8:30am CDT');
+  assert.equal(atSpring('2027-03-15T21:30:00Z'), 'Happening now', 'Mon 4:30pm CDT');
+  assert.equal(atSpring('2027-03-15T22:30:00Z'), '', 'Mon 5:30pm CDT: over');
+});
+
+test('a multi-day event closing at midnight runs to the end of its last day', () => {
+  // Oct 15–16, 6p–12a.
+  const [start, end] = [localToUtc('2026-10-15', '18:00'), localToUtc('2026-10-17', '00:00')];
+  const at = (iso) => whenLabel(start, end, Date.parse(iso), { multiDay: true });
+  assert.equal(at('2026-10-16T12:00:00Z'), 'Tonight', 'day two, 7am');
+  assert.equal(at('2026-10-17T04:00:00Z'), 'Happening now', 'day two, 11pm');
+});
+
+test('dayRange names the days a multi-day event spans', () => {
+  assert.equal(dayRange('2026-10-15T13:00:00.000Z', '2026-10-16T22:00:00.000Z'), 'Thu–Fri Oct 15–16');
 });
 
 test('month and day names, and plurals', () => {
