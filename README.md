@@ -29,7 +29,7 @@ calendar (and a couple of groups' own websites).
 
 ## Adding things
 
-Not into YAML? The site's [Add your group](https://dsmtechevents.com/add/) page
+Not into YAML? The site's [Add your group or event](https://dsmtechevents.com/add/) page
 explains what fits and has the email address (hello@dsmtechevents.com).
 Otherwise, open a pull request:
 

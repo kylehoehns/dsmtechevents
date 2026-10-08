@@ -116,10 +116,10 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
     g.upcomingCount = upcoming.filter((e) => e.groupIds.includes(g.id)).length;
     g.lastEvent = past.find((e) => e.groupIds.includes(g.id)) ?? null;
     // Show the full name only when it adds something. "Web Geeks" / "DSM Web
-    // Geeks" says the same thing twice; "Data" / "Des Moines Data & Analytics"
-    // and "IADNUG" / "Iowa .NET User Group" don't.
+    // Geeks" and "Data & Analytics" / "Des Moines Data & Analytics" say the
+    // same thing twice; "IADNUG" / "Iowa .NET User Group" doesn't.
     const [short, full] = [squash(g.short), squash(g.name)];
-    g.showFullName = !(full.includes(short) && short.length >= full.length * 0.6);
+    g.showFullName = !(full.includes(short) && short.length >= full.length * 0.55);
     // The groups page shows logos at 60px; the 180px webp is plenty.
     g.logoThumb = meetupPhoto(g.logo)?.small ?? g.logo;
     delete g._events;
