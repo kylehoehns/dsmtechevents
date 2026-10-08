@@ -19,6 +19,13 @@ test('starts on the overview and steps through posters', async ({ page }) => {
   await expect(current(page).getByRole('heading', { name: 'Coming up' })).toBeVisible();
 });
 
+test('the overview shows every day of a multi-day event, with its hours apart', async ({ page }) => {
+  await page.goto('/tv/');
+  const row = page.locator('.overview li', { hasText: 'Test Conf 2026' });
+  await expect(row.locator('.row-date')).toHaveText('Thu–Fri Oct 22–23');
+  await expect(row.locator('.row-time')).toHaveText('8a–5p');
+});
+
 test('drops events once they have ended', async ({ page }) => {
   await page.goto('/tv/');
   await expect(page.locator('.slide', { hasText: 'Coding Dojo' })).toHaveCount(2); // overview row + poster
@@ -57,4 +64,22 @@ test('?fx=off, or reduced motion, keeps the plain swap', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/tv/');
   await expect(page.locator('.tv')).not.toHaveAttribute('data-fx');
+});
+
+test.describe('on a portrait screen', () => {
+  test.use({ viewport: { width: 1080, height: 1920 } });
+
+  test('the poster stacks inside the screen, under the clock', async ({ page }) => {
+    await page.goto('/tv/');
+    await page.keyboard.press('ArrowRight');
+    await expect(current(page).getByRole('heading', { name: 'Coding Dojo' })).toBeVisible();
+    await page.clock.runFor(2000); // let the screen-print entrance finish
+    const header = await page.locator('.tv-top').boundingBox();
+    for (const sel of ['.date-block', '.hosts', 'h2', '.time', '.where', '.qr']) {
+      const b = await page.locator(`.slide.is-on ${sel}`).boundingBox();
+      expect(b.y, `${sel} below the header`).toBeGreaterThanOrEqual(header.y + header.height);
+      expect(b.x + b.width, `${sel} inside the screen`).toBeLessThanOrEqual(1080);
+      expect(b.y + b.height, `${sel} above the bottom`).toBeLessThanOrEqual(1920);
+    }
+  });
 });

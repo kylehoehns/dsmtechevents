@@ -39,7 +39,7 @@ for (const el of $$('.show', listView)) {
   if (tag.textContent !== label) tag.textContent = label;
   tag.hidden = !label;
 }
-for (const el of $$('.countdown[data-start]')) el.textContent = countdown(el.dataset.start, now);
+for (const el of $$('.countdown[data-start]')) el.textContent = countdown(el.dataset.start, el.dataset.end, now, { multiDay: 'days' in el.dataset });
 
 // Venue links open Google Maps; on iPhones and iPads, Apple Maps instead.
 if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes('Macintosh') && navigator.maxTouchPoints > 1)) {
