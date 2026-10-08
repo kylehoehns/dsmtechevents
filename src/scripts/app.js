@@ -490,7 +490,11 @@ addEventListener('popstate', () => {
   announceFilter();
 });
 
+// The search button on other pages links here as /?search: open the box ready
+// to type. Read before render(), whose syncUrl tidies ?search out of the URL.
+const openSearch = new URLSearchParams(location.search).has('search') && !state.q;
 render();
+if (openSearch) { showSearchBox(true); searchInput.focus(); }
 
 // About opens and closes smoothly: the panel's height animates, and on
 // desktop a copy of the photo flies between the thumbnail on the right and its
