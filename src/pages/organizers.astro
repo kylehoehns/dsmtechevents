@@ -7,9 +7,17 @@
 import Layout from '../layouts/Layout.astro';
 import { site } from '../lib/site.mjs';
 import { loadData } from '../lib/data.mjs';
-import { weekday, month, day } from '../lib/format.mjs';
+import { weekday, month, day, monthName, plural } from '../lib/format.mjs';
+import { hostedVenues } from '../lib/venues.mjs';
 
-const { upcoming, updatedAt } = loadData();
+const { upcoming, past, archive, allGroups, updatedAt } = loadData();
+
+// Rooms that have hosted a meetup, from the events on record. The record only
+// reaches back to the archive's first event, so say from when.
+const record = [...archive, ...past];
+const venues = hostedVenues(record);
+const since = record.reduce((min, e) => (e.start < min ? e.start : min), new Date().toISOString());
+const shortName = Object.fromEntries(allGroups.map((g) => [g.id, g.short]));
 
 // The "Open in your email app" button starts the email with what we need.
 const subject = 'Add to DSM Tech Events';
@@ -137,6 +145,22 @@ const snippets = [
       <h2>Picking a date?</h2>
       <p>Check <a href="/?view=calendar">the calendar</a> for clashes before you book the room.</p>
     </section>
+
+    {venues.length > 0 && (
+      <section aria-labelledby="rooms-h">
+        <h2 id="rooms-h">Need a room?</h2>
+        <p>These places have hosted a Des Moines tech meetup since {monthName(since, true)}, most often first. Ask them directly; this list doesn't book anything.</p>
+        <ul class="venue-list">
+          {venues.map((v) => (
+            <li>
+              <b>{v.name}</b>
+              {v.address && <span class="venue-addr">{v.address}</span>}
+              <span class="venue-meta">{plural(v.count, 'meetup')}{v.groups.length > 0 && ` · ${v.groups.map((g) => shortName[g] ?? g).join(', ')}`}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
   </div>
 </Layout>
 

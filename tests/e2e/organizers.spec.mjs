@@ -30,3 +30,12 @@ test('getting listed comes first, then the badge kit', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Point your members here' })).toBeVisible();
   await expect(page.getByRole('img', { name: 'Find more Des Moines tech events' })).toBeVisible();
 });
+
+test('lists rooms that have hosted a meetup, from the events on record', async ({ page }) => {
+  await page.goto('/organizers/');
+  const rooms = page.getByRole('region', { name: 'Need a room?' });
+  const rows = rooms.getByRole('listitem');
+  await expect(rows.first()).toContainText(/\d+ meetups? · /);
+  await expect(rooms).not.toContainText(/^Online$/m);
+  expect(await rows.count()).toBeGreaterThan(0);
+});
