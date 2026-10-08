@@ -3,9 +3,10 @@ import '../styles/global.css';
 import { Font } from 'astro:assets';
 import { site } from '../lib/site.mjs';
 
-interface Props { title?: string; nav?: 'list' | 'calendar' | 'groups' | null; updatedAt?: string; blurb?: string }
-const { title, nav = 'list', updatedAt, blurb } = Astro.props;
-const pageTitle = title ? `${title} · ${site.name}` : site.name;
+// headTitle replaces the whole <title> (for search); title gets " · DSM Tech Events".
+interface Props { title?: string; headTitle?: string; description?: string; noindex?: boolean; nav?: 'list' | 'calendar' | 'groups' | null; updatedAt?: string; blurb?: string }
+const { title, headTitle, description = site.tagline, noindex = false, nav = 'list', updatedAt, blurb } = Astro.props;
+const pageTitle = headTitle ?? (title ? `${title} · ${site.name}` : site.name);
 const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-US', { timeZone: site.timeZone, ...opts });
 const updated = updatedAt && fmt({ month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(updatedAt));
 const canonical = new URL(Astro.url.pathname, site.url).href;
@@ -17,13 +18,13 @@ const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{pageTitle}</title>
-    <meta name="description" content={site.tagline} />
-    <link rel="canonical" href={canonical} />
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={site.tagline} />
+    <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL('/og-image-dark.png', site.url).href} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />

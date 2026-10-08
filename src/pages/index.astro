@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import EventCard from '../components/EventCard.astro';
 import { loadData } from '../lib/data.mjs';
+import { eventJsonLd, websiteJsonLd, toScript } from '../lib/jsonld.mjs';
 import { dayKey, weekday, day, month, shortTime } from '../lib/format.mjs';
 
 const { events, upcoming, past, groups, byId, updatedAt } = loadData();
@@ -56,8 +57,14 @@ const calendarData = {
   })),
   groups: Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short, url: g.meetupUrl ?? g.website ?? null }])),
 };
+// Structured data for the events the list shows (not the hidden card pool,
+// which holds past events and repeat dates).
+const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).filter(Boolean)];
 ---
-<Layout updatedAt={updatedAt}>
+<Layout updatedAt={updatedAt}
+  headTitle="DSM Tech Events: Des Moines tech meetups & conferences"
+  description="Every upcoming Des Moines tech meetup, user group and conference in one list: Python, Java, .NET, AI, AWS, security, UX and more. Updated four times a day.">
+  <script type="application/ld+json" set:html={toScript(structured)} />
   <h1 class="sr-only">Upcoming tech events in Des Moines</h1>
   <p class="sr-only" role="status" id="status"></p>
   <div class="layout">

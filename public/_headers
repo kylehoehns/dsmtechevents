@@ -14,6 +14,10 @@
 /
   Cache-Control: no-cache
 
+# The workers.dev address serves the same site; keep it out of search results.
+https://dsmtechevents.kyhoehns.workers.dev/*
+  X-Robots-Tag: noindex
+
 /groups/
   Cache-Control: no-cache
 

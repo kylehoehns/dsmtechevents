@@ -60,6 +60,7 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
     .map((e) => ({
       ...e,
       multiDay: e.multiDay ?? dayKey(e.start) !== dayKey(e.end),
+      fullAddress: e.address ?? null, // the short one is for people, this one is for search engines
       address: shortAddress(e.address),
       tags: [...new Set([...(e.tags ?? []), ...e.groupIds.flatMap((id) => byId[id]?.tags ?? [])])],
     }))
