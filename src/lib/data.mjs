@@ -6,10 +6,9 @@ import { meetupSlug, meetupPhoto } from './meetup.mjs';
 import { dayKey, weekday } from './format.mjs';
 import { localToUtc } from './time.mjs';
 
-const dataDir = path.resolve('data');
-const readYaml = (f) => YAML.parse(fs.readFileSync(path.join(dataDir, f), 'utf8')) ?? [];
-
-export function loadData() {
+// Tests pass their own data folder and clock.
+export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = {}) {
+  const readYaml = (f) => YAML.parse(fs.readFileSync(path.join(dataDir, f), 'utf8')) ?? [];
   const groups = readYaml('groups.yaml').map((g) => {
     const cacheFile = path.join(dataDir, 'cache', `${g.id}.json`);
     const cache = fs.existsSync(cacheFile) ? JSON.parse(fs.readFileSync(cacheFile, 'utf8')) : { events: [] };
@@ -57,7 +56,6 @@ export function loadData() {
     else merged.set(key, { ...e });
   }
 
-  const now = Date.now();
   const events = [...merged.values()]
     .map((e) => ({
       ...e,
@@ -120,7 +118,7 @@ export function loadData() {
   }
 
   const fetched = groups.map((g) => g.fetchedAt).filter(Boolean).sort();
-  return { groups, byId, events, upcoming, past, updatedAt: fetched.at(-1) ?? new Date().toISOString() };
+  return { groups, byId, events, upcoming, past, updatedAt: fetched.at(-1) ?? new Date(now).toISOString() };
 }
 
 
@@ -130,7 +128,7 @@ function longWeekday(iso) {
 
 // Every event is around Des Moines, so ", Des Moines, IA 50309" says nothing
 // and makes the row wrap. Keep suburbs ("West Des Moines", "Johnston").
-function shortAddress(a) {
+export function shortAddress(a) {
   if (!a) return a ?? null;
   return a
     .replace(/,+/g, ',')

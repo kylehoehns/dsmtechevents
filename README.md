@@ -48,6 +48,24 @@ npm run dev      # http://localhost:4321
 npm run build    # what Cloudflare runs (no fetching, just the committed data)
 ```
 
+## Tests
+
+```sh
+npm test
+```
+
+Node's built-in test runner, no extra packages. The tests in `tests/` cover the
+parts that break quietly: Des Moines time zones and daylight saving, reading
+Meetup's feed and events page, the SecDSM and PMI readers, merging with the
+previous cache, and the build-time rules (joint meetups, repeating series,
+hiding logo photos and repeated names, short addresses). They run on saved
+fixtures in `tests/fixtures/`, never the network.
+
+`npm run build` runs the tests first, so a failing test stops the build
+everywhere it runs: the `ci` check on pull requests, Cloudflare's deploy, and
+the event refresh. When a source's page changes, save a trimmed copy of the
+new page as a fixture and update the reader until the test passes.
+
 ## Deploying
 
 Cloudflare Workers static assets, connected to `main` with Workers Builds.

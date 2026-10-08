@@ -1,0 +1,7 @@
+{
+  "fetchedAt": "2026-10-07T15:20:00.000Z",
+  "logo": "https://secure.meetupstatic.com/photos/event/a/b/600_777.jpeg",
+  "events": [
+    { "id": "iadnug-1", "title": "Joint Night: JVM vs CLR", "start": "2026-10-22T22:30:00.000Z", "end": "2026-10-23T00:30:00.000Z", "allDay": false, "venue": "Source Allies", "address": "4501 NW Urbandale Dr, Urbandale, IA 50322", "image": "https://secure.meetupstatic.com/photos/event/a/b/600_888.jpeg" }
+  ]
+}

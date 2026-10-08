@@ -1,0 +1,11 @@
+{
+  "fetchedAt": "2026-10-06T10:20:00.000Z",
+  "logo": "https://secure.meetupstatic.com/photos/event/a/b/600_555.jpeg",
+  "events": [
+    { "id": "webgeeks-1", "title": "Spring recap", "start": "2026-09-14T23:30:00.000Z", "end": "2026-09-15T01:00:00.000Z", "allDay": false, "venue": "Source Allies", "address": "4501 NW Urbandale Dr, Urbandale, IA 50322", "going": 9 },
+    { "id": "webgeeks-2", "title": "Hacktoberfest", "start": "2026-10-12T23:30:00.000Z", "end": "2026-10-13T01:00:00.000Z", "allDay": false, "venue": "Online", "online": true, "image": "https://secure.meetupstatic.com/photos/event/a/b/600_555.jpeg" },
+    { "id": "webgeeks-3", "title": "Web Geeks Monthly Meeting", "start": "2026-11-10T00:30:00.000Z", "end": "2026-11-10T02:30:00.000Z", "allDay": false, "venue": "Online", "online": true },
+    { "id": "webgeeks-4", "title": "Web Geeks Monthly Meeting", "start": "2026-12-15T00:30:00.000Z", "end": "2026-12-15T02:30:00.000Z", "allDay": false, "venue": "Online", "online": true },
+    { "id": "webgeeks-5", "title": "Web Geeks Monthly Meeting", "start": "2027-01-12T00:30:00.000Z", "end": "2027-01-12T02:30:00.000Z", "allDay": false, "venue": "Online", "online": true }
+  ]
+}

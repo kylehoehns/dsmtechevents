@@ -1,0 +1,7 @@
+{
+  "fetchedAt": "2026-10-05T10:20:00.000Z",
+  "logo": null,
+  "events": [
+    { "id": "cijug-1", "title": "Joint night - JVM vs. CLR", "start": "2026-10-22T22:30:00.000Z", "end": "2026-10-23T00:30:00.000Z", "allDay": false, "venue": "Source Allies" }
+  ]
+}
