@@ -6,8 +6,10 @@ import { meetupSlug, meetupUrl, meetupPhoto } from './meetup.mjs';
 import { dayKey, lastDay, weekday, fmt } from './format.mjs';
 import { localToUtc } from './time.mjs';
 
-// Tests pass their own data folder and clock.
-export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = {}) {
+// Tests pass their own data folder and clock. The browser tests build the
+// whole site from a fixture folder by setting DSM_DATA_DIR (see
+// playwright.config.mjs); unset, it's the real data/.
+export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'data'), now = Date.now() } = {}) {
   const readYaml = (f) => YAML.parse(fs.readFileSync(path.join(dataDir, f), 'utf8')) ?? [];
   const groups = readYaml('groups.yaml').map((g) => {
     const cacheFile = path.join(dataDir, 'cache', `${g.id}.json`);

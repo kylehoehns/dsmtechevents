@@ -82,6 +82,30 @@ everywhere it runs: the `ci` check on pull requests, Cloudflare's deploy, and
 the event refresh. When a source's page changes, save a trimmed copy of the
 new page as a fixture and update the reader until the test passes.
 
+### Browser tests
+
+```sh
+npx playwright install chromium   # once
+npm run test:e2e
+```
+
+Playwright drives the built site in Chromium at desktop (1280×900) and phone
+(390×844) sizes: the list, the group filter and Back/Forward, the calendar
+and its keyboard controls, the About toggle, the theme button, the Groups,
+Add and TV pages, plus axe accessibility checks on every page in light and
+dark. Any console error fails a test.
+
+The live data changes four times a day, so these tests never use it. They
+build their own copy of the site into `dist-e2e/` from
+`tests/e2e/fixtures/data/` (`DSM_DATA_DIR`), as if it were Wednesday
+Oct 14 2026, 9am (`FAKE_NOW` with `scripts/fake-now.mjs`), and set the
+browser's clock to the same moment. `playwright.config.mjs` does the build
+and serves it with `astro preview`; `tests/e2e/fixtures.mjs` sets the clock.
+To test a new date-dependent case, add an event to the fixture data.
+
+They run as the `e2e` check on every pull request. `npm test` stays the fast
+unit suite and needs no browser.
+
 ## Deploying
 
 Cloudflare Workers static assets, connected to `main` with Workers Builds.

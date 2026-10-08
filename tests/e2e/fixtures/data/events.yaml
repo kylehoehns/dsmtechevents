@@ -1,0 +1,12 @@
+# A two-day headliner 8 days after the test clock, so its poster shows.
+- title: Test Conf 2026
+  url: https://example.com/conf
+  start: 2026-10-22
+  end: 2026-10-23
+  time: "08:00"
+  endTime: "17:00"
+  venue: Convention Center
+  address: 833 5th Ave, Des Moines, IA 50309
+  description: Two days of talks.
+  tags: [conference]
+  featured: true

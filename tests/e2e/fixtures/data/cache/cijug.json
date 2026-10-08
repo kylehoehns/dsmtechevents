@@ -1,0 +1,8 @@
+{
+  "fetchedAt": "2026-10-14T10:20:00.000Z",
+  "logo": null,
+  "events": [
+    { "id": "cijug-past", "title": "Records and sealed types", "start": "2026-10-01T22:30:00.000Z", "end": "2026-10-02T00:30:00.000Z", "allDay": false, "url": "https://www.meetup.com/central-iowa-java-users-group/events/1/", "venue": "Court Avenue Hub", "going": 25 },
+    { "id": "cijug-joint", "title": "Joint night - JVM vs. CLR", "start": "2026-10-20T22:30:00.000Z", "end": "2026-10-21T00:30:00.000Z", "allDay": false, "url": "https://www.meetup.com/central-iowa-java-users-group/events/3/", "venue": "Court Avenue Hub", "address": "100 Court Ave, Des Moines, IA 50309" }
+  ]
+}

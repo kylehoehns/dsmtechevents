@@ -1,0 +1,7 @@
+{
+  "fetchedAt": "2026-10-14T10:20:00.000Z",
+  "logo": null,
+  "events": [
+    { "id": "devopsdsm-online", "title": "Remote DevOps Chat", "start": "2026-10-28T00:00:00.000Z", "end": "2026-10-28T01:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/devopsdsm/events/1/", "online": true }
+  ]
+}
