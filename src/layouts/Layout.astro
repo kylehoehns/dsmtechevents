@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { Font } from 'astro:assets';
 import { site } from '../lib/site.mjs';
 
 interface Props { title?: string; nav?: 'list' | 'calendar' | 'groups' | null; updatedAt?: string; blurb?: string }
@@ -36,12 +37,18 @@ const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="DSM Tech" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Permanent+Marker&display=swap" />
+    {/* Self-hosted fonts (see astro.config.mjs). Only the logo's face is
+        preloaded: it is the biggest thing on screen. */}
+    <Font cssVariable="--display" preload={[{ weight: 900 }]} />
+    <Font cssVariable="--mono" />
+    <Font cssVariable="--sans" />
+    <Font cssVariable="--marker" />
     <script is:inline>
       // Apply a saved light/dark choice before first paint. No choice = follow the device.
       try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}
+      // A shared calendar link hides the list before first paint, so it never
+      // flashes up and then jumps away. app.js keeps this in sync after that.
+      if (new URLSearchParams(location.search).get('view') === 'calendar') document.documentElement.dataset.view = 'calendar';
     </script>
   </head>
   <body>

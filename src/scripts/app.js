@@ -37,10 +37,14 @@ function relLabel(startIso, endIso) {
   const n = daysBetween(today, start);
   return n === 1 ? 'Tomorrow' : '';
 }
+// The build already printed these for the day it ran (see EventCard.astro);
+// they only change for a page opened on a later day, or once an event starts.
 for (const el of $$('.show', listView)) {
   const label = relLabel(el.dataset.start, el.dataset.end);
   const tag = $('.when-tag', el);
-  if (label && tag) { tag.textContent = label; tag.hidden = false; }
+  if (!tag) continue;
+  if (tag.textContent !== label) tag.textContent = label;
+  tag.hidden = !label;
 }
 for (const el of $$('.countdown[data-start]')) {
   const n = daysBetween(today, dayKey(el.dataset.start));
@@ -48,23 +52,33 @@ for (const el of $$('.countdown[data-start]')) {
 }
 
 // ---- state ----
-const params = new URLSearchParams(location.search);
-const state = {
-  view: params.get('view') === 'calendar' ? 'calendar' : 'list',
-  group: groups[params.get('group')] ? params.get('group') : '',
-  day: /^\d{4}-\d{2}-\d{2}$/.test(params.get('day') ?? '') ? params.get('day') : null,
-};
-state.month = (state.day ?? today).slice(0, 7);
+const state = {};
+function readUrl() {
+  const params = new URLSearchParams(location.search);
+  state.view = params.get('view') === 'calendar' ? 'calendar' : 'list';
+  state.group = groups[params.get('group')] ? params.get('group') : '';
+  state.day = /^\d{4}-\d{2}-\d{2}$/.test(params.get('day') ?? '') ? params.get('day') : null;
+  state.month = (state.day ?? today).slice(0, 7);
+}
+readUrl();
 
 // Tell screen readers what a click changed. Never called on first load.
 function announce(text) { status.textContent = text; }
 
+// Switching view or group is a new history entry, so Back undoes it. Picking
+// a day or month just updates the current entry; paging through a calendar
+// shouldn't fill up the Back button.
+let synced = null;
 function syncUrl() {
   const p = new URLSearchParams();
   if (state.view === 'calendar') p.set('view', 'calendar');
   if (state.group) p.set('group', state.group);
   if (state.view === 'calendar' && state.day) p.set('day', state.day);
-  history.replaceState(null, '', p.size ? `?${p}` : location.pathname);
+  const url = p.size ? `?${p}` : location.pathname;
+  const key = `${state.view}|${state.group}`;
+  if (synced != null && synced !== key) history.pushState(null, '', url);
+  else history.replaceState(null, '', url);
+  synced = key;
 }
 const matches = (groupsAttr) => !state.group || (groupsAttr ?? '').split(' ').includes(state.group);
 
@@ -80,7 +94,14 @@ function renderList() {
     const count = $('[data-count]', sec);
     count.textContent = $('.far', sec) ? `${n} on the books` : `${n} ${n === 1 ? 'event' : 'events'}`;
   }
-  $('#list-empty').hidden = anyVisible;
+  const empty = $('#list-empty');
+  empty.hidden = anyVisible;
+  if (!anyVisible && state.group) {
+    const g = groups[state.group];
+    empty.innerHTML = `Nothing on the books for this group right now. ${g.url
+      ? `Check <a href="${escapeHtml(g.url)}" target="_blank" rel="noopener">their page<span class="sr-only"> (opens in new tab)</span></a> for what's next.`
+      : 'Check their page for what\'s next.'}`;
+  }
   squashRepeats();
 }
 
@@ -240,6 +261,10 @@ function render() {
   }
   listView.hidden = state.view !== 'list';
   calView.hidden = state.view !== 'calendar';
+  // Layout.astro sets this before first paint for ?view=calendar links; the
+  // CSS that reads it must agree with the hidden flags above.
+  if (state.view === 'calendar') document.documentElement.dataset.view = 'calendar';
+  else delete document.documentElement.dataset.view;
   if (state.view === 'list') { renderList(); renderMinical(); } else renderCalendar();
   renderSide();
   syncUrl();
@@ -361,6 +386,17 @@ calView.addEventListener('keydown', (ev) => {
   cell.tabIndex = -1;
   next.tabIndex = 0;
   next.focus();
+});
+
+// Back/Forward: the URL changed under us, so read it again. The status line
+// says what is showing now, the same as a click would.
+addEventListener('popstate', () => {
+  const before = `${state.view}|${state.group}|${state.day}`;
+  readUrl();
+  if (`${state.view}|${state.group}|${state.day}` === before) return; // e.g. Back from the skip link's #main
+  synced = null; // the URL is already right; don't push it again
+  render();
+  announceFilter();
 });
 
 render();

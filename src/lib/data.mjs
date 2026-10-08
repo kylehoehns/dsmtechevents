@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
-import { meetupSlug } from './meetup.mjs';
+import { meetupSlug, meetupPhoto } from './meetup.mjs';
 import { dayKey, weekday } from './format.mjs';
 import { localToUtc } from './time.mjs';
 
@@ -76,6 +76,8 @@ export function loadData() {
   for (const e of events) {
     const logos = e.groupIds.map((id) => photoId(byId[id]?.logo)).filter(Boolean);
     e.photo = e.image && !logos.includes(photoId(e.image)) ? e.image : null;
+    // Smaller webp copies when it's a Meetup photo: { small, large } or null.
+    e.photoSizes = meetupPhoto(e.photo);
     e.venueKey = e.online ? 'online' : (e.venue ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() || null;
   }
 
@@ -111,6 +113,8 @@ export function loadData() {
     // and "IADNUG" / "Iowa .NET User Group" don't.
     const [short, full] = [squash(g.short), squash(g.name)];
     g.showFullName = !(full.includes(short) && short.length >= full.length * 0.6);
+    // The groups page shows logos at 60px; the 180px webp is plenty.
+    g.logoThumb = meetupPhoto(g.logo)?.small ?? g.logo;
     delete g._events;
   }
 

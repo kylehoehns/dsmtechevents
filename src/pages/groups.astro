@@ -15,7 +15,7 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
   <div class="board">
     {sorted.map((g, i) => (
       <article class:list={['flyer', { 'has-logo': !!g.logo }]}>
-        {g.logo && <img class="logo-img" src={g.logo} alt="" loading="lazy" width="60" height="60" />}
+        {g.logo && <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />}
         <h2>{g.short}</h2>
         {g.showFullName && <p class="full">{g.name}</p>}
         <p class="tags">{g.tags.map((t: string) => <b>{t}</b>)}</p>
