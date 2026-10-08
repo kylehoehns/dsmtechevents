@@ -233,4 +233,14 @@ const slides = await Promise.all(events.map(async (e) => ({
   });
   setInterval(() => { clock.textContent = clockFmt.format(new Date()); }, 15_000);
   show(0);
+
+  // Keep the screen from dimming or sleeping while the page is up (a laptop
+  // driving a booth TV, say). Browsers drop the lock whenever the tab is
+  // hidden, so ask again each time it comes back. Where it isn't supported,
+  // or is refused, the slideshow just runs as before.
+  async function stayAwake() {
+    try { if (document.visibilityState === 'visible') await navigator.wakeLock?.request('screen'); } catch {}
+  }
+  stayAwake();
+  document.addEventListener('visibilitychange', stayAwake);
 </script>
