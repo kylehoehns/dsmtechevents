@@ -191,7 +191,7 @@ for (const colorScheme of ['light', 'dark']) {
 test('every page has the search button in the same spot; elsewhere it opens search on the events page', async ({ page }) => {
   const spot = async (path) => { await page.goto(path); return page.getByRole('link', { name: 'Search events' }).or(page.getByRole('button', { name: 'Search events' })).boundingBox(); };
   const home = await spot('/');
-  for (const path of ['/groups/', '/about/', '/add/']) expect(await spot(path), path).toEqual(home);
+  for (const path of ['/groups/', '/about/', '/organizers/']) expect(await spot(path), path).toEqual(home);
   await page.getByRole('link', { name: 'Search events' }).click();
   await expect(page).toHaveURL(/\/(\?search)?$/);
   await expect(page.getByRole('searchbox', { name: 'Search events' })).toBeFocused();

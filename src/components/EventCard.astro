@@ -13,7 +13,7 @@ const { event: e, byId } = Astro.props;
 const hosts = e.groupIds.map((id: string) => byId[id]).filter(Boolean);
 const lead = hosts[0];
 const isMeetup = e.url?.includes('meetup.com');
-const cta = isMeetup ? 'RSVP on Meetup' : e.headliner ? 'Tickets & info' : 'RSVP & info';
+const cta = isMeetup ? 'RSVP on Meetup' : 'RSVP & info';
 const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
 // Meetup photos come as small webp copies (see meetupPhoto). Most are 16:9 at
 // 600x338; width/height hold that shape until the image arrives.

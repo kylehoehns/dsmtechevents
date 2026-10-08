@@ -8,8 +8,8 @@ test('Recently recounts its summary and "All" button for a group filter', async 
   await page.goto(`/?group=${group.split(' ')[0]}`);
   const rows = page.locator('#recent-list li:not([hidden])');
   const n = await rows.count();
-  const rsvps = (await rows.evaluateAll((lis) => lis.map((li) => Number(li.dataset.going)))).reduce((a, b) => a + b, 0);
-  await expect(sub).toHaveText(`The last three months. ${n} event${n === 1 ? '' : 's'}, ${rsvps} RSVP${rsvps === 1 ? '' : 's'}.`);
+  const went = (await rows.evaluateAll((lis) => lis.map((li) => Number(li.dataset.going)))).reduce((a, b) => a + b, 0);
+  await expect(sub).toHaveText(`The last three months. ${n} event${n === 1 ? '' : 's'}, ${went} ${went === 1 ? 'person' : 'people'} went.`);
   expect(await sub.textContent()).not.toBe(before);
 });
 

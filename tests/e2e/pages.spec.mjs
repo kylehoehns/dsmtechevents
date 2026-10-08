@@ -46,15 +46,17 @@ test('a link to /groups/#id highlights that group', async ({ page }) => {
   const outline = (id) => page.locator(`article#${id}`).evaluate((el) => getComputedStyle(el).outlineStyle);
   expect(await outline('pyowa')).toBe('solid');
   expect(await outline('cijug')).toBe('none');
-  await page.locator('article#pyowa').getByRole('link', { name: '1 event from Pyowa' }).click();
+  await page.locator('article#pyowa').getByRole('link', { name: 'See 1 upcoming from Pyowa' }).click();
   await expect(page).toHaveURL(/\/\?group=pyowa$/);
 });
 
-test('add page copies the email address', async ({ page, context }) => {
+test('the organizers page copies the email address', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.goto('/add/');
-  await page.getByRole('button', { name: 'Copy address' }).click();
-  await expect(page.getByRole('status')).toHaveText('Copied');
+  await page.goto('/organizers/');
+  const copy = page.locator('.email-actions button');
+  await expect(copy).toHaveText('Copy address');
+  await copy.click();
+  await expect(copy).toHaveText('Copied');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('hello@dsmtechevents.com');
 });
 
@@ -84,8 +86,10 @@ test('theme button remembers the choice', async ({ page }) => {
 
 test('the footer links to the organizers page, which links the TV and print pages', async ({ page }) => {
   await page.goto('/about/');
-  await page.getByRole('contentinfo').getByRole('link', { name: 'For organizers' }).click();
+  await page.getByRole('contentinfo').getByRole('link', { name: 'Add your group or event' }).click();
   await expect(page).toHaveURL(/\/organizers\/$/);
+  await expect(page.getByRole('heading', { name: 'Get listed' })).toBeVisible();
+  await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Add your group or event' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'The regular TV page' })).toHaveAttribute('href', '/tv/');
   await expect(page.getByRole('link', { name: 'Print a flyer' })).toHaveAttribute('href', '/print/');
 });

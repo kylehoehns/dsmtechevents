@@ -23,11 +23,10 @@ test('copies the screen link and the badge snippets', async ({ page, context }) 
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Find more Des Moines tech meetups and conferences: https://dsmtechevents.com');
 });
 
-test('the badge kit lives here, and /add/ points to it', async ({ page }) => {
-  await page.goto('/add/');
-  await expect(page.locator('.badge-kit')).toHaveCount(0);
-  await page.getByRole('link', { name: 'The organizers page' }).click();
-  await expect(page).toHaveURL(/\/organizers\/$/);
+test('getting listed comes first, then the badge kit', async ({ page }) => {
+  await page.goto('/organizers/');
+  await expect(page.getByRole('heading', { level: 2 }).first()).toHaveText('Get listed');
+  await expect(page.getByRole('link', { name: 'Open in your email app' })).toHaveAttribute('href', /^mailto:hello@dsmtechevents\.com\?subject=/);
   await expect(page.getByRole('heading', { name: 'Point your members here' })).toBeVisible();
   await expect(page.getByRole('img', { name: 'Find more Des Moines tech events' })).toBeVisible();
 });

@@ -9,7 +9,7 @@ import { month, day, shortTime } from '../lib/format.mjs';
 // search: the events page's search button and box (app.js runs them). Every
 // other page gets the same button as a link to /?search, so the nav row never
 // shifts between pages and search works from anywhere.
-interface Props { bare?: boolean; search?: boolean; title?: string; headTitle?: string; description?: string; noindex?: boolean; nav?: 'list' | 'calendar' | 'groups' | 'add' | 'about' | 'organizers' | null; updatedAt?: string; blurb?: string }
+interface Props { bare?: boolean; search?: boolean; title?: string; headTitle?: string; description?: string; noindex?: boolean; nav?: 'list' | 'calendar' | 'groups' | 'about' | 'organizers' | null; updatedAt?: string; blurb?: string }
 const { bare = false, search = false, title, headTitle, description = site.tagline, noindex = false, nav = 'list', updatedAt, blurb } = Astro.props;
 const pageTitle = headTitle ?? (title ? `${title} · ${site.name}` : site.name);
 // Same time style as the event list: "Oct 8, 5:52a".
@@ -124,16 +124,15 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
 
     <footer class="foot">
       <div class="wrap">
-        {nav !== 'add' ? (
+        {nav !== 'organizers' ? (
         <div>
-          <p class="big"><a href="/add/">Add your group or event →</a></p>
-          <p style="margin-top:10px">Run a tech meetup, conference or one-off event in central Iowa? Here's how to get it listed.</p>
+          <p class="big"><a href="/organizers/">Add your group or event →</a></p>
+          <p style="margin-top:10px">Run a tech meetup, conference or one-off event in central Iowa? Here's how to get it listed, plus a TV screen, flyers and a badge.</p>
         </div>
         ) : <div />}
         <div class="fine">
           {updated && <p>Last updated {updated}.</p>}
           <p>All times Central. <a href="/about/">About this site</a></p>
-          <p><a href="/organizers/">For organizers</a>: TV screens, flyers and a badge</p>
           <button type="button" class="install-app btn btn-solid" id="install-app" hidden>Install as an app</button>
         </div>
       </div>
