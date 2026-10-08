@@ -27,3 +27,11 @@ test('ties go to the venue used most recently', () => {
   ]);
   assert.deepEqual(rows.map((r) => r.name), ['Big Grove Brewery', 'Wellmark Building']);
 });
+
+test('one room under slightly different names is one venue', () => {
+  const rows = hostedVenues([
+    { venue: 'Lean Techniques, Inc.', start: '2026-03-10T23:00:00Z', group: 'aws' },
+    { venue: 'Lean Techniques', start: '2026-05-12T23:00:00Z', group: 'aws' },
+  ]);
+  assert.deepEqual(rows.map((r) => [r.name, r.count]), [['Lean Techniques, Inc.', 2]]);
+});

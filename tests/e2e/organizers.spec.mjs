@@ -31,11 +31,13 @@ test('getting listed comes first, then the badge kit', async ({ page }) => {
   await expect(page.getByRole('img', { name: 'Find more Des Moines tech events' })).toBeVisible();
 });
 
-test('lists rooms that have hosted a meetup, from the events on record', async ({ page }) => {
+test('lists rooms that have hosted a meetup, folded away until asked', async ({ page }) => {
   await page.goto('/organizers/');
-  const rooms = page.getByRole('region', { name: 'Need a room?' });
-  const rows = rooms.getByRole('listitem');
-  await expect(rows.first()).toContainText(/\d+ meetups? · /);
-  await expect(rooms).not.toContainText(/^Online$/m);
-  expect(await rows.count()).toBeGreaterThan(0);
+  const summary = page.getByText(/^\d+ places? that have hosted a meetup since /);
+  const rows = page.locator('.venue-list li');
+  await expect(rows.first()).toBeHidden();
+  await summary.click();
+  await expect(rows.first()).toBeVisible();
+  await expect(rows.first()).toContainText(/\d+ meetups?$/);
+  await expect(page.locator('.venue-list')).not.toContainText(/^Online/m);
 });

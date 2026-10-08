@@ -576,12 +576,11 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 .snippet-head .btn { min-width: 6.5em; }
 .snippet pre { margin: 0; padding: 10px; overflow-x: auto; font: var(--fs-meta)/1.45 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
 .add-page > p { margin: 0; }
-.add-page .venue-list { list-style: none; padding: 0; margin-top: 10px; gap: 0; }
-.venue-list li { display: grid; gap: 2px; padding: 10px 0; border-top: 1px solid var(--line); }
-.venue-list li:last-child { border-bottom: 1px solid var(--line); }
-.venue-list b { font-weight: 600; }
-.venue-addr, .venue-meta { font-size: var(--fs-meta); color: var(--ink-soft); }
-.venue-meta { font-family: var(--mono); }
+.venues { margin-top: 10px; }
+.venues summary { cursor: pointer; color: var(--link-t); }
+.add-page .venue-list { list-style: none; padding: 0; margin-top: 8px; gap: 0; }
+.venue-list li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 6px 0; border-top: 1px solid var(--line); }
+.venue-n { flex: none; font: var(--fs-meta) var(--mono); color: var(--ink-soft); }
 /* ---------- for organizers: the TV screen builder ---------- */
 .builder-box { margin-top: 12px; border: 2px solid var(--line); background: var(--sheet); padding: 14px; display: grid; gap: 14px; }
 .builder .field { margin: 0; display: grid; gap: 4px; }
