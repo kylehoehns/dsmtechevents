@@ -259,6 +259,7 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 }
 .filter-note { font-size: var(--fs-meta); margin: 8px 0 0; }
 .filter-note button { background: none; border: 0; padding: 0; text-decoration: underline; font-weight: 600; }
+.filter-note a { color: inherit; font-weight: 600; }
 
 /* ---------- section heads ---------- */
 .sec { margin-top: 22px; }

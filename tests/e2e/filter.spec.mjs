@@ -17,6 +17,7 @@ test('a chip filters the list and updates the URL', async ({ page }) => {
   await expect(event(page, 'Python Office Hours')).toBeHidden();
   await expect(page.getByRole('status')).toHaveText('Showing 1 event from Web Geeks');
   await expect(page.getByText('Showing only DSM Web Geeks.')).toBeVisible();
+  await expect(page.locator('#filter-note').getByRole('link', { name: 'About the group' })).toHaveAttribute('href', '/groups/#webgeeks');
 
   await page.getByRole('button', { name: 'Show all groups' }).click();
   await expect(page).toHaveURL(/\/$/);
