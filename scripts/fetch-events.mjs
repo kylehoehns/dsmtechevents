@@ -82,7 +82,7 @@ async function fetchGroup(group) {
   if (group.source) {
     const read = SOURCES[group.source];
     if (!read) throw new Error(`unknown source "${group.source}"`);
-    const events = (await read(group, { get })).filter((e) => Date.parse(e.end) >= cutoff);
+    const events = (await read(group, { get, now, since: cutoff })).filter((e) => Date.parse(e.end) >= cutoff);
     fresh = { events, logo: group.logo ?? null, enriched: true };
   } else {
     fresh = await fetchFeed(group, now, cutoff);
