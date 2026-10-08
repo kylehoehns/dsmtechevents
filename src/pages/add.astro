@@ -3,6 +3,7 @@
 // lands here, so nobody is surprised by their mail app opening.
 import Layout from '../layouts/Layout.astro';
 import { site } from '../lib/site.mjs';
+import { loadData } from '../lib/data.mjs';
 
 const subject = 'Add to DSM Tech Events';
 const body = [
@@ -21,7 +22,7 @@ const snippets = [
   { label: 'Plain text (Meetup description)', code: `Find more Des Moines tech meetups and conferences: ${site.url}` },
 ];
 ---
-<Layout nav="add" headTitle="Add your group or event · DSM Tech Events"
+<Layout nav="add" updatedAt={loadData().updatedAt} headTitle="Add your group or event · DSM Tech Events"
   description="Get your Des Moines tech meetup, user group, conference or one-off event listed on DSM Tech Events. Send us your Meetup link, or the details of a single event.">
   <div class="page-head"><h1>Add your group or event</h1></div>
 

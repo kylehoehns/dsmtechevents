@@ -15,7 +15,9 @@ const dayPanel = $('#day-panel');
 const minical = $('#minical');
 const recent = $('#recent');
 const status = $('#status');
+// A filtered view's title builds on the short name, not the long search title.
 const siteTitle = document.title;
+const siteName = document.querySelector('meta[property="og:site_name"]')?.content ?? siteTitle;
 const now = Date.now();
 const today = dayKey(now);
 
@@ -144,7 +146,7 @@ function renderSide() {
   const all = $('#recent-all');
   if (all) {
     all.hidden = shown <= limit;
-    if (all.getAttribute('aria-expanded') !== 'true') all.textContent = `All ${shown} →`;
+    if (all.getAttribute('aria-expanded') !== 'true') all.textContent = `+ All ${shown}`;
   }
   recent.hidden = state.view === 'calendar' || shown === 0;
   minical.hidden = state.view === 'calendar';
@@ -250,7 +252,7 @@ function renderMinical() {
     if (!key.startsWith(ym)) return '<span class="blank" aria-hidden="true"></span>';
     const list = eventsOn(key);
     const cls = [list.length ? 'has' : '', list.some((e) => e.headliner) ? 'headliner' : '', key === today ? 'today' : '', key < today ? 'past' : ''].filter(Boolean).join(' ');
-    return `<button type="button" class="${cls}" data-goto="${key}" aria-label="${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'no events'}">${Number(key.slice(8))}</button>`;
+    return `<button type="button" class="${cls}" data-goto="${key}" aria-label="${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}">${Number(key.slice(8))}</button>`;
   });
   minical.innerHTML = `<h2>${monthName(ym)} <a href="?view=calendar" data-nav="calendar">Full calendar</a></h2>
     <div class="mini-grid">${WEEKDAYS.map((d) => `<span class="weekday" aria-hidden="true">${d[0]}</span>`).join('')}${cells.join('')}</div>`;
@@ -261,7 +263,7 @@ let listShown = 0;
 function render() {
   const viewName = state.view === 'calendar' ? 'Calendar' : '';
   const groupName = state.group ? groups[state.group].short : '';
-  document.title = [groupName, viewName, siteTitle].filter(Boolean).join(' · ');
+  document.title = groupName || viewName ? [groupName, viewName, siteName].filter(Boolean).join(' · ') : siteTitle;
   for (const a of $$('.nav a[data-nav]')) {
     if (a.dataset.nav === state.view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   }
@@ -332,7 +334,7 @@ document.addEventListener('click', (ev) => {
     const open = all.getAttribute('aria-expanded') !== 'true';
     all.setAttribute('aria-expanded', String(open));
     $('#recent-list').classList.toggle('open', open);
-    all.textContent = open ? 'Fewer ↑' : `All ${$$('#recent-list li:not([hidden])').length} →`;
+    all.textContent = open ? '− Fewer' : `+ All ${$$('#recent-list li:not([hidden])').length}`;
     return;
   }
 

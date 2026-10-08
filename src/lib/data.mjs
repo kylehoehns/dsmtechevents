@@ -83,6 +83,10 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
     // other image is used as-is for both.
     const url = e.image && !logos.includes(photoId(e.image)) ? e.image : null;
     e.photo = url && (meetupPhoto(url) ?? { small: url, large: url });
+    // Who's putting it on, as plain text: "CIJUG + Pyowa", or for an event
+    // with no group, "Conference" / "Community event". Every list uses this.
+    e.hostsLabel = e.groupIds.map((id) => byId[id]?.short).filter(Boolean).join(' + ')
+      || (e.headliner || e.tags.includes('conference') ? 'Conference' : 'Community event');
     // Same street address = same venue, even when it's spelled two ways
     // ("Community Choice Convention Center" vs "...Credit Union Convention Center").
     const street = /^\s*(\d+\s+\S+(?:\s+\S+)?)/.exec(e.address ?? '')?.[1];
