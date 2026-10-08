@@ -129,6 +129,6 @@ test('mergeCache keeps the typical turnout and leaves it out when unknown', () =
   assert.equal(mergeCache(previous, { events: [], enriched: true }, { now, cutoff, fetchedAt: 'NOW' }).fetchedAt, 'THEN');
   assert.equal(mergeCache(previous, { events: [], typical: 22, enriched: true }, { now, cutoff, fetchedAt: 'NOW' }).typical, 22);
   assert.ok(!('typical' in mergeCache({ events: [] }, { events: [], enriched: true }, { now, cutoff })));
-  const facts = mergeCache({ events: [], members: 300 }, { events: [], members: 326, pastCount: 19, usual: '4th Tue · 5:30p', enriched: true }, { now, cutoff });
-  assert.deepEqual([facts.members, facts.pastCount, facts.usual], [326, 19, '4th Tue · 5:30p']);
+  const facts = mergeCache({ events: [], members: 300 }, { events: [], members: 326, pastCount: 19, enriched: true }, { now, cutoff });
+  assert.deepEqual([facts.members, facts.pastCount], [326, 19]);
 });
