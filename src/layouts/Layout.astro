@@ -47,7 +47,7 @@ const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format
           <p class="blurb" set:html={blurb ?? 'Every tech meetup, user group and conference in Des Moines, on one sheet.'} />
           {nav !== null && (
             <nav class="nav" aria-label="Main">
-              <a href="/" data-nav="list" aria-current={nav === 'list' ? 'page' : undefined}>Shows</a>
+              <a href="/" data-nav="list" aria-current={nav === 'list' ? 'page' : undefined}>Events</a>
               <a href="/?view=calendar" data-nav="calendar" aria-current={nav === 'calendar' ? 'page' : undefined}>Calendar</a>
               <a href="/groups/" data-nav="groups" aria-current={nav === 'groups' ? 'page' : undefined}>Groups</a>
             </nav>

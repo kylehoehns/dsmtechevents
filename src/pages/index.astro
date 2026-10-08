@@ -61,10 +61,10 @@ const blurb = 'Every tech meetup, user group and conference in Des Moines, on on
 <Layout updatedAt={updatedAt} blurb={blurb}>
   <div class="layout">
     <div class="main">
-      <section id="list-view" aria-label="Upcoming shows">
+      <section id="list-view" aria-label="Upcoming events">
         {sections.map((s) => (
           <section class="sec" data-sec>
-            <div class="sec-head"><h2>{s.title}</h2><span class="count" data-count>{s.items.length} {s.items.length === 1 ? 'show' : 'shows'}</span></div>
+            <div class="sec-head"><h2>{s.title}</h2><span class="count" data-count>{s.items.length} {s.items.length === 1 ? 'event' : 'events'}</span></div>
             <ul class="shows">{s.items.map((e) => <EventCard event={e} byId={byId} />)}</ul>
           </section>
         ))}
@@ -129,7 +129,7 @@ const blurb = 'Every tech meetup, user group and conference in Des Moines, on on
       <section class="minical" id="minical" aria-label="This month"></section>
 
       <section class="recent" id="recent" aria-labelledby="recent-h">
-        <h2 id="recent-h">Recent shows</h2>
+        <h2 id="recent-h">Recent events</h2>
         <p class="sub">The last three months. {past.length} events, {past.reduce((n, e) => n + (e.going ?? 0), 0)} RSVPs.</p>
         <ol class="setlist" id="recent-list">
           {past.map((e, i) => (
