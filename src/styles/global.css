@@ -209,7 +209,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   border: 1.5px solid var(--line); padding: 6px 8px; font: 600 12.5px/1 var(--mono); white-space: nowrap;
 }
 .chip .n { font-weight: 400; color: var(--ink-soft); }
-.chip.idle { color: var(--ink-soft); border-style: dashed; }
 .chip[aria-pressed="true"] { background: var(--blue-fill); color: var(--on-blue); border-color: var(--blue-fill); }
 .chip[aria-pressed="true"] .n { color: var(--on-blue); }
 .chip:hover:not([aria-pressed="true"]) { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
