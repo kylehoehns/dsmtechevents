@@ -15,7 +15,6 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
     const slug = meetupSlug(g.meetup);
     return {
       ...g,
-      tags: g.tags ?? [],
       meetupUrl: slug ? `https://www.meetup.com/${slug}/` : null,
       logo: g.logo ?? cache.logo ?? null,
       fetchedAt: cache.fetchedAt ?? null,
@@ -63,9 +62,9 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
     .map((e) => ({
       ...e,
       multiDay: e.multiDay ?? dayKey(e.start) !== dayKey(e.end),
+      tags: e.tags ?? [],
       fullAddress: e.address ?? null, // the short one is for people, this one is for search engines
       address: shortAddress(e.address),
-      tags: [...new Set([...(e.tags ?? []), ...e.groupIds.flatMap((id) => byId[id]?.tags ?? [])])],
     }))
     .sort((a, b) => a.start.localeCompare(b.start));
 
