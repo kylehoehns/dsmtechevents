@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import secdsm from '../scripts/sources/secdsm.mjs';
 import pmiChapter from '../scripts/sources/pmi-chapter.mjs';
 import taiTechbrew from '../scripts/sources/tai-techbrew.mjs';
+import iowansOfThings from '../scripts/sources/iowans-of-things.mjs';
 import { decode, toText } from '../scripts/sources/html.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
@@ -100,4 +101,24 @@ test('tai-techbrew fails loudly when the feed or event page changes', async () =
 test('html helpers decode entities and strip tags', () => {
   assert.equal(decode('Q&amp;A &#8212; &#x2192; &rsquo;s &bogus;'), 'Q&A — → ’s &bogus;');
   assert.equal(toText('<p>Hi<br/>there  <b>you</b></p>'), 'Hi\nthere you');
+});
+
+test('iowans-of-things reads the Upcoming Events section of the homepage', async () => {
+  const events = await iowansOfThings({ id: 'iot', website: 'https://iowansofthings.com/' }, serve(fixture('iowans-of-things.html')));
+  assert.deepEqual(events.map((e) => e.id), ['iot-ff-october-2026', 'iot-hh-november-2026'], 'past events are left out');
+  const [ff, hh] = events;
+  assert.equal(ff.title, 'Firmware Fellowship - October 2026');
+  assert.equal(ff.start, '2026-10-09T00:00:00.000Z', '7pm CDT');
+  assert.equal(ff.end, '2026-10-09T01:00:00.000Z');
+  assert.equal(ff.venue, 'Area515, Des Moines Maker Space');
+  assert.equal(ff.address, '108 Jefferson Avenue, Des Moines, IA 50314');
+  assert.equal(ff.url, 'https://iowansofthings.com/ff-october-2026');
+  assert.equal(ff.image, 'https://iowansofthings.com/assets/images/banner_ff.png');
+  assert.equal(ff.description, 'A technical discussion series on embedded firmware. Don’t be afraid to join us!\n\nThis month: an open-source project review.');
+  assert.equal(hh.start, '2026-11-13T00:30:00.000Z', '6:30pm CST');
+  assert.ok(!('image' in hh));
+});
+
+test('iowans-of-things fails loudly when the homepage changes', async () => {
+  await assert.rejects(iowansOfThings({ id: 'iot' }, serve('<html>new site</html>')), /no Upcoming Events section/);
 });
