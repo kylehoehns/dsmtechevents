@@ -1,0 +1,222 @@
+[
+ {
+  "id": "webgeeks-312416819",
+  "group": "webgeeks",
+  "title": "Hiring in the Age of AI",
+  "start": "2026-07-13T23:30:00.000Z",
+  "end": "2026-07-14T01:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 37,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416819/"
+ },
+ {
+  "id": "cijug-315286709",
+  "group": "cijug",
+  "title": "From Sidebar to Sub-Agents: A Live, Hands-On Guide to Building with AI Agents",
+  "start": "2026-07-16T22:30:00.000Z",
+  "end": "2026-07-17T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 20,
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/315286709/"
+ },
+ {
+  "id": "azure-315743826",
+  "group": "azure",
+  "title": "Beyond the YAML Spaghetti: Building App-Centric Systems with Radius",
+  "start": "2026-07-22T17:00:00.000Z",
+  "end": "2026-07-22T18:00:00.000Z",
+  "online": true,
+  "going": 5,
+  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/315743826/"
+ },
+ {
+  "id": "devopsdsm-315470117",
+  "group": "devopsdsm",
+  "title": "July Lightning Talks",
+  "start": "2026-07-22T23:00:00.000Z",
+  "end": "2026-07-23T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 18,
+  "url": "https://www.meetup.com/devopsdsm/events/315470117/"
+ },
+ {
+  "id": "alf-315376050",
+  "group": "alf",
+  "title": "The AI-Human Edge",
+  "start": "2026-07-24T13:30:00.000Z",
+  "end": "2026-07-24T15:30:00.000Z",
+  "venue": "Corteva Carver Research Center",
+  "going": 34,
+  "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/315376050/"
+ },
+ {
+  "id": "dsmdata-315499336",
+  "group": "dsmdata",
+  "title": "Des Moines Data for Good Update",
+  "start": "2026-07-28T21:00:00.000Z",
+  "end": "2026-07-28T22:30:00.000Z",
+  "venue": "Wellmark Building",
+  "going": 32,
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/315499336/"
+ },
+ {
+  "id": "pyowa-315470463",
+  "group": "pyowa",
+  "title": "Sick Risk: From Messy Data to an Illness Risk Model",
+  "start": "2026-07-28T22:30:00.000Z",
+  "end": "2026-07-29T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 14,
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315470463/"
+ },
+ {
+  "id": "webgeeks-312416822",
+  "group": "webgeeks",
+  "title": "Coding Dojo",
+  "start": "2026-08-10T23:30:00.000Z",
+  "end": "2026-08-11T01:00:00.000Z",
+  "online": true,
+  "going": 16,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416822/"
+ },
+ {
+  "id": "producttank-315588233",
+  "group": "producttank",
+  "title": "The Best User Story I Never Wrote",
+  "start": "2026-08-18T21:30:00.000Z",
+  "end": "2026-08-18T23:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 21,
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/315588233/"
+ },
+ {
+  "id": "dsmai-311239023",
+  "group": "dsmai",
+  "title": "Trust, But Verify: Human-in-the-Loop for Agents That Actually Matter",
+  "start": "2026-08-18T22:30:00.000Z",
+  "end": "2026-08-19T00:30:00.000Z",
+  "venue": "We Write Code",
+  "going": 35,
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239023/"
+ },
+ {
+  "id": "cijug-315859295",
+  "group": "cijug",
+  "title": "The Past Didn't Go Anywhere: Fundamentals > AI",
+  "start": "2026-08-20T22:30:00.000Z",
+  "end": "2026-08-21T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 13,
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/315859295/"
+ },
+ {
+  "id": "pyowa-315907190",
+  "group": "pyowa",
+  "title": "Roboflow",
+  "start": "2026-08-25T22:30:00.000Z",
+  "end": "2026-08-26T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 17,
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315907190/"
+ },
+ {
+  "id": "devopsdsm-315859296",
+  "group": "devopsdsm",
+  "title": "The SaaS Startup Dependency Graph",
+  "start": "2026-08-26T23:00:00.000Z",
+  "end": "2026-08-27T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 17,
+  "url": "https://www.meetup.com/devopsdsm/events/315859296/"
+ },
+ {
+  "id": "iadnug-316281444",
+  "group": "iadnug",
+  "title": "Social@.NET - 2026 Evening Social",
+  "start": "2026-09-03T22:30:00.000Z",
+  "end": "2026-09-04T00:30:00.000Z",
+  "venue": "Gilroy's Kitchen + Pub + Patio",
+  "going": 12,
+  "url": "https://www.meetup.com/iadnug/events/316281444/"
+ },
+ {
+  "id": "mobile-316098796",
+  "group": "mobile",
+  "title": "Mobile Engineering Meetup",
+  "start": "2026-09-09T22:30:00.000Z",
+  "end": "2026-09-10T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 5,
+  "url": "https://www.meetup.com/des-moines-mobile-developers/events/316098796/"
+ },
+ {
+  "id": "dsmdata-316271371",
+  "group": "dsmdata",
+  "title": "Knowledge Graphs: The Memory Your Data Team Doesn't Have (Yet)",
+  "start": "2026-09-14T21:00:00.000Z",
+  "end": "2026-09-14T22:30:00.000Z",
+  "venue": "John Deere Financial",
+  "going": 33,
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/316271371/"
+ },
+ {
+  "id": "webgeeks-312416823",
+  "group": "webgeeks",
+  "title": "The Great Migration: An AI-Assisted Journey from TypeScript to Python",
+  "start": "2026-09-14T23:30:00.000Z",
+  "end": "2026-09-15T01:00:00.000Z",
+  "online": true,
+  "going": 16,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416823/"
+ },
+ {
+  "id": "dsmai-316356573",
+  "group": "dsmai",
+  "title": "429 Problems: Scaling Systems Without Breaking Everything",
+  "start": "2026-09-15T22:30:00.000Z",
+  "end": "2026-09-16T00:30:00.000Z",
+  "venue": "We Write Code",
+  "going": 23,
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/316356573/"
+ },
+ {
+  "id": "cijug-316358683",
+  "group": "cijug",
+  "title": "CIJUG Social Networking Event",
+  "start": "2026-09-16T22:30:00.000Z",
+  "end": "2026-09-17T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 13,
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/316358683/"
+ },
+ {
+  "id": "producttank-316421956",
+  "group": "producttank",
+  "title": "End of Summer | Product Networking Mixer",
+  "start": "2026-09-22T21:30:00.000Z",
+  "end": "2026-09-22T23:00:00.000Z",
+  "venue": "Big Grove Brewery",
+  "going": 15,
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/316421956/"
+ },
+ {
+  "id": "pyowa-316355128",
+  "group": "pyowa",
+  "title": "Pybites Coding Exercises",
+  "start": "2026-09-22T22:30:00.000Z",
+  "end": "2026-09-23T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 5,
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/316355128/"
+ },
+ {
+  "id": "devopsdsm-316404457",
+  "group": "devopsdsm",
+  "title": "SaltStack: Configuration Management From Cloud Images to Developer Desktops",
+  "start": "2026-09-23T23:00:00.000Z",
+  "end": "2026-09-24T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 10,
+  "url": "https://www.meetup.com/devopsdsm/events/316404457/"
+ }
+]

@@ -24,6 +24,7 @@ import pmiChapter from './sources/pmi-chapter.mjs';
 import taiTechbrew from './sources/tai-techbrew.mjs';
 import iowansOfThings from './sources/iowans-of-things.mjs';
 import { parseFeed, parseEventsPage, enrich, mergeCache } from './sources/meetup.mjs';
+import { updateArchive } from './archive.mjs';
 
 const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew, 'iowans-of-things': iowansOfThings };
 
@@ -55,6 +56,20 @@ for (const group of groups) {
   await new Promise((r) => setTimeout(r, 500)); // be polite to Meetup
 }
 await fs.writeFile(path.join(root, 'fetch-report.json'), JSON.stringify(report, null, 2) + '\n');
+
+// Every ended event also goes into data/archive/<year>.json, which keeps them
+// after they age out of the cache's 90 days.
+const archiveDir = path.join(root, 'data/archive');
+await fs.mkdir(archiveDir, { recursive: true });
+const archive = {};
+for (const f of await fs.readdir(archiveDir)) {
+  if (f.endsWith('.json')) archive[f.slice(0, -5)] = JSON.parse(await fs.readFile(path.join(archiveDir, f), 'utf8'));
+}
+const caches = Object.fromEntries(await Promise.all(groups.map(async (g) => [g.id, await readCache(g.id)])));
+for (const [year, list] of Object.entries(updateArchive(archive, caches, Date.now()))) {
+  await fs.writeFile(path.join(archiveDir, `${year}.json`), JSON.stringify(list, null, 1) + '\n');
+  console.log(`archive ${year}: ${list.length} events`);
+}
 if (failures === groups.length) {
   console.error('Every feed failed. Building from cache only.');
 }
