@@ -28,6 +28,7 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   const byId = Object.fromEntries(groups.map((g) => [g.id, g]));
 
   const manual = readYaml('events.yaml').map((e) => {
+    if ('featured' in e) throw new Error(`events.yaml: "${e.title}" uses featured:, which is now headliner:`);
     const startDate = String(e.start);
     const endDate = String(e.end ?? e.start);
     const allDay = !e.time;
