@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, formatDescription, todayWord } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 
 test('dates are Des Moines dates, not UTC dates', () => {
@@ -56,4 +56,38 @@ test('todayWord says Tonight only for events starting at 4pm or later', () => {
   assert.equal(todayWord('2026-10-08T17:00:00.000Z'), 'Today'); // noon
   assert.equal(todayWord('2026-10-22T22:30:00.000Z'), 'Tonight'); // 5:30pm
   assert.equal(todayWord('2026-10-22T21:00:00.000Z'), 'Tonight'); // 4pm
+});
+
+test('whenLabel: one rule for the build, the browser and the TV page', () => {
+  const at = (iso) => Date.parse(iso);
+  const noon = { start: '2026-10-08T17:00:00.000Z', end: '2026-10-08T18:00:00.000Z' }; // Thu 12p–1p
+  assert.equal(whenLabel(noon.start, noon.end, at('2026-10-07T23:00:00Z')), 'Tomorrow', 'Wed 6pm');
+  assert.equal(whenLabel(noon.start, noon.end, at('2026-10-08T14:00:00Z')), 'Today', 'Thu 9am, a noon talk');
+  assert.equal(whenLabel(noon.start, noon.end, at('2026-10-08T17:30:00Z')), 'Happening now');
+  const evening = { start: '2026-10-22T22:30:00.000Z', end: '2026-10-23T00:00:00.000Z' };
+  assert.equal(whenLabel(evening.start, evening.end, at('2026-10-22T15:00:00Z')), 'Tonight');
+  const conf = { start: '2026-10-15T13:00:00.000Z', end: '2026-10-16T22:00:00.000Z' }; // Thu–Fri
+  assert.equal(whenLabel(conf.start, conf.end, at('2026-10-16T14:00:00Z')), 'Happening now', 'day two of a conference');
+  assert.equal(whenLabel(conf.start, conf.end, at('2026-10-12T14:00:00Z')), '');
+  // Sat Oct 31 → Sun Nov 1 is the night clocks fall back; 'tomorrow' is still one calendar day.
+  const sunday = { start: '2026-11-01T15:00:00.000Z', end: '2026-11-01T16:00:00.000Z' };
+  assert.equal(whenLabel(sunday.start, sunday.end, at('2026-11-01T04:30:00Z')), 'Tomorrow', 'Sat 11:30pm CDT');
+});
+
+test('countdown on headliner posters', () => {
+  const start = '2026-10-15T13:00:00.000Z';
+  assert.equal(countdown(start, Date.parse('2026-10-07T15:00:00Z')), '8 days out');
+  assert.equal(countdown(start, Date.parse('2026-10-14T15:00:00Z')), 'Tomorrow');
+  assert.equal(countdown(start, Date.parse('2026-10-15T05:30:00Z')), 'Today', 'just after midnight');
+  assert.equal(countdown(start, Date.parse('2026-10-15T15:00:00Z')), 'Happening now');
+});
+
+test('month and day names, and plurals', () => {
+  assert.equal(monthName('2026-12'), 'December');
+  assert.equal(monthName('2027-01-15', true), 'January 2027');
+  assert.equal(dayName('2026-10-22'), 'Thursday, October 22');
+  assert.equal(plural(1, 'event'), '1 event');
+  assert.equal(plural(3, 'event'), '3 events');
+  assert.equal(addDays('2026-11-01', 1), '2026-11-02');
+  assert.equal(daysBetween('2026-10-31', '2026-11-02'), 2);
 });

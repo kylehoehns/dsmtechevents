@@ -8,7 +8,7 @@
 import QRCode from 'qrcode';
 import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
-import { weekday, day, month, shortRange, dayKey } from '../lib/format.mjs';
+import { weekday, day, month, shortRange } from '../lib/format.mjs';
 import { site } from '../lib/site.mjs';
 
 const { upcoming, byId } = loadData();
@@ -35,7 +35,7 @@ const slides = await Promise.all(events.map(async (e) => ({
     </header>
 
     <div class="tv-stage">
-      <section class="slide overview is-on" data-ends="">
+      <section class="slide overview is-on">
         <h1 class="mis" data-t="Coming up">Coming up</h1>
         <ol>
           {slides.slice(0, 7).map(({ e, hosts }) => (
@@ -50,7 +50,7 @@ const slides = await Promise.all(events.map(async (e) => ({
       </section>
 
       {slides.map(({ e, hosts, where, qr }) => (
-        <section class:list={['slide', 'poster-slide', { conf: e.featured }]} data-end={e.end} data-start={e.start} data-day={dayKey(e.start)}>
+        <section class:list={['slide', 'poster-slide', { conf: e.featured }]} data-end={e.end} data-start={e.start}>
           <div class="date-block">
             <span class="dow">{weekday(e.start)}</span>
             <span class="num mis" data-t={day(e.start)}>{day(e.start)}</span>
@@ -151,14 +151,14 @@ const slides = await Promise.all(events.map(async (e) => ({
 </style>
 
 <script>
-  import { dayKey, todayWord } from '../lib/format.mjs';
+  import { fmt, whenLabel } from '../lib/format.mjs';
 
   const SLIDE_MS = 12_000;
   const RELOAD_MS = 60 * 60 * 1000;
   const loadedAt = Date.now();
   const bar = document.getElementById('tv-bar')!;
   const clock = document.getElementById('tv-clock')!;
-  const clockFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const clockFmt = fmt({ weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
   // The page is built ahead of time: drop anything that has ended, and label
   // today's and tomorrow's events.
@@ -167,12 +167,9 @@ const slides = await Promise.all(events.map(async (e) => ({
     for (const el of document.querySelectorAll<HTMLElement>('[data-end]')) {
       if (el.dataset.end && Date.parse(el.dataset.end) <= now) el.remove();
     }
-    const today = dayKey(new Date().toISOString());
-    const tomorrow = dayKey(new Date(now + 86_400_000).toISOString());
     for (const s of document.querySelectorAll<HTMLElement>('.poster-slide')) {
       const tag = s.querySelector<HTMLElement>('.when-tag')!;
-      const started = Date.parse(s.dataset.start!) <= now;
-      const label = started ? 'Happening now' : s.dataset.day === today ? todayWord(s.dataset.start!) : s.dataset.day === tomorrow ? 'Tomorrow' : '';
+      const label = whenLabel(s.dataset.start!, s.dataset.end!, now);
       tag.textContent = label;
       tag.hidden = !label;
     }

@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 import { meetupSlug, meetupPhoto } from './meetup.mjs';
-import { dayKey, weekday } from './format.mjs';
+import { dayKey, weekday, fmt } from './format.mjs';
 import { localToUtc } from './time.mjs';
 
 // Tests pass their own data folder and clock.
@@ -105,7 +105,7 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
     list[0].series = {
       count: list.length,
       rule: same ? `Every ${ord} ${longWeekday(list[0].start)}` : 'Repeats',
-      until: new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', year: 'numeric' }).format(new Date(last.start)),
+      until: fmt({ month: 'short', year: 'numeric' }).format(new Date(last.start)),
     };
     for (const x of list.slice(1)) x.repeat = true;
   }
@@ -131,7 +131,7 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
 
 
 function longWeekday(iso) {
-  return new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', weekday: 'long' }).format(new Date(iso));
+  return fmt({ weekday: 'long' }).format(new Date(iso));
 }
 
 // Every event is around Des Moines, so ", Des Moines, IA 50309" says nothing
