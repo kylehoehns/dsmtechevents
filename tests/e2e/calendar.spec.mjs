@@ -1,5 +1,6 @@
 // The month calendar and its day panel.
 import { test, expect } from './fixtures.mjs';
+import { test as plain, expect as plainExpect } from '@playwright/test';
 
 const dayPanel = (page) => page.locator('#day-panel');
 
@@ -59,4 +60,15 @@ test('arrow keys move between days and focus survives picking one', async ({ pag
   await expect(conf).toBeFocused();
   await expect(dayPanel(page)).toContainText('Test Conf 2026');
   await expect(page.getByRole('status')).toHaveText('Thursday, October 22: 1 event');
+});
+
+// Plain Playwright here: blocking app.js on purpose logs a failed request,
+// which the shared fixture would count as a console error.
+plain('opening the calendar from another page never shows Events as the current tab', async ({ page }) => {
+  // Hold back app.js, so this checks what the page shows before any script of ours runs.
+  await page.route('**/_astro/*.js', (route) => route.abort());
+  await page.goto('/?view=calendar');
+  const nav = page.getByRole('navigation', { name: 'Main' });
+  await plainExpect(nav.getByRole('link', { name: 'Calendar' })).toHaveAttribute('aria-current', 'page');
+  await plainExpect(nav.getByRole('link', { name: 'Events' })).not.toHaveAttribute('aria-current');
 });
