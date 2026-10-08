@@ -49,20 +49,25 @@ function loadPool() {
   return pool;
 }
 
-// The page is built ahead of time; drop anything that has ended since.
-for (const el of $$('#list-view [data-end], .poster[data-end]')) if (Date.parse(el.dataset.end) <= now) el.remove();
-
 // ---- relative labels ----
 // The build already printed these for the day it ran (see EventCard.astro);
-// they only change for a page opened on a later day, or once an event starts.
-for (const el of $$('.show', listView)) {
-  const tag = $('.when-tag', el);
-  if (!tag) continue;
-  const label = whenLabel(el.dataset.start, el.dataset.end, now, { multiDay: 'days' in el.dataset });
-  if (tag.textContent !== label) tag.textContent = label;
-  tag.hidden = !label;
+// they only change for a page opened on a later day, or once an event starts
+// or ends. The page is built ahead of time, so it also drops anything that
+// has ended since. Returns whether it dropped anything.
+function freshen(t) {
+  let dropped = false;
+  for (const el of $$('#list-view [data-end], .poster[data-end]')) if (Date.parse(el.dataset.end) <= t) { el.remove(); dropped = true; }
+  for (const el of $$('.show', listView)) {
+    const tag = $('.when-tag', el);
+    if (!tag) continue;
+    const label = whenLabel(el.dataset.start, el.dataset.end, t, { multiDay: 'days' in el.dataset });
+    if (tag.textContent !== label) tag.textContent = label;
+    tag.hidden = !label;
+  }
+  for (const el of $$('.countdown[data-start]')) el.textContent = countdown(el.dataset.start, el.dataset.end, t, { multiDay: 'days' in el.dataset });
+  return dropped;
 }
-for (const el of $$('.countdown[data-start]')) el.textContent = countdown(el.dataset.start, el.dataset.end, now, { multiDay: 'days' in el.dataset });
+freshen(now);
 
 // Venue links open Google Maps; on iPhones and iPads, Apple Maps instead.
 if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes('Macintosh') && navigator.maxTouchPoints > 1)) {
@@ -560,6 +565,20 @@ addEventListener('popstate', () => {
 const openSearch = new URLSearchParams(location.search).has('search') && !state.q;
 render();
 if (openSearch) { showSearchBox(true); searchInput.focus(); }
+
+// A page left open, or an app on a phone's home screen (which iOS resumes
+// as it was), keeps its labels current: when it comes back into view and once
+// a minute while it's showing. Layout.astro reloads a page over an hour old;
+// on a new day the sections and the calendar's today are stale too, so reload.
+function keepCurrent() {
+  if (document.hidden) return;
+  const t = Date.now();
+  if (dayKey(t) !== today) { location.reload(); return; }
+  if (freshen(t)) { listShown = renderList(); renderSide(); }
+}
+document.addEventListener('visibilitychange', keepCurrent);
+addEventListener('pageshow', (e) => { if (e.persisted) keepCurrent(); });
+setInterval(keepCurrent, 60_000);
 
 // About opens and closes smoothly: the panel's height animates, and on
 // desktop a copy of the photo flies between the thumbnail on the right and its

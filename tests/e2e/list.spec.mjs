@@ -37,6 +37,27 @@ test('the browser re-labels a page opened on a later day', async ({ page }) => {
   await expect(row(page, 'Python Office Hours').getByText('Today', { exact: true })).toBeVisible();
 });
 
+// An app on an iPhone home screen is resumed, not reloaded. Layout.astro
+// reloads a page more than an hour old; these cover the hour before that.
+// The Coding Dojo runs 5:30-7:30p.
+test('a page reopened within the hour re-labels itself', async ({ page }) => {
+  await page.clock.setSystemTime(new Date('2026-10-14T22:00:00Z'));
+  await page.goto('/');
+  await expect(row(page, 'Coding Dojo').getByText('Tonight', { exact: true })).toBeVisible();
+  await page.clock.setSystemTime(new Date('2026-10-14T22:45:00Z'));
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+  await expect(row(page, 'Coding Dojo').getByText('Happening now', { exact: true })).toBeVisible();
+});
+
+test('a page left showing re-checks once a minute', async ({ page }) => {
+  await page.clock.setSystemTime(new Date('2026-10-14T22:20:00Z'));
+  await page.goto('/');
+  await page.clock.runFor('15:00');
+  await expect(row(page, 'Coding Dojo').getByText('Happening now', { exact: true })).toBeVisible();
+  await page.clock.runFor('02:00:00');
+  await expect(row(page, 'Coding Dojo')).toHaveCount(0);
+});
+
 test('headliner poster counts down to the conference', async ({ page }) => {
   await page.goto('/');
   const poster = page.getByRole('region', { name: 'Coming up soon' });
