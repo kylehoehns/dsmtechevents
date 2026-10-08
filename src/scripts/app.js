@@ -73,7 +73,7 @@ function renderList() {
     sec.hidden = n === 0;
     anyVisible ||= n > 0;
     const count = $('[data-count]', sec);
-    count.textContent = $('.far', sec) ? `${n} on the books` : `${n} ${n === 1 ? 'show' : 'shows'}`;
+    count.textContent = $('.far', sec) ? `${n} on the books` : `${n} ${n === 1 ? 'event' : 'events'}`;
   }
   $('#list-empty').hidden = anyVisible;
   squashRepeats();
@@ -178,7 +178,7 @@ function renderCalendar() {
       ${WEEKDAYS.map((d) => `<span class="wd" aria-hidden="true">${d}</span>`).join('')}
       ${cells.join('')}
     </div>
-    <div class="cal-key"><span><i class="k1"></i>Meetup</span><span><i class="k2"></i>Conference</span><span>Tap a day to see its shows</span></div>`;
+    <div class="cal-key"><span><i class="k1"></i>Meetup</span><span><i class="k2"></i>Conference</span><span>Tap a day to see its events</span></div>`;
   renderDayPanel();
 }
 
@@ -187,7 +187,7 @@ function renderDayPanel() {
   const n = daysBetween(today, state.day);
   const rel = n === 0 ? ' · today' : n === 1 ? ' · tomorrow' : '';
   dayPanel.innerHTML = `<h2>${fullDate(`${state.day}T17:00:00Z`)}</h2>
-    <p class="sub">${list.length ? `${list.length} ${list.length === 1 ? 'show' : 'shows'}` : 'A quiet day'}${rel}</p>`;
+    <p class="sub">${list.length ? `${list.length} ${list.length === 1 ? 'event' : 'events'}` : 'A quiet day'}${rel}</p>`;
   if (!list.length) {
     dayPanel.insertAdjacentHTML('beforeend', '<p class="none">Nothing on the books. Pick a day with a mark.</p>');
     return;
