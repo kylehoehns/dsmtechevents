@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
-import { loadData, shortAddress, topVenues } from '../src/lib/data.mjs';
+import { loadData, shortAddress } from '../src/lib/data.mjs';
 
 const dataDir = fileURLToPath(new URL('./fixtures/data', import.meta.url));
 const now = Date.parse('2026-10-07T17:00:00Z');
@@ -71,14 +71,4 @@ test('two spellings of one venue at the same street address count as one venue',
   const keys = data.events.filter((e) => e.address?.startsWith('4501 NW Urbandale')).map((e) => e.venueKey);
   assert.ok(keys.length >= 2);
   assert.equal(new Set(keys).size, 1);
-});
-
-test('topVenues counts in-person events per venue, under its most common spelling', () => {
-  const v = topVenues(data.events);
-  assert.equal(v[0].name, 'Source Allies');
-  assert.ok(v.every((x) => x.name !== 'Online'));
-  assert.deepEqual(topVenues([
-    { venue: 'Big Hall', venueKey: '833 5th ave' }, { venue: 'Big Hall', venueKey: '833 5th ave' }, { venue: 'Big Hall Center', venueKey: '833 5th ave' },
-    { venue: 'Online', online: true, venueKey: 'online' },
-  ]), [{ name: 'Big Hall', count: 3 }]);
 });

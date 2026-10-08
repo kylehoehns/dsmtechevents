@@ -134,22 +134,6 @@ function longWeekday(iso) {
 
 // Every event is around Des Moines, so ", Des Moines, IA 50309" says nothing
 // and makes the row wrap. Keep suburbs ("West Des Moines", "Johnston").
-// Venues by how many events they host (in-person only), using each venue's
-// most common spelling. Feeds the About page's thank-you list.
-export function topVenues(events) {
-  const byKey = new Map();
-  for (const e of events) {
-    if (e.online || !e.venue || !e.venueKey) continue;
-    const v = byKey.get(e.venueKey) ?? { count: 0, names: new Map() };
-    v.count++;
-    v.names.set(e.venue, (v.names.get(e.venue) ?? 0) + 1);
-    byKey.set(e.venueKey, v);
-  }
-  return [...byKey.values()]
-    .map((v) => ({ name: [...v.names].sort((a, b) => b[1] - a[1])[0][0], count: v.count }))
-    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-}
-
 export function shortAddress(a) {
   if (!a) return a ?? null;
   return a

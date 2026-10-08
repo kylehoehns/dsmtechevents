@@ -2,15 +2,10 @@
 // Who runs this, how the listings get here, and what to do when one is wrong.
 // Linked from the footer, not the top nav.
 import Layout from '../layouts/Layout.astro';
-import { loadData, topVenues } from '../lib/data.mjs';
-import { plural } from '../lib/format.mjs';
+import { loadData } from '../lib/data.mjs';
 import { site } from '../lib/site.mjs';
 
-const { groups, events, updatedAt } = loadData();
-// The last 90 days plus everything coming up.
-const venues = topVenues(events);
-const regulars = venues.filter((v) => v.count >= 2);
-const others = venues.length - regulars.length;
+const { groups, updatedAt } = loadData();
 ---
 <Layout nav="about" updatedAt={updatedAt} headTitle="About · DSM Tech Events"
   description="DSM Tech Events is one calendar of every public tech meetup, user group and conference in the Des Moines area, pulled from each group's own page four times a day.">
@@ -30,17 +25,6 @@ const others = venues.length - regulars.length;
         <li>We're not affiliated with any of the groups. If a listing looks wrong, the group's page is the one to trust. Let us know and we'll fix it.</li>
       </ul>
     </section>
-
-    {regulars.length > 0 && (
-      <section>
-        <h2>Thanks to our hosts</h2>
-        <p>Meetups need a room, and often pizza. These places host the most, counting the last three months and what's coming up:</p>
-        <ul class="hosts">
-          {regulars.map((v) => <li><b>{v.name}</b> {plural(v.count, 'event')}</li>)}
-        </ul>
-        {others > 0 && <p>Plus {plural(others, 'other venue')} around town.</p>}
-      </section>
-    )}
 
     <section>
       <h2>Who runs it</h2>
