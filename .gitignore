@@ -7,3 +7,5 @@ fetch-report.json
 dist-e2e/
 test-results/
 playwright-report/
+lighthouse.json
+prev/
