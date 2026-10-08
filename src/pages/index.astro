@@ -97,9 +97,9 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
       <div class="filter" id="filter">
         <h2>Pick a group</h2>
         <div class="chips" role="group" aria-label="Filter by group">
-          <button type="button" class="chip" data-chip="" aria-pressed="true">All groups <span class="n">{listed.length}</span></button>
+          <button type="button" class="chip" data-chip="" aria-pressed="true">All groups <span class="chip-count">{listed.length}</span></button>
           {filterGroups.map((g) => (
-            <button type="button" class="chip" data-chip={g.id} aria-pressed="false" title={g.name}>{g.short} <span class="n">{counts[g.id]}</span></button>
+            <button type="button" class="chip" data-chip={g.id} aria-pressed="false" title={g.name}>{g.short} <span class="chip-count">{counts[g.id]}</span></button>
           ))}
         </div>
         <p class="filter-note" id="filter-note" hidden></p>
@@ -120,15 +120,15 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
             <ol class="setlist far">
               {far.map((e) => (
                 <li data-groups={e.groupIds.join(' ')} data-end={e.end} data-id={e.id}>
-                  <span class="d">{month(e.start)} {day(e.start)}</span>
+                  <span class="row-date">{month(e.start)} {day(e.start)}</span>
                   <a href={e.url} target="_blank" rel="noopener" data-click="later">
-                    <span class="g">{e.groupIds.map((id) => byId[id]?.short).join(' + ') || 'Conference'}</span>
-                    {e.series && <span class="rr">{e.series.rule} · {e.series.count} dates</span>}
-                    <span class="tt">{e.title}</span>
-                    <span class="v">{e.allDay ? 'All day' : shortTime(e.start)} · {e.online ? 'Online' : `@ ${e.venue ?? 'TBA'}`}</span>
+                    <span class="row-group">{e.groupIds.map((id) => byId[id]?.short).join(' + ') || 'Conference'}</span>
+                    {e.series && <span class="row-series">{e.series.rule} · {e.series.count} dates</span>}
+                    <span class="row-title">{e.title}</span>
+                    <span class="row-where">{e.allDay ? 'All day' : shortTime(e.start)} · {e.online ? 'Online' : `@ ${e.venue ?? 'TBA'}`}</span>
                     <span class="sr-only"> (opens in new tab)</span>
                   </a>
-                  <span class="n">{e.going ? <><b>{e.going}</b> going</> : ''}</span>
+                  <span class="row-going">{e.going ? <><b>{e.going}</b> going</> : ''}</span>
                 </li>
               ))}
             </ol>
@@ -149,14 +149,14 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         <ol class="setlist" id="recent-list" data-shown={PAST_SHOWN}>
           {past.map((e, i) => (
             <li class:list={{ extra: i >= PAST_SHOWN }} data-groups={e.groupIds.join(' ')} data-id={e.id}>
-              <span class="d">{month(e.start)} {day(e.start)}</span>
+              <span class="row-date">{month(e.start)} {day(e.start)}</span>
               <a href={e.url} target="_blank" rel="noopener" data-click="past">
-                <span class="g">{e.groupIds.map((id) => byId[id]?.short).join(' + ')}</span>
-                <span class="tt">{e.title}</span>
-                <span class="v">{e.online ? 'Online' : `@ ${e.venue ?? ''}`}</span>
+                <span class="row-group">{e.groupIds.map((id) => byId[id]?.short).join(' + ')}</span>
+                <span class="row-title">{e.title}</span>
+                <span class="row-where">{e.online ? 'Online' : `@ ${e.venue ?? ''}`}</span>
                 <span class="sr-only"> (opens in new tab)</span>
               </a>
-              <span class="n">{e.going ? <><b>{e.going}</b> went</> : ''}</span>
+              <span class="row-going">{e.going ? <><b>{e.going}</b> went</> : ''}</span>
             </li>
           ))}
         </ol>

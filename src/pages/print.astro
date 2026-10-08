@@ -46,10 +46,10 @@ const span = rows.length ? `${month(rows[0].start)} ${day(rows[0].start)} – ${
         <ol class="lineup">
           {rows.map((e) => (
             <li class:list={{ headliner: e.headliner }} data-end={e.end}>
-              <span class="d"><b>{weekday(e.start)}</b> {dates(e)}</span>
-              <span class="t">{hours(e)}</span>
+              <span class="row-date"><b>{weekday(e.start)}</b> {dates(e)}</span>
+              <span class="row-time">{hours(e)}</span>
               <span class="what"><b>{label(e)}</b> {e.title}</span>
-              <span class="w">{where(e)}</span>
+              <span class="row-where">{where(e)}</span>
             </li>
           ))}
         </ol>
@@ -90,11 +90,11 @@ const span = rows.length ? `${month(rows[0].start)} ${day(rows[0].start)} – ${
 
   .lineup { list-style: none; margin: 14px 0 0; padding: 0; }
   .lineup li { display: grid; grid-template-columns: 1.15in 0.95in 1fr; grid-template-areas: 'd t what' 'd t w'; column-gap: 12px; padding: 7px 0; border-bottom: 1.5px dashed #000; break-inside: avoid; }
-  .lineup .d { grid-area: d; font: 900 20px/1 var(--display); text-transform: uppercase; }
-  .lineup .t { grid-area: t; font: 700 13px/1.4 var(--mono); }
+  .lineup .row-date { grid-area: d; font: 900 20px/1 var(--display); text-transform: uppercase; }
+  .lineup .row-time { grid-area: t; font: 700 13px/1.4 var(--mono); }
   .lineup .what { grid-area: what; font-size: 14.5px; line-height: 1.3; }
   .lineup .what b { font: 900 16px/1 var(--display); text-transform: uppercase; margin-right: 4px; }
-  .lineup .w { grid-area: w; font: 500 12px/1.4 var(--mono); }
+  .lineup .row-where { grid-area: w; font: 500 12px/1.4 var(--mono); }
   .lineup li.headliner { border-bottom-style: solid; border-bottom-width: 3px; }
 
   .sheet-foot { margin-top: auto; padding-top: 14px; display: flex; align-items: center; gap: 16px; font-size: 14px; line-height: 1.4; }

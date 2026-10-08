@@ -183,7 +183,7 @@ function dayCell(key) {
   const name = `${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}`;
   // Only the selected day is in the tab order; arrow keys move between days.
   return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}">
-    <span class="sr-only">${name}</span><span class="n" aria-hidden="true">${Number(key.slice(8))}</span><span class="pills" aria-hidden="true">${pills}</span><span class="dots" aria-hidden="true">${dots}</span>
+    <span class="sr-only">${name}</span><span class="day-num" aria-hidden="true">${Number(key.slice(8))}</span><span class="pills" aria-hidden="true">${pills}</span><span class="dots" aria-hidden="true">${dots}</span>
   </button>`;
 }
 
@@ -203,7 +203,7 @@ function renderCalendar() {
       </div>
     </div>
     <div class="grid" role="group" aria-label="${monthName(state.month, true)}">
-      ${WEEKDAYS.map((d) => `<span class="wd" aria-hidden="true">${d}</span>`).join('')}
+      ${WEEKDAYS.map((d) => `<span class="weekday" aria-hidden="true">${d}</span>`).join('')}
       ${cells.join('')}
     </div>
     <div class="cal-key"><span><i class="key-meetup"></i>Meetup</span><span><i class="key-headliner"></i>Conference</span><span>Tap a day to see its events</span></div>`;
@@ -247,7 +247,7 @@ function renderMinical() {
     return `<button type="button" class="${cls}" data-goto="${key}" aria-label="${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'no events'}">${Number(key.slice(8))}</button>`;
   });
   minical.innerHTML = `<h2>${monthName(ym)} <a href="?view=calendar" data-nav="calendar">Full calendar</a></h2>
-    <div class="mini-grid">${WEEKDAYS.map((d) => `<span class="wd" aria-hidden="true">${d[0]}</span>`).join('')}${cells.join('')}</div>`;
+    <div class="mini-grid">${WEEKDAYS.map((d) => `<span class="weekday" aria-hidden="true">${d[0]}</span>`).join('')}${cells.join('')}</div>`;
 }
 
 // ---- render ----
