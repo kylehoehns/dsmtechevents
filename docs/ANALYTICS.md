@@ -32,6 +32,19 @@ A new kind has to be added to `KINDS` in the Worker too, or it is rejected.
 
 Nothing else is stored: no IP address, user agent, referrer or cookie.
 
+### Abuse
+
+- Cloudflare's network DDoS protection sits in front of everything.
+- Only `/api/*` runs the Worker. A flood that used up the daily Worker
+  quota would make clicks fail (429) for the rest of the day; the pages
+  themselves are static files and keep serving.
+- The Worker refuses posts whose `Origin` isn't the site itself (403),
+  bodies over 1 KB (413), and more than 30 posts a minute from one address
+  (429, the `CLICK_LIMIT` binding). The address is only an in-memory
+  counter key and is never stored.
+- Someone scripting fake clicks slowly can still nudge the counts. Treat
+  them as a rough signal, not an audit.
+
 ### Querying
 
 Analytics Engine has a SQL API. Make an API token with the **Account

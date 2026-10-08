@@ -45,6 +45,9 @@
   // Click counts land in Workers Analytics Engine; see docs/ANALYTICS.md for
   // how to query them.
   "analytics_engine_datasets": [{ "binding": "CLICKS", "dataset": "dsmtechevents_clicks" }],
+  // Caps how fast one visitor can post clicks (worker/index.js). Counters are
+  // in memory per Cloudflare location and never stored.
+  "ratelimits": [{ "name": "CLICK_LIMIT", "namespace_id": "1001", "simple": { "limit": 30, "period": 60 } }],
   // Declared here, not toggled in the dashboard: every deploy reconciles the
   // Worker against this file, so a dashboard-only setting gets reset.
   "observability": { "enabled": true, "head_sampling_rate": 1 }
