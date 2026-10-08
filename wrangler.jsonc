@@ -10,11 +10,15 @@
   //
   // Dashboard settings (Workers & Pages → dsmtechevents → Settings → Build).
   // The build command stays empty because both wrangler commands run `build`
-  // below; filling it in just builds twice. Each PR branch gets a preview
-  // upload. Same setup as benchcard.
+  // below; filling it in just builds twice. Each PR branch gets a Preview
+  // named after the branch.
   //   Production tab:    Build command (empty), Deploy command
   //                      `npx wrangler deploy`, Root `/`, Branch `main`
-  //   Previews Base tab: Preview command `npx wrangler versions upload`
+  //   Previews Base tab: Build command (empty), Preview command
+  //                      `npx wrangler preview`
+  // On the Previews Base tab, `wrangler versions upload` in either box fails
+  // with "The name in your wrangler.jsonc file (dsmtechevents) must match the
+  // name of your Worker"; previews need `wrangler preview`.
   // The Cloudflare GitHub app must have access to this repo, or pushes never
   // build (that was the outage on 2026-10-07).
   "name": "dsmtechevents",
