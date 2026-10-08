@@ -4,4 +4,5 @@ export const site = {
   tagline: 'Every Des Moines tech meetup, user group and conference in one place.',
   timeZone: 'America/Chicago',
   repo: 'https://github.com/kylehoehns/dsmtechevents',
+  email: 'hello@dsmtechevents.com',
 };
