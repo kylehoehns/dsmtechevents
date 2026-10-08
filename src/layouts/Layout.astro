@@ -35,12 +35,12 @@ const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format
     </script>
   </head>
   <body>
-    <a class="sr-only" href="#main">Skip to events</a>
+    <a class="sr-only skip" href="#main">Skip to events</a>
     <header class="mast">
       <div class="wrap">
         <div class="mast-top">
           <span><b>Des Moines, IA</b> · 515 · {builtOn}</span>
-          <button type="button" class="theme-btn" id="theme-btn" aria-label="Color theme">Theme: auto</button>
+          <button type="button" class="theme-btn" id="theme-btn">Theme: auto</button>
         </div>
         <div class="mast-body">
           <div class="mast-row">
@@ -112,7 +112,12 @@ const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format
       const standalone = matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
       if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !standalone && store.get('install-hint') !== 'dismissed') {
         hint.hidden = false;
-        hint.querySelector('button')!.addEventListener('click', () => { hint.hidden = true; store.set('install-hint', 'dismissed'); });
+        // Keep focused elements from scrolling under the fixed hint.
+        document.documentElement.classList.add('has-hint');
+        hint.querySelector('button')!.addEventListener('click', () => {
+          hint.hidden = true; store.set('install-hint', 'dismissed');
+          document.documentElement.classList.remove('has-hint');
+        });
       }
     </script>
   </body>

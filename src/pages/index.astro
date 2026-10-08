@@ -58,7 +58,47 @@ const calendarData = {
 };
 ---
 <Layout updatedAt={updatedAt}>
+  <h1 class="sr-only">Upcoming tech events in Des Moines</h1>
+  <p class="sr-only" role="status" id="status"></p>
   <div class="layout">
+    {/* Headliners and the group filter come first in the page so phones read
+        and tab them in the order they show. On desktop the grid puts them in
+        the side rail (see .layout in global.css). */}
+    <div class="lead">
+      {featured.length > 0 && (
+        <section class="headliners" id="headliners" aria-label="Coming up soon">
+          {featured.map((e, i) => (
+            <article class:list={['poster', i % 2 ? 'blue' : 'taped']} data-end={e.end} data-groups={e.groupIds.join(' ')}>
+              <div class="poster-full">
+                <span class="halftone" aria-hidden="true" />
+                {i % 2 === 0 && <span class="tape" aria-hidden="true" />}
+                <div class="bill"><span>Headliner</span><span>{e.multiDay ? 'Two-day conference' : 'One-day conference'}</span></div>
+                <h2>{e.title}</h2>
+                <p class="when">{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
+                <span class="stamp-days countdown" data-start={e.start}>{daysOut(e)} days out</span>
+                <p class="where">{e.venue}{e.address && <><br />{e.address}</>}</p>
+                <a class="go" href={e.url} target="_blank" rel="noopener">{e.multiDay ? 'Tickets & lineup' : 'Register'}<span class="sr-only">: {e.title} (opens in new tab)</span> <span aria-hidden="true">→</span></a>
+              </div>
+            </article>
+          ))}
+        </section>
+      )}
+
+      {/* desktop only; phones hide it */}
+      <section class="minical" id="minical" aria-label="This month"></section>
+
+      <div class="filter" id="filter">
+        <h2>Pick a group</h2>
+        <div class="chips" role="group" aria-label="Filter by group">
+          <button type="button" class="chip" data-chip="" aria-pressed="true">All groups <span class="n">{listed.length}</span></button>
+          {filterGroups.map((g) => (
+            <button type="button" class:list={['chip', { idle: !counts[g.id] }]} data-chip={g.id} aria-pressed="false" title={g.name}>{g.short} <span class="n">{counts[g.id]}</span></button>
+          ))}
+        </div>
+        <p class="filter-note" id="filter-note" hidden></p>
+      </div>
+    </div>
+
     <div class="main">
       <section id="list-view" aria-label="Upcoming events">
         {sections.map((s) => (
@@ -79,6 +119,7 @@ const calendarData = {
                     {e.series && <span class="rr">{e.series.rule} · {e.series.count} dates</span>}
                     <span class="tt">{e.title}</span>
                     <span class="v">{e.allDay ? 'All day' : shortTime(e.start)} · {e.online ? 'Online' : `@ ${e.venue ?? 'TBA'}`}</span>
+                    <span class="sr-only"> (opens in new tab)</span>
                   </a>
                   <span class="n">{e.going ? <><b>{e.going}</b> going</> : ''}</span>
                 </li>
@@ -92,40 +133,8 @@ const calendarData = {
       <section id="calendar-view" aria-label="Calendar" hidden></section>
     </div>
 
-    <aside class="side" aria-label="Filter and recent events">
-      {featured.length > 0 && (
-        <section class="headliners" id="headliners" aria-label="Coming up soon">
-          {featured.map((e, i) => (
-            <article class:list={['poster', i % 2 ? 'blue' : 'taped']} data-end={e.end} data-groups={e.groupIds.join(' ')}>
-              <div class="poster-full">
-                <span class="halftone" aria-hidden="true" />
-                {i % 2 === 0 && <span class="tape" aria-hidden="true" />}
-                <div class="bill"><span>Headliner</span><span>{e.multiDay ? 'Two-day conference' : 'One-day conference'}</span></div>
-                <h2>{e.title}</h2>
-                <p class="when">{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
-                <span class="stamp-days countdown" data-start={e.start}>{daysOut(e)} days out</span>
-                <p class="where">{e.venue}{e.address && <><br />{e.address}</>}</p>
-                <a class="go" href={e.url} target="_blank" rel="noopener">{e.multiDay ? 'Tickets & lineup' : 'Register'} →</a>
-              </div>
-            </article>
-          ))}
-        </section>
-      )}
-
-      <div class="filter" id="filter">
-        <h2>Pick a group</h2>
-        <div class="chips" role="group" aria-label="Filter by group">
-          <button type="button" class="chip" data-chip="" aria-pressed="true">All groups <span class="n">{listed.length}</span></button>
-          {filterGroups.map((g) => (
-            <button type="button" class:list={['chip', { idle: !counts[g.id] }]} data-chip={g.id} aria-pressed="false" title={g.name}>{g.short} <span class="n">{counts[g.id]}</span></button>
-          ))}
-        </div>
-        <p class="filter-note" id="filter-note" hidden></p>
-      </div>
-
-      <section class="day-panel" id="day-panel" aria-live="polite" hidden></section>
-
-      <section class="minical" id="minical" aria-label="This month"></section>
+    <aside class="side" aria-label="Day details and recent events">
+      <section class="day-panel" id="day-panel" hidden></section>
 
       <section class="recent" id="recent" aria-labelledby="recent-h">
         <h2 id="recent-h">Recent events</h2>
@@ -138,6 +147,7 @@ const calendarData = {
                 <span class="g">{e.groupIds.map((id) => byId[id]?.short).join(' + ')}</span>
                 <span class="tt">{e.title}</span>
                 <span class="v">{e.online ? 'Online' : `@ ${e.venue ?? ''}`}</span>
+                <span class="sr-only"> (opens in new tab)</span>
               </a>
               <span class="n">{e.going ? <><b>{e.going}</b> went</> : ''}</span>
             </li>
