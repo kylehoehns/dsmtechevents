@@ -1,0 +1,43 @@
+{
+  "fetchedAt": "2026-10-08T04:04:46.447Z",
+  "logo": "https://www.technologyiowa.org/wp-content/uploads/2025/06/cropped-tai-avatar-1080x1080-1.png",
+  "enriched": true,
+  "events": [
+    {
+      "id": "techbrew-techbrew-october-2026",
+      "sourceId": "techbrew-october-2026",
+      "title": "TechBrew – October 2026",
+      "start": "2026-10-08T13:00:00.000Z",
+      "end": "2026-10-08T14:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.technologyiowa.org/events/techbrew-october-2026/",
+      "description": "Join us for coffee and a tech discussion with featured guest, Todd Herren, Senior Vice President, Technology and Operations at Delta Dental of Iowa.\n\nWhat to Expect:\n\n8:00 – 8:15 a.m. | Networking\n\n8:15 – 8:45 a.m. | Interview with Todd Herren\n\nStick around after for more networking!\n\n☕ Drip coffee provided by West End Salvage. Specialty drinks available for purchase.\n\nTechBrew is presented by Zirous",
+      "venue": "West End Architectural Salvage",
+      "address": "22 9th Street, Des Moines, IA"
+    },
+    {
+      "id": "techbrew-techbrew-november-2026",
+      "sourceId": "techbrew-november-2026",
+      "title": "TechBrew – November 2026",
+      "start": "2026-11-12T14:00:00.000Z",
+      "end": "2026-11-12T15:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.technologyiowa.org/events/techbrew-november-2026/",
+      "description": "Connect over coffee and tune into a tech discussion with a local Iowa tech leader. Each interview covers the lead origin story, career milestones, key initiatives, and fun facts. Join us on Thursday, November 12th, from 8:00 – 9:00 a.m., at West End Architectural Salvage. November’s featured guest coming soon!\n\nWhat to Expect:\n\n8:00 – 8:15 a.m. | Networking\n\n8:15 – 8:45 a.m. | Interview with Featured Guest\n\nStick around after for more networking!\n\n☕ Drip coffee provided by West End Salvage. Specialty drinks available for purchase.\n🅿️ Free parking east of the building at 207 9th St.\n\nTechBrew is presented by Zirous",
+      "venue": "West End Architectural Salvage",
+      "address": "22 9th Street, Des Moines, IA"
+    },
+    {
+      "id": "techbrew-techbrew-december-2026",
+      "sourceId": "techbrew-december-2026",
+      "title": "TechBrew – December 2026",
+      "start": "2026-12-10T14:00:00.000Z",
+      "end": "2026-12-10T15:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.technologyiowa.org/events/techbrew-december-2026/",
+      "description": "Connect over coffee and tune into a tech discussion with a local Iowa tech leader. Each interview covers the lead origin story, career milestones, key initiatives, and fun facts. Join us on Thursday, December 10th, from 8:00 – 9:00 a.m., at West End Architectural Salvage. December‘s featured guest coming soon!\n\nWhat to Expect:\n\n8:00 – 8:15 a.m. | Networking\n\n8:15 – 8:45 a.m. | Interview with Featured Guest\n\nStick around after for more networking!\n\n☕ Drip coffee provided by West End Salvage. Specialty drinks available for purchase.\n🅿️ Free parking east of the building at 207 9th St.\n\nTechBrew is presented by Zirous",
+      "venue": "West End Architectural Salvage",
+      "address": "22 9th Street, Des Moines, IA"
+    }
+  ]
+}

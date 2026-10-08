@@ -21,9 +21,10 @@ import YAML from 'yaml';
 import { meetupSlug } from '../src/lib/meetup.mjs';
 import secdsm from './sources/secdsm.mjs';
 import pmiChapter from './sources/pmi-chapter.mjs';
+import taiTechbrew from './sources/tai-techbrew.mjs';
 import { parseFeed, parseEventsPage, enrich, mergeCache, typicalGoing } from './sources/meetup.mjs';
 
-const SOURCES = { secdsm, 'pmi-chapter': pmiChapter };
+const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew };
 
 const root = path.resolve(import.meta.dirname, '..');
 const cacheDir = path.join(root, 'data/cache');

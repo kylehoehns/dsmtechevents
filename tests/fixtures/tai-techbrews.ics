@@ -1,0 +1,199 @@
+BEGIN:VCALENDAR
+METHOD:PUBLISH
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//NONSGML WPForms//NONSGML Sugar Calendar Feeds v3.12.1//EN
+X-WR-CALNAME:TechBrews
+X-WR-CALDESC:Technology Association of Iowa
+X-WR-TIMEZONE:America/Chicago
+BEGIN:VTIMEZONE
+TZID:America/Chicago
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+DTSTART:20231105T070000
+TZNAME:CST
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0500
+DTSTART:20240310T080000
+TZNAME:CDT
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+DTSTART:20241103T070000
+TZNAME:CST
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0500
+DTSTART:20250309T080000
+TZNAME:CDT
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+DTSTART:20251102T070000
+TZNAME:CST
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0500
+DTSTART:20260308T080000
+TZNAME:CDT
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+DTSTART:20261101T070000
+TZNAME:CST
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VTIMEZONE
+TZID:America/Chicago
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+DTSTART:20231105T070000
+TZNAME:CST
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0500
+DTSTART:20240310T080000
+TZNAME:CDT
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+DTSTART:20241103T070000
+TZNAME:CST
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0500
+DTSTART:20250309T080000
+TZNAME:CDT
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+DTSTART:20251102T070000
+TZNAME:CST
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0500
+DTSTART:20260308T080000
+TZNAME:CDT
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+DTSTART:20261101T070000
+TZNAME:CST
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+SUMMARY:TechBrew with Featured Guest: Ted Hughes
+DESCRIPTION:Connect over coffee and dive into a tech focused discussion 
+ with Ted Hughes\, Senior Vice President &amp\; Chief Information Officer
+  at F&amp\;G\n\nWhat to Expect:\n\n 	8:00 – 8:15 a.m. | Networking\n 
+ 	8:15 – 8:45 a.m. | Interview with Ted Hughes\n 	Stick around after fo
+ r more networking!\n\n☕ Drip coffee provided by West End Salvage. Spe
+ cialty drinks available for purchase.\n\nTechBrew is presented by Zirous
+ \n\n&nbsp\;\n\nRegister Now:
+URL;VALUE=URI:https://www.technologyiowa.org/events/techbrew-september-2
+ 026/
+UID:urn:uuid:4f8450b1-96bd-4920-86b6-6a458e9cd238
+STATUS:CONFIRMED
+ORGANIZER:
+DTSTAMP:20261008T040122Z
+DTSTART;TZID=America/Chicago:20260910T080000
+DTEND;TZID=America/Chicago:20260910T090000
+LOCATION:22 9th Street
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:TechBrew – October 2026
+DESCRIPTION:Join us for coffee and a tech discussion with featured guest
+ \, Todd Herren\, Senior Vice President\, Technology and Operations at De
+ lta Dental of Iowa.\n\nWhat to Expect:\n\n 	8:00 – 8:15 a.m. | Networ
+ king\n 	8:15 – 8:45 a.m. | Interview with Todd Herren\n 	Stick around 
+ after for more networking!\n\n☕ Drip coffee provided by West End Salv
+ age. Specialty drinks available for purchase.\n\nTechBrew is presented b
+ y Zirous\n\n&nbsp\;\n\nRegister Now:
+URL;VALUE=URI:https://www.technologyiowa.org/events/techbrew-october-202
+ 6/
+UID:urn:uuid:a8cb79aa-f035-4227-980c-046e617df6b4
+STATUS:CONFIRMED
+ORGANIZER:
+DTSTAMP:20261008T040122Z
+DTSTART;TZID=America/Chicago:20261008T080000
+DTEND;TZID=America/Chicago:20261008T090000
+LOCATION:22 9th Street
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:TechBrew – November 2026
+DESCRIPTION:Connect over coffee and tune into a tech discussion with a l
+ ocal Iowa tech leader. Each interview covers the lead origin story\, car
+ eer milestones\, key initiatives\, and fun facts. Join us on Thursday\, 
+ November 12th\, from 8:00 - 9:00 a.m.\, at West End Architectural Salvag
+ e. November's featured guest coming soon!\n\nWhat to Expect:\n\n 	8:00 �
+ �� 8:15 a.m. | Networking\n 	8:15 – 8:45 a.m. | Interview with Featur
+ ed Guest\n 	Stick around after for more networking!\n\n☕ Drip coffee p
+ rovided by West End Salvage. Specialty drinks available for purchase.\n
+ 🅿️ Free parking east of the building at 207 9th St.\n\n&nbsp\;\n\n
+ TechBrew is presented by Zirous\n\n&nbsp\;\n\nRegister Now:
+URL;VALUE=URI:https://www.technologyiowa.org/events/techbrew-november-20
+ 26/
+UID:urn:uuid:a1a5bd5a-2756-4646-ae2e-9795783e3d27
+STATUS:CONFIRMED
+ORGANIZER:
+DTSTAMP:20261008T040122Z
+DTSTART;TZID=America/Chicago:20261112T080000
+DTEND;TZID=America/Chicago:20261112T090000
+LOCATION:22 9th Street
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:TechBrew – December 2026
+DESCRIPTION:Connect over coffee and tune into a tech discussion with a l
+ ocal Iowa tech leader. Each interview covers the lead origin story\, car
+ eer milestones\, key initiatives\, and fun facts. Join us on Thursday\, 
+ December 10th\, from 8:00 - 9:00 a.m.\, at West End Architectural Salvag
+ e. December's featured guest coming soon!\n\nWhat to Expect:\n\n 	8:00 �
+ �� 8:15 a.m. | Networking\n 	8:15 – 8:45 a.m. | Interview with Featur
+ ed Guest\n 	Stick around after for more networking!\n\n☕ Drip coffee p
+ rovided by West End Salvage. Specialty drinks available for purchase.\n
+ 🅿️ Free parking east of the building at 207 9th St.\n\n&nbsp\;\n\n
+ TechBrew is presented by Zirous\n\n&nbsp\;\n\nRegister Now:
+URL;VALUE=URI:https://www.technologyiowa.org/events/techbrew-december-20
+ 26/
+UID:urn:uuid:63888ab4-06f4-4e88-842d-a66c9fcf9c97
+STATUS:CONFIRMED
+ORGANIZER:
+DTSTAMP:20261008T040122Z
+DTSTART;TZID=America/Chicago:20261210T080000
+DTEND;TZID=America/Chicago:20261210T090000
+LOCATION:22 9th Street
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:CIO Roundtable
+DESCRIPTION:TAI’s Chief Information Officer (CIO) Roundtable convenes 
+ C-level information technology leaders to exchange strategic insights on
+  shared successes\, challenges\, and emerging best practices.\n\nThe rou
+ ndtable meets hybrid on a quarterly basis and is exclusively reserved fo
+ r technology executives of TAI member organizations with CIO (or compara
+ ble) job titles. Complete the form below to express your interest in par
+ ticipating. Once confirmed\, you’ll receive meeting details and calend
+ ar invitations.\n\nSubmit Your Interest to Join
+URL;VALUE=URI:https://www.technologyiowa.org/events/cio-roundtable/
+UID:urn:uuid:622a9b7c-1d1a-4a27-9965-c07d490e5863
+STATUS:CONFIRMED
+ORGANIZER:
+DTSTAMP:20261008T040041Z
+DTSTART;TZID=America/Chicago:20261104T140000
+DTEND;TZID=America/Chicago:20261104T153000
+END:VEVENT
+END:VCALENDAR
