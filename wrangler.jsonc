@@ -31,8 +31,13 @@
   "workers_dev": true,
   "preview_urls": true,
   // `wrangler preview` (the Previews Base command) refuses to run without
-  // this block. Empty is fine: previews use the top-level settings.
-  "previews": {},
+  // this block. Previews don't inherit the bindings below, so they get their
+  // own: a separate dataset and rate-limit counter, so testing a preview
+  // never adds rows to the real click counts.
+  "previews": {
+    "analytics_engine_datasets": [{ "binding": "CLICKS", "dataset": "dsmtechevents_clicks_preview" }],
+    "ratelimits": [{ "name": "CLICK_LIMIT", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }]
+  },
   "assets": {
     "directory": "dist",
     // /groups serves /groups/index.html; unknown paths get the real 404 page
