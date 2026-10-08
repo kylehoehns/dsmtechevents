@@ -50,13 +50,15 @@ Nothing else is stored: no IP address, user agent, referrer or cookie.
 - Someone scripting fake clicks slowly can still nudge the counts. Treat
   them as a rough signal, not an audit.
 
-### The weekly report
+### The weekly site report
 
-Every Monday, `.github/workflows/click-report.yml` runs
-`scripts/click-report.mjs` and writes a summary (clicks per group for the
-last 7 and 30 days, the top events, which kinds of links get used) to that
-run's page: **Actions → click report → the latest run**. Run it any time
-with `gh workflow run click-report.yml`. It needs a repository secret
+Every Monday, `.github/workflows/site-report.yml` runs
+`scripts/site-report.mjs` and writes a summary to that run's page
+(**Actions → site report → the latest run**): visits and page views with the
+week-on-week change, visits per day, top pages, where visits come from and
+phone vs computer (Cloudflare Web Analytics), then the outbound clicks above
+(per group for 7 and 30 days, top events, which links get used). Run it any
+time with `gh workflow run site-report.yml`. It needs a repository secret
 `CF_ANALYTICS_TOKEN`: a Cloudflare API token with **Account Analytics: Read**.
 
 ### Querying
