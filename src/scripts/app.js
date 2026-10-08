@@ -214,7 +214,7 @@ function renderCalendar() {
       ${WEEKDAYS.map((d) => `<span class="weekday" aria-hidden="true">${d}</span>`).join('')}
       ${cells.join('')}
     </div>
-    <div class="cal-key"><span><i class="key-meetup"></i>Meetup</span><span><i class="key-headliner"></i>Conference</span><span>Tap a day to see its events</span></div>`;
+    <div class="cal-key"><span><i class="key-event"></i>Event</span><span><i class="key-headliner"></i>Conference</span><span>Pick a day to see its events</span></div>`;
   if (had?.dataset.month != null) $(`[data-month="${had.dataset.month}"]`, calView)?.focus({ preventScroll: true });
   else if (had?.dataset.day) $(`.day[data-day="${state.day}"]`, calView)?.focus({ preventScroll: true });
   renderDayPanel();

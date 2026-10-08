@@ -15,15 +15,17 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
   <div class="board">
     {sorted.map((g, i) => (
       <article id={g.id} data-groups={g.id} class:list={['flyer', { 'has-logo': !!g.logo }]}>
-        {g.logo && <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />}
-        <h2>{g.short}{!g.showFullName && <span class="sr-only"> ({g.name})</span>}</h2>
-        {g.showFullName && <p class="full">{g.name}</p>}
-        {(g.members || g.pastCount) && (
-          <p class="facts">{[g.members && `${g.members.toLocaleString('en-US')} members`, g.pastCount && `${g.pastCount} meetups`].filter(Boolean).join(' · ')}</p>
-        )}
+        <div class="flyer-head">
+          {g.logo && <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />}
+          <h2>{g.short}{!g.showFullName && <span class="sr-only"> ({g.name})</span>}</h2>
+          {g.showFullName && <p class="full">{g.name}</p>}
+          {(g.members || g.pastCount) && (
+            <p class="facts">{[g.members && `${g.members.toLocaleString('en-US')} members`, g.pastCount && `${g.pastCount} meetups`].filter(Boolean).join(' · ')}</p>
+          )}
+        </div>
         <p class="next">
           {g.nextEvent
-            ? <><span class="next-when">Next: {when(g.nextEvent)}</span><span class="sr-only">, </span><span class="next-title">{g.nextEvent.title}</span><span class="sr-only">, </span>{g.nextEvent.online ? 'Online' : `@ ${g.nextEvent.venue ?? 'TBA'}`} · {g.nextEvent.allDay ? 'All day' : shortTime(g.nextEvent.start)}</>
+            ? <><span class="next-when">Next: {when(g.nextEvent)}</span><span class="sr-only">, </span><span class="next-title">{g.nextEvent.title}</span><span class="sr-only">, </span>{g.nextEvent.online ? 'Online' : `@ ${g.nextEvent.venue ?? 'Venue TBA'}`} · {g.nextEvent.allDay ? 'All day' : shortTime(g.nextEvent.start)}</>
             : <><span class="next-when idle">Nothing scheduled</span>Check their page for what's next.</>}
         </p>
         {g.lastEvent && (
