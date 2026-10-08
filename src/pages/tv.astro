@@ -24,7 +24,7 @@ const siteQr = await QRCode.toString(site.url, { type: 'svg', margin: 0, errorCo
 
 const slides = await Promise.all(events.map(async (e) => ({
   e,
-  hosts: e.groupIds.map((id: string) => byId[id]?.short).filter(Boolean).join(' w/ ') || (e.featured ? 'Conference' : 'Community event'),
+  hosts: e.groupIds.map((id: string) => byId[id]?.short).filter(Boolean).join(' w/ ') || (e.headliner ? 'Conference' : 'Community event'),
   where: e.online ? 'Online' : [e.venue, e.address].filter(Boolean).join(' · ') || 'Venue TBA',
   qr: e.url ? await QRCode.toString(e.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#1d1b2b', light: '#0000' } }) : null,
 })));
@@ -49,7 +49,7 @@ const slides = await Promise.all(events.map(async (e) => ({
         <p class="tv-empty" hidden>Nothing on the calendar right now. New events show up here as groups post them.</p>
         <ol>
           {slides.slice(0, 7).map(({ e, hosts }) => (
-            <li class:list={{ conf: e.featured }} data-end={e.end}>
+            <li class:list={{ headliner: e.headliner }} data-end={e.end}>
               <span class="d"><b>{weekday(e.start)}</b> {month(e.start)} {day(e.start)}</span>
               <span class="h">{hosts}</span>
               <span class="t">{e.title}</span>
@@ -60,7 +60,7 @@ const slides = await Promise.all(events.map(async (e) => ({
       </section>
 
       {slides.map(({ e, hosts, where, qr }) => (
-        <section class:list={['slide', 'poster-slide', { conf: e.featured }]} data-end={e.end} data-start={e.start}>
+        <section class:list={['slide', 'poster-slide', { headliner: e.headliner }]} data-end={e.end} data-start={e.start}>
           <div class="date-block">
             <span class="dow">{weekday(e.start)}</span>
             <span class="num mis" data-t={day(e.start)}>{day(e.start)}</span>
@@ -121,7 +121,7 @@ const slides = await Promise.all(events.map(async (e) => ({
   .tv-empty { margin: 0; font: 600 3.4vh/1.3 var(--sans); color: var(--soft); }
   .overview ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.4vh; }
   .overview li { display: grid; grid-template-columns: 14vw 14vw 1fr auto; align-items: baseline; gap: 2vw; padding-bottom: 1.2vh; border-bottom: 2px dashed #5d5966; font-size: 3.2vh; }
-  .overview li.conf .t { color: var(--pink); }
+  .overview li.headliner .t { color: var(--pink); }
   .overview .d { font: 700 2.8vh/1 var(--mono); }
   .overview .d b { color: var(--blue); }
   .overview .h { font: 900 3.4vh/1 var(--display); text-transform: uppercase; color: var(--pink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -129,21 +129,21 @@ const slides = await Promise.all(events.map(async (e) => ({
   .overview .w { font: 600 2.6vh/1 var(--mono); color: var(--soft); }
 
   .poster-slide { align-items: center; gap: 4vw; padding: 3vh 0; }
-  .poster-slide.conf { background: var(--pink); color: #1d1b2b; margin: 2vh -4vw; padding: 3vh 4vw; }
+  .poster-slide.headliner { background: var(--pink); color: #1d1b2b; margin: 2vh -4vw; padding: 3vh 4vw; }
   .date-block { display: flex; flex-direction: column; align-items: center; gap: 1.6vh; min-width: 16vw; }
   .date-block .dow, .date-block .mon { font: 900 6vh/1 var(--display); text-transform: uppercase; }
   .date-block .num { font: 900 30vh/0.8 var(--display); color: var(--blue); }
-  .poster-slide.conf .date-block .num { color: #1d1b2b; }
-  .poster-slide.conf .date-block .num::before { color: #0a6cc0; }
+  .poster-slide.headliner .date-block .num { color: #1d1b2b; }
+  .poster-slide.headliner .date-block .num::before { color: #0a6cc0; }
   .date-block .when-tag { margin-top: 2vh; font: 400 3.6vh/1 var(--marker); background: var(--pink); color: #1d1b2b; padding: 0.6vh 1vw 0.2vh; transform: rotate(-3deg); }
-  .poster-slide.conf .when-tag { background: #1d1b2b; color: var(--pink); }
+  .poster-slide.headliner .when-tag { background: #1d1b2b; color: var(--pink); }
   .info { flex: 1; min-width: 0; }
   .info .hosts { margin: 0 0 1vh; font: 900 6vh/0.95 var(--display); text-transform: uppercase; color: var(--pink); }
-  .poster-slide.conf .info .hosts { color: #1d1b2b; }
+  .poster-slide.headliner .info .hosts { color: #1d1b2b; }
   .info h2 { margin: 0 0 2.5vh; font: 700 6.4vh/1.08 var(--sans); text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .info .time { margin: 0; font: 700 4vh/1.2 var(--mono); }
   .info .where { margin: 0.6vh 0 0; font: 500 3vh/1.3 var(--mono); color: var(--soft); }
-  .poster-slide.conf .info .where { color: inherit; }
+  .poster-slide.headliner .info .where { color: inherit; }
   .info .going { margin: 2.5vh 0 0; font: 600 3vh/1 var(--mono); }
   .info .going b { font: 900 6vh/1 var(--display); vertical-align: -0.6vh; margin-right: 0.6vw; }
   .tv-side { display: flex; flex-direction: column; align-items: center; gap: 3vh; width: 28vw; }

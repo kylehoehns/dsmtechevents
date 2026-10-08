@@ -44,7 +44,7 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
       description: e.description ?? '',
       tags: e.tags,
       groupIds: e.hosts ?? [],
-      featured: !!e.featured,
+      headliner: !!e.headliner,
       source: 'manual',
     };
   });

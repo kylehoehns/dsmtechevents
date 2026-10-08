@@ -44,7 +44,7 @@ test('hand-added events use Des Moines time and span days', () => {
   assert.equal(conf.start, '2026-10-15T13:00:00.000Z');
   assert.equal(conf.end, '2026-10-16T22:00:00.000Z');
   assert.equal(conf.multiDay, true);
-  assert.equal(conf.featured, true);
+  assert.equal(conf.headliner, true);
   assert.equal(conf.address, '833 5th Ave');
 });
 
