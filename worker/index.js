@@ -20,6 +20,29 @@ export function parseClick(text) {
   return { kind: body.kind, groups, event };
 }
 
+// The body as text, or null as soon as it passes `max` bytes (the rest is
+// never read).
+export async function readCapped(request, max) {
+  if (!request.body) return '';
+  const reader = request.body.getReader();
+  const chunks = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > max) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size);
+  let at = 0;
+  for (const c of chunks) { bytes.set(c, at); at += c.byteLength; }
+  return new TextDecoder().decode(bytes);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -33,8 +56,11 @@ export default {
       // address is only a counter key in memory; it is never written anywhere.
       const ip = request.headers.get('CF-Connecting-IP') ?? '';
       if (env.CLICK_LIMIT && !(await env.CLICK_LIMIT.limit({ key: ip })).success) return new Response(null, { status: 429 });
-      const text = await request.text();
-      if (text.length > MAX_BODY) return new Response(null, { status: 413 });
+      // Refuse a large body before reading it: a stated Content-Length first,
+      // then a hard cap while streaming (a chunked body states none).
+      if (Number(request.headers.get('Content-Length') ?? 0) > MAX_BODY) return new Response(null, { status: 413 });
+      const text = await readCapped(request, MAX_BODY);
+      if (text == null) return new Response(null, { status: 413 });
       const click = parseClick(text);
       if (!click) return new Response(null, { status: 400 });
       // Analytics Engine: blobs are the dimensions, the index is what we
