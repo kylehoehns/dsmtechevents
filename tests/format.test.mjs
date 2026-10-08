@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, dateRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
@@ -110,4 +110,11 @@ test('isDayKey accepts only real dates', () => {
   assert.equal(isDayKey('2026-02-30'), false);
   assert.equal(isDayKey('yesterday'), false);
   assert.equal(isDayKey(null), false);
+});
+
+test('dateRange spans months and ends on the last real day', () => {
+  assert.equal(dateRange('2026-10-15T13:00:00.000Z', '2026-10-16T22:00:00.000Z'), 'Oct 15–16');
+  assert.equal(dateRange('2026-10-30T13:00:00.000Z', '2026-11-02T22:00:00.000Z'), 'Oct 30–Nov 2');
+  // Ends at midnight Des Moines time (05:00Z): the last day is the 16th, not the 17th.
+  assert.equal(dateRange('2026-10-15T13:00:00.000Z', '2026-10-17T05:00:00.000Z'), 'Oct 15–16');
 });

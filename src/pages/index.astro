@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import EventCard from '../components/EventCard.astro';
 import { loadData } from '../lib/data.mjs';
 import { eventJsonLd, websiteJsonLd, toScript } from '../lib/jsonld.mjs';
-import { dayKey, lastDay, weekday, day, month, shortTime, addDays, daysBetween, monthName, plural, countdown } from '../lib/format.mjs';
+import { dayKey, lastDay, weekday, day, month, shortTime, addDays, daysBetween, monthName, plural, countdown, dateRange, recentSummary } from '../lib/format.mjs';
 
 const { events, upcoming, past, groups, byId, updatedAt } = loadData();
 
@@ -81,7 +81,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
                 <span class="tape" aria-hidden="true" />
                 <div class="bill"><span>Headliner</span><span>{conferenceLength(e)}</span></div>
                 <h2>{e.title}</h2>
-                <p class="when">{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
+                <p class="when">{e.multiDay ? dateRange(e.start, e.end) : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
                 <span class="stamp-days countdown" data-start={e.start}>{countdown(e.start)}</span>
                 <p class="where">{e.venue}{e.address && <><br />{e.address}</>}</p>
                 <a class="go" href={e.url} target="_blank" rel="noopener" data-click="poster">Tickets & info<span class="sr-only">: {e.title} (opens in new tab)</span> <span aria-hidden="true">→</span></a>
@@ -145,10 +145,10 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
 
       <section class="recent" id="recent" aria-labelledby="recent-h">
         <h2 id="recent-h">Recent events</h2>
-        <p class="sub">The last three months. {past.length} events, {past.reduce((n, e) => n + (e.going ?? 0), 0)} RSVPs.</p>
+        <p class="sub" id="recent-sub">{recentSummary(past.length, past.reduce((n, e) => n + (e.going ?? 0), 0))}</p>
         <ol class="setlist" id="recent-list" data-shown={PAST_SHOWN}>
           {past.map((e, i) => (
-            <li class:list={{ extra: i >= PAST_SHOWN }} data-groups={e.groupIds.join(' ')} data-id={e.id}>
+            <li class:list={{ extra: i >= PAST_SHOWN }} data-groups={e.groupIds.join(' ')} data-id={e.id} data-going={e.going ?? 0}>
               <span class="row-date">{month(e.start)} {day(e.start)}</span>
               <a href={e.url} target="_blank" rel="noopener" data-click="past">
                 <span class="row-group">{e.groupIds.map((id) => byId[id]?.short).join(' + ')}</span>

@@ -169,6 +169,10 @@ const slides = await Promise.all(events.map(async (e) => ({
   const SLIDE_MS = 12_000;
   const RELOAD_MS = 60 * 60 * 1000;
   const loadedAt = Date.now();
+  // The bare layout skips Layout's footer script, so register the service
+  // worker here: a lobby screen that only ever opens /tv/ then has a saved copy
+  // to fall back on if the Wi-Fi drops during the hourly reload.
+  if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('/sw.js');
   const bar = document.getElementById('tv-bar')!;
   const clock = document.getElementById('tv-clock')!;
   const clockFmt = fmt({ weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });

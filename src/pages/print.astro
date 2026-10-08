@@ -5,7 +5,7 @@
 import QRCode from 'qrcode';
 import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
-import { weekday, day, month, shortTime, monthName, lastDay } from '../lib/format.mjs';
+import { weekday, day, month, shortTime, monthName, dateRange } from '../lib/format.mjs';
 import { site } from '../lib/site.mjs';
 
 const { upcoming, byId } = loadData();
@@ -20,8 +20,7 @@ const hosts = (e: any) => e.groupIds.map((id: string) => byId[id]?.short).filter
 const label = (e: any) => [hosts(e), e.headliner && 'conference'].filter(Boolean).join(' · ') || 'Community';
 // The date column carries the dates, so this is only the hours.
 const hours = (e: any) => (e.allDay ? 'All day' : `${shortTime(e.start)}–${shortTime(e.end)}`);
-// "Oct 15–16" for a multi-day event.
-const dates = (e: any) => { const end = `${lastDay(e.start, e.end)}T17:00:00Z`; return e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(end)}` : `${month(e.start)} ${day(e.start)}`; };
+const dates = (e: any) => (e.multiDay ? dateRange(e.start, e.end) : `${month(e.start)} ${day(e.start)}`);
 const where = (e: any) => (e.online ? 'Online' : e.venue ?? 'Venue TBA');
 const qr = await QRCode.toString(site.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#000000', light: '#0000' } });
 const siteHost = new URL(site.url).host;
@@ -106,7 +105,7 @@ const span = rows.length ? `${month(rows[0].start)} ${day(rows[0].start)} – ${
   .tabs span { display: flex; align-items: center; justify-content: center; border-left: 1.5px dashed #000; writing-mode: vertical-rl; transform: rotate(180deg); font: 700 12px/1 var(--mono); }
   .tabs span:first-child { border-left: 0; }
 
-  @media (max-width: 8.6in) { .sheet { min-height: 0; } .sheet h1 { font-size: 48px; } .lineup li { grid-template-columns: 1fr; grid-template-areas: 'd' 't' 'what' 'w'; } }
+  @media screen and (max-width: 8.6in) { .sheet { min-height: 0; } .sheet h1 { font-size: 48px; } .sheet-foot p { min-width: 0; } .sheet-foot .url { font-size: clamp(18px, 6vw, 28px); overflow-wrap: anywhere; } .lineup li { grid-template-columns: 1fr; grid-template-areas: 'd' 't' 'what' 'w'; } }
 
   @page { size: letter; margin: 0; }
   @media print {
