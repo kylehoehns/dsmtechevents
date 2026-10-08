@@ -170,16 +170,6 @@
   "url": "https://www.meetup.com/des-moines-data-analytics/events/313524885/"
  },
  {
-  "id": "webgeeks-306721564",
-  "group": "webgeeks",
-  "title": "Web Geeks Monthly Meeting - New Trends in Web Development (TBD)",
-  "start": "2026-03-09T23:30:00.000Z",
-  "end": "2026-03-10T01:30:00.000Z",
-  "online": true,
-  "going": 4,
-  "url": "https://www.meetup.com/des-moines-web-geeks/events/306721564/"
- },
- {
   "id": "devopsdsm-313619115",
   "group": "devopsdsm",
   "title": "Testing Infrastructure as Code",
@@ -310,16 +300,6 @@
   "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/314214712/"
  },
  {
-  "id": "webgeeks-312416809",
-  "group": "webgeeks",
-  "title": "Web Geeks Monthly Meeting - New Trends in Web Development (TBD)",
-  "start": "2026-05-11T23:30:00.000Z",
-  "end": "2026-05-12T01:30:00.000Z",
-  "online": true,
-  "going": 6,
-  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416809/"
- },
- {
   "id": "webgeeks-314385247",
   "group": "webgeeks",
   "title": "Access Granted: Accessibility in the Modern Web",
@@ -388,16 +368,6 @@
   "venue": "Source Allies",
   "going": 20,
   "url": "https://www.meetup.com/devopsdsm/events/314508493/"
- },
- {
-  "id": "iadnug-314693288",
-  "group": "iadnug",
-  "title": ".NET@Noon - Virtual - Resilience Isn’t a Buzzword",
-  "start": "2026-06-04T05:00:00.000Z",
-  "end": "2026-06-04T06:00:00.000Z",
-  "online": true,
-  "going": 11,
-  "url": "https://www.meetup.com/iadnug/events/314693288/"
  },
  {
   "id": "iadnug-315100213",

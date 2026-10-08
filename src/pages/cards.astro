@@ -6,7 +6,9 @@
 // styles, kept out of search.
 //
 // It also holds a one-line row for every past event, archive included, which
-// a search shows in its "Past" section (app.js).
+// a search shows in its "Past" section (app.js). Events ending in the next
+// two days get a row too, with data-after, so one that ends while a search or
+// a group's view is open moves to Past instead of vanishing.
 import EventCard from '../components/EventCard.astro';
 import { loadData } from '../lib/data.mjs';
 import { splitEvents, pastEvents } from '../lib/pool.mjs';
@@ -14,7 +16,7 @@ import { dayKey, month, day } from '../lib/format.mjs';
 
 const data = loadData();
 const { pooled, today } = splitEvents(data);
-const pastRows = pastEvents(data);
+const pastRows = pastEvents({ ...data, past: [...data.endingSoon, ...data.past] });
 const year = (e) => (dayKey(e.start).slice(0, 4) === today.slice(0, 4) ? '' : `, ${dayKey(e.start).slice(0, 4)}`);
 ---
 <!doctype html>
@@ -22,7 +24,7 @@ const year = (e) => (dayKey(e.start).slice(0, 4) === today.slice(0, 4) ? '' : `,
 <head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Card pool</title></head>
 <body><ul>{pooled.map((e) => <EventCard event={e} byId={data.byId} />)}</ul>
 <ol id="past">{pastRows.map((e) => (
-  <li data-groups={e.groupIds.join(' ')} data-id={e.id}>
+  <li data-groups={e.groupIds.join(' ')} data-id={e.id} data-after={data.endingSoon.includes(e) ? e.end : undefined}>
     <span class="row-date">{month(e.start)} {day(e.start)}{year(e)}</span>
     <a href={e.url ?? data.byId[e.groupIds[0]]?.meetupUrl} target="_blank" rel="noopener" data-click="past">
       <span class="row-group">{e.hostsLabel}</span>

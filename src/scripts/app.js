@@ -187,9 +187,12 @@ function renderList() {
   // A search or one group's view looks back too: past events, newest first,
   // under the upcoming ones (the archive's rows come with the card pool).
   pastShown = 0;
-  const pastShows = (li) => (state.q ? found(li) : !!state.group && matches(hostsOf(li)));
+  // data-after: an event that was still on when the pool was built shows once it's over.
+  const over = (li) => !(Date.parse(li.dataset.after) > Date.now());
+  const pastShows = (li) => over(li) && (state.q ? found(li) : !!state.group && matches(hostsOf(li)));
   for (const li of $$('li', pastResults)) { li.hidden = !pastShows(li); if (!li.hidden) pastShown++; }
-  pastResults.hidden = pastShown === 0;
+  // Past belongs to the list; the calendar shows past days itself.
+  pastResults.hidden = pastShown === 0 || state.view !== 'list';
   $('[data-count]', pastResults).textContent = plural(pastShown, 'event');
   const empty = $('#list-empty');
   empty.hidden = total > 0;

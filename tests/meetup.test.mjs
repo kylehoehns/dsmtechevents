@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { meetupSlug, meetupPhoto } from '../src/lib/meetup.mjs';
-import { parseFeed, parseEventsPage, enrich, mergeCache, formatAddress, cleanDescription } from '../scripts/sources/meetup.mjs';
+import { parseFeed, parseEventsPage, enrich, mergeCache, checkEmptyFeed, formatAddress, cleanDescription } from '../scripts/sources/meetup.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
 const group = { id: 'iadnug', name: 'Iowa .NET User Group' };
@@ -41,6 +41,25 @@ test('parseFeed rejects something that is not a calendar', () => {
   assert.throws(() => parseFeed('<html>Rate limited</html>', group, { now }), /did not return a calendar/);
 });
 
+test('an empty feed throws when the events page still lists upcoming events, or could not be read', () => {
+  const upcoming = parseFeed(fixture('meetup-feed-empty.ics'), group, { slug: 'iadnug', now });
+  assert.deepEqual(upcoming, []);
+  const page = parseEventsPage(fixture('meetup-events-page.html'), 'iadnug'); // 300000001 still ACTIVE
+  assert.throws(() => checkEmptyFeed(upcoming, page, { now, hadUpcoming: 1 }), /feed lists no upcoming events, but the events page lists 1/);
+  assert.throws(() => checkEmptyFeed(upcoming, null, { now, hadUpcoming: 1 }), /couldn't be read to confirm/);
+  assert.doesNotThrow(() => checkEmptyFeed(upcoming, null, { now, hadUpcoming: 0 }), 'a group with nothing scheduled before stays quiet');
+});
+
+test('an empty feed is fine when the page shows the event cancelled, and the event drops out', () => {
+  const upcoming = parseFeed(fixture('meetup-feed-empty.ics'), group, { slug: 'iadnug', now });
+  const page = parseEventsPage(fixture('meetup-events-page-cancelled.html'), 'iadnug');
+  assert.doesNotThrow(() => checkEmptyFeed(upcoming, page, { now, hadUpcoming: 1 }));
+  const cached = { id: 'iadnug-300000001', title: '.NET@Noon', start: '2026-10-08T17:00:00.000Z', end: '2026-10-08T18:00:00.000Z' };
+  const recent = enrich(upcoming, page, group, { now, cutoff });
+  const merged = mergeCache({ fetchedAt: 'THEN', logo: null, events: [cached] }, { events: [...recent, ...upcoming] }, { now, cutoff });
+  assert.ok(!merged.events.some((e) => e.id === 'iadnug-300000001'), 'the cancelled event is gone from the cache');
+});
+
 test('parseEventsPage reads venue, photo, RSVPs and the group logo', () => {
   const { logo, events, members, pastCount, lastMet } = parseEventsPage(fixture('meetup-events-page.html'), 'iadnug');
   assert.equal(logo, 'https://secure.meetupstatic.com/photos/event/a/b/600_111.jpeg');
@@ -66,6 +85,10 @@ test('parseEventsPage reads venue, photo, RSVPs and the group logo', () => {
 
 test('parseEventsPage finds the group even when the URL differs in case', () => {
   assert.equal(parseEventsPage(fixture('meetup-events-page.html'), 'IADNUG').members, 1543);
+});
+
+test('parseEventsPage throws when the page has no entry for the group', () => {
+  assert.throws(() => parseEventsPage(fixture('meetup-events-page.html'), 'some-other-group'), /no Group entry for some-other-group/);
 });
 
 test('parseEventsPage fails loudly when Meetup changes the page', () => {

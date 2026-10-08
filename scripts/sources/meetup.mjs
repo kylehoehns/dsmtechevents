@@ -54,16 +54,17 @@ export function parseEventsPage(html, slug) {
   }
   // Meetup's urlname can differ in case from the URL we have (ProductTank-Des-Moines-Ames).
   const group = Object.entries(state).find(([k, v]) => k.startsWith('Group:') && v.urlname?.toLowerCase() === slug.toLowerCase())?.[1];
+  if (!group) throw new Error(`no Group entry for ${slug} on page`);
   // Total past meetups lives under a key like events({"filter":{"status":["PAST"]},"first":1}).
-  const pastKey = group && Object.keys(group).find((k) => k.startsWith('events(') && k.includes('"status":["PAST"]') && !k.includes('DateTime'));
+  const pastKey = Object.keys(group).find((k) => k.startsWith('events(') && k.includes('"status":["PAST"]') && !k.includes('DateTime'));
   // When the group last met: its newest PAST event (cancelled ones don't
   // count). The page lists the last ten events however old they are, so this
   // reaches further back than the cache's 90 days. The site uses it to hide
   // quiet groups and to say "Back!" when one returns.
   const lastMet = [...events.values()].filter((e) => e.status === 'PAST').map((e) => e.start).sort().at(-1) ?? null;
   return {
-    logo: photo(group?.keyGroupPhoto),
-    members: group?.stats?.memberCounts?.all ?? null,
+    logo: photo(group.keyGroupPhoto),
+    members: group.stats?.memberCounts?.all ?? null,
     pastCount: (pastKey && group[pastKey]?.totalCount) ?? null,
     lastMet,
     events,
@@ -91,6 +92,18 @@ export function enrich(upcoming, details, group, { now, cutoff }) {
     }
   }
   return recent;
+}
+
+// A Meetup feed with nothing coming up, for a group whose last run had events
+// coming up. Fine if the events page agrees (the events were called off or
+// taken down); broken if the page still lists upcoming events, or couldn't be
+// read either (`details` null). Broken throws, so the last good cache stays
+// and a source-broken issue opens.
+export function checkEmptyFeed(upcoming, details, { now, hadUpcoming }) {
+  if (upcoming.length || !hadUpcoming) return;
+  if (!details) throw new Error(`feed lists no upcoming events (the last run had ${hadUpcoming}), and the events page couldn't be read to confirm`);
+  const onPage = [...details.events.values()].filter((e) => e.status !== 'CANCELLED' && Date.parse(e.end) >= now).length;
+  if (onPage) throw new Error(`feed lists no upcoming events, but the events page lists ${onPage}`);
 }
 
 // Merge a fresh fetch into the previous cache file: past events from the cache

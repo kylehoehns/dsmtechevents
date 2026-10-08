@@ -30,3 +30,22 @@ test('events are filed under their Des Moines year', () => {
   // 7pm Dec 31 in Des Moines is already Jan 1 in UTC.
   assert.deepEqual(Object.keys(updateArchive({}, { g: { events: [ev('g-1', '2026-01-01T01:00:00Z')] } }, now)), ['2025']);
 });
+
+test('a lower RSVP count from a stale copy does not replace the final one', () => {
+  const first = updateArchive({}, { iadnug: { events: [ev('i-1', '2026-09-22T22:30:00Z', { going: 32 })] } }, now);
+  assert.deepEqual(updateArchive(first, { iadnug: { events: [ev('i-1', '2026-09-22T22:30:00Z', { going: 27 })] } }, now), {}, 'kept at 32, and nothing to rewrite');
+  assert.deepEqual(updateArchive(first, { iadnug: { events: [ev('i-1', '2026-09-22T22:30:00Z')] } }, now), {}, 'a copy with no count keeps it too');
+});
+
+test('ended hand-added events are archived: no group without hosts, the first host with them', () => {
+  const conf = ev('manual-tech-fuse-dsm-2026-2026-10-15', '2026-10-01T13:00:00Z', { headliner: true, groupIds: [] });
+  const joint = ev('manual-joint-2026-09-30', '2026-09-30T23:00:00Z', { groupIds: ['cijug', 'iadnug'] });
+  const later = ev('manual-code-camp-2026-11-07', '2026-11-07T13:00:00Z', { headliner: true, groupIds: [] });
+  const changed = updateArchive({}, {}, now, [conf, joint, later]);
+  assert.deepEqual(changed['2026'].map((r) => [r.id, r.group, r.headliner]), [
+    ['manual-joint-2026-09-30', 'cijug', undefined],
+    ['manual-tech-fuse-dsm-2026-2026-10-15', undefined, true],
+  ]);
+  assert.ok(!('group' in changed['2026'][1]), 'no group key at all, rather than null');
+  assert.deepEqual(updateArchive(changed, {}, now, [conf, joint, later]), {}, 'a quiet refresh changes nothing');
+});
