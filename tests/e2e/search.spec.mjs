@@ -61,6 +61,23 @@ test('words match from their start: "ai" finds AI, not "said"', async ({ page })
   await expect(past(page, 'Hiring in the Age of AI')).toBeVisible();
 });
 
+test('a longer word also finds its singular and the middle of a word', async ({ page }) => {
+  await page.goto('/');
+  // Remote DevOps Chat's About text says "agent" and "OpenTelemetry".
+  await search(page, 'agents');
+  await expect(event(page, 'Remote DevOps Chat')).toBeVisible();
+  await expect(event(page, 'Coding Dojo')).toBeHidden();
+  await box(page).fill('telemetry');
+  await expect(event(page, 'Remote DevOps Chat')).toBeVisible();
+  await expect(event(page, 'Python Office Hours')).toBeHidden();
+  await box(page).fill('dojos');
+  await expect(event(page, 'Coding Dojo')).toBeVisible();
+  await expect(event(page, 'Remote DevOps Chat')).toBeHidden();
+  // Short words still have to start a word: "ops" isn't the end of "DevOps".
+  await box(page).fill('ops');
+  await expect(event(page, 'Remote DevOps Chat')).toBeHidden();
+});
+
 test('the address is searched, so a town name works', async ({ page }) => {
   await page.goto('/');
   await search(page, 'urbandale');

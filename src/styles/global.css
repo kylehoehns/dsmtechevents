@@ -614,6 +614,19 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 /* while it shows, the footer ends the hint's height higher (Layout.astro measures it into --hint-h), so nothing stays under it */
 .has-hint .foot { padding-bottom: calc(32px + 12px + var(--hint-h, 84px) + env(safe-area-inset-bottom)); }
 
+/* Touch screens: every button and link-chip gets a tap area at least 44px
+   tall without looking any bigger. A see-through ::after box, centered on the
+   control, takes the tap; the layout doesn't move. (min() keeps a control
+   that is already taller at its own size.) The group name on a card grows
+   up, away from the title link just below it. The organizers' event picker
+   is a real form field, so it simply gets taller. */
+@media (pointer: coarse) {
+  :is(.btn, .more, .band a) { position: relative; }
+  :is(.btn, .more)::after { content: ""; position: absolute; left: 0; right: 0; top: min(0px, calc(50% - 22px)); bottom: min(0px, calc(50% - 22px)); }
+  .band a::after { content: ""; position: absolute; left: 0; right: 0; top: min(0px, calc(100% - 41px)); bottom: -3px; }
+  .builder select { min-height: 44px; }
+}
+
 /* the copy of a photo that flies between the thumbnail and About (app.js) */
 .about-ghost { position: fixed; z-index: 60; margin: 0; transform-origin: 0 0; pointer-events: none; object-fit: contain; border: 1.5px solid var(--line); background: var(--paper); }
 @media (prefers-reduced-motion: reduce) {

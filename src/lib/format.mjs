@@ -104,11 +104,17 @@ export function dateRange(start, end) {
 // "Thu–Fri Oct 15–16".
 export const dayRange = (start, end) => `${weekday(start)}–${weekday(`${lastDay(start, end)}T17:00:00Z`)} ${dateRange(start, end)}`;
 
-// "5:30p–7p", "Thu–Fri Oct 15–16 · 8a–5p", "All day".
-export function shortRange(e) {
-  if (e.allDay) return e.multiDay ? `${dateRange(e.start, e.end)} · All day` : 'All day';
-  const t = `${shortTime(e.start)}–${shortTime(e.end)}`;
-  return e.multiDay ? `${dayRange(e.start, e.end)} · ${t}` : t;
+// "5:30p–7p", "All day", and for an event over several days
+// "through Fri Oct 16 · 8a–5p". Cards and TV slides print the start date big
+// beside this line, so it only adds the last day (say it once). Where nothing
+// shows the start (the calendar's day panel hides it), { full: true } gives
+// the whole range: "Thu–Fri Oct 15–16 · 8a–5p".
+export function shortRange(e, { full = false } = {}) {
+  const t = e.allDay ? 'All day' : `${shortTime(e.start)}–${shortTime(e.end)}`;
+  if (!e.multiDay) return t;
+  const last = `${lastDay(e.start, e.end)}T17:00:00Z`;
+  if (!full) return `through ${weekday(last)} ${month(last)} ${day(last)} · ${t}`;
+  return `${e.allDay ? dateRange(e.start, e.end) : dayRange(e.start, e.end)} · ${t}`;
 }
 
 export const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
