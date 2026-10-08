@@ -8,8 +8,8 @@
 // Each change is screen-printed in (src/styles/tv-fx.css). Reduced motion,
 // or ?fx=off for a TV stick too slow for it, gets a plain swap.
 //
-// Event mode, /tv/?event=<id>, shows ONE event for a host's lobby screen,
-// with the host's own slides (src/scripts/tv-event.ts; /organizers/ builds
+// Event mode, /tv/?event=<id>, shows ONE event on a host venue's lobby
+// screen, then what's next (src/scripts/tv-event.ts; /organizers/ makes
 // the link). It runs in the browser from the event data embedded below.
 // noindex covers it too: it's a screen display that points out, not a page.
 import QRCode from 'qrcode';
@@ -181,7 +181,7 @@ const eventData = {
   .qr span { font: 900 2.6vh/1 var(--display); text-transform: uppercase; }
 
   /* ---- Event mode (/tv/?event=, src/scripts/tv-event.ts): one event as a
-     gig poster, then the host's slides and what's next. Same flyer inks. */
+     gig poster, then what's next. Same flyer inks. */
   .ev-slide { align-items: center; gap: 4vw; padding: 3vh 0; }
   .ev-slide .qr-code { width: 22vh; height: 22vh; } /* holds the space while the code draws */
   .ev-slide .qr-code svg { width: 100%; height: 100%; }
@@ -219,23 +219,6 @@ const eventData = {
   .ev-closing-text .where { margin: 0; font: 600 3.6vh/1.3 var(--sans); color: var(--soft); }
   .ev-gone .ev-title { font-size: 9vh; margin-bottom: 3vh; text-wrap: balance; }
 
-  /* host slides */
-  .ev-host-body { flex: 1; min-width: 0; align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
-  .ev-welcome-text { margin: 0; font: 900 15vh/0.88 var(--display); text-transform: uppercase; text-wrap: balance; overflow-wrap: anywhere; }
-  .ev-welcome-text.long { font-size: 10vh; }
-  .ev-note-text { margin: 0; font: 600 5vh/1.3 var(--sans); white-space: pre-line; overflow-wrap: anywhere; max-width: 70vw; }
-  .ev-agenda-list { list-style: none; margin: 4vh 0 0; padding: 0; display: grid; gap: 1.6vh; }
-  .ev-agenda-list li { display: grid; grid-template-columns: 6vw 1fr; align-items: baseline; padding-bottom: 1.4vh; border-bottom: 2px dashed #5d5966; }
-  .ev-agenda-list .ag-n { font: 900 4.4vh/1 var(--display); color: var(--pink); }
-  .ev-agenda-list .ag-text { font: 600 4.2vh/1.15 var(--sans); overflow-wrap: anywhere; }
-  .ev-agenda-list.many { gap: 1vh; margin-top: 3vh; }
-  .ev-agenda-list.many li { padding-bottom: 0.8vh; }
-  .ev-agenda-list.many .ag-text { font-size: 3.2vh; }
-  .ev-wifi-list { margin: 5vh 0 0; display: grid; grid-template-columns: auto 1fr; gap: 3vh 3vw; align-items: baseline; }
-  .ev-wifi-list dt { font: 700 3vh/1 var(--mono); text-transform: uppercase; color: var(--soft); }
-  .ev-wifi-list dd { margin: 0; font: 700 8vh/1.05 var(--mono); color: var(--ink); overflow-wrap: anywhere; }
-  .ev-wifi-list dd + dt + dd { color: var(--blue); }
-  .ev-wifi-list dd.none { color: var(--soft); font-size: 5vh; }
 
   /* Up next: a setlist of dates */
   .ev-next-all { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 3vh; padding-top: 3vh; }
@@ -314,12 +297,6 @@ const eventData = {
     .ev-lineup .lt-time, .ev-lineup .lt-title { font-size: 3.6vw; }
     .ev-title, .ev-next-all .ev-title, .ev-gone .ev-title { font-size: 10vw; }
     .ev-huge { font-size: 14vw; }
-    .ev-welcome-text { font-size: 12vw; }
-    .ev-welcome-text.long { font-size: 8vw; }
-    .ev-note-text { font-size: 5vw; max-width: none; }
-    .ev-agenda-list .ag-n { font-size: 5vw; }
-    .ev-agenda-list .ag-text, .ev-agenda-list.many .ag-text { font-size: 4.4vw; }
-    .ev-wifi-list dd { font-size: 8vw; }
     .ev-next li { grid-template-columns: auto minmax(0, 1fr); gap: 0.6vh 3vw; }
     .ev-next .row-date, .ev-next .row-group { font-size: 3.6vw; }
     .ev-next .row-title { grid-column: 1 / -1; font-size: 4vw; white-space: normal; }
@@ -350,7 +327,7 @@ const eventData = {
   // Event mode (?event=<id>) swaps in that event's slides, or, for an id
   // that isn't on the calendar, puts a notice in front of the regular ones.
   const mode = params.has('event')
-    ? eventMode(document.querySelector<HTMLElement>('.tv-stage')!, JSON.parse(document.getElementById('tv-data')!.textContent!), params, location.hash.slice(1))
+    ? eventMode(document.querySelector<HTMLElement>('.tv-stage')!, JSON.parse(document.getElementById('tv-data')!.textContent!), params.get('event')!)
     : null;
 
   // The page is built ahead of time: drop anything that has ended, and label
@@ -417,8 +394,7 @@ const eventData = {
 
   function next() {
     // Reload between slides once an hour, to pick up new events. reload()
-    // keeps the whole address, so event mode's ?event=…&slides=… and the
-    // host's #welcome=… fragment come back as is.
+    // keeps the address, so event mode's ?event=… comes back as is.
     if (Date.now() - loadedAt > RELOAD_MS && index === slides.length - 1) return location.reload();
     // refresh() may remove ended slides, so step from where the current one
     // ends up rather than by position (which would skip a slide).

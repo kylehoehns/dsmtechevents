@@ -1,22 +1,16 @@
 // Event mode for the lobby TV: /tv/?event=<id>, for a host putting ONE event
 // on the screen at their venue. tv.astro calls eventMode() before the
-// slideshow starts; it swaps the regular slides for this event's, in the
-// order the URL asks for (src/lib/tv-slides.mjs), and update() keeps them
-// current as the clock moves: a countdown, "Happening now", then a closing
-// slide once the event is over.
+// slideshow starts; it swaps the regular slides for this event's three (the
+// event, the group's next meetup, what's next from every group), and
+// update() keeps them current as the clock moves: a countdown, "Happening
+// now", then a closing slide once the event is over. Everything on screen
+// comes from the fetched event data; the URL carries only the event id.
 //
 // This is not a "per-event page" in the product-rule sense (AGENTS.md): it
 // is a screen in a room, built from data the site already has, and every
 // slide points out, to the group's own page (QR to RSVP) or to the site. It
 // takes no sign-ups, stores nothing, and the page stays noindex.
-//
-// Host text comes from the URL, so it only ever reaches the page through
-// textContent (or a data-t attribute for the misprint), never as HTML. It is
-// read from the fragment (after #), which never reaches a server; nothing
-// here logs it or sends it anywhere, and the bare layout has no click
-// beacon. public/_headers keeps Cloudflare's analytics script off /tv/.
-import { weekday, day, month, shortRange, todayWord, liveLabel } from '../lib/format.mjs';
-import { readTvParams, wifiCode } from '../lib/tv-slides.mjs';
+import { weekday, day, month, shortRange, liveLabel } from '../lib/format.mjs';
 
 export type TvEvent = {
   id: string; title: string; start: string; end: string; allDay: boolean; multiDay: boolean; repeat: boolean;
@@ -106,35 +100,6 @@ function closing(e: TvEvent, site: string) {
   return [text, qr(site, `See what's next at ${new URL(site).host}`, 'qr-big')];
 }
 
-function hostSlide(kind: string, text: ReturnType<typeof readTvParams>['text'], from: string) {
-  const body = el('div', 'ev-host-body');
-  body.append(kicker(from));
-  const nodes: HTMLElement[] = [body];
-  if (kind === 'welcome') {
-    body.append(misprint(el('h2', `ev-welcome-text${[...text.welcome].length > 60 ? ' long' : ''}`), text.welcome));
-  } else if (kind === 'note') {
-    body.append(el('p', 'ev-note-text', text.note));
-  } else if (kind === 'agenda') {
-    body.append(misprint(el('h2', 'ev-title'), 'Agenda'));
-    const list = el('ol', `ev-agenda-list${text.agenda.length > 5 ? ' many' : ''}`);
-    text.agenda.forEach((item, i) => {
-      const li = el('li');
-      li.append(el('span', 'ag-n', String(i + 1).padStart(2, '0')), el('span', 'ag-text', item));
-      list.append(li);
-    });
-    stagger(list);
-    body.append(list);
-  } else if (kind === 'wifi') {
-    body.append(misprint(el('h2', 'ev-title'), 'Wi-Fi'));
-    const dl = el('dl', 'ev-wifi-list');
-    dl.append(el('dt', '', 'Network'), el('dd', '', text.wifi), el('dt', '', 'Password'), el('dd', text.wifipass ? '' : 'none', text.wifipass || 'No password'));
-    body.append(dl);
-    nodes.push(qr(wifiCode(text.wifi, text.wifipass), 'Scan to join', 'qr-big'));
-  }
-  stagger(body);
-  return nodes;
-}
-
 const upcoming = (data: TvData, now: number) => data.events.filter((x) => Date.parse(x.end) > now);
 
 // "Up next in DSM tech": the next few events from any group after this one,
@@ -155,8 +120,8 @@ function nextAll(e: TvEvent, data: TvData, now: number) {
   return { key: rows.map((x) => x.id).join(), nodes };
 }
 
-// "Next CIJUG meetup": the host group's own next event, as a poster. For a
-// joint event, ?group= picks the group (the first host otherwise).
+// "Next CIJUG meetup": the host group's own next event, as a poster. A
+// joint event uses its first host group.
 function nextGroup(e: TvEvent, data: TvData, group: string, now: number) {
   const next = upcoming(data, now).find((x) => x.id !== e.id && x.groups.includes(group) && x.start > e.start);
   const head = el('div', 'ev-head');
@@ -189,18 +154,16 @@ function goneSlide(site: string) {
   return s;
 }
 
-export function eventMode(stage: HTMLElement, data: TvData, params: URLSearchParams, fragment = '', now = Date.now()) {
-  const e = data.events.find((x) => x.id === params.get('event'));
+export function eventMode(stage: HTMLElement, data: TvData, id: string, now = Date.now()) {
+  const e = data.events.find((x) => x.id === id);
   if (!e || Date.parse(e.end) + CLOSING_MS <= now) {
     stage.prepend(goneSlide(data.site));
     return null;
   }
-  const { order, text, group: asked } = readTvParams(params, fragment);
-  const group = e.groups.includes(asked) ? asked : e.groups[0];
-  const from = `From ${todayWord(e.start).toLowerCase()}'s host`;
+  const group = e.groups[0];
   const updates: ((now: number) => void)[] = [];
   stage.replaceChildren();
-  for (const kind of order) {
+  for (const kind of ['event', 'next-group', 'next-all']) {
     if (kind === 'next-group' && !group) continue; // a conference with no group has no "next meetup"
     const s = el('section', `slide ev-slide ev-${kind}`);
     if (kind === 'event') {
@@ -223,14 +186,12 @@ export function eventMode(stage: HTMLElement, data: TvData, params: URLSearchPar
           stamp.classList.toggle('live', stamp.textContent === 'Happening now');
         }
       });
-    } else if (kind === 'next-all' || kind === 'next-group') {
+    } else {
       let key: string | null = null;
       updates.push((t) => {
         const out = kind === 'next-all' ? nextAll(e, data, t) : nextGroup(e, data, group, t);
         if (out.key !== key) { key = out.key; s.replaceChildren(...out.nodes); }
       });
-    } else {
-      s.append(...hostSlide(kind, text, from));
     }
     stage.append(s);
   }

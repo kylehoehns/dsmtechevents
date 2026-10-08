@@ -7,8 +7,6 @@ visitor.
 
 Cloudflare Web Analytics, which Cloudflare injects for the domain. See the
 dashboard: **Analytics & Logs → Web Analytics → dsmtechevents.com**.
-The lobby TV (`/tv/`) is left out: `public/_headers` blocks the beacon there,
-since event mode keeps the host's Wi-Fi password in the URL's fragment.
 
 ## Outbound clicks
 

@@ -20,16 +20,6 @@ test('scriptHash is the CSP sha256 source of the exact script text', () => {
   assert.notEqual(scriptHash(body), scriptHash(body.trim()), 'whitespace counts, so hashes come from the built HTML');
 });
 
-test("/tv/ gets a second policy that leaves out Cloudflare's analytics (event mode's #fragment holds the host's Wi-Fi password)", async () => {
-  const fs = await import('node:fs');
-  const headers = fs.readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
-  const tv = /^\/tv\/\n((?:[ \t]+.*\n?)+)/m.exec(headers)?.[1] ?? '';
-  const policy = /Content-Security-Policy:\s*(.*)/.exec(tv)?.[1] ?? '';
-  assert.match(policy, /script-src 'self' 'inline-script-hashes';/);
-  assert.match(policy, /connect-src 'self'$/);
-  assert.doesNotMatch(policy, /cloudflareinsights/);
-});
-
 test('scriptSrc reads the script-src of each CSP line in _headers', () => {
   const headers = "/*\n  X-Frame-Options: DENY\n  Content-Security-Policy: script-src 'self' 'sha256-abc=' https://x; object-src 'none'\n";
   assert.deepEqual(scriptSrc(headers), [["'self'", "'sha256-abc='", 'https://x']]);

@@ -31,7 +31,7 @@
 @keyframes fx-blade { from { transform: translateX(-100%); } 92% { opacity: 1; } to { transform: translateX(0); opacity: 0; } }
 
 /* two plates on plain text: plate color as a text-shadow, ink color after */
-.tv[data-fx=print] .slide.is-on :is(h2, .hosts, .time, .where, .going, .dow, .mon, li > span, .qr span, .ev-kicker, .ev-note-text, .ev-wifi-list > *) {
+.tv[data-fx=print] .slide.is-on :is(h2, .hosts, .time, .where, .going, .dow, .mon, li > span, .qr span, .ev-kicker) {
   animation: fx-plate 1.3s ease-out backwards;
   animation-delay: calc(0.2s + var(--i, 0) * 0.07s);
 }

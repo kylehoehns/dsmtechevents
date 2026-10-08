@@ -1,34 +1,21 @@
 ---
 // For group organizers and hosts: the tools in one place. Getting listed
 // stays on /add/ (where the footer's call to action goes), so it's a pointer
-// here. The screen builder writes a /tv/?event=… link (src/lib/tv-slides.mjs
-// has the slide names and caps the TV reads back); nothing is stored, the
-// whole setup lives in the link.
+// here. "Put your event on a screen" makes a /tv/?event=… link (the event
+// mode in src/scripts/tv-event.ts); nothing is stored.
 import Layout from '../layouts/Layout.astro';
 import { site } from '../lib/site.mjs';
 import { loadData } from '../lib/data.mjs';
 import { weekday, month, day } from '../lib/format.mjs';
-import { CAPS } from '../lib/tv-slides.mjs';
 
-const { upcoming, byId, updatedAt } = loadData();
+const { upcoming, updatedAt } = loadData();
 // Every upcoming event, by date. The browser drops any that have ended since the build.
 const choices = upcoming.map((e) => ({
   id: e.id,
   end: e.end,
   label: `${e.hostsLabel}: ${e.title}, ${weekday(e.start)} ${month(e.start)} ${day(e.start)}`,
-  groups: e.groupIds.filter((id) => byId[id]).map((id) => `${id}:${byId[id].short}`).join('|'),
 }));
-
-// The slides a host can pick, in the builder's starting order.
-const slideTypes = [
-  { kind: 'event', label: 'The event', note: 'Date, time, place, the talk lineup when the listing has one, and a QR code to RSVP. Always shown, and up longest.' },
-  { kind: 'welcome', label: 'Welcome message' },
-  { kind: 'agenda', label: 'Agenda' },
-  { kind: 'wifi', label: 'Wi-Fi' },
-  { kind: 'note', label: 'Note' },
-  { kind: 'next-group', label: 'Up next: just my group', note: "Your group's next meetup after this one, as a poster with its own QR code." },
-  { kind: 'next-all', label: 'Up next: all groups', note: 'The next five events from any group, by date.' },
-];
+const firstUrl = choices[0] ? `${site.url}/tv/?event=${encodeURIComponent(choices[0].id)}` : '';
 
 // Copy-paste snippets for the organizer badge. Meetup's group description
 // takes plain text only, so that one is just a sentence and the link.
@@ -58,71 +45,35 @@ const snippets = [
 
     <section class="builder" aria-labelledby="screen-h">
       <h2 id="screen-h">Put your event on a screen</h2>
-      <p>Build a slideshow of your event for the TV in your lobby. Pick the slides and their order, and it makes a link. Nothing is saved: everything lives in the link.</p>
+      <p>Show your event on the TV in your lobby: its date, time, place and talks with a QR code to RSVP, then your group's next meetup and what else is coming up.</p>
 
       <div class="builder-box" id="builder">
-        <p class="field">
-          <label for="b-event">Your event</label>
-          <select id="b-event">
-            {choices.map((c) => <option value={c.id} data-end={c.end} data-groups={c.groups}>{c.label}</option>)}
-          </select>
-        </p>
-        <p class="tv-empty-note" id="b-none" hidden>Nothing is coming up right now. Once your next event is listed, it shows up here.</p>
-
-        <fieldset>
-          <legend>Slides, in order</legend>
-          <ol class="slide-list" id="b-slides">
-            {slideTypes.map((s) => (
-              <li class="slide-row" data-kind={s.kind}>
-                <div class="slide-row-head">
-                  <label><input type="checkbox" value={s.kind} checked={s.kind === 'event' || s.kind === 'next-all'} disabled={s.kind === 'event'} /> {s.label}</label>
-                  <span class="move">
-                    <button type="button" class="btn btn-outline btn-small" data-move="-1" aria-label={`Move ${s.label} up`}>Up</button>
-                    <button type="button" class="btn btn-outline btn-small" data-move="1" aria-label={`Move ${s.label} down`}>Down</button>
-                  </span>
-                </div>
-                {s.note && <p class="slide-note">{s.note}</p>}
-                {s.kind === 'welcome' && (
-                  <p class="field slide-fields"><label for="f-welcome">Message</label><input id="f-welcome" data-field="welcome" maxlength={CAPS.welcome} placeholder="Welcome! Grab a slice and a seat." /></p>
-                )}
-                {s.kind === 'agenda' && (
-                  <p class="field slide-fields"><label for="f-agenda">One item per line, up to {CAPS.agendaItems}</label><textarea id="f-agenda" data-field="agenda" rows="4" placeholder={'6:00 Doors and pizza\n6:30 Talks\n7:45 Hang out'}></textarea></p>
-                )}
-                {s.kind === 'wifi' && (
-                  <div class="slide-fields wifi-fields">
-                    <p class="field"><label for="f-wifi">Network name</label><input id="f-wifi" data-field="wifi" maxlength={CAPS.wifi} autocomplete="off" spellcheck="false" /></p>
-                    <p class="field"><label for="f-wifipass">Password (blank for an open network)</label><input id="f-wifipass" data-field="wifipass" maxlength={CAPS.wifipass} autocomplete="off" spellcheck="false" /></p>
-                    <p class="slide-note">Use a guest network: the password shows on the screen. Your text stays in the link (after the #), which is never sent to our server.</p>
-                  </div>
-                )}
-                {s.kind === 'note' && (
-                  <p class="field slide-fields"><label for="f-note">Note</label><textarea id="f-note" data-field="note" rows="3" maxlength={CAPS.note} placeholder="Parking is free in the north lot."></textarea></p>
-                )}
-                {s.kind === 'next-group' && (
-                  <p class="field slide-fields" id="f-group-wrap" hidden><label for="f-group">Which group</label><select id="f-group"></select></p>
-                )}
-              </li>
-            ))}
-          </ol>
-          <p class="sr-only" id="b-moved" role="status"></p>
-        </fieldset>
-
-        <p class="field check"><label><input type="checkbox" id="b-plain" /> Plain transitions, for a slow TV stick</label></p>
-
-        <div class="tv-link">
-          <p class="tv-link-label" id="b-url-label">Your screen's link</p>
-          <pre><code id="b-url" aria-labelledby="b-url-label"></code></pre>
-          <div class="tv-link-actions">
-            <button type="button" class="btn btn-solid" id="b-copy">Copy link</button>
-            <a class="btn btn-outline" id="b-open" href="/tv/" target="_blank" rel="noopener">Open preview<span class="sr-only"> (opens in new tab)</span></a>
-          </div>
-        </div>
+        {choices.length ? (
+          <>
+            <p class="field">
+              <label for="b-event">Your event</label>
+              <select id="b-event">
+                {choices.map((c) => <option value={c.id} data-end={c.end}>{c.label}</option>)}
+              </select>
+            </p>
+            <div class="tv-link">
+              <p class="tv-link-label" id="b-url-label">Your screen's link</p>
+              <pre><code id="b-url" aria-labelledby="b-url-label">{firstUrl}</code></pre>
+              <div class="tv-link-actions">
+                <button type="button" class="btn btn-solid" id="b-copy">Copy link</button>
+                <a class="btn btn-outline" id="b-open" href={firstUrl} target="_blank" rel="noopener">Open preview<span class="sr-only"> (opens in new tab)</span></a>
+              </div>
+            </div>
+          </>
+        ) : (
+          <p class="field">Nothing is coming up right now. Once your next event is listed, it shows up here.</p>
+        )}
       </div>
 
       <ul class="howto">
         <li>Open the link on the computer or TV stick driving the lobby screen, and make it full screen.</li>
-        <li>It keeps the screen awake, refreshes itself every hour, and switches to "Happening now" and then a thank-you slide on its own.</li>
-        <li>Arrow keys step through the slides; the space bar pauses.</li>
+        <li>It keeps the screen awake, and switches to "Happening now" and then a thank-you slide on its own.</li>
+        <li>On a slow TV stick, add <code>&amp;fx=off</code> to the end of the link for plain transitions.</li>
       </ul>
       <p>A coworking space or office? <a href="/tv/">The regular TV page</a> rotates through everything coming up. Prefer paper? <a href="/print/">Print a flyer</a>.</p>
     </section>
@@ -151,79 +102,26 @@ const snippets = [
 
 <script>
   import { copyButton } from '../scripts/copy';
-  import { tvUrl, TEXT_SLIDES } from '../lib/tv-slides.mjs';
 
   for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-copy-from]')) {
     const code = document.getElementById(btn.dataset.copyFrom!)!;
     copyButton(btn, () => code.textContent!, code);
   }
 
-  // The screen builder.
-  const eventSel = document.getElementById('b-event') as HTMLSelectElement;
-  const list = document.getElementById('b-slides')!;
-  const groupSel = document.getElementById('f-group') as HTMLSelectElement;
-  const plain = document.getElementById('b-plain') as HTMLInputElement;
-  const urlEl = document.getElementById('b-url')!;
-  const open = document.getElementById('b-open') as HTMLAnchorElement;
-  const moved = document.getElementById('b-moved')!;
-  const rows = () => [...list.querySelectorAll<HTMLElement>('.slide-row')];
-  const box = (row: HTMLElement) => row.querySelector<HTMLInputElement>('input[type=checkbox]')!;
-  const field = (name: string) => document.querySelector<HTMLInputElement>(`[data-field="${name}"]`)!.value.trim();
-
-  // The page was built ahead of time: drop events that have ended since.
-  for (const o of [...eventSel.options]) if (Date.parse(o.dataset.end!) <= Date.now()) o.remove();
-  if (!eventSel.options.length) {
-    document.getElementById('b-none')!.hidden = false;
-    for (const el of document.querySelectorAll<HTMLElement>('#builder > :not(#b-none)')) el.hidden = true;
-  }
-
-  // A joint event gets a choice of whose next meetup to show; an event with
-  // no group (a conference) has no "next meetup" slide at all.
-  function pickEvent() {
-    const groups = (eventSel.selectedOptions[0]?.dataset.groups ?? '').split('|').filter(Boolean).map((g) => g.split(':'));
-    groupSel.replaceChildren(...groups.map(([id, name]) => new Option(name, id)));
-    document.getElementById('f-group-wrap')!.hidden = groups.length < 2;
-    const row = list.querySelector<HTMLElement>('[data-kind="next-group"]')!;
-    box(row).disabled = !groups.length;
-    if (!groups.length) box(row).checked = false;
-  }
-
-  function update() {
-    for (const row of rows()) {
-      const fields = row.querySelector<HTMLElement>('.slide-fields');
-      if (fields) fields.hidden = !box(row).checked || (row.dataset.kind === 'next-group' && groupSel.options.length < 2);
-    }
-    if (!eventSel.value) return;
-    const fields = Object.fromEntries(['welcome', 'agenda', 'wifi', 'wifipass', 'note'].map((k) => [k, field(k)]));
-    fields.agenda = fields.agenda.split('\n').map((s) => s.trim()).filter(Boolean).join('|');
-    // A host slide with nothing typed yet would show nothing, so it stays out of the link.
-    const hasText = (kind: string) => !!fields[kind];
-    const order = rows().filter((r) => box(r).checked && (!TEXT_SLIDES.includes(r.dataset.kind!) || hasText(r.dataset.kind!))).map((r) => r.dataset.kind!);
-    for (const k of TEXT_SLIDES) if (!order.includes(k)) { fields[k] = ''; if (k === 'wifi') fields.wifipass = ''; }
-    const group = order.includes('next-group') && groupSel.selectedIndex > 0 ? groupSel.value : '';
-    const url = tvUrl(location.origin, { event: eventSel.value, order, fields, group, plain: plain.checked });
-    urlEl.textContent = url;
-    open.href = url;
-  }
-
-  // Up and Down swap a slide with its neighbour; focus stays on the button
-  // pressed, and a status line says where the slide went.
-  list.addEventListener('click', (ev) => {
-    const btn = (ev.target as Element).closest<HTMLButtonElement>('[data-move]');
-    if (!btn) return;
-    const row = btn.closest<HTMLElement>('.slide-row')!;
-    const all = rows();
-    const to = all.indexOf(row) + Number(btn.dataset.move);
-    if (to < 0 || to >= all.length) return;
-    if (Number(btn.dataset.move) < 0) all[to].before(row); else all[to].after(row);
-    btn.focus();
-    moved.textContent = `${row.querySelector('label')!.textContent!.trim()}: slide ${to + 1} of ${all.length}`;
+  // The screen link for the chosen event, on this site's own address.
+  const eventSel = document.getElementById('b-event') as HTMLSelectElement | null;
+  if (eventSel) {
+    const urlEl = document.getElementById('b-url')!;
+    const open = document.getElementById('b-open') as HTMLAnchorElement;
+    // The page was built ahead of time: drop events that have ended since.
+    for (const o of [...eventSel.options]) if (Date.parse(o.dataset.end!) <= Date.now()) o.remove();
+    const update = () => {
+      const url = new URL(`/tv/?event=${encodeURIComponent(eventSel.value)}`, location.origin).href;
+      urlEl.textContent = url;
+      open.href = url;
+    };
+    eventSel.addEventListener('change', update);
+    copyButton(document.getElementById('b-copy') as HTMLButtonElement, () => urlEl.textContent!, urlEl);
     update();
-  });
-  eventSel.addEventListener('change', () => { pickEvent(); update(); });
-  document.getElementById('builder')!.addEventListener('input', update);
-  document.getElementById('builder')!.addEventListener('change', update);
-  copyButton(document.getElementById('b-copy') as HTMLButtonElement, () => urlEl.textContent!, urlEl);
-  pickEvent();
-  update();
+  }
 </script>
