@@ -1,6 +1,7 @@
 ---
 // How to get a group or event listed. The footer's "Add your group" button
-// lands here, so nobody is surprised by their mail app opening.
+// lands here, so nobody is surprised by their mail app opening. The other
+// organizer tools (the badge, the TV screen builder) are on /organizers/.
 import Layout from '../layouts/Layout.astro';
 import { site } from '../lib/site.mjs';
 import { loadData } from '../lib/data.mjs';
@@ -13,14 +14,6 @@ const body = [
   'Anything else we should know:',
 ].join('\n\n');
 const mailto = `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-// Copy-paste snippets for the organizer badge. Meetup's group description
-// takes plain text only, so that one is just a sentence and the link.
-const badgeImg = new URL('/badge.png', site.url).href;
-const snippets = [
-  { label: 'HTML (your website)', code: `<a href="${site.url}/"><img src="${new URL('/badge.svg', site.url).href}" width="300" height="64" alt="Find more Des Moines tech events"></a>` },
-  { label: 'Markdown (a README)', code: `[![Find more Des Moines tech events](${badgeImg})](${site.url}/)` },
-  { label: 'Plain text (Meetup description)', code: `Find more Des Moines tech meetups and conferences: ${site.url}` },
-];
 ---
 <Layout nav="add" updatedAt={loadData().updatedAt} headTitle="Add your group or event · DSM Tech Events"
   description="Get your Des Moines tech meetup, user group, conference or one-off event listed on DSM Tech Events. Send us your Meetup link, or the details of a single event.">
@@ -62,20 +55,7 @@ const snippets = [
       </div>
     </section>
 
-    <section class="badge-kit" aria-labelledby="badge-h">
-      <h2 id="badge-h">Already listed? Point your members here</h2>
-      <p>Add this to your group's site or README so people can find the rest of the Des Moines tech scene.</p>
-      <p><img src="/badge.svg" width="300" height="64" alt="Find more Des Moines tech events" /></p>
-      {snippets.map((sn, i) => (
-        <div class="snippet">
-          <div class="snippet-head">
-            <b>{sn.label}</b>
-            <button type="button" class="btn btn-solid btn-small" data-copy-from={`snippet-${i}`}>Copy</button>
-          </div>
-          <pre><code id={`snippet-${i}`}>{sn.code}</code></pre>
-        </div>
-      ))}
-    </section>
+    <p>Already listed? <a href="/organizers/">The organizers page</a> has a badge for your site, a lobby screen for your event, and more.</p>
 
     <p class="dev-note">
       Prefer GitHub? The site is open source. <a href={`${site.repo}#get-your-group-or-event-listed`}>Open a pull request</a> with your group in <code>data/groups.yaml</code> or your event in <code>data/events.yaml</code>.
@@ -84,31 +64,12 @@ const snippets = [
 </Layout>
 
 <script>
-  // Copy buttons: the email address, and each badge snippet. Without
-  // clipboard access, select the text so it can be copied by hand.
+  import { copyText } from '../scripts/copy';
+
   const note = document.getElementById('copied')!;
-  async function copy(button: HTMLButtonElement, text: string, el: HTMLElement, status: (msg: string) => void) {
-    try {
-      await navigator.clipboard.writeText(text);
-      status('Copied');
-    } catch {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      getSelection()?.removeAllRanges();
-      getSelection()?.addRange(range);
-      status('Selected. Copy it from here.');
-    }
-  }
   const emailBtn = document.getElementById('copy-email') as HTMLButtonElement;
-  emailBtn.addEventListener('click', () => copy(emailBtn, emailBtn.dataset.copy!, document.getElementById('add-email')!, (msg) => {
-    note.textContent = msg;
+  emailBtn.addEventListener('click', async () => {
+    note.textContent = (await copyText(emailBtn.dataset.copy!, document.getElementById('add-email')!)) ? 'Copied' : 'Selected. Copy it from here.';
     setTimeout(() => { note.textContent = ''; }, 3000);
-  }));
-  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-copy-from]')) {
-    const code = document.getElementById(btn.dataset.copyFrom!)!;
-    btn.addEventListener('click', () => copy(btn, code.textContent!, code, (msg) => {
-      btn.textContent = msg === 'Copied' ? 'Copied' : 'Selected';
-      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
-    }));
-  }
+  });
 </script>

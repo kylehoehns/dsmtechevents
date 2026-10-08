@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween, liveLabel, lineup } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
@@ -174,4 +174,24 @@ test('a two-day conference is only "Happening now" during its hours', () => {
   assert.equal(at('2026-10-16T12:00:00Z'), 'Today', 'day two, 7am');
   assert.equal(at('2026-10-16T17:00:00Z'), 'Happening now', 'day two, noon');
   assert.equal(whenLabel(start, end, Date.parse('2026-10-16T02:00:00Z')), 'Happening now', 'without the flag it runs straight through, as before');
+});
+
+test('liveLabel (the event-mode TV stamp) counts down, then says Happening now, then nothing', () => {
+  const e = { start: '2026-10-22T22:30:00.000Z', end: '2026-10-23T00:00:00.000Z' }; // CIJUG, Thu 5:30p–7p
+  assert.equal(liveLabel(e, Date.parse('2026-10-21T15:00:00Z')), 'Tomorrow at 5:30p');
+  assert.equal(liveLabel(e, Date.parse('2026-10-22T14:00:00Z')), 'Tonight at 5:30p');
+  assert.equal(liveLabel(e, Date.parse('2026-10-22T22:05:00Z')), 'Starts in 25 min');
+  assert.equal(liveLabel(e, Date.parse('2026-10-22T23:00:00Z')), 'Happening now');
+  assert.equal(liveLabel(e, Date.parse('2026-10-23T00:00:00Z')), '');
+  assert.equal(liveLabel(e, Date.parse('2026-10-18T15:00:00Z')), 'Thu Oct 22 at 5:30p');
+});
+
+test('lineup reads bold "time · title — speaker" lines', () => {
+  const text = 'Doors open at 5 PM.\n\n**5:45 PM · Records on the JVM** — Sam Lee\nA tour.\n\n**6:30 PM · Virtual threads** — Ana Ruiz\nMore.';
+  assert.deepEqual(lineup(text), [
+    { time: '5:45p', title: 'Records on the JVM', speaker: 'Sam Lee' },
+    { time: '6:30p', title: 'Virtual threads', speaker: 'Ana Ruiz' },
+  ]);
+  assert.deepEqual(lineup('Talk schedule pending.'), []);
+  assert.deepEqual(lineup(undefined), []);
 });

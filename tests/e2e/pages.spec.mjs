@@ -82,8 +82,10 @@ test('theme button remembers the choice', async ({ page }) => {
   await expect(html).not.toHaveAttribute('data-theme');
 });
 
-test('the footer links to the TV and print pages', async ({ page }) => {
+test('the footer links to the organizers page, which links the TV and print pages', async ({ page }) => {
   await page.goto('/about/');
-  await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Put it on a TV' })).toHaveAttribute('href', '/tv/');
-  await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Print a flyer' })).toHaveAttribute('href', '/print/');
+  await page.getByRole('contentinfo').getByRole('link', { name: 'For organizers' }).click();
+  await expect(page).toHaveURL(/\/organizers\/$/);
+  await expect(page.getByRole('link', { name: 'The regular TV page' })).toHaveAttribute('href', '/tv/');
+  await expect(page.getByRole('link', { name: 'Print a flyer' })).toHaveAttribute('href', '/print/');
 });

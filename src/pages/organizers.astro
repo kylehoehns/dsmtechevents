@@ -1,0 +1,127 @@
+---
+// For group organizers and hosts: the tools in one place. Getting listed
+// stays on /add/ (where the footer's call to action goes), so it's a pointer
+// here. "Put your event on a screen" makes a /tv/?event=… link (the event
+// mode in src/scripts/tv-event.ts); nothing is stored.
+import Layout from '../layouts/Layout.astro';
+import { site } from '../lib/site.mjs';
+import { loadData } from '../lib/data.mjs';
+import { weekday, month, day } from '../lib/format.mjs';
+
+const { upcoming, updatedAt } = loadData();
+// Every upcoming event, by date. The browser drops any that have ended since the build.
+const choices = upcoming.map((e) => ({
+  id: e.id,
+  end: e.end,
+  label: `${e.hostsLabel}: ${e.title}, ${weekday(e.start)} ${month(e.start)} ${day(e.start)}`,
+}));
+const firstUrl = choices[0] ? `${site.url}/tv/?event=${encodeURIComponent(choices[0].id)}` : '';
+
+// Copy-paste snippets for the organizer badge. Meetup's group description
+// takes plain text only, so that one is just a sentence and the link.
+const badgeImg = new URL('/badge.png', site.url).href;
+const snippets = [
+  { label: 'HTML (your website)', code: `<a href="${site.url}/"><img src="${new URL('/badge.svg', site.url).href}" width="300" height="64" alt="Find more Des Moines tech events"></a>` },
+  { label: 'Markdown (a README)', code: `[![Find more Des Moines tech events](${badgeImg})](${site.url}/)` },
+  { label: 'Plain text (Meetup description)', code: `Find more Des Moines tech meetups and conferences: ${site.url}` },
+];
+---
+<Layout nav="organizers" updatedAt={updatedAt} headTitle="For organizers · DSM Tech Events"
+  description="Tools for Des Moines tech meetup organizers and hosts: get listed, check your listing, put your event on the venue's TV, and a badge for your site.">
+  <div class="page-head"><h1>For organizers</h1></div>
+
+  <div class="add-page">
+    <p class="lede">Run a group or host an event? Here's what the site can do for you. It's all free, and none of it needs an account.</p>
+
+    <section>
+      <h2>Get listed</h2>
+      <p>If your group is on Meetup, send us the link once and new events show up on their own. <a href="/add/">Here's how to get listed</a>.</p>
+    </section>
+
+    <section>
+      <h2>Is your listing working?</h2>
+      <p>The <a href="/status/">status page</a> shows where each group's events come from, when they last changed, and whether the latest check worked.</p>
+    </section>
+
+    <section class="builder" aria-labelledby="screen-h">
+      <h2 id="screen-h">Put your event on a screen</h2>
+      <p>Show your event on the TV in your lobby: its date, time, place and talks with a QR code to RSVP, then your group's next meetup and what else is coming up.</p>
+
+      <div class="builder-box" id="builder">
+        {choices.length ? (
+          <>
+            <p class="field">
+              <label for="b-event">Your event</label>
+              <select id="b-event">
+                {choices.map((c) => <option value={c.id} data-end={c.end}>{c.label}</option>)}
+              </select>
+            </p>
+            <div class="tv-link">
+              <p class="tv-link-label" id="b-url-label">Your screen's link</p>
+              <pre><code id="b-url" aria-labelledby="b-url-label">{firstUrl}</code></pre>
+              <div class="tv-link-actions">
+                <button type="button" class="btn btn-solid" id="b-copy">Copy link</button>
+                <a class="btn btn-outline" id="b-open" href={firstUrl} target="_blank" rel="noopener">Open preview<span class="sr-only"> (opens in new tab)</span></a>
+              </div>
+            </div>
+          </>
+        ) : (
+          <p class="field">Nothing is coming up right now. Once your next event is listed, it shows up here.</p>
+        )}
+      </div>
+
+      <ul class="howto">
+        <li>Open the link on the computer or TV stick driving the lobby screen, and make it full screen.</li>
+        <li>It keeps the screen awake, and switches to "Happening now" and then a thank-you slide on its own.</li>
+        <li>On a slow TV stick, add <code>&amp;fx=off</code> to the end of the link for plain transitions.</li>
+      </ul>
+      <p>A coworking space or office? <a href="/tv/">The regular TV page</a> rotates through everything coming up. Prefer paper? <a href="/print/">Print a flyer</a>.</p>
+    </section>
+
+    <section class="badge-kit" aria-labelledby="badge-h">
+      <h2 id="badge-h">Point your members here</h2>
+      <p>Add this to your group's site or README so people can find the rest of the Des Moines tech scene.</p>
+      <p><img src="/badge.svg" width="300" height="64" alt="Find more Des Moines tech events" /></p>
+      {snippets.map((sn, i) => (
+        <div class="snippet">
+          <div class="snippet-head">
+            <b>{sn.label}</b>
+            <button type="button" class="btn btn-solid btn-small" data-copy-from={`snippet-${i}`}>Copy</button>
+          </div>
+          <pre><code id={`snippet-${i}`}>{sn.code}</code></pre>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2>Picking a date?</h2>
+      <p>Check <a href="/?view=calendar">the calendar</a> for clashes before you book the room.</p>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  import { copyButton } from '../scripts/copy';
+
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-copy-from]')) {
+    const code = document.getElementById(btn.dataset.copyFrom!)!;
+    copyButton(btn, () => code.textContent!, code);
+  }
+
+  // The screen link for the chosen event, on this site's own address.
+  const eventSel = document.getElementById('b-event') as HTMLSelectElement | null;
+  if (eventSel) {
+    const urlEl = document.getElementById('b-url')!;
+    const open = document.getElementById('b-open') as HTMLAnchorElement;
+    // The page was built ahead of time: drop events that have ended since.
+    for (const o of [...eventSel.options]) if (Date.parse(o.dataset.end!) <= Date.now()) o.remove();
+    const update = () => {
+      const url = new URL(`/tv/?event=${encodeURIComponent(eventSel.value)}`, location.origin).href;
+      urlEl.textContent = url;
+      open.href = url;
+    };
+    eventSel.addEventListener('change', update);
+    copyButton(document.getElementById('b-copy') as HTMLButtonElement, () => urlEl.textContent!, urlEl);
+    update();
+  }
+</script>

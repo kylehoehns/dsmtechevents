@@ -40,7 +40,9 @@ the group's own page.
 | **Groups** | Every group with its next meetup, members and a link to its own page. |
 | **Headliners** | Conferences get a taped-up poster with a countdown. |
 | **Lobby TV** (`/tv/`) | A self-running slideshow for a screen at a coworking space or venue, with QR codes. Arrow keys step through it, space pauses. |
+| **Event screen** (`/tv/?event=…`) | One event on a venue's lobby TV: a countdown, the talk lineup, the group's next meetup and what else is coming up. Linked from the organizers page. |
 | **Print flyer** (`/print/`) | One Letter page with tear-off tabs, for a real corkboard. |
+| **For organizers** (`/organizers/`) | Getting listed, the event screen link, and a badge for a group's site. |
 | **Light and dark**, offline, installable | A service worker keeps the last copy; it installs as an app. |
 
 <p align="center"><img src="docs/images/tv.webp" alt="The lobby TV overview slide: upcoming events in a table with a QR code" width="80%"></p>
