@@ -4,8 +4,10 @@ Status: accepted (since the first commit, 1230375)
 
 ## Context
 
-Most groups are on Meetup. Meetup's API needs an OAuth client, which Meetup
-only offers to paid Meetup Pro accounts. Every public group, though, has a
+Most groups are on Meetup. Meetup's API (GraphQL only since February 2025)
+needs an OAuth client, and only members with an active Meetup Pro
+subscription can create one; when the subscription lapses, the client stops
+working ([Meetup help, checked Oct 2026](https://help.meetup.com/hc/en-us/articles/41467209211917)). Every public group, though, has a
 public iCal feed at `meetup.com/<group>/events/ical/`, and its `/events/`
 page embeds JSON for its own scripts. The commit history does not record
 the API being weighed; this records the choice as the code makes it.
