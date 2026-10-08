@@ -20,7 +20,7 @@ DSM Tech Events lists every public Des Moines tech meetup, user group and confer
 ## Data
 
 - `data/cache/*.json` belongs to the refresh workflow (4×/day), which pushes it to `main` with a deploy key that bypasses the ruleset. After a local `npm run fetch`, discard the data changes (`git checkout data/cache data/archive`); commit a cache file only for a newly added group so it shows up before the next refresh.
-- Cache files must stay byte-stable when nothing changed: `fetchedAt` only moves on real changes, and optional facts (`members`, `pastCount`) are omitted when unknown rather than written as `null`. Breaking this makes every refresh commit and deploy.
+- Cache files must stay byte-stable when nothing changed: `fetchedAt` only moves on real changes, and optional facts (`members`, `pastCount`, `lastMet`) are omitted when unknown rather than written as `null`. Breaking this makes every refresh commit and deploy.
 - `data/archive/<year>.json` is the long-term record of every ended event (the cache keeps only 90 days). The fetch maintains it (`scripts/archive.mjs`) and the refresh workflow commits it; like the cache, a file only changes when an event in it does.
 - A failing source keeps its previous cache and opens one `source-broken` issue (`scripts/source-issues.mjs`); the other groups are unaffected. Readers in `scripts/sources/` throw on any unexpected page shape so that this alert fires instead of the group quietly emptying.
 - New readers: `export default async (group, { get }) => events[]`, registered in `SOURCES` in `scripts/fetch-events.mjs`, with a trimmed fixture in `tests/fixtures/` and a test that proves the throw.

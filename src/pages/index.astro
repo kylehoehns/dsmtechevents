@@ -108,8 +108,8 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
                 <li data-groups={e.groupIds.join(' ')} data-end={e.end} data-id={e.id}>
                   <span class="row-date">{month(e.start)} {day(e.start)}</span>
                   <a href={e.url} target="_blank" rel="noopener" data-click="later">
-                    <span class="row-group">{e.hostsLabel}</span>
-                    {e.series && <span class="row-series">{e.series.rule} · {e.series.count} dates</span>}
+                    <span class="row-group">{e.hostsLabel}{e.back && <> <span class="back-tag">Back!</span></>}</span>
+                    {e.series &&<span class="row-series">{e.series.rule} · {e.series.count} dates</span>}
                     <span class="row-title">{e.title}</span>
                     <span class="row-where">{e.allDay ? 'All day' : shortTime(e.start)} · {e.online ? 'Online' : `@ ${e.venue ?? 'Venue TBA'}`}</span>
                     <span class="sr-only"> (opens in new tab)</span>

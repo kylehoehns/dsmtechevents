@@ -1,0 +1,86 @@
+---
+// Where each group's events come from and whether the latest refresh could
+// read them. Linked from /about/; kept out of search engines (noindex, and not
+// in the sitemap), since it's for the curious and for the groups themselves.
+//
+// Health is data/cache/status.json, which the refresh writes and commits
+// (scripts/source-status.mjs): only groups that failed are in it. Quiet groups
+// are listed here too, since every other page hides them.
+import Layout from '../layouts/Layout.astro';
+import { loadData } from '../lib/data.mjs';
+import { month, day } from '../lib/format.mjs';
+import { site } from '../lib/site.mjs';
+
+const { allGroups, updatedAt, checkedOn } = loadData();
+const sorted = [...allGroups].sort((a, b) => a.short.localeCompare(b.short, 'en', { sensitivity: 'base' }));
+const date = (iso: string) => `${month(iso)} ${day(iso)}`;
+// A YYYY-MM-DD day in Des Moines; noon keeps it on that day in any zone.
+const onDay = (key: string) => date(`${key}T17:00:00Z`);
+const source = (g: any) => (g.source ? 'Website' : g.ical ? 'iCal' : 'Meetup');
+const health = (h: any) => !h ? ['unknown', 'Not checked yet']
+  : h.kind === 'ok' ? ['ok', 'Healthy']
+  : h.kind === 'details' ? ['partial', `Partial since ${onDay(h.since)}`]
+  : ['failing', `Failing since ${onDay(h.since)}`];
+---
+<Layout nav={null} updatedAt={updatedAt} noindex headTitle="Status · DSM Tech Events"
+  description="Where each group's events come from on DSM Tech Events, when they last changed, and whether the latest refresh could read them.">
+  <div class="page-head"><h1>Status</h1></div>
+
+  <div class="status-page">
+    <p class="lede">
+      Where each group's events come from, and whether the site could read them.
+      Every group is checked automatically{checkedOn && `, most recently on ${onDay(checkedOn)}`}.
+    </p>
+
+    {/* A list, not a table: five columns don't fit a phone, and each line reads on its own. */}
+    <ul class="sources">
+      {sorted.map((g) => {
+        const [kind, label] = health(g.health);
+        return (
+          <li>
+            <h2>{g.quiet ? g.short : <a href={`/groups/#${g.id}`}>{g.short}</a>}{g.quiet && <span class="quiet">Quiet</span>}</h2>
+            <p class={`health ${kind}`}>{label}</p>
+            <p class="facts">{[source(g), g.fetchedAt && `changed ${date(g.fetchedAt)}`, `${g.upcomingCount} coming up`].filter(Boolean).join(' · ')}</p>
+          </li>
+        );
+      })}
+    </ul>
+
+    <section>
+      <h2>What these mean</h2>
+      <dl>
+        <dt>Healthy</dt>
+        <dd>The latest check read the group's page without an error.</dd>
+        <dt>Partial</dt>
+        <dd>Its events came in, but the extra details from its Meetup events page (venue, photo, RSVPs) didn't.</dd>
+        <dt>Failing</dt>
+        <dd>Its page couldn't be read, so the site is showing the events it had from the last good check. Each one has an <a href={`${site.repo}/issues?q=label%3Asource-broken`}>open issue on GitHub</a> until it's fixed.</dd>
+        <dt>Changed</dt>
+        <dd>When that group's listing here last changed: a new event, a new time, a new RSVP count. Not when it was last checked.</dd>
+        <dt>Quiet</dt>
+        <dd>Nothing coming up and no meetup in the past year. Quiet groups are hidden from the other pages and come back on their own when they post an event.</dd>
+      </dl>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .status-page { max-width: 64ch; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 18px 0 8px; font-family: var(--sans); font-size: var(--fs-body); line-height: 1.55; }
+  .lede { margin: 0; }
+  .status-page a { color: var(--link-t); }
+  .sources { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--line); }
+  .sources li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; padding: 8px 0; border-bottom: 1.5px dashed var(--line); }
+  .sources h2 { margin: 0; font: 900 var(--fs-title-s)/1.1 var(--display); text-transform: uppercase; overflow-wrap: anywhere; }
+  .sources h2 a { color: inherit; }
+  .sources p { margin: 0; font: var(--fs-meta)/1.35 var(--mono); }
+  .sources .facts { flex-basis: 100%; color: var(--ink-soft); }
+  .quiet { margin-left: 8px; font: 600 var(--fs-label)/1 var(--mono); text-transform: none; color: var(--ink-soft); border: 1.5px solid var(--line); padding: 1px 5px; vertical-align: middle; }
+  .health.ok { color: var(--blue-t); font-weight: 600; }
+  .health.partial, .health.failing { font-weight: 700; }
+  .health.unknown { color: var(--ink-soft); }
+  section h2 { margin: 0 0 6px; font: 900 var(--fs-title)/1 var(--display); text-transform: uppercase; }
+  dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; }
+  dt { font: 700 var(--fs-meta)/1.55 var(--mono); }
+  dd { margin: 0; }
+  @media (max-width: 479px) { dl { grid-template-columns: minmax(0, 1fr); gap: 0; } dd { margin-bottom: 8px; } }
+</style>

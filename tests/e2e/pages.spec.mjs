@@ -1,11 +1,44 @@
 // The Groups and Add pages, and the theme button every page shares.
 import { test, expect } from './fixtures.mjs';
 
-test('groups page lists every group alphabetically', async ({ page }) => {
+test('groups page lists every active group alphabetically, and hides quiet ones', async ({ page }) => {
   await page.goto('/groups/');
-  await expect(page.getByRole('heading', { level: 2 })).toHaveText([/^AWS/, /^CIJUG/, /^DevOps/, /^DSM AI/, /^IADNUG/, /^Pyowa/, /^UX/, /^Web Geeks/]);
-  // A group with nothing posted still gets a card.
-  await expect(page.locator('article', { has: page.getByRole('heading', { name: /^UX/ }) })).toContainText('Nothing scheduled');
+  // UX hasn't met since 2024 and has nothing coming up, so it's hidden.
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText([/^AWS/, /^CIJUG/, /^DevOps/, /^DSM AI/, /^IADNUG/, /^Mobile/, /^Pyowa/, /^Web Geeks/]);
+  // A group that met recently but has nothing posted still gets a card.
+  await expect(page.locator('article#mobile')).toContainText('Nothing scheduled');
+});
+
+test('a group back after a quiet year says "Back!" once on its card and once on its next event', async ({ page }) => {
+  await page.goto('/groups/');
+  await expect(page.locator('.back-tag')).toHaveCount(1);
+  await expect(page.locator('article#devopsdsm h2 .back-tag')).toHaveText('Back!');
+
+  await page.goto('/');
+  const card = page.locator('#list-view .show', { hasText: 'Remote DevOps Chat' });
+  await expect(card.locator('.back-tag')).toHaveText('Back!');
+  await expect(page.locator('#list-view .back-tag')).toHaveCount(1);
+  // A group that never went quiet gets no tag.
+  await expect(page.locator('#list-view .show', { hasText: 'Coding Dojo' }).locator('.back-tag')).toHaveCount(0);
+});
+
+test('status page lists every group, quiet ones included, with source and health', async ({ page }) => {
+  await page.goto('/status/');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+  const row = (name) => page.locator('.sources li', { has: page.getByRole('heading', { name: new RegExp(`^${name}`) }) });
+  await expect(page.locator('.sources li')).toHaveCount(9);
+  await expect(row('UX')).toContainText('Quiet');
+  await expect(row('UX').getByRole('link')).toHaveCount(0); // no Groups card to link to
+  await expect(row('AWS')).toContainText('Partial since Oct 12');
+  await expect(row('Pyowa')).toContainText('Healthy');
+  await expect(row('Pyowa')).toContainText('Meetup · changed Oct 14 · 1 coming up');
+  await expect(page.getByText('most recently on Oct 14')).toBeVisible();
+});
+
+test('the about page links to the status page', async ({ page }) => {
+  await page.goto('/about/');
+  await page.getByRole('link', { name: "see each source's status" }).click();
+  await expect(page).toHaveURL(/\/status\/$/);
 });
 
 test('a link to /groups/#id highlights that group', async ({ page }) => {

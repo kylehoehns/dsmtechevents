@@ -29,7 +29,13 @@
   name: Des Moines Artificial Intelligence Group
   short: DSM AI
   meetup: https://www.meetup.com/des-moines-artificial-intelligence-group/
-# No cache file: a group with nothing scheduled.
+# Last met in September, nothing scheduled: still listed.
+- id: mobile
+  name: Des Moines Mobile Developers
+  short: Mobile
+  meetup: https://www.meetup.com/des-moines-mobile-developers/
+# Last met in 2024, nothing scheduled: quiet, so only /status/ lists it.
+# (DevOps last met in 2025, so its next event says "Back!".)
 - id: uxdsm
   name: Experiencing UX - Central Iowa
   short: UX

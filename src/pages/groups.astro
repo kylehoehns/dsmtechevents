@@ -24,7 +24,7 @@ const monogram = (name: string) => name.split(/\s+/).filter(Boolean)
           {g.logo
             ? <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />
             : <span class="logo-img logo-mono" aria-hidden="true">{monogram(g.short)}</span>}
-          <h2>{g.short}{!g.showFullName && g.name !== g.short && <span class="sr-only"> ({g.name})</span>}</h2>
+          <h2>{g.short}{!g.showFullName && g.name !== g.short && <span class="sr-only"> ({g.name})</span>}{g.returning && <> <span class="back-tag">Back!</span></>}</h2>
           {g.showFullName && <p class="full">{g.name}</p>}
           {(g.members || g.pastCount) && (
             <p class="facts">{[g.members && `${g.members.toLocaleString('en-US')} members`, g.pastCount && `${g.pastCount} meetups`].filter(Boolean).join(' · ')}</p>
