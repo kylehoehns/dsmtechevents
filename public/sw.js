@@ -1,4 +1,4 @@
-// Pages: try the network first so nightly updates show up, fall back to the
+// Pages: try the network first so data refreshes show up, fall back to the
 // cached copy when offline (or after 3s on a bad connection).
 // Our CSS, JS and fonts: precached on install, so an offline page is styled.
 // Meetup event photos: their own small cache, oldest dropped past 60.

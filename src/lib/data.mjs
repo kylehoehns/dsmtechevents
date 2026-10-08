@@ -1,4 +1,4 @@
-// Build-time loader: merges the nightly Meetup cache with hand-added events.
+// Build-time loader: merges the cached Meetup data (refreshed four times a day) with hand-added events.
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
@@ -67,7 +67,7 @@ export function loadData() {
     }))
     .sort((a, b) => a.start.localeCompare(b.start));
 
-  // "Upcoming" is as of the build. The browser re-checks, since builds are nightly.
+  // "Upcoming" is as of the build. The browser re-checks, since the page can be up to a day old.
   const upcoming = events.filter((e) => Date.parse(e.end) >= now);
   const past = events.filter((e) => Date.parse(e.end) < now).reverse();
 

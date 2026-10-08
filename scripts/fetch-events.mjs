@@ -13,7 +13,7 @@
 // Past events from the previous cache are carried forward for BACKFILL_DAYS,
 // so history keeps building even if Meetup stops showing an event.
 // If a group's feed fails, its previous cache file is left alone, so one bad
-// night never empties the calendar.
+// run never empties the calendar.
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -27,7 +27,7 @@ const SOURCES = { secdsm, 'pmi-chapter': pmiChapter };
 
 const root = path.resolve(import.meta.dirname, '..');
 const cacheDir = path.join(root, 'data/cache');
-const UA = 'dsmtechevents/1.0 (+https://dsmtechevents.com; community event calendar, fetched nightly)';
+const UA = 'dsmtechevents/1.0 (+https://dsmtechevents.com; community event calendar, fetched four times a day)';
 const BACKFILL_DAYS = 90;
 
 const groups = YAML.parse(await fs.readFile(path.join(root, 'data/groups.yaml'), 'utf8'));
@@ -67,13 +67,13 @@ async function fetchGroup(group) {
   const previous = await readCache(group.id);
   const carried = previous.events.filter((e) => Date.parse(e.end) < now && Date.parse(e.end) >= cutoff);
 
-  // Freshest copy wins over last night's cache.
+  // Freshest copy wins over the last run's cache.
   const byId = new Map();
   for (const e of [...carried, ...fresh.events]) byId.set(e.id, { ...byId.get(e.id), ...e });
   const events = [...byId.values()].map(({ status, ...e }) => e).sort((a, b) => a.start.localeCompare(b.start));
 
   const result = { logo: fresh.logo ?? previous.logo ?? null, enriched: fresh.enriched, events };
-  // Only move the timestamp when something changed, so an unchanged night
+  // Only move the timestamp when something changed, so an unchanged run
   // leaves the file untouched and the refresh workflow has nothing to commit.
   const { fetchedAt, ...previousResult } = previous;
   const unchanged = fetchedAt && JSON.stringify(previousResult) === JSON.stringify(result);
