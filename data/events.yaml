@@ -1,10 +1,12 @@
 # Hand-added events: conferences, joint meetups, anything not on a group's feed.
 # Times are Des Moines local time. Leave out `time` for an all-day event.
 #
-#   title, url, start (YYYY-MM-DD), end (optional, multi-day), time / endTime ("HH:MM")
+#   title (no year: the date shows it), url, start (YYYY-MM-DD), end (optional, multi-day), time / endTime ("HH:MM")
 #   venue, address, description, tags, hosts (group ids), headliner (a pink row, and a poster up top when it is close)
+#   id (optional): keeps an event's id, and so its /tv/?event= link, after a title change
 
-- title: Tech Fuse DSM 2026
+- title: Tech Fuse DSM
+  id: manual-tech-fuse-dsm-2026-2026-10-15
   url: https://techfusedsm.com/
   start: 2026-10-15
   end: 2026-10-16
@@ -16,7 +18,8 @@
   tags: [conference]
   headliner: true
 
-- title: Iowa Code Camp 2026
+- title: Iowa Code Camp
+  id: manual-iowa-code-camp-2026-2026-11-07
   url: https://iowacodecamp.com/
   start: 2026-11-07
   time: "08:00"

@@ -168,3 +168,10 @@ test('a group card is printed as it reads now and as it will once an event endin
   assert.deepEqual(monday.byId.uxdsm.states.map((s) => [s.next, s.count, s.attrs.hidden]), [[null, 0, false]]);
   assert.deepEqual(monday.endingSoon.map((e) => e.title), ['Hacktoberfest'], 'Recent events gets it once it ends');
 });
+
+test("a hand-added event's id: keeps its id (and /tv/?event= links) after a title change", async () => {
+  const { manualEvent } = await import('../src/lib/data.mjs');
+  const base = { title: 'Tech Fuse DSM', start: '2026-10-15' };
+  assert.equal(manualEvent(base).id, 'manual-tech-fuse-dsm-2026-10-15');
+  assert.equal(manualEvent({ ...base, id: 'manual-tech-fuse-dsm-2026-2026-10-15' }).id, 'manual-tech-fuse-dsm-2026-2026-10-15');
+});
