@@ -1,6 +1,10 @@
 {
-  "fetchedAt": "2026-10-08T03:30:39.130Z",
+  "fetchedAt": "2026-10-08T04:07:12.272Z",
   "logo": "https://secure.meetupstatic.com/photos/event/2/b/9/b/600_525311163.jpeg",
+  "typical": 15,
+  "usual": "4th Tue · 5:30p",
+  "members": 326,
+  "pastCount": 19,
   "enriched": true,
   "events": [
     {
