@@ -126,7 +126,7 @@ function renderSide() {
   for (const c of $$('.chip')) c.setAttribute('aria-pressed', String(c.dataset.chip === state.group));
   const note = $('#filter-note');
   note.hidden = !state.group;
-  if (state.group) note.innerHTML = `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <button type="button" data-chip="">Show all groups</button>`;
+  if (state.group) note.innerHTML = `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <a href="/groups/#${encodeURIComponent(state.group)}">About the group</a> · <button type="button" data-chip="">Show all groups</button>`;
 
   for (const p of $$('.poster')) p.hidden = !!state.group && !matches(hostsOf(p));
   // The calendar already shows conference days in pink; skip the posters there.

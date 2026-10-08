@@ -49,3 +49,9 @@ test('theme button cycles auto, light, dark and remembers the choice', async ({ 
   await expect(theme).toHaveAccessibleName('Theme: auto');
   await expect(html).not.toHaveAttribute('data-theme');
 });
+
+test('the footer links to the TV and print pages', async ({ page }) => {
+  await page.goto('/about/');
+  await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Put it on a TV' })).toHaveAttribute('href', '/tv/');
+  await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Print a flyer' })).toHaveAttribute('href', '/print/');
+});
