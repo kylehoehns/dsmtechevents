@@ -1,0 +1,8 @@
+{
+  "fetchedAt": "2026-10-14T10:20:00.000Z",
+  "logo": null,
+  "events": [
+    { "id": "pyowa-past", "title": "Pyowa September", "start": "2026-09-10T23:00:00.000Z", "end": "2026-09-11T01:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/1/", "venue": "Gravitate", "going": 20 },
+    { "id": "pyowa-tomorrow", "title": "Python Office Hours", "start": "2026-10-15T17:00:00.000Z", "end": "2026-10-15T18:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/2/", "venue": "Source Allies", "address": "4501 NW Urbandale Dr, Urbandale, IA 50322" }
+  ]
+}

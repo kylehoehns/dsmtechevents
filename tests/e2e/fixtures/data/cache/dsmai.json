@@ -1,0 +1,9 @@
+{
+  "fetchedAt": "2026-10-14T10:20:00.000Z",
+  "logo": null,
+  "events": [
+    { "id": "dsmai-nov", "title": "AI Study Group", "start": "2026-11-12T18:00:00.000Z", "end": "2026-11-12T19:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/1/", "venue": "Data Loft" },
+    { "id": "dsmai-dec", "title": "AI Study Group", "start": "2026-12-10T18:00:00.000Z", "end": "2026-12-10T19:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/2/", "venue": "Data Loft" },
+    { "id": "dsmai-jan", "title": "AI Study Group", "start": "2027-01-14T18:00:00.000Z", "end": "2027-01-14T19:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/3/", "venue": "Data Loft" }
+  ]
+}

@@ -1,0 +1,36 @@
+# Groups for the browser tests (tests/e2e). The site is built as if it were
+# Wednesday 2026-10-14, 9am Des Moines time (see playwright.config.mjs).
+- id: cijug
+  name: Central Iowa Java Users Group
+  short: CIJUG
+  meetup: https://www.meetup.com/central-iowa-java-users-group/
+  website: https://www.cijug.net/
+- id: pyowa
+  name: Iowa Python User Group
+  short: Pyowa
+  meetup: https://www.meetup.com/pyowa-iowa-python-user-group/
+- id: iadnug
+  name: Iowa .NET User Group
+  short: IADNUG
+  meetup: https://www.meetup.com/iadnug/
+- id: webgeeks
+  name: DSM Web Geeks
+  short: Web Geeks
+  meetup: https://www.meetup.com/des-moines-web-geeks/
+- id: devopsdsm
+  name: DevOpsDSM
+  short: DevOps
+  meetup: https://www.meetup.com/devopsdsm/
+- id: aws
+  name: AWS Des Moines
+  short: AWS
+  meetup: https://www.meetup.com/aws-user-group-des-moines/
+- id: dsmai
+  name: Des Moines Artificial Intelligence Group
+  short: DSM AI
+  meetup: https://www.meetup.com/des-moines-artificial-intelligence-group/
+# No cache file: a group with nothing scheduled.
+- id: uxdsm
+  name: Experiencing UX - Central Iowa
+  short: UX
+  meetup: https://www.meetup.com/experiencing-ux/

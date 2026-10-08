@@ -1,0 +1,8 @@
+{
+  "fetchedAt": "2026-10-14T10:20:00.000Z",
+  "logo": null,
+  "events": [
+    { "id": "webgeeks-past", "title": "Hiring in the Age of AI", "start": "2026-10-05T23:30:00.000Z", "end": "2026-10-06T01:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/des-moines-web-geeks/events/1/", "venue": "Source Allies", "address": "4501 NW Urbandale Dr, Urbandale, IA 50322", "going": 37 },
+    { "id": "webgeeks-tonight", "title": "Coding Dojo", "start": "2026-10-14T22:30:00.000Z", "end": "2026-10-15T00:30:00.000Z", "allDay": false, "url": "https://www.meetup.com/des-moines-web-geeks/events/2/", "venue": "Source Allies", "address": "4501 NW Urbandale Dr, Urbandale, IA 50322", "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='338'%3E%3Crect width='600' height='338' fill='%23e0609f'/%3E%3C/svg%3E", "description": "Bring a laptop. We pair on a kata.", "going": 12 }
+  ]
+}
