@@ -14,7 +14,7 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
   <h1 class="sr-only">Des Moines tech groups</h1>
   <div class="board">
     {sorted.map((g, i) => (
-      <article id={g.id} class:list={['flyer', { 'has-logo': !!g.logo }]}>
+      <article id={g.id} data-groups={g.id} class:list={['flyer', { 'has-logo': !!g.logo }]}>
         {g.logo && <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />}
         <h2>{g.short}{!g.showFullName && <span class="sr-only"> ({g.name})</span>}</h2>
         {g.showFullName && <p class="full">{g.name}</p>}
@@ -31,8 +31,8 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
         )}
         <div class="links">
           {g.upcomingCount > 0 && <a class="primary" href={`/?group=${g.id}`}>{plural(g.upcomingCount, 'event')}<span class="sr-only"> from {g.short}</span></a>}
-          {g.meetupUrl && <a href={g.meetupUrl} target="_blank" rel="noopener">Meetup<span class="sr-only"> page for {g.short}, opens in new tab</span> <span aria-hidden="true">↗</span></a>}
-          {g.website && <a href={g.website} target="_blank" rel="noopener">Website<span class="sr-only"> for {g.short}, opens in new tab</span> <span aria-hidden="true">↗</span></a>}
+          {g.meetupUrl && <a href={g.meetupUrl} target="_blank" rel="noopener" data-click="meetup">Meetup<span class="sr-only"> page for {g.short}, opens in new tab</span> <span aria-hidden="true">↗</span></a>}
+          {g.website && <a href={g.website} target="_blank" rel="noopener" data-click="website">Website<span class="sr-only"> for {g.short}, opens in new tab</span> <span aria-hidden="true">↗</span></a>}
         </div>
       </article>
     ))}

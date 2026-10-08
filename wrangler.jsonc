@@ -20,6 +20,10 @@
   // build (that was the outage on 2026-10-07).
   "name": "dsmtechevents",
   "compatibility_date": "2026-09-01",
+  // A tiny Worker counts outbound clicks at /api/click (worker/index.js).
+  // Only /api/* reaches it; every other request is a static file served
+  // straight from `assets`, as before.
+  "main": "worker/index.js",
   "build": { "command": "npm run build" },
   // dsmtechevents.kyhoehns.workers.dev stays up alongside dsmtechevents.com, and every
   // branch push gets a preview URL. Both are wrangler's defaults; declaring
@@ -27,15 +31,28 @@
   "workers_dev": true,
   "preview_urls": true,
   // `wrangler preview` (the Previews Base command) refuses to run without
-  // this block. Empty is fine: previews use the top-level settings.
-  "previews": {},
+  // this block. Previews don't inherit the bindings below, so they get their
+  // own: a separate dataset and rate-limit counter, so testing a preview
+  // never adds rows to the real click counts.
+  "previews": {
+    "analytics_engine_datasets": [{ "binding": "CLICKS", "dataset": "dsmtechevents_clicks_preview" }],
+    "ratelimits": [{ "name": "CLICK_LIMIT", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }]
+  },
   "assets": {
     "directory": "dist",
     // /groups serves /groups/index.html; unknown paths get the real 404 page
     // rather than the home page.
     "html_handling": "auto-trailing-slash",
-    "not_found_handling": "404-page"
+    "not_found_handling": "404-page",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
   },
+  // Click counts land in Workers Analytics Engine; see docs/ANALYTICS.md for
+  // how to query them.
+  "analytics_engine_datasets": [{ "binding": "CLICKS", "dataset": "dsmtechevents_clicks" }],
+  // Caps how fast one visitor can post clicks (worker/index.js). Counters are
+  // in memory per Cloudflare location and never stored.
+  "ratelimits": [{ "name": "CLICK_LIMIT", "namespace_id": "1001", "simple": { "limit": 30, "period": 60 } }],
   // Declared here, not toggled in the dashboard: every deploy reconciles the
   // Worker against this file, so a dashboard-only setting gets reset.
   "observability": { "enabled": true, "head_sampling_rate": 1 }
