@@ -30,6 +30,8 @@ test('secdsm reads meetings, talks, venue and door time from the homepage', asyn
 
 test('secdsm fails loudly when the page layout changes', async () => {
   await assert.rejects(secdsm({ id: 'secdsm' }, serve('<html>redesigned</html>')), /no schedule blocks/);
+  const noDates = fixture('secdsm.html').replaceAll('secdsm-job-date', 'secdsm-job-when');
+  await assert.rejects(secdsm({ id: 'secdsm' }, serve(noDates)), /no date could be read/);
 });
 
 test('pmi-chapter maps the JSON calendar to events in local time', async () => {
@@ -100,6 +102,21 @@ test('tai-techbrew skips TechBrews outside the Des Moines metro', async () => {
   assert.deepEqual(events.map((e) => e.sourceId), ['techbrew-october-2026', 'techbrew-december-2026']);
 });
 
+test('tai-techbrew counts the wider metro: Norwalk, Bondurant, Indianola, Polk City', async () => {
+  const url = 'https://www.technologyiowa.org/events/techbrew-november-2026/';
+  for (const city of ['Norwalk', 'Bondurant', 'Indianola', 'Polk City']) {
+    const page = fixture('tai-techbrew-event.html').replace('22 9th Street, Des Moines.', `1 Main St, ${city}.`);
+    const events = await taiTechbrew({ id: 'techbrew' }, techbrewSite({ [url]: page }));
+    assert.equal(events.find((e) => e.sourceId === 'techbrew-november-2026')?.address, `1 Main St, ${city}, IA`);
+  }
+});
+
+test('tai-techbrew fails loudly when no TechBrew passes the city check', async () => {
+  const noCity = fixture('tai-techbrew-event.html').replace('22 9th Street, Des Moines.', '22 9th Street Des Moines.');
+  const site = techbrewSite();
+  await assert.rejects(taiTechbrew({ id: 'techbrew' }, { ...site, get: async (u) => (u === FEED ? site.get(u) : noCity) }), /every TechBrew was outside the metro/);
+});
+
 test('tai-techbrew fails loudly when the feed or event page changes', async () => {
   await assert.rejects(taiTechbrew({ id: 'techbrew' }, { get: async () => '<html>not a calendar</html>' }), /did not return a calendar/);
   const site = techbrewSite({ 'https://www.technologyiowa.org/events/techbrew-october-2026/': '<html>redesigned</html>' });
@@ -129,6 +146,10 @@ test('iowans-of-things reads the Upcoming Events section of the homepage', async
 
 test('iowans-of-things fails loudly when the homepage changes', async () => {
   await assert.rejects(iowansOfThings({ id: 'iot' }, serve('<html>new site</html>')), /no Upcoming Events section/);
+  const noDates = fixture('iowans-of-things.html').replace(/<strong>\s*Date:/g, '<strong>When:');
+  await assert.rejects(iowansOfThings({ id: 'iot' }, serve(noDates)), /none had a link and date/);
+  const empty = '<section id="upcoming-events"></section><section id="past-events"></section>';
+  assert.deepEqual(await iowansOfThings({ id: 'iot' }, serve(empty)), [], 'nothing scheduled is not an error');
 });
 
 test('secdsm says "at" inside a venue name written with "@"', async () => {

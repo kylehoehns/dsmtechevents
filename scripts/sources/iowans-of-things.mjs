@@ -36,7 +36,7 @@ export default async function iowansOfThings(group, { get }) {
   if (start < 0 || end < start) throw new Error('no Upcoming Events section on iowansofthings.com');
   const items = html.slice(start, end).split('class="archive-item"').slice(1);
 
-  return items.flatMap((item) => {
+  const events = items.flatMap((item) => {
     const link = /<h4>\s*<a href="([^"]+)">([\s\S]*?)<\/a>/.exec(item);
     const date = isoDate(field(item, 'Date') ?? '');
     if (!link || !date) return [];
@@ -72,4 +72,8 @@ export default async function iowansOfThings(group, { get }) {
       ...(banner && { image: new URL(banner, base).href }),
     }];
   });
+  // An empty section is fine (nothing scheduled); items that all fail to
+  // parse mean the markup changed.
+  if (items.length && !events.length) throw new Error(`${items.length} upcoming items on iowansofthings.com but none had a link and date`);
+  return events;
 }
