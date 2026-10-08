@@ -41,12 +41,11 @@ for (const e of near) {
 // the calendar's day panel.
 const pooled = [...upcoming.filter((e) => e.repeat), ...far, ...past];
 // Conferences get poster treatment only when they're close. Further out,
-// they're just a pink row at their date in the list. Once one starts, the
-// poster comes down: its pink row is at the top of the list by then, so a
-// poster would only say the same thing twice.
+// they're just a pink row at their date in the list. A poster stays up
+// until its conference is over.
 const HEADLINER_DAYS = 30;
 const daysOutOf = (e: any) => Math.round((Date.parse(dayKey(e.start)) - Date.parse(today)) / 86_400_000);
-const featured = upcoming.filter((e) => e.featured && daysOutOf(e) <= HEADLINER_DAYS && Date.parse(e.start) > Date.now());
+const featured = upcoming.filter((e) => e.featured && daysOutOf(e) <= HEADLINER_DAYS);
 const daysOut = daysOutOf;
 
 const counts = Object.fromEntries(groups.map((g) => [g.id, listed.filter((e) => e.groupIds.includes(g.id)).length]));
@@ -78,7 +77,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
       {featured.length > 0 && (
         <section class="headliners" id="headliners" aria-label="Coming up soon">
           {featured.map((e, i) => (
-            <article class:list={['poster', i % 2 ? 'blue' : 'taped']} data-start={e.start} data-groups={e.groupIds.join(' ')}>
+            <article class:list={['poster', i % 2 ? 'blue' : 'taped']} data-end={e.end} data-groups={e.groupIds.join(' ')}>
               <div class="poster-full">
                 <span class="halftone" aria-hidden="true" />
                 {i % 2 === 0 && <span class="tape" aria-hidden="true" />}

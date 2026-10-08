@@ -28,8 +28,7 @@ for (const el of $$('.show', $('#card-pool').content)) cards.set(el.dataset.id, 
 
 // The page is built ahead of time; drop anything that has ended since.
 for (const el of $$('[data-end]', listView)) if (Date.parse(el.dataset.end) <= now) el.remove();
-// Posters come down when the conference starts; its row in the list takes over.
-for (const el of $$('.poster[data-start]')) if (Date.parse(el.dataset.start) <= now) el.remove();
+for (const el of $$('.poster[data-end]')) if (Date.parse(el.dataset.end) <= now) el.remove();
 
 // ---- relative labels ----
 function relLabel(startIso, endIso) {
@@ -49,7 +48,7 @@ for (const el of $$('.show', listView)) {
 }
 for (const el of $$('.countdown[data-start]')) {
   const n = daysBetween(today, dayKey(el.dataset.start));
-  el.textContent = n <= 0 ? 'Today' : n === 1 ? 'Tomorrow' : `${n} days out`;
+  el.textContent = Date.parse(el.dataset.start) <= now ? 'Happening now' : n <= 0 ? 'Today' : n === 1 ? 'Tomorrow' : `${n} days out`;
 }
 
 // ---- state ----
