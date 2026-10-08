@@ -1,5 +1,515 @@
 [
  {
+  "id": "iadnug-312543699",
+  "group": "iadnug",
+  "title": "Virtual .NET@Noon: Responsibility Thinking",
+  "start": "2026-01-08T18:00:00.000Z",
+  "end": "2026-01-08T19:00:00.000Z",
+  "online": true,
+  "going": 19,
+  "url": "https://www.meetup.com/iadnug/events/312543699/"
+ },
+ {
+  "id": "webgeeks-306721560",
+  "group": "webgeeks",
+  "title": "Signals Through Time and JavaScript",
+  "start": "2026-01-13T00:30:00.000Z",
+  "end": "2026-01-13T02:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 25,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/306721560/"
+ },
+ {
+  "id": "cijug-312394650",
+  "group": "cijug",
+  "title": "Application Visibility and Monitoring with OpenTelemetry",
+  "start": "2026-01-15T23:30:00.000Z",
+  "end": "2026-01-16T01:00:00.000Z",
+  "venue": "Lean Techniques, Inc.",
+  "going": 28,
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/312394650/"
+ },
+ {
+  "id": "dsmai-311239028",
+  "group": "dsmai",
+  "title": "DSPy and GEPA Optimization",
+  "start": "2026-01-20T23:30:00.000Z",
+  "end": "2026-01-21T01:30:00.000Z",
+  "venue": "We Write Code",
+  "going": 17,
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239028/"
+ },
+ {
+  "id": "pyowa-312477848",
+  "group": "pyowa",
+  "title": "Coding Dojo",
+  "start": "2026-01-27T23:30:00.000Z",
+  "end": "2026-01-28T01:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 17,
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/312477848/"
+ },
+ {
+  "id": "dsmdata-312737781",
+  "group": "dsmdata",
+  "title": "Pella’s Copilot Rollout: Driving Adoption and Impact",
+  "start": "2026-01-28T22:00:00.000Z",
+  "end": "2026-01-28T23:30:00.000Z",
+  "venue": "Pella Corporation - Urbandale Location",
+  "going": 72,
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/312737781/"
+ },
+ {
+  "id": "iadnug-313058429",
+  "group": "iadnug",
+  "title": "Hybrid .NET@Noon: Practical AI Tooling Tips For The Too Busy Developer",
+  "start": "2026-02-05T17:40:00.000Z",
+  "end": "2026-02-05T19:00:00.000Z",
+  "venue": "Sammons Financial Group",
+  "going": 131,
+  "url": "https://www.meetup.com/iadnug/events/313058429/"
+ },
+ {
+  "id": "webgeeks-306721561",
+  "group": "webgeeks",
+  "title": "Convex: Reactive Database and Sync Engine",
+  "start": "2026-02-10T00:30:00.000Z",
+  "end": "2026-02-10T02:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 16,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/306721561/"
+ },
+ {
+  "id": "azure-313067793",
+  "group": "azure",
+  "title": "The Power Arsenal: Equipping Agents with MCP Tools",
+  "start": "2026-02-11T18:00:00.000Z",
+  "end": "2026-02-11T19:00:00.000Z",
+  "online": true,
+  "going": 13,
+  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/313067793/"
+ },
+ {
+  "id": "mobile-312539495",
+  "group": "mobile",
+  "title": "Mobile Engineering Meetup",
+  "start": "2026-02-11T23:00:00.000Z",
+  "end": "2026-02-12T01:00:00.000Z",
+  "venue": "Corteva Agriscience (Shull Building)",
+  "going": 7,
+  "url": "https://www.meetup.com/des-moines-mobile-developers/events/312539495/"
+ },
+ {
+  "id": "producttank-313133560",
+  "group": "producttank",
+  "title": "Products Built on Relationships",
+  "start": "2026-02-17T22:30:00.000Z",
+  "end": "2026-02-18T00:00:00.000Z",
+  "venue": "Lean Techniques, Inc.",
+  "going": 23,
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/313133560/"
+ },
+ {
+  "id": "dsmai-311239035",
+  "group": "dsmai",
+  "title": "Trust in Multi-Agent Architectures",
+  "start": "2026-02-17T23:30:00.000Z",
+  "end": "2026-02-18T01:30:00.000Z",
+  "venue": "We Write Code",
+  "going": 33,
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239035/"
+ },
+ {
+  "id": "pyowa-313174348",
+  "group": "pyowa",
+  "title": "Log Like a Robot, Debug Like a Human",
+  "start": "2026-02-24T23:30:00.000Z",
+  "end": "2026-02-25T01:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 27,
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/313174348/"
+ },
+ {
+  "id": "devopsdsm-313190329",
+  "group": "devopsdsm",
+  "title": "FinOps: Bringing Engineering and Finance Together",
+  "start": "2026-02-26T00:00:00.000Z",
+  "end": "2026-02-26T01:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 16,
+  "url": "https://www.meetup.com/devopsdsm/events/313190329/"
+ },
+ {
+  "id": "cijug-313066806",
+  "group": "cijug",
+  "title": "Building Engineers or Teaching Technicians?",
+  "start": "2026-02-26T23:30:00.000Z",
+  "end": "2026-02-27T01:00:00.000Z",
+  "venue": "Lean Techniques, Inc.",
+  "going": 11,
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/313066806/"
+ },
+ {
+  "id": "alf-313080304",
+  "group": "alf",
+  "title": "Navigating the AI Readiness Gap: 2026 Talent Strategies",
+  "start": "2026-02-27T14:30:00.000Z",
+  "end": "2026-02-27T16:30:00.000Z",
+  "venue": "Corteva Carver Research Center",
+  "going": 32,
+  "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/313080304/"
+ },
+ {
+  "id": "dsmdata-313524885",
+  "group": "dsmdata",
+  "title": "DSM Community Code & Collaborate",
+  "start": "2026-03-09T23:30:00.000Z",
+  "end": "2026-03-10T01:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 15,
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/313524885/"
+ },
+ {
+  "id": "webgeeks-306721564",
+  "group": "webgeeks",
+  "title": "Web Geeks Monthly Meeting - New Trends in Web Development (TBD)",
+  "start": "2026-03-09T23:30:00.000Z",
+  "end": "2026-03-10T01:30:00.000Z",
+  "online": true,
+  "going": 4,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/306721564/"
+ },
+ {
+  "id": "devopsdsm-313619115",
+  "group": "devopsdsm",
+  "title": "Testing Infrastructure as Code",
+  "start": "2026-03-25T23:00:00.000Z",
+  "end": "2026-03-26T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 24,
+  "url": "https://www.meetup.com/devopsdsm/events/313619115/"
+ },
+ {
+  "id": "azure-313926057",
+  "group": "azure",
+  "title": "AI on Your Machine: .NET, AI Foundry Local, and Zero Cloud Guilt",
+  "start": "2026-03-26T17:00:00.000Z",
+  "end": "2026-03-26T18:00:00.000Z",
+  "online": true,
+  "going": 8,
+  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/313926057/"
+ },
+ {
+  "id": "mobile-313728985",
+  "group": "mobile",
+  "title": "Mobile Engineering Meetup",
+  "start": "2026-04-09T16:45:00.000Z",
+  "end": "2026-04-09T18:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 10,
+  "url": "https://www.meetup.com/des-moines-mobile-developers/events/313728985/"
+ },
+ {
+  "id": "iadnug-314148713",
+  "group": "iadnug",
+  "title": ".NET@Noon - “The Past Didn’t Go Anywhere”: Fundamentals > AI",
+  "start": "2026-04-09T16:50:00.000Z",
+  "end": "2026-04-09T18:10:00.000Z",
+  "online": true,
+  "going": 37,
+  "url": "https://www.meetup.com/iadnug/events/314148713/"
+ },
+ {
+  "id": "webgeeks-311473701",
+  "group": "webgeeks",
+  "title": "The Power of Common Knowledge: Why Teams Break When Information Isn't Shared",
+  "start": "2026-04-13T23:30:00.000Z",
+  "end": "2026-04-14T01:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 21,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/311473701/"
+ },
+ {
+  "id": "producttank-313733522",
+  "group": "producttank",
+  "title": "Bridging the Gap: Scaling Product Strategy for the AI-Accelerated Team",
+  "start": "2026-04-21T21:30:00.000Z",
+  "end": "2026-04-21T23:00:00.000Z",
+  "venue": "The Venue",
+  "going": 45,
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/313733522/"
+ },
+ {
+  "id": "dsmai-311239044",
+  "group": "dsmai",
+  "title": "Pella's Copilot Rollout: Driving Adoption and Impact",
+  "start": "2026-04-21T22:30:00.000Z",
+  "end": "2026-04-22T00:30:00.000Z",
+  "venue": "We Write Code",
+  "going": 48,
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239044/"
+ },
+ {
+  "id": "azure-314166341",
+  "group": "azure",
+  "title": "Azure Developer CLI & GitHub Copilot: From Zero to Cloud Infrastructure",
+  "start": "2026-04-22T17:00:00.000Z",
+  "end": "2026-04-22T18:00:00.000Z",
+  "online": true,
+  "going": 11,
+  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/314166341/"
+ },
+ {
+  "id": "devopsdsm-314055212",
+  "group": "devopsdsm",
+  "title": "Serve, Protect, Automate: Building Better AI Agents",
+  "start": "2026-04-22T23:00:00.000Z",
+  "end": "2026-04-23T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 26,
+  "url": "https://www.meetup.com/devopsdsm/events/314055212/"
+ },
+ {
+  "id": "dsmdata-314214648",
+  "group": "dsmdata",
+  "title": "AI Ready Data",
+  "start": "2026-04-28T21:00:00.000Z",
+  "end": "2026-04-28T22:30:00.000Z",
+  "venue": "Wellabe",
+  "going": 36,
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/314214648/"
+ },
+ {
+  "id": "pyowa-314040501",
+  "group": "pyowa",
+  "title": "From TypeScript to Python:  AI-Powered Code Migration Magic",
+  "start": "2026-04-28T22:30:00.000Z",
+  "end": "2026-04-29T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 15,
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/314040501/"
+ },
+ {
+  "id": "aws-313625045",
+  "group": "aws",
+  "title": "Parallel Processing: Scaling Political Opinion Analysis with Serverless AWS",
+  "start": "2026-04-29T22:30:00.000Z",
+  "end": "2026-04-30T00:00:00.000Z",
+  "venue": "Lean Techniques",
+  "going": 13,
+  "url": "https://www.meetup.com/aws-user-group-des-moines/events/313625045/"
+ },
+ {
+  "id": "alf-314214712",
+  "group": "alf",
+  "title": "Beyond the AI Hype: Turning Models into End-to-End Business Value at Corteva",
+  "start": "2026-05-01T13:30:00.000Z",
+  "end": "2026-05-01T15:30:00.000Z",
+  "venue": "Corteva Carver Research Center",
+  "going": 26,
+  "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/314214712/"
+ },
+ {
+  "id": "webgeeks-312416809",
+  "group": "webgeeks",
+  "title": "Web Geeks Monthly Meeting - New Trends in Web Development (TBD)",
+  "start": "2026-05-11T23:30:00.000Z",
+  "end": "2026-05-12T01:30:00.000Z",
+  "online": true,
+  "going": 6,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416809/"
+ },
+ {
+  "id": "webgeeks-314385247",
+  "group": "webgeeks",
+  "title": "Access Granted: Accessibility in the Modern Web",
+  "start": "2026-05-11T23:30:00.000Z",
+  "end": "2026-05-12T01:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 14,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/314385247/"
+ },
+ {
+  "id": "cijug-314300787",
+  "group": "cijug",
+  "title": "What's New In Java (Live): Simplicity and Vector API",
+  "start": "2026-05-19T22:30:00.000Z",
+  "end": "2026-05-20T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 22,
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/314300787/"
+ },
+ {
+  "id": "dsmai-313494233",
+  "group": "dsmai",
+  "title": "How Claimable Uses AI to Overturn Unjust Denials",
+  "start": "2026-05-19T22:30:00.000Z",
+  "end": "2026-05-20T00:30:00.000Z",
+  "venue": "We Write Code",
+  "going": 44,
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/313494233/"
+ },
+ {
+  "id": "producttank-314181001",
+  "group": "producttank",
+  "title": "Emotional Intelligence in an AI World",
+  "start": "2026-05-20T21:30:00.000Z",
+  "end": "2026-05-20T23:00:00.000Z",
+  "venue": "The Venue",
+  "going": 19,
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/314181001/"
+ },
+ {
+  "id": "iadnug-314693266",
+  "group": "iadnug",
+  "title": ".NET@Noon - Hybrid - \"From Fear to Flow: 7 Weeks That Changed My Mind About AI\"",
+  "start": "2026-05-21T16:45:00.000Z",
+  "end": "2026-05-21T18:00:00.000Z",
+  "venue": "ITA Group",
+  "going": 52,
+  "url": "https://www.meetup.com/iadnug/events/314693266/"
+ },
+ {
+  "id": "pyowa-314738462",
+  "group": "pyowa",
+  "title": "May Lightning Talks",
+  "start": "2026-05-26T22:30:00.000Z",
+  "end": "2026-05-27T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 11,
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/314738462/"
+ },
+ {
+  "id": "devopsdsm-314508493",
+  "group": "devopsdsm",
+  "title": "Beyond Firefighting: Managing Reliability with Service Level Objectives",
+  "start": "2026-05-27T23:00:00.000Z",
+  "end": "2026-05-28T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 20,
+  "url": "https://www.meetup.com/devopsdsm/events/314508493/"
+ },
+ {
+  "id": "iadnug-314693288",
+  "group": "iadnug",
+  "title": ".NET@Noon - Virtual - Resilience Isn’t a Buzzword",
+  "start": "2026-06-04T05:00:00.000Z",
+  "end": "2026-06-04T06:00:00.000Z",
+  "online": true,
+  "going": 11,
+  "url": "https://www.meetup.com/iadnug/events/314693288/"
+ },
+ {
+  "id": "iadnug-315100213",
+  "group": "iadnug",
+  "title": ".NET@Noon - Virtual - Resilience Isn’t a Buzzword",
+  "start": "2026-06-04T17:00:00.000Z",
+  "end": "2026-06-04T18:00:00.000Z",
+  "online": true,
+  "going": 10,
+  "url": "https://www.meetup.com/iadnug/events/315100213/"
+ },
+ {
+  "id": "webgeeks-312416814",
+  "group": "webgeeks",
+  "title": "Team Chartering: The Secret to Effective Collaboration",
+  "start": "2026-06-08T23:30:00.000Z",
+  "end": "2026-06-09T01:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 16,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416814/"
+ },
+ {
+  "id": "dsmai-313494263",
+  "group": "dsmai",
+  "title": "Closing the AI Skills Gap: From Academia to Industry",
+  "start": "2026-06-16T22:30:00.000Z",
+  "end": "2026-06-17T00:30:00.000Z",
+  "venue": "We Write Code",
+  "going": 25,
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/313494263/"
+ },
+ {
+  "id": "producttank-315016710",
+  "group": "producttank",
+  "title": "Life After Launch: Everything I Learned About Product After Leaving",
+  "start": "2026-06-17T21:30:00.000Z",
+  "end": "2026-06-17T23:00:00.000Z",
+  "venue": "The Venue",
+  "going": 17,
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/315016710/"
+ },
+ {
+  "id": "pyowa-315056917",
+  "group": "pyowa",
+  "title": "Tic-Tac-Toe Coding Competition",
+  "start": "2026-06-23T22:30:00.000Z",
+  "end": "2026-06-24T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 9,
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315056917/"
+ },
+ {
+  "id": "azure-315288786",
+  "group": "azure",
+  "title": "Missed Microsoft Build? We've Got You Covered.",
+  "start": "2026-06-24T17:00:00.000Z",
+  "end": "2026-06-24T18:00:00.000Z",
+  "online": true,
+  "going": 12,
+  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/315288786/"
+ },
+ {
+  "id": "aws-314736069",
+  "group": "aws",
+  "title": "Strands Agent Workshop",
+  "start": "2026-06-24T22:00:00.000Z",
+  "end": "2026-06-25T00:00:00.000Z",
+  "venue": "Lean Techniques",
+  "going": 13,
+  "url": "https://www.meetup.com/aws-user-group-des-moines/events/314736069/"
+ },
+ {
+  "id": "devopsdsm-315056758",
+  "group": "devopsdsm",
+  "title": "AI in DevOps: Real World Practices Roundtable",
+  "start": "2026-06-24T23:00:00.000Z",
+  "end": "2026-06-25T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 20,
+  "url": "https://www.meetup.com/devopsdsm/events/315056758/"
+ },
+ {
+  "id": "dsmdata-315064557",
+  "group": "dsmdata",
+  "title": "How GenAI Changed My Job",
+  "start": "2026-06-26T17:00:00.000Z",
+  "end": "2026-06-26T18:00:00.000Z",
+  "online": true,
+  "going": 111,
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/315064557/"
+ },
+ {
+  "id": "mobile-314628745",
+  "group": "mobile",
+  "title": "Mobile Engineering Meetup",
+  "start": "2026-07-08T16:45:00.000Z",
+  "end": "2026-07-08T18:00:00.000Z",
+  "venue": "QCI",
+  "going": 18,
+  "url": "https://www.meetup.com/des-moines-mobile-developers/events/314628745/"
+ },
+ {
+  "id": "iadnug-315562317",
+  "group": "iadnug",
+  "title": ".NET@Noon - Virtual - Advanced EF Core",
+  "start": "2026-07-09T17:00:00.000Z",
+  "end": "2026-07-09T18:00:00.000Z",
+  "online": true,
+  "going": 25,
+  "url": "https://www.meetup.com/iadnug/events/315562317/"
+ },
+ {
   "id": "webgeeks-312416819",
   "group": "webgeeks",
   "title": "Hiring in the Age of AI",
@@ -245,5 +755,15 @@
   "end": "2026-10-08T14:00:00.000Z",
   "venue": "West End Architectural Salvage",
   "url": "https://www.technologyiowa.org/events/techbrew-october-2026/"
+ },
+ {
+  "id": "iadnug-316779818",
+  "group": "iadnug",
+  "title": ".NET@Noon - Build Your First Real-Time Voice Agent",
+  "start": "2026-10-08T17:00:00.000Z",
+  "end": "2026-10-08T18:00:00.000Z",
+  "online": true,
+  "going": 32,
+  "url": "https://www.meetup.com/iadnug/events/316779818/"
  }
 ]
