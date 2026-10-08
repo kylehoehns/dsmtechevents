@@ -1,8 +1,8 @@
 // Events page behavior: list/calendar views, the group filter, relative
 // labels ("Tomorrow", "8 days out"), squashing repeated dates and addresses,
 // the month calendar and the mini calendar in the side rail.
-// State lives in the URL (?view=calendar&group=cijug&day=2026-10-15) so any
-// view can be shared or bookmarked.
+// State lives in the URL (?view=calendar&group=cijug&day=2026-10-15, ?q=java)
+// so any view can be shared or bookmarked.
 import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, recentSummary } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -56,6 +56,9 @@ function readUrl() {
   state.group = Object.hasOwn(groups, params.get('group') ?? '') ? params.get('group') : '';
   state.day = isDayKey(params.get('day')) ? params.get('day') : null;
   state.month = (state.day ?? today).slice(0, 7);
+  // A search looks through every group, and shows its results in the list.
+  state.q = (params.get('q') ?? '').trim().slice(0, 100);
+  if (state.q) { state.group = ''; state.view = 'list'; }
 }
 readUrl();
 
@@ -71,6 +74,7 @@ function syncUrl() {
   if (state.view === 'calendar') p.set('view', 'calendar');
   if (state.group) p.set('group', state.group);
   if (state.view === 'calendar' && state.day) p.set('day', state.day);
+  if (state.q) p.set('q', state.q);
   const url = p.size ? `?${p}` : location.pathname;
   const key = `${state.view}|${state.group}`;
   if (synced != null && synced !== key) history.pushState(null, '', url);
@@ -81,6 +85,35 @@ function syncUrl() {
 const matches = (ids) => !state.group || ids.includes(state.group);
 const hostsOf = (el) => (el.dataset.groups ?? '').split(' ');
 
+// ---- search ----
+// Matches what a card says (title, hosts, venue, address, About text) plus
+// each host's short and full name. Every word typed must start a word in
+// there: "ai" finds "AI" but not "said". Built from the page on first use.
+// ".", "#" and "+" count as part of a word, so ".net" or "c#" don't match
+// "networking" or every "C"; the text is also kept without them, so "net"
+// still finds ".NET".
+const fold = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’]/g, '').toLowerCase();
+const words = (s) => { const t = fold(s).replace(/[^\p{L}\p{N}.#+]+/gu, ' '); return ` ${t} ${t.replace(/[.#+]+/g, ' ')} `; };
+const queryWords = (q) => fold(q).split(/[^\p{L}\p{N}.#+]+/u).map((w) => w.replace(/\.+$/, '')).filter((w) => /[\p{L}\p{N}]/u.test(w));
+let searchIndex = null;
+function haystack(id) {
+  if (!searchIndex) {
+    searchIndex = new Map();
+    for (const [key, card] of cards) {
+      const names = hostsOf(card).flatMap((g) => groups[g] ? [groups[g].short, groups[g].name] : []);
+      const text = $$('.band, .series, .title, .venue, .addr, .tag-online, .desc', card).map((el) => el.textContent);
+      searchIndex.set(key, words([...names, ...text].join(' ')));
+    }
+  }
+  return searchIndex.get(id) ?? '';
+}
+const found = (el) => {
+  if (!state.q) return true;
+  const hay = haystack(el.dataset.id);
+  return queryWords(state.q).every((w) => hay.includes(` ${w}`));
+};
+const shows = (el) => matches(hostsOf(el)) && found(el);
+
 // ---- list ----
 // Returns how many events are showing.
 function renderList() {
@@ -88,7 +121,7 @@ function renderList() {
   for (const sec of $$('[data-sec]', listView)) {
     const items = $$('.show, .far > li', sec);
     let n = 0;
-    for (const el of items) { el.hidden = !matches(hostsOf(el)); if (!el.hidden) n++; }
+    for (const el of items) { el.hidden = !shows(el); if (!el.hidden) n++; }
     sec.hidden = n === 0;
     total += n;
     const count = $('[data-count]', sec);
@@ -96,7 +129,9 @@ function renderList() {
   }
   const empty = $('#list-empty');
   empty.hidden = total > 0;
-  if (!total && state.group) {
+  if (!total && state.q) {
+    empty.innerHTML = `Nothing coming up matches '${escapeHtml(state.q)}'. <button type="button" class="btn btn-outline btn-small" data-clear-search>Clear search</button>`;
+  } else if (!total && state.group) {
     const g = groups[state.group];
     empty.innerHTML = `Nothing on the books for this group right now. ${g.url
       ? `Check <a href="${escapeHtml(g.url)}" target="_blank" rel="noopener">their page<span class="sr-only"> (opens in new tab)</span></a> for what's next.`
@@ -128,7 +163,9 @@ function renderSide() {
   note.hidden = !state.group;
   if (state.group) note.innerHTML = `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <a href="/groups/#${encodeURIComponent(state.group)}">About the group</a> · <button type="button" data-chip="">Show all groups</button>`;
 
-  for (const p of $$('.poster')) p.hidden = !!state.group && !matches(hostsOf(p));
+  for (const p of $$('.poster')) p.hidden = !shows(p);
+  // A search covers every group, so the group picker steps aside until it's cleared.
+  $('#filter').hidden = !!state.q;
   // The calendar already shows conference days in pink; skip the posters there.
   const headliners = $('#headliners');
   if (headliners) headliners.hidden = state.view === 'calendar' || $$('.poster', headliners).every((p) => p.hidden);
@@ -137,7 +174,7 @@ function renderSide() {
   const limit = Number(list.dataset.shown);
   let shown = 0;
   for (const li of $$('li', list)) {
-    li.hidden = !matches(hostsOf(li));
+    li.hidden = !shows(li);
     if (!li.hidden) li.classList.toggle('extra', ++shown > limit);
   }
   // The summary and the "All N" button count what the filter left.
@@ -262,7 +299,7 @@ function renderMinical() {
 let listShown = 0;
 function render() {
   const viewName = state.view === 'calendar' ? 'Calendar' : '';
-  const groupName = state.group ? groups[state.group].short : '';
+  const groupName = state.group ? groups[state.group].short : state.q ? `'${state.q}'` : '';
   document.title = groupName || viewName ? [groupName, viewName, siteName].filter(Boolean).join(' · ') : siteTitle;
   for (const a of $$('.nav a[data-nav]')) {
     if (a.dataset.nav === state.view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
@@ -275,26 +312,77 @@ function render() {
   else delete document.documentElement.dataset.view;
   if (state.view === 'list') { listShown = renderList(); renderMinical(); } else renderCalendar();
   renderSide();
+  syncSearchBox();
   syncUrl();
 }
 
 const monthCount = () => events.filter((e) => dayKey(e.start).startsWith(state.month) && matches(e.groups)).length;
 function announceFilter() {
   const who = state.group ? ` from ${groups[state.group].short}` : '';
-  if (state.view === 'list') announce(`Showing ${plural(listShown, 'event')}${who}`);
+  if (state.q) announce(listShown ? `Showing ${plural(listShown, 'event')} matching '${state.q}'` : `Nothing coming up matches '${state.q}'`);
+  else if (state.view === 'list') announce(`Showing ${plural(listShown, 'event')}${who}`);
   else announce(`Calendar showing ${plural(monthCount(), 'event')}${who} in ${monthName(state.month)}`);
 }
 const dayStatus = () => { const n = eventsOn(state.day).length; return `${dayName(state.day)}: ${n ? plural(n, 'event') : 'nothing scheduled'}`; };
+
+// ---- search box ----
+// The magnifier opens a box under the nav. Typing filters the list at once and
+// keeps ?q= in the URL (replacing it, so Back isn't a keystroke at a time);
+// the status line waits for a pause. Closing it (×, Escape, the magnifier
+// again) always clears the search, so a closed box never hides events.
+const searchBtn = $('#search-btn');
+const searchForm = $('#search');
+const searchInput = $('#q');
+let announceTimer;
+function showSearchBox(open) {
+  searchForm.hidden = !open;
+  searchBtn.setAttribute('aria-expanded', String(open));
+}
+function setQuery(q) {
+  state.q = q.trim().slice(0, 100);
+  // Leaving a group or the calendar for a search is one Back step (syncUrl
+  // pushes when view or group change); each keystroke after that is not.
+  if (state.q) { state.group = ''; state.view = 'list'; }
+  render();
+  clearTimeout(announceTimer);
+  announceTimer = setTimeout(announceFilter, 600);
+}
+function closeSearch() {
+  if (state.q) { searchInput.value = ''; setQuery(''); }
+  showSearchBox(false);
+  searchBtn.focus();
+}
+searchBtn.addEventListener('click', () => {
+  if (searchForm.hidden) { showSearchBox(true); searchInput.focus(); } else closeSearch();
+});
+searchInput.addEventListener('input', () => setQuery(searchInput.value));
+searchInput.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { ev.preventDefault(); closeSearch(); } });
+// Enter puts the phone keyboard away so the results show.
+searchForm.addEventListener('submit', (ev) => { ev.preventDefault(); searchInput.blur(); });
+$('#search-clear').addEventListener('click', closeSearch);
+// A shared ?q= link opens with the box showing what was searched.
+function syncSearchBox() {
+  if (searchInput.value.trim() !== state.q) searchInput.value = state.q;
+  if (state.q) showSearchBox(true);
+  else if (document.activeElement !== searchInput) showSearchBox(false);
+}
 
 // ---- events ----
 document.addEventListener('click', (ev) => {
   const t = ev.target;
 
+  if (t.closest('[data-clear-search]')) {
+    searchInput.value = '';
+    searchInput.focus(); // first, so the box stays open (see syncSearchBox)
+    setQuery('');
+    return;
+  }
+
   const nav = t.closest('[data-nav="list"], [data-nav="calendar"]');
   if (nav) {
     ev.preventDefault();
     state.view = nav.dataset.nav;
-    if (state.view === 'calendar') state.month = (state.day ?? today).slice(0, 7);
+    if (state.view === 'calendar') { state.month = (state.day ?? today).slice(0, 7); state.q = ''; }
     render();
     announce(state.view === 'calendar' ? `Calendar, ${monthName(state.month, true)}` : 'Event list');
     scrollTo({ top: 0 });
@@ -317,6 +405,7 @@ document.addEventListener('click', (ev) => {
     ev.preventDefault();
     state.group = groupLink.dataset.group;
     state.view = 'list';
+    state.q = '';
     render();
     $('#filter').scrollIntoView({ block: 'start' });
     announceFilter();
@@ -391,10 +480,16 @@ calView.addEventListener('keydown', (ev) => {
 // Back/Forward: the URL changed under us, so read it again. The status line
 // says what is showing now, the same as a click would.
 addEventListener('popstate', () => {
-  const before = `${state.view}|${state.group}|${state.day}`;
+  const before = `${state.view}|${state.group}|${state.day}|${state.q}`;
   readUrl();
-  if (`${state.view}|${state.group}|${state.day}` === before) return; // e.g. Back from the skip link's #main
+  if (`${state.view}|${state.group}|${state.day}|${state.q}` === before) return; // e.g. Back from the skip link's #main
   synced = null; // the URL is already right; don't push it again
+  // Back out of a search: close the box even if it has focus.
+  if (!state.q && !searchForm.hidden) {
+    const hadFocus = searchForm.contains(document.activeElement);
+    showSearchBox(false);
+    if (hadFocus) searchBtn.focus();
+  }
   render();
   announceFilter();
 });
