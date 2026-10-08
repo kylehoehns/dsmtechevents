@@ -1,8 +1,31 @@
 {
-  "fetchedAt": "2026-10-08T04:04:46.447Z",
+  "fetchedAt": "2026-10-08T16:07:57.844Z",
   "logo": "https://www.technologyiowa.org/wp-content/uploads/2025/06/cropped-tai-avatar-1080x1080-1.png",
-  "enriched": true,
   "events": [
+    {
+      "id": "techbrew-techbrew-august-2026",
+      "sourceId": "techbrew-august-2026",
+      "title": "TechBrew w/ Kevin Larkin, Federal Home Loan Bank of Des Moines",
+      "start": "2026-08-13T13:00:00.000Z",
+      "end": "2026-08-13T14:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.technologyiowa.org/events/techbrew-august-2026/",
+      "description": "Connect over coffee and dive into a tech discussion with Kevin Larkin, Chief Information and Operations Officer Federal Home Loan Bank of Des Moines\n\nWhat to Expect:\n\n8:00 – 8:15 a.m. | Networking\n\n8:15 – 8:45 a.m. | Interview with Featured Guest\n\nStick around after for more networking!\n\n☕ Drip coffee provided by West End Salvage. Specialty drinks available for purchase.\n\nTechBrew is presented by Zirous",
+      "venue": "West End Architectural Salvage",
+      "address": "22 9th Street, Des Moines, IA"
+    },
+    {
+      "id": "techbrew-techbrew-september-2026",
+      "sourceId": "techbrew-september-2026",
+      "title": "TechBrew with Featured Guest: Ted Hughes",
+      "start": "2026-09-10T13:00:00.000Z",
+      "end": "2026-09-10T14:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.technologyiowa.org/events/techbrew-september-2026/",
+      "description": "Connect over coffee and dive into a tech focused discussion with Ted Hughes, Senior Vice President & Chief Information Officer at F&G\n\nWhat to Expect:\n\n8:00 – 8:15 a.m. | Networking\n\n8:15 – 8:45 a.m. | Interview with Ted Hughes\n\nStick around after for more networking!\n\n☕ Drip coffee provided by West End Salvage. Specialty drinks available for purchase.\n\nTechBrew is presented by Zirous",
+      "venue": "West End Architectural Salvage",
+      "address": "22 9th Street, Des Moines, IA"
+    },
     {
       "id": "techbrew-techbrew-october-2026",
       "sourceId": "techbrew-october-2026",

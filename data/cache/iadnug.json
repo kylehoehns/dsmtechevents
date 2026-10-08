@@ -1,9 +1,8 @@
 {
-  "fetchedAt": "2026-10-08T05:38:44.255Z",
+  "fetchedAt": "2026-10-08T16:07:45.188Z",
   "logo": "https://secure.meetupstatic.com/photos/event/b/3/e/6/600_525706054.jpeg",
   "members": 1497,
   "pastCount": 120,
-  "enriched": true,
   "events": [
     {
       "id": "iadnug-316281444",
@@ -35,7 +34,7 @@
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/b/3/e/6/600_525706054.jpeg",
-      "going": 20
+      "going": 27
     }
   ]
 }

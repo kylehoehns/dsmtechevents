@@ -1,9 +1,8 @@
 {
-  "fetchedAt": "2026-10-08T05:38:51.196Z",
+  "fetchedAt": "2026-10-08T16:07:51.255Z",
   "logo": "https://secure.meetupstatic.com/photos/event/7/6/7/a/600_517170330.jpeg",
   "members": 172,
   "pastCount": 13,
-  "enriched": true,
   "events": [
     {
       "id": "alf-315376050",
@@ -35,7 +34,7 @@
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/7/6/7/a/600_517170330.jpeg",
-      "going": 27
+      "going": 26
     }
   ]
 }

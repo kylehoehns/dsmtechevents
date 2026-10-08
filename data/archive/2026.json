@@ -80,6 +80,15 @@
   "url": "https://www.meetup.com/des-moines-web-geeks/events/312416822/"
  },
  {
+  "id": "techbrew-techbrew-august-2026",
+  "group": "techbrew",
+  "title": "TechBrew w/ Kevin Larkin, Federal Home Loan Bank of Des Moines",
+  "start": "2026-08-13T13:00:00.000Z",
+  "end": "2026-08-13T14:00:00.000Z",
+  "venue": "West End Architectural Salvage",
+  "url": "https://www.technologyiowa.org/events/techbrew-august-2026/"
+ },
+ {
   "id": "producttank-315588233",
   "group": "producttank",
   "title": "The Best User Story I Never Wrote",
@@ -150,6 +159,15 @@
   "url": "https://www.meetup.com/des-moines-mobile-developers/events/316098796/"
  },
  {
+  "id": "techbrew-techbrew-september-2026",
+  "group": "techbrew",
+  "title": "TechBrew with Featured Guest: Ted Hughes",
+  "start": "2026-09-10T13:00:00.000Z",
+  "end": "2026-09-10T14:00:00.000Z",
+  "venue": "West End Architectural Salvage",
+  "url": "https://www.technologyiowa.org/events/techbrew-september-2026/"
+ },
+ {
   "id": "dsmdata-316271371",
   "group": "dsmdata",
   "title": "Knowledge Graphs: The Memory Your Data Team Doesn't Have (Yet)",
@@ -218,5 +236,14 @@
   "venue": "Source Allies",
   "going": 10,
   "url": "https://www.meetup.com/devopsdsm/events/316404457/"
+ },
+ {
+  "id": "techbrew-techbrew-october-2026",
+  "group": "techbrew",
+  "title": "TechBrew – October 2026",
+  "start": "2026-10-08T13:00:00.000Z",
+  "end": "2026-10-08T14:00:00.000Z",
+  "venue": "West End Architectural Salvage",
+  "url": "https://www.technologyiowa.org/events/techbrew-october-2026/"
  }
 ]

@@ -1,7 +1,6 @@
 {
-  "fetchedAt": "2026-10-07T22:03:51.682Z",
-  "logo": null,
-  "enriched": true,
+  "fetchedAt": "2026-10-08T16:07:53.459Z",
+  "logo": "https://secdsm.org/images/og-logo.png",
   "events": [
     {
       "id": "secdsm-2026-11-05",
@@ -12,7 +11,7 @@
       "allDay": false,
       "url": "https://secdsm.org/#schedule",
       "description": "Doors open at 6 PM.\n\n**7:00 PM · Tokens, Tickets, & Thievery - Authentication Material Theft for Privilege Escalation and Defense Planning** — Andrew Ware\nWe all know that you’re supposed to protect privileged accounts with strong passwords and MFA, but what if the authentication process itself can be undermined? In this talk I’ll explore how stolen authentication material can be used to hijack accounts without ever needing to obtain the actual credentials. We’ll look at classic Kerberos ticket theft and Microsoft Entra access token theft. \n\nThe lesson for defenders: Strong credentials are only part of the defense strategy. The entire authentication process needs to be treated as privileged from start to finish.",
-      "venue": "T12 Distillery @ The Foundry",
+      "venue": "T12 Distillery at The Foundry",
       "address": "111 S 11th St, Ste 100, West Des Moines, IA 50265"
     },
     {
@@ -24,7 +23,7 @@
       "allDay": false,
       "url": "https://secdsm.org/#schedule",
       "description": "Doors open at 6 PM.\n\n**7:00 PM · Everything is a Date** — Craig Leabhart\nTips and tricks to make Excel work for you. Because why work harder when you can work smarter.\n\n**7:25 PM · DIY Flipper Zero** — Jacob Schubert\nA flipper zero at 20 dollars cost",
-      "venue": "T12 Distillery @ The Foundry",
+      "venue": "T12 Distillery at The Foundry",
       "address": "111 S 11th St, Ste 100, West Des Moines, IA 50265"
     },
     {
@@ -36,7 +35,7 @@
       "allDay": false,
       "url": "https://secdsm.org/#schedule",
       "description": "Doors open at 6 PM.\n\nTalk schedule pending. Check the SecDSM Discord for updates.",
-      "venue": "T12 Distillery @ The Foundry",
+      "venue": "T12 Distillery at The Foundry",
       "address": "111 S 11th St, Ste 100, West Des Moines, IA 50265"
     },
     {
@@ -48,7 +47,7 @@
       "allDay": false,
       "url": "https://secdsm.org/#schedule",
       "description": "Doors open at 6 PM.\n\nTalk schedule pending. Check the SecDSM Discord for updates.",
-      "venue": "T12 Distillery @ The Foundry",
+      "venue": "T12 Distillery at The Foundry",
       "address": "111 S 11th St, Ste 100, West Des Moines, IA 50265"
     }
   ]
