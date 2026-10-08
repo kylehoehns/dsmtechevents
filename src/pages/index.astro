@@ -51,7 +51,8 @@ const daysOut = daysOutOf;
 const counts = Object.fromEntries(groups.map((g) => [g.id, listed.filter((e) => e.groupIds.includes(g.id)).length]));
 // Only groups with something coming up get a chip; the groups page lists them all.
 const filterGroups = groups.filter((g) => counts[g.id] > 0).sort((a, b) => counts[b.id] - counts[a.id] || a.short.localeCompare(b.short));
-const PAST_SHOWN = 8;
+// Recent events shows the last few; "All N →" opens the rest (90 days' worth).
+const PAST_SHOWN = 3;
 
 const calendarData = {
   events: events.map((e) => ({
@@ -148,7 +149,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
       <section class="recent" id="recent" aria-labelledby="recent-h">
         <h2 id="recent-h">Recent events</h2>
         <p class="sub">The last three months. {past.length} events, {past.reduce((n, e) => n + (e.going ?? 0), 0)} RSVPs.</p>
-        <ol class="setlist" id="recent-list">
+        <ol class="setlist" id="recent-list" data-shown={PAST_SHOWN}>
           {past.map((e, i) => (
             <li class:list={{ extra: i >= PAST_SHOWN }} data-groups={e.groupIds.join(' ')}>
               <span class="d">{month(e.start)} {day(e.start)}</span>
