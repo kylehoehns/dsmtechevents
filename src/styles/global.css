@@ -146,7 +146,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .poster .when { font-size: 26px; }
 }
 
-/* ---------- page layout: main column + sticky side rail on desktop ---------- */
+/* ---------- page layout: main column + side rail on desktop ---------- */
 .layout { display: flex; flex-direction: column; margin-top: 22px; }
 .layout > .main { order: 2; min-width: 0; }
 .side { display: contents; }
@@ -161,7 +161,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .side { order: 1; }
   .side > * { order: 0; margin: 0; }
   .side > .day-panel { order: -1; }
-  .side { display: grid; gap: 22px; position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding-bottom: 8px; scrollbar-width: thin; }
+  .side { display: grid; gap: 22px; }
   .side > .minical { display: block; }
 }
 
