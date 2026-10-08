@@ -3,19 +3,16 @@ import Layout from '../layouts/Layout.astro';
 import EventCard from '../components/EventCard.astro';
 import { loadData } from '../lib/data.mjs';
 import { eventJsonLd, websiteJsonLd, toScript } from '../lib/jsonld.mjs';
-import { dayKey, weekday, day, month, shortTime } from '../lib/format.mjs';
+import { dayKey, weekday, day, month, shortTime, addDays, daysBetween, monthName, plural, countdown } from '../lib/format.mjs';
 
 const { events, upcoming, past, groups, byId, updatedAt } = loadData();
 
 // Section labels are relative to the build. Builds run daily, and the browser
 // re-labels "Tomorrow"/"Tonight" itself.
-const today = dayKey(new Date().toISOString());
-const addDays = (key: string, n: number) => new Date(Date.parse(key) + n * 86_400_000).toISOString().slice(0, 10);
+const today = dayKey(Date.now());
 const dow = new Date(`${today}T12:00:00Z`).getUTCDay();
 const thisWeekEnd = addDays(today, (7 - dow) % 7);
 const nextWeekEnd = addDays(thisWeekEnd, 7);
-const monthName = (key: string, withYear: boolean) =>
-  new Date(`${key.slice(0, 7)}-15T12:00:00Z`).toLocaleString('en-US', { month: 'long', year: withYear ? 'numeric' : undefined, timeZone: 'UTC' });
 // Full rows through the end of next month; anything later is a compact set list.
 const [ty, tm] = today.split('-').map(Number);
 const horizon = new Date(Date.UTC(ty, tm + 1, 0)).toISOString().slice(0, 10);
@@ -44,9 +41,7 @@ const pooled = [...upcoming.filter((e) => e.repeat), ...far, ...past];
 // they're just a pink row at their date in the list. A poster stays up
 // until its conference is over.
 const HEADLINER_DAYS = 30;
-const daysOutOf = (e: any) => Math.round((Date.parse(dayKey(e.start)) - Date.parse(today)) / 86_400_000);
-const featured = upcoming.filter((e) => e.featured && daysOutOf(e) <= HEADLINER_DAYS);
-const daysOut = daysOutOf;
+const featured = upcoming.filter((e) => e.featured && daysBetween(today, dayKey(e.start)) <= HEADLINER_DAYS);
 
 const counts = Object.fromEntries(groups.map((g) => [g.id, listed.filter((e) => e.groupIds.includes(g.id)).length]));
 // Only groups with something coming up get a chip; the groups page lists them all.
@@ -85,7 +80,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
                 <div class="bill"><span>Headliner</span><span>{e.multiDay ? 'Two-day conference' : 'One-day conference'}</span></div>
                 <h2>{e.title}</h2>
                 <p class="when">{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
-                <span class="stamp-days countdown" data-start={e.start}>{daysOut(e)} days out</span>
+                <span class="stamp-days countdown" data-start={e.start}>{countdown(e.start)}</span>
                 <p class="where">{e.venue}{e.address && <><br />{e.address}</>}</p>
                 <a class="go" href={e.url} target="_blank" rel="noopener">Tickets & info<span class="sr-only">: {e.title} (opens in new tab)</span> <span aria-hidden="true">→</span></a>
               </div>
@@ -113,7 +108,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
       <section id="list-view" aria-label="Upcoming events">
         {sections.map((s) => (
           <section class="sec" data-sec>
-            <div class="sec-head"><h2>{s.title}</h2><span class="count" data-count>{s.items.length} {s.items.length === 1 ? 'event' : 'events'}</span></div>
+            <div class="sec-head"><h2>{s.title}</h2><span class="count" data-count>{plural(s.items.length, 'event')}</span></div>
             <ul class="shows">{s.items.map((e) => <EventCard event={e} byId={byId} />)}</ul>
           </section>
         ))}

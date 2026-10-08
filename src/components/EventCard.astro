@@ -6,7 +6,7 @@
 // real event photo (not the group's logo), the group's full name only when it
 // says more than its short name, and the browser hides the date and street
 // address when the row above already showed them (see app.js).
-import { weekday, day, month, shortRange, formatDescription, dayKey, todayWord } from '../lib/format.mjs';
+import { weekday, day, month, shortRange, formatDescription, dayKey, whenLabel } from '../lib/format.mjs';
 
 const { event: e, byId } = Astro.props;
 const hosts = e.groupIds.map((id: string) => byId[id]).filter(Boolean);
@@ -20,10 +20,7 @@ const photo = e.photoSizes ?? { small: e.photo, large: e.photo };
 const thumbSrcset = e.photoSizes ? `${photo.small} 180w, ${photo.large} 600w` : undefined;
 // "Tomorrow" / "Tonight" as of the build, so the tag is in the page from the
 // start and nothing moves when app.js re-checks it against the real date.
-const today = dayKey(new Date().toISOString());
-const startDay = dayKey(e.start);
-const tomorrow = dayKey(new Date(Date.now() + 86_400_000).toISOString());
-const whenTag = startDay === today ? todayWord(e.start) : startDay < today && today <= dayKey(e.end) ? 'Today' : startDay === tomorrow ? 'Tomorrow' : '';
+const whenTag = whenLabel(e.start, e.end);
 // Tapping the venue opens a map search (app.js switches it to Apple Maps on iPhones).
 const mapQuery = [e.venue, e.fullAddress ?? e.address ?? 'Des Moines, IA'].filter(Boolean).join(', ');
 const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;

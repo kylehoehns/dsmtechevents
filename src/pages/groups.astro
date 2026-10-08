@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
-import { weekday, day, month, shortTime } from '../lib/format.mjs';
+import { weekday, day, month, shortTime, plural } from '../lib/format.mjs';
 
 const { groups, updatedAt } = loadData();
 // Alphabetical by the name on the card, so a group is easy to find.
@@ -30,7 +30,7 @@ const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`
           <p class="last">Last event {month(g.lastEvent.start)} {day(g.lastEvent.start)}{g.lastEvent.going ? ` · ${g.lastEvent.going} went` : ''}</p>
         )}
         <div class="links">
-          {g.upcomingCount > 0 && <a class="primary" href={`/?group=${g.id}`}>{g.upcomingCount} {g.upcomingCount === 1 ? 'event' : 'events'}<span class="sr-only"> from {g.short}</span></a>}
+          {g.upcomingCount > 0 && <a class="primary" href={`/?group=${g.id}`}>{plural(g.upcomingCount, 'event')}<span class="sr-only"> from {g.short}</span></a>}
           {g.meetupUrl && <a href={g.meetupUrl} target="_blank" rel="noopener">Meetup<span class="sr-only"> page for {g.short}, opens in new tab</span> <span aria-hidden="true">↗</span></a>}
           {g.website && <a href={g.website} target="_blank" rel="noopener">Website<span class="sr-only"> for {g.short}, opens in new tab</span> <span aria-hidden="true">↗</span></a>}
         </div>

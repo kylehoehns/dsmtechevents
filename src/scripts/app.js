@@ -3,7 +3,7 @@
 // the month calendar and the mini calendar in the side rail.
 // State lives in the URL (?view=calendar&group=cijug&day=2026-10-15) so any
 // view can be shared or bookmarked.
-import { dayKey, fullDate, todayWord } from '../lib/format.mjs';
+import { dayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -17,9 +17,7 @@ const recent = $('#recent');
 const status = $('#status');
 const siteTitle = document.title;
 const now = Date.now();
-const today = dayKey(new Date().toISOString());
-const DAY = 86_400_000;
-const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / DAY);
+const today = dayKey(now);
 
 // ---- cards: every event has one, in the list or in the hidden pool ----
 const cards = new Map();
@@ -27,29 +25,19 @@ for (const el of $$('.show', listView)) cards.set(el.dataset.id, el);
 for (const el of $$('.show', $('#card-pool').content)) cards.set(el.dataset.id, el);
 
 // The page is built ahead of time; drop anything that has ended since.
-for (const el of $$('[data-end]', listView)) if (Date.parse(el.dataset.end) <= now) el.remove();
-for (const el of $$('.poster[data-end]')) if (Date.parse(el.dataset.end) <= now) el.remove();
+for (const el of $$('#list-view [data-end], .poster[data-end]')) if (Date.parse(el.dataset.end) <= now) el.remove();
 
 // ---- relative labels ----
-function relLabel(startIso, endIso) {
-  const start = dayKey(startIso), end = dayKey(endIso);
-  if (start <= today && today <= end) return Date.parse(startIso) <= now ? 'Happening now' : start === today ? todayWord(startIso) : 'Today';
-  const n = daysBetween(today, start);
-  return n === 1 ? 'Tomorrow' : '';
-}
 // The build already printed these for the day it ran (see EventCard.astro);
 // they only change for a page opened on a later day, or once an event starts.
 for (const el of $$('.show', listView)) {
-  const label = relLabel(el.dataset.start, el.dataset.end);
   const tag = $('.when-tag', el);
   if (!tag) continue;
+  const label = whenLabel(el.dataset.start, el.dataset.end, now);
   if (tag.textContent !== label) tag.textContent = label;
   tag.hidden = !label;
 }
-for (const el of $$('.countdown[data-start]')) {
-  const n = daysBetween(today, dayKey(el.dataset.start));
-  el.textContent = Date.parse(el.dataset.start) <= now ? 'Happening now' : n <= 0 ? 'Today' : n === 1 ? 'Tomorrow' : `${n} days out`;
-}
+for (const el of $$('.countdown[data-start]')) el.textContent = countdown(el.dataset.start, now);
 
 // Venue links open Google Maps; on iPhones and iPads, Apple Maps instead.
 if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes('Macintosh') && navigator.maxTouchPoints > 1)) {
@@ -97,7 +85,7 @@ function renderList() {
     sec.hidden = n === 0;
     anyVisible ||= n > 0;
     const count = $('[data-count]', sec);
-    count.textContent = $('.far', sec) ? `${n} on the books` : `${n} ${n === 1 ? 'event' : 'events'}`;
+    count.textContent = $('.far', sec) ? `${n} on the books` : `${plural(n, 'event')}`;
   }
   const empty = $('#list-empty');
   empty.hidden = anyVisible;
@@ -153,11 +141,7 @@ function renderSide() {
 
 // ---- calendar ----
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const addDays = (key, n) => new Date(Date.parse(key) + n * DAY).toISOString().slice(0, 10);
 const addMonths = (ym, n) => { const d = new Date(`${ym}-01T00:00:00Z`); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString().slice(0, 7); };
-const monthLabel = (ym) => new Date(`${ym}-15T12:00:00Z`).toLocaleString('en-US', { month: 'long', timeZone: 'UTC' });
-const timeShort = (iso) => new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit' })
-  .format(new Date(iso)).replace(':00', '').replace(/\s?AM$/, 'a').replace(/\s?PM$/, 'p');
 const eventsOn = (key) => events
   .filter((e) => dayKey(e.start) <= key && key <= dayKey(e.end) && matches(e.groups.join(' ')))
   .sort((a, b) => a.start.localeCompare(b.start));
@@ -188,10 +172,10 @@ function renderCalendar() {
       const ended = Date.parse(e.end) < now ? ' ended' : '';
       return e.featured
         ? `<span class="pill c${ended}" title="${escapeHtml(e.title)}">${escapeHtml(label(e))}</span>`
-        : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : timeShort(e.start)}</i> ${escapeHtml(label(e))}</span>`;
+        : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : shortTime(e.start)}</i> ${escapeHtml(label(e))}</span>`;
     }).join('') + (list.length > 3 ? `<span class="more-n">+${list.length - 3} more</span>` : '');
     const dots = list.filter((e) => !e.featured).map(() => '<i class="dot"></i>').join('');
-    const name = `${fullDate(`${key}T17:00:00Z`)}${list.length ? `, ${list.length} event${list.length > 1 ? 's' : ''}` : ', nothing scheduled'}`;
+    const name = `${dayName(key)}${list.length ? `, ${list.length} event${list.length > 1 ? 's' : ''}` : ', nothing scheduled'}`;
     // Only the selected day is in the tab order; arrow keys move between days.
     return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}">
       <span class="sr-only">${name}</span><span class="n" aria-hidden="true">${Number(key.slice(8))}</span><span class="pills" aria-hidden="true">${pills}</span><span class="dots" aria-hidden="true">${dots}</span>
@@ -202,14 +186,14 @@ function renderCalendar() {
   const had = calView.contains(document.activeElement) ? document.activeElement : null;
   calView.innerHTML = `
     <div class="cal-head">
-      <h2>${monthLabel(state.month)}<span> ${y}</span></h2>
+      <h2>${monthName(state.month)}<span> ${y}</span></h2>
       <div class="cal-nav">
         <button type="button" data-month="-1" aria-label="Previous month">←</button>
         <button type="button" data-month="0">Today</button>
         <button type="button" data-month="1" aria-label="Next month">→</button>
       </div>
     </div>
-    <div class="grid" role="group" aria-label="${monthLabel(state.month)} ${y}">
+    <div class="grid" role="group" aria-label="${monthName(state.month, true)}">
       ${WEEKDAYS.map((d) => `<span class="wd" aria-hidden="true">${d}</span>`).join('')}
       ${cells.join('')}
     </div>
@@ -223,8 +207,8 @@ function renderDayPanel() {
   const list = eventsOn(state.day);
   const n = daysBetween(today, state.day);
   const rel = n === 0 ? ' · today' : n === 1 ? ' · tomorrow' : '';
-  dayPanel.innerHTML = `<h2>${fullDate(`${state.day}T17:00:00Z`)}</h2>
-    <p class="sub">${list.length ? `${list.length} ${list.length === 1 ? 'event' : 'events'}` : 'A quiet day'}${rel}</p>`;
+  dayPanel.innerHTML = `<h2>${dayName(state.day)}</h2>
+    <p class="sub">${list.length ? `${plural(list.length, 'event')}` : 'A quiet day'}${rel}</p>`;
   if (!list.length) {
     dayPanel.insertAdjacentHTML('beforeend', '<p class="none">Nothing on the books. Pick a day with a mark.</p>');
     return;
@@ -251,9 +235,9 @@ function renderMinical() {
     if (!key.startsWith(ym)) return '<span class="blank" aria-hidden="true"></span>';
     const list = eventsOn(key);
     const cls = [list.length ? 'has' : '', list.some((e) => e.featured) ? 'conf' : '', key === today ? 'today' : '', key < today ? 'past' : ''].filter(Boolean).join(' ');
-    return `<button type="button" class="${cls}" data-goto="${key}" aria-label="${fullDate(`${key}T17:00:00Z`)}, ${list.length || 'no'} event${list.length === 1 ? '' : 's'}">${Number(key.slice(8))}</button>`;
+    return `<button type="button" class="${cls}" data-goto="${key}" aria-label="${dayName(key)}, ${list.length || 'no'} event${list.length === 1 ? '' : 's'}">${Number(key.slice(8))}</button>`;
   });
-  minical.innerHTML = `<h2>${monthLabel(ym)} <a href="?view=calendar" data-nav="calendar">Full calendar</a></h2>
+  minical.innerHTML = `<h2>${monthName(ym)} <a href="?view=calendar" data-nav="calendar">Full calendar</a></h2>
     <div class="mini-grid">${WEEKDAYS.map((d) => `<span class="wd" aria-hidden="true">${d[0]}</span>`).join('')}${cells.join('')}</div>`;
 }
 
@@ -280,14 +264,10 @@ const visibleCount = () => $$('.show, .far > li', listView).filter((el) => !el.h
 const monthCount = () => events.filter((e) => e.start.startsWith(state.month) && matches(e.groups.join(' '))).length;
 function announceFilter() {
   const who = state.group ? ` from ${groups[state.group].short}` : '';
-  if (state.view === 'list') { const n = visibleCount(); announce(`Showing ${n} ${n === 1 ? 'event' : 'events'}${who}`); }
-  else { const n = monthCount(); announce(`Calendar showing ${n} ${n === 1 ? 'event' : 'events'}${who} in ${monthLabel(state.month)}`); }
+  if (state.view === 'list') { const n = visibleCount(); announce(`Showing ${plural(n, 'event')}${who}`); }
+  else { const n = monthCount(); announce(`Calendar showing ${plural(n, 'event')}${who} in ${monthName(state.month)}`); }
 }
-const dayStatus = () => { const n = eventsOn(state.day).length; return `${fullDate(`${state.day}T17:00:00Z`)}: ${n ? `${n} ${n === 1 ? 'event' : 'events'}` : 'nothing scheduled'}`; };
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-}
+const dayStatus = () => { const n = eventsOn(state.day).length; return `${dayName(state.day)}: ${n ? `${plural(n, 'event')}` : 'nothing scheduled'}`; };
 
 // ---- events ----
 document.addEventListener('click', (ev) => {
@@ -299,7 +279,7 @@ document.addEventListener('click', (ev) => {
     state.view = nav.dataset.nav;
     if (state.view === 'calendar') state.month = (state.day ?? today).slice(0, 7);
     render();
-    announce(state.view === 'calendar' ? `Calendar, ${monthLabel(state.month)} ${state.month.slice(0, 4)}` : 'Event list');
+    announce(state.view === 'calendar' ? `Calendar, ${monthName(state.month, true)}` : 'Event list');
     scrollTo({ top: 0 });
     return;
   }
@@ -360,7 +340,7 @@ document.addEventListener('click', (ev) => {
     state.month = step === 0 ? today.slice(0, 7) : addMonths(state.month, step);
     state.day = step === 0 ? today : null;
     render();
-    announce(`${monthLabel(state.month)} ${state.month.slice(0, 4)}`);
+    announce(`${monthName(state.month, true)}`);
     return;
   }
 
