@@ -1,0 +1,23 @@
+name: ci
+
+# Runs the tests and the build on every pull request and every push to main.
+# `npm run build` runs the tests first, so this one step covers both; the
+# same command runs in Cloudflare's deploy and the event refresh, so a failing
+# test also blocks a deploy and a data commit.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run build

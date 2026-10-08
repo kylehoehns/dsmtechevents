@@ -1,0 +1,10 @@
+- title: Test Conf 2026
+  url: https://example.com/conf
+  start: 2026-10-15
+  end: 2026-10-16
+  time: "08:00"
+  endTime: "17:00"
+  venue: Convention Center
+  address: 833 5th Ave, Des Moines, IA 50309
+  tags: [conference]
+  featured: true
