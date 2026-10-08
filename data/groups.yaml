@@ -119,8 +119,9 @@
   color: "#1864ab"
 
 - id: techbrew
-  name: TAI TechBrew
-  short: TechBrew
+  name: Technology Association of Iowa
+  short: TAI
+  # Only TAI's public TechBrew events (see scripts/sources/tai-techbrew.mjs).
   source: tai-techbrew
   website: https://www.technologyiowa.org/events/calendar/techbrews/
   logo: https://www.technologyiowa.org/wp-content/uploads/2025/06/cropped-tai-avatar-1080x1080-1.png
