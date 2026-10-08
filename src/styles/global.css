@@ -289,16 +289,18 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 
 @container (min-width: 640px) {
   .show { grid-template-columns: 70px minmax(0, 1fr); gap: 0 18px; padding: 14px 0; }
-  .show.has-photo { grid-template-columns: 70px 160px minmax(0, 1fr); }
+  /* the photo sits on the right, so every row's text starts in the same column */
+  .show.has-photo { grid-template-columns: 70px minmax(0, 1fr) 160px; }
   .date { grid-row: 1 / span 3; }
   .date .num { font-size: 58px; }
-  .show.has-photo .photo { display: block; grid-row: 1 / span 3; width: 160px; align-self: start; }
+  .show.has-photo .body { grid-column: 2; grid-row: 1; }
+  .show.has-photo .photo { display: block; grid-column: 3; grid-row: 1 / span 2; width: 160px; align-self: start; }
   .show.has-photo .photo .ink { width: 160px; transform: rotate(-1deg); }
   .show.has-photo:nth-child(even) .photo .ink { transform: rotate(0.8deg); }
   .band a, .band span.b { font-size: 30px; }
   .title { font-size: 18px; }
   .acts, .desc { grid-column: 2 / -1; }
-  .show.has-photo .acts, .show.has-photo .desc { grid-column: 3; }
+  .show.has-photo .acts { grid-column: 2; }
   .show.has-photo .desc-photo { display: none; } /* the thumbnail is already showing it */
 }
 

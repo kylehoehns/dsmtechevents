@@ -9,8 +9,7 @@ const sorted = [...groups].sort((a, b) =>
   (a.nextEvent?.start ?? '9999').localeCompare(b.nextEvent?.start ?? '9999') || a.short.localeCompare(b.short));
 const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
 ---
-<Layout title="Groups" nav="groups" updatedAt={updatedAt}
-  blurb={`${groups.length} Des Moines tech groups. Pick one, show up, say hi.`}>
+<Layout title="Groups" nav="groups" updatedAt={updatedAt}>
   <h1 class="sr-only">Des Moines tech groups</h1>
   <div class="board">
     {sorted.map((g, i) => (
