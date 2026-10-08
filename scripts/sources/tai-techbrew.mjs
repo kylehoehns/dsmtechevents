@@ -7,26 +7,22 @@
 // Only TechBrew is wanted from TAI (no roundtables, member events, awards or
 // conferences), so titles must also match an allow-list. TechBrews outside
 // the Des Moines metro are skipped, based on the venue's city.
-import ical from 'node-ical';
 import { toText } from './html.mjs';
+import { calendarEvents, isUpcoming, times, eventUrl } from './ical.mjs';
 
 const FEED = 'https://www.technologyiowa.org/events/calendar/techbrews/ics/';
 const TECHBREW = /tech\s*brew/i;
 const METRO = ['Des Moines', 'West Des Moines', 'Urbandale', 'Clive', 'Johnston', 'Ankeny', 'Altoona', 'Grimes', 'Waukee', 'Windsor Heights', 'Pleasant Hill'];
 
 export default async function taiTechbrew(group, { get, now = Date.now() }) {
-  const ics = await get(FEED);
-  if (!ics.includes('BEGIN:VCALENDAR')) throw new Error('TAI TechBrew feed did not return a calendar');
-  const all = Object.values(ical.sync.parseICS(ics)).filter((e) => e.type === 'VEVENT');
+  const all = calendarEvents(await get(FEED), 'TAI TechBrew feed');
+  // TAI's feed always holds past TechBrews too; an empty one means it broke.
   if (!all.length) throw new Error('TAI TechBrew feed has no events');
-
-  const upcoming = all.filter((e) => e.status !== 'CANCELLED'
-    && TECHBREW.test(e.summary ?? '')
-    && (e.end ?? e.start).getTime() >= now);
+  const upcoming = all.filter((e) => isUpcoming(e, now) && TECHBREW.test(e.summary ?? ''));
 
   const events = [];
   for (const e of upcoming) {
-    const url = e.url?.val ?? e.url;
+    const url = eventUrl(e);
     if (!url) throw new Error(`TechBrew "${e.summary}" has no URL`);
     const page = readEventPage(await get(url), url);
     if (!METRO.includes(page.city)) continue;
@@ -35,9 +31,7 @@ export default async function taiTechbrew(group, { get, now = Date.now() }) {
       id: `${group.id}-${sourceId}`,
       sourceId,
       title: e.summary.trim(),
-      start: e.start.toISOString(),
-      end: (e.end ?? e.start).toISOString(),
-      allDay: e.datetype === 'date',
+      ...times(e),
       url,
       description: page.description,
       venue: page.venue,

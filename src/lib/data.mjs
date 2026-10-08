@@ -76,9 +76,10 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
   const photoId = (url) => /_(\d+)\.\w+$/.exec(url ?? '')?.[1] ?? url;
   for (const e of events) {
     const logos = e.groupIds.map((id) => photoId(byId[id]?.logo)).filter(Boolean);
-    e.photo = e.image && !logos.includes(photoId(e.image)) ? e.image : null;
-    // Smaller webp copies when it's a Meetup photo: { small, large } or null.
-    e.photoSizes = meetupPhoto(e.photo);
+    // { small, large } or null. Meetup photos get their small webp copies; any
+    // other image is used as-is for both.
+    const url = e.image && !logos.includes(photoId(e.image)) ? e.image : null;
+    e.photo = url && (meetupPhoto(url) ?? { small: url, large: url });
     // Same street address = same venue, even when it's spelled two ways
     // ("Community Choice Convention Center" vs "...Credit Union Convention Center").
     const street = /^\s*(\d+\s+\S+(?:\s+\S+)?)/.exec(e.address ?? '')?.[1];
