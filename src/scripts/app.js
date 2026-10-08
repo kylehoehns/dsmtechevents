@@ -158,14 +158,11 @@ function squashRepeats() {
 
 // ---- side rail: filter, recent, headliners ----
 function renderSide() {
-  for (const c of $$('.chip')) c.setAttribute('aria-pressed', String(c.dataset.chip === state.group));
-  const note = $('#filter-note');
-  note.hidden = !state.group;
-  if (state.group) note.innerHTML = `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <a href="/groups/#${encodeURIComponent(state.group)}">About the group</a> · <button type="button" data-chip="">Show all groups</button>`;
+  // Filtered to one group: say which, with a way to the group and a way out.
+  $('#filter').hidden = !state.group;
+  if (state.group) $('#filter-note').innerHTML = `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <a href="/groups/#${encodeURIComponent(state.group)}">About the group</a> · <button type="button" data-show-all>Show all groups</button>`;
 
   for (const p of $$('.poster')) p.hidden = !shows(p);
-  // A search covers every group, so the group picker steps aside until it's cleared.
-  $('#filter').hidden = !!state.q;
   // The calendar already shows conference days in pink; skip the posters there.
   const headliners = $('#headliners');
   if (headliners) headliners.hidden = state.view === 'calendar' || $$('.poster', headliners).every((p) => p.hidden);
@@ -389,13 +386,12 @@ document.addEventListener('click', (ev) => {
     return;
   }
 
-  const chip = t.closest('[data-chip]');
-  if (chip) {
-    state.group = chip.dataset.chip;
-    // "Show all groups" lives in the note that this hides; land on the All chip.
-    const fromNote = !!chip.closest('#filter-note');
+  if (t.closest('[data-show-all]')) {
+    state.group = '';
     render();
-    if (fromNote) $('.chip[data-chip=""]').focus();
+    // The button just hid itself with the note; land on the full list.
+    listView.tabIndex = -1;
+    listView.focus();
     announceFilter();
     return;
   }

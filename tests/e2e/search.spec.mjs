@@ -128,7 +128,7 @@ test('a search covers every group and shows the list, even from the calendar', a
   await search(page, 'java');
   await expect(page).toHaveURL(/\?q=java$/);
   await expect(event(page, 'Joint night - JVM vs. CLR')).toBeVisible();
-  await expect(page.getByRole('group', { name: 'Filter by group' })).toBeHidden();
+  await expect(page.locator('#filter')).toBeHidden(); // the search cleared the group filter
   // Back returns to the group filter in one step, not a keystroke at a time.
   await page.goBack();
   await expect(page).toHaveURL(/\?group=pyowa$/);
