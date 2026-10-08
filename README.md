@@ -100,3 +100,11 @@ To refresh events right away instead of waiting for the next scheduled run:
 ```sh
 gh workflow run refresh.yml
 ```
+
+## More docs
+
+- [CONTRIBUTING.md](CONTRIBUTING.md): getting listed, and making a change
+- [AGENTS.md](AGENTS.md): house rules and known traps
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): the data flow, with a diagram
+- [docs/decisions/](docs/decisions/): why it's built this way
+- [SECURITY.md](SECURITY.md): reporting a security problem

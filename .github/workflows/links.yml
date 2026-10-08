@@ -1,0 +1,39 @@
+name: check links
+
+# Once a week, checks the links people click that can quietly rot: each
+# group's Meetup page and website (data/groups.yaml) and each hand-added
+# event's link (data/events.yaml). Meetup event links are not checked; they
+# come fresh from the feed four times a day.
+# If any are broken, scripts/check-links.mjs keeps ONE issue labeled
+# broken-link up to date, and closes it once every link works again.
+# Run it by hand from the Actions tab or with `gh workflow run links.yml`.
+
+on:
+  schedule:
+    # Mondays 14:40 UTC (9:40am Des Moines in summer). Off the hour because
+    # GitHub runs on-the-hour schedules late.
+    - cron: '40 14 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write # opens, updates and closes the broken-link issue
+
+concurrency:
+  group: links
+  cancel-in-progress: false
+
+jobs:
+  links:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: check links and update the broken-link issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/check-links.mjs --issue

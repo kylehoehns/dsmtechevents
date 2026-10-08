@@ -1,0 +1,33 @@
+# Weekly dependency updates. Each one is a normal pull request, so it has to
+# pass the test-and-build check like any other change before it can merge.
+# No `labels:` on purpose: Dependabot's defaults (`dependencies` plus
+# `javascript` or `github_actions`) are created for us, where custom labels
+# would have to exist in the repo first.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    groups:
+      # One PR for every minor and patch update. Major updates still get
+      # their own PR each, since those are the ones that break things.
+      npm-minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    groups:
+      # One PR for all workflow action updates.
+      actions:
+        patterns: ['*']

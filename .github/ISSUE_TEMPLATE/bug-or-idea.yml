@@ -1,0 +1,14 @@
+name: Bug or idea
+description: Something on the site is broken, or you have an idea to make it better.
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, or what's the idea?
+    validations:
+      required: true
+  - type: textarea
+    id: where
+    attributes:
+      label: Where
+      description: For a bug, the page's link, your device and browser, and the steps to see it. A screenshot helps.
