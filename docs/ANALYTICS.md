@@ -42,6 +42,11 @@ Nothing else is stored: no IP address, user agent, referrer or cookie.
   bodies over 1 KB (413), and more than 30 posts a minute from one address
   (429, the `CLICK_LIMIT` binding). The address is only an in-memory
   counter key and is never stored.
+- The rate limit is loose: Cloudflare counts per location and catches up
+  late, so a fast burst gets mostly through (tested at launch: 4 of 150
+  rapid posts got 429). It stops a sustained flood, not a burst. For a hard
+  cap, add a WAF rate-limiting rule for `/api/click` on the
+  dsmtechevents.com zone (the free plan includes one).
 - Someone scripting fake clicks slowly can still nudge the counts. Treat
   them as a rough signal, not an audit.
 
@@ -60,6 +65,9 @@ curl -s "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT/analytics_engine
       GROUP BY group, kind
       ORDER BY clicks DESC"
 ```
+
+Launch-day test clicks have `blob3 = 'smoke-test'`; add
+`AND blob3 != 'smoke-test'` to leave them out.
 
 `SUM(_sample_interval)` rather than `COUNT()`: Analytics Engine may sample at
 high volume, and this corrects for it. Data is kept for three months.
