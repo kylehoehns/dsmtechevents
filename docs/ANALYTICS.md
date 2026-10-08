@@ -57,7 +57,7 @@ Every Monday, `.github/workflows/site-report.yml` runs
 (**Actions → site report → the latest run**): visits and page views with the
 week-on-week change, visits per day, top pages, where visits come from and
 phone vs computer (Cloudflare Web Analytics), then the outbound clicks above
-(per group for 7 and 30 days, top events, which links get used). Run it any
+(per group for 7 and 30 days, the listings people clicked through to, which links get used). Run it any
 time with `gh workflow run site-report.yml`. It needs a repository secret
 `CF_ANALYTICS_TOKEN`: a Cloudflare API token with **Account Analytics: Read**.
 
