@@ -106,7 +106,7 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
   // Group facts from Meetup: kept from the last run if this one missed them,
   // and left out when unknown so files without them don't change.
   const facts = {};
-  for (const k of ['typical', 'usual', 'members', 'pastCount']) {
+  for (const k of ['typical', 'members', 'pastCount']) {
     const v = fresh[k] ?? previous[k];
     if (v != null) facts[k] = v;
   }

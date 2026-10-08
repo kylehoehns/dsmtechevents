@@ -19,7 +19,6 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import YAML from 'yaml';
 import { meetupSlug } from '../src/lib/meetup.mjs';
-import { usualNight } from '../src/lib/pattern.mjs';
 import secdsm from './sources/secdsm.mjs';
 import pmiChapter from './sources/pmi-chapter.mjs';
 import { parseFeed, parseEventsPage, enrich, mergeCache, typicalGoing } from './sources/meetup.mjs';
@@ -87,10 +86,7 @@ async function fetchFeed(group, now, cutoff) {
       logo = details.logo;
       recent = enrich(upcoming, details, group, { now, cutoff });
       typical = typicalGoing(details, now);
-      // The page lists ~10 past events plus upcoming ones: enough history to
-      // see a group's usual night.
-      const starts = [...details.events.values()].filter((e) => e.status !== 'CANCELLED').map((e) => e.start);
-      facts = { members: details.members, pastCount: details.pastCount, usual: usualNight(starts) };
+      facts = { members: details.members, pastCount: details.pastCount };
       enriched = true;
     } catch (err) {
       console.warn(`  ${group.id}: enrichment skipped (${err.message})`);
