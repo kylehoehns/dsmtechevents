@@ -30,7 +30,7 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   foldSeries(upcoming);
   const archive = readArchive(dataDir);
   const archived = {};
-  for (const r of archive) if (!(archived[r.group] >= r.start)) archived[r.group] = r.start;
+  for (const r of archive) if (r.group && !(archived[r.group] >= r.start)) archived[r.group] = r.start;
   for (const g of groups) {
     summarize(g, upcoming, past, now);
     markQuiet(g, archived[g.id], now);
@@ -102,8 +102,9 @@ function readGroup(g, dataDir) {
   };
 }
 
-// A hand-added event from events.yaml, in the cache's shape.
-function manualEvent(e) {
+// A hand-added event from events.yaml, in the cache's shape. The fetch uses
+// it too, to archive ended ones (scripts/archive.mjs).
+export function manualEvent(e) {
   if ('featured' in e) throw new Error(`events.yaml: "${e.title}" uses featured:, which is now headliner:`);
   const startDate = String(e.start);
   const endDate = String(e.end ?? e.start);

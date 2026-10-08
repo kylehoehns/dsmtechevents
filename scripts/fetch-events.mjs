@@ -25,6 +25,7 @@ import taiTechbrew from './sources/tai-techbrew.mjs';
 import iowansOfThings from './sources/iowans-of-things.mjs';
 import { parseFeed, parseEventsPage, enrich, mergeCache } from './sources/meetup.mjs';
 import { updateArchive } from './archive.mjs';
+import { manualEvent } from '../src/lib/data.mjs';
 import { safeLinks } from './sources/html.mjs';
 import { sourceStatus } from './source-status.mjs';
 
@@ -74,7 +75,9 @@ for (const f of await fs.readdir(archiveDir)) {
   if (f.endsWith('.json')) archive[f.slice(0, -5)] = JSON.parse(await fs.readFile(path.join(archiveDir, f), 'utf8'));
 }
 const caches = Object.fromEntries(await Promise.all(groups.map(async (g) => [g.id, await readCache(g.id)])));
-for (const [year, list] of Object.entries(updateArchive(archive, caches, Date.now()))) {
+// Hand-added events (conferences) are archived too once they end.
+const manual = (YAML.parse(await fs.readFile(path.join(root, 'data/events.yaml'), 'utf8')) ?? []).map(manualEvent);
+for (const [year, list] of Object.entries(updateArchive(archive, caches, Date.now(), manual))) {
   await fs.writeFile(path.join(archiveDir, `${year}.json`), JSON.stringify(list, null, 1) + '\n');
   console.log(`archive ${year}: ${list.length} events`);
 }
@@ -86,6 +89,7 @@ async function fetchGroup(group) {
   const now = Date.now();
   const cutoff = now - BACKFILL_DAYS * 86_400_000;
 
+  const previous = await readCache(group.id);
   let fresh;
   if (group.source) {
     const read = SOURCES[group.source];
@@ -93,20 +97,21 @@ async function fetchGroup(group) {
     const events = (await read(group, { get, now, since: cutoff })).filter((e) => Date.parse(e.end) >= cutoff);
     fresh = { events, logo: group.logo ?? null };
   } else {
-    fresh = await fetchFeed(group, now, cutoff);
+    const hadUpcoming = previous.events.filter((e) => Date.parse(e.end) >= now).length;
+    fresh = await fetchFeed(group, now, cutoff, hadUpcoming);
   }
 
   fresh.events = safeLinks(fresh.events, group);
-  return { ...mergeCache(await readCache(group.id), fresh, { now, cutoff }), enrichError: fresh.enrichError };
+  return { ...mergeCache(previous, fresh, { now, cutoff }), enrichError: fresh.enrichError };
 }
 
 // Meetup groups and plain iCal feeds.
-async function fetchFeed(group, now, cutoff) {
+async function fetchFeed(group, now, cutoff, hadUpcoming) {
   const slug = meetupSlug(group.meetup);
   const feedUrl = group.ical ?? (slug && meetupUrl(slug, 'events/ical/'));
   if (!feedUrl) throw new Error('needs a meetup, ical or source entry');
 
-  const upcoming = parseFeed(await get(feedUrl), group, { slug, now });
+  const upcoming = parseFeed(await get(feedUrl), group, { slug, now, hadUpcoming });
 
   let recent = [];
   let logo = null;
