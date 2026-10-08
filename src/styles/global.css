@@ -280,7 +280,7 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .desc p:last-child { margin: 0; }
 .desc h4 { margin: 12px 0 4px; font: 800 16px/1 var(--display); text-transform: uppercase; }
 .desc a { color: var(--link-t); }
-.desc-photo { display: block; width: 100%; max-width: 520px; height: auto; margin: 0 0 10px; border: 1.5px solid var(--line); background: var(--paper); }
+.desc-photo { display: block; width: 100%; max-width: 520px; height: auto; margin: 0 auto 12px; border: 1.5px solid var(--line); background: var(--paper); }
 
 /* event photos in their own colors: they're each group's flyer art */
 .ink { overflow: hidden; background: var(--paper-2); border: 1.5px solid var(--line); }
@@ -302,9 +302,8 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   .acts, .desc { grid-column: 2 / -1; }
   .show.has-photo .acts { grid-column: 2; }
   .show.has-photo:not(.open) .desc-photo { display: none; } /* the thumbnail is already showing it */
-  /* open: the photo moves from the right column into the About section (app.js animates it) */
-  .show.has-photo.open { grid-template-columns: 70px minmax(0, 1fr); }
-  .show.has-photo.open .photo { display: none; }
+  /* open: the photo moves into the About section (app.js animates it); its column stays put so nothing reflows */
+  .show.has-photo.open .photo { visibility: hidden; }
 }
 
 /* conference rows: a solid pink slab */
@@ -468,8 +467,8 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 }
 .install-hint button { border: 0; background: none; color: inherit; font-size: 16px; padding: 4px; margin-left: auto; }
 
-::view-transition-group(about-photo) { animation-duration: 0.35s; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.2s; }
+/* the copy of a photo that flies between the thumbnail and About (app.js) */
+.about-ghost { position: fixed; z-index: 60; margin: 0; transform-origin: 0 0; pointer-events: none; object-fit: contain; border: 1.5px solid var(--line); background: var(--paper); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transform: none !important; scroll-behavior: auto !important; }
   .mis::before { transform: translate(3px, 2px) !important; }

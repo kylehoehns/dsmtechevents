@@ -398,31 +398,81 @@ addEventListener('popstate', () => {
 
 render();
 
-// About: on desktop the photo on the right grows into the About section and
-// shrinks back when it closes. Both images get the same view-transition name
-// for the swap, and the browser animates one into the other. Browsers without
-// view transitions, phones (no thumbnail) and reduced motion just toggle.
-function toggleAbout(more) {
+// About opens and closes smoothly: the panel's height animates, and on
+// desktop a copy of the photo flies between the thumbnail on the right and its
+// full-size spot in the panel, both ways. The layout itself never jumps: the
+// thumbnail keeps its column (just hidden) while the panel is open.
+// Reduced motion gets the plain toggle.
+const EASE = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
+const MS = 380;
+
+async function toggleAbout(more) {
   const card = more.closest('.show');
+  if (card.dataset.animating) return;
   const desc = $('.desc', card);
   const open = more.getAttribute('aria-expanded') !== 'true';
-  const apply = () => {
-    more.setAttribute('aria-expanded', String(open));
-    desc.hidden = !open;
-    card.classList.toggle('open', open);
+  const set = (isOpen) => {
+    more.setAttribute('aria-expanded', String(isOpen));
+    desc.hidden = !isOpen;
+    card.classList.toggle('open', isOpen);
   };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return set(open);
+
   const thumb = $('.photo img', card);
   const big = $('.desc-photo', card);
-  const animate = document.startViewTransition && thumb?.offsetParent && big
-    && !matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!animate) return apply();
+  const fly = thumb?.offsetParent && big;
+  card.dataset.animating = '1';
+  try {
+    if (open) {
+      if (fly) { big.loading = 'eager'; await big.decode().catch(() => {}); }
+      const from = fly && thumb.getBoundingClientRect();
+      set(true);
+      const grow = slide(desc, true);
+      if (fly) await flyImage(big, from, big.getBoundingClientRect(), { rotate: [rotation(thumb), 0], hide: [big] });
+      await grow;
+    } else {
+      const from = fly && big.getBoundingClientRect();
+      const to = fly && thumb.getBoundingClientRect(); // the thumbnail keeps its spot while hidden
+      const shrink = slide(desc, false);
+      if (fly) await flyImage(big, from, to, { rotate: [0, rotation(thumb)], hide: [big, thumb] });
+      await shrink;
+      set(false);
+    }
+  } finally {
+    delete card.dataset.animating;
+  }
+}
 
-  const [from, to] = open ? [thumb, big] : [big, thumb];
-  from.style.viewTransitionName = 'about-photo';
-  const swap = document.startViewTransition(() => {
-    from.style.viewTransitionName = '';
-    apply();
-    to.style.viewTransitionName = 'about-photo';
+// Animate a panel's height, padding and margin between 0 and its natural size.
+function slide(el, opening) {
+  const cs = getComputedStyle(el);
+  const full = { height: cs.height, paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, marginTop: cs.marginTop, opacity: 1 };
+  const none = { height: '0px', paddingTop: '0px', paddingBottom: '0px', marginTop: '0px', opacity: 0 };
+  el.style.overflow = 'hidden';
+  const anim = el.animate(opening ? [none, full] : [full, none], { duration: MS, easing: EASE, fill: 'forwards' });
+  return anim.finished.then(() => { anim.cancel(); el.style.overflow = ''; });
+}
+
+// Fly a copy of `img` from one box to another above the page, hiding the real
+// images until it lands.
+function flyImage(img, from, to, { rotate, hide }) {
+  const ghost = img.cloneNode();
+  ghost.removeAttribute('loading');
+  ghost.className = 'about-ghost';
+  ghost.alt = '';
+  Object.assign(ghost.style, { left: `${to.left}px`, top: `${to.top}px`, width: `${to.width}px`, height: `${to.height}px` });
+  document.body.append(ghost);
+  for (const el of hide) el.style.visibility = 'hidden';
+  const at = (r, deg) => `translate(${r.left - to.left}px, ${r.top - to.top}px) scale(${r.width / to.width}, ${r.height / to.height}) rotate(${deg}deg)`;
+  const anim = ghost.animate([{ transform: at(from, rotate[0]) }, { transform: at(to, rotate[1]) }], { duration: MS, easing: EASE });
+  return anim.finished.then(() => {
+    for (const el of hide) el.style.visibility = '';
+    ghost.remove();
   });
-  swap.finished.finally(() => { to.style.viewTransitionName = ''; });
+}
+
+// The thumbnail is printed slightly crooked (see .photo .ink in the CSS).
+function rotation(thumb) {
+  const m = new DOMMatrix(getComputedStyle(thumb.closest('.ink')).transform);
+  return Math.round(Math.atan2(m.b, m.a) * (180 / Math.PI) * 10) / 10;
 }
