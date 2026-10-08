@@ -50,7 +50,8 @@ const featured = upcoming.filter((e) => e.featured && daysOutOf(e) <= HEADLINER_
 const daysOut = daysOutOf;
 
 const counts = Object.fromEntries(groups.map((g) => [g.id, listed.filter((e) => e.groupIds.includes(g.id)).length]));
-const filterGroups = [...groups].sort((a, b) => counts[b.id] - counts[a.id] || a.short.localeCompare(b.short));
+// Only groups with something coming up get a chip; the groups page lists them all.
+const filterGroups = groups.filter((g) => counts[g.id] > 0).sort((a, b) => counts[b.id] - counts[a.id] || a.short.localeCompare(b.short));
 const PAST_SHOWN = 8;
 
 const calendarData = {
@@ -101,7 +102,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         <div class="chips" role="group" aria-label="Filter by group">
           <button type="button" class="chip" data-chip="" aria-pressed="true">All groups <span class="n">{listed.length}</span></button>
           {filterGroups.map((g) => (
-            <button type="button" class:list={['chip', { idle: !counts[g.id] }]} data-chip={g.id} aria-pressed="false" title={g.name}>{g.short} <span class="n">{counts[g.id]}</span></button>
+            <button type="button" class="chip" data-chip={g.id} aria-pressed="false" title={g.name}>{g.short} <span class="n">{counts[g.id]}</span></button>
           ))}
         </div>
         <p class="filter-note" id="filter-note" hidden></p>
