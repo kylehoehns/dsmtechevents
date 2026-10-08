@@ -4,7 +4,7 @@ DSM Tech Events lists every public Des Moines tech meetup, user group and confer
 
 ## Shipping a change
 
-- Every change is a branch and a pull request. `main` has a ruleset: no direct pushes, and a PR merges only once the `test-and-build` check is green. Wait for it, then `gh pr merge --merge --delete-branch`.
+- Every change is a branch and a pull request. `main` has a ruleset: no direct pushes, and a PR merges only once the `test-and-build` and `e2e` checks are green. Wait for them, then `gh pr merge --merge --delete-branch`.
 - Production deploys itself: Cloudflare Workers Builds deploys `main`, and every PR branch gets a preview at `<branch>-dsmtechevents.kyhoehns.workers.dev`. Deploy only through GitHub. The working dashboard settings are recorded in the comment at the top of `wrangler.jsonc`.
 - `npm run build` runs the tests first, so a red test stops CI, Cloudflare and the data refresh alike.
 - PR descriptions follow the owner's `pr` skill template (Summary, Evidence, Undo and Impact; 400 words max), written for a junior developer. Commit messages carry no trailers.
