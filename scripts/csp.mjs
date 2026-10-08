@@ -17,9 +17,10 @@ import path from 'node:path';
 
 export const PLACEHOLDER = "'inline-script-hashes'";
 
-// Script types a browser runs; JSON and JSON-LD blocks are data, which CSP
-// doesn't apply to.
-const RUNS = /^(?:|module|text\/javascript|application\/javascript)$/i;
+// Script types CSP applies to: ones a browser runs, plus speculation rules
+// (Chrome checks them against script-src too). JSON and JSON-LD blocks are
+// data, which CSP doesn't apply to.
+const RUNS = /^(?:|module|text\/javascript|application\/javascript|speculationrules)$/i;
 
 // The bodies of the inline scripts a browser would run.
 export function inlineScripts(html) {
