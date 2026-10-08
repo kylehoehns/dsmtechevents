@@ -128,7 +128,10 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 /* ---------- headliners (conferences in the next 30 days) ----------
    Phone: one slim strip each above the list, so this week stays on screen.
    Desktop: small posters at the top of the side rail. */
-.headliners { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-top: 12px; margin-right: -16px; padding-right: 16px; }
+/* overflow-x: auto quietly makes the strip scrollable up/down too when the tape
+   and tilted corners stick out, so a diagonal swipe wobbled it. Lock it to
+   sideways, leave room for the tape and tilt, and keep swipes in the strip. */
+.headliners { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: 12px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; padding-top: 18px; padding-bottom: 6px; margin-right: -16px; padding-right: 16px; }
 .headliners::-webkit-scrollbar { display: none; }
 .headliners:has(.poster + .poster) { grid-auto-columns: 86%; }
 .headliners .poster { scroll-snap-align: start; }
