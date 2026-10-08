@@ -29,6 +29,9 @@
   // them here silences the deploy warning and keeps them from changing.
   "workers_dev": true,
   "preview_urls": true,
+  // `wrangler preview` (the Previews Base command) refuses to run without
+  // this block. Empty is fine: previews use the top-level settings.
+  "previews": {},
   "assets": {
     "directory": "dist",
     // /groups serves /groups/index.html; unknown paths get the real 404 page
