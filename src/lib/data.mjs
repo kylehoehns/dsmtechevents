@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 import { meetupSlug, meetupPhoto } from './meetup.mjs';
-import { dayKey, weekday, fmt } from './format.mjs';
+import { dayKey, lastDay, weekday, fmt } from './format.mjs';
 import { localToUtc } from './time.mjs';
 
 // Tests pass their own data folder and clock.
@@ -61,7 +61,7 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
   const events = [...merged.values()]
     .map((e) => ({
       ...e,
-      multiDay: e.multiDay ?? dayKey(e.start) !== dayKey(e.end),
+      multiDay: e.multiDay ?? dayKey(e.start) !== lastDay(e.start, e.end),
       tags: e.tags ?? [],
       fullAddress: e.address ?? null, // the short one is for people, this one is for search engines
       address: shortAddress(e.address),
@@ -113,7 +113,8 @@ export function loadData({ dataDir = path.resolve('data'), now = Date.now() } = 
   const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
   for (const g of groups) {
     g.nextEvent = upcoming.find((e) => e.groupIds.includes(g.id)) ?? null;
-    g.upcomingCount = upcoming.filter((e) => e.groupIds.includes(g.id)).length;
+    // Matches the filter chip: a repeating series counts once, like its row.
+    g.upcomingCount = upcoming.filter((e) => !e.repeat && e.groupIds.includes(g.id)).length;
     g.lastEvent = past.find((e) => e.groupIds.includes(g.id)) ?? null;
     // Show the full name only when it adds something. "Web Geeks" / "DSM Web
     // Geeks" and "Data & Analytics" / "Des Moines Data & Analytics" say the
@@ -140,7 +141,7 @@ export function shortAddress(a) {
   if (!a) return a ?? null;
   return a
     .replace(/,+/g, ',')
-    .replace(/,?\s*(IA|Iowa)\s*\d{5}(-\d{4})?\s*$/i, '')
+    .replace(/(?:,|\s)\s*(IA|Iowa)(\s*\d{5}(-\d{4})?)?\s*$/i, '') // the ZIP is optional (TAI omits it)
     .replace(/,\s*Des Moines\s*$/i, '')
     .trim();
 }

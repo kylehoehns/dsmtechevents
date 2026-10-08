@@ -1,9 +1,13 @@
 import { site } from './site.mjs';
 
 // "2026-10-15" + "08:00" in Des Moines time → UTC ISO string.
+// The offset is read twice: first at the wall time taken as UTC, then at the
+// resulting instant, which lands on the right side of a DST switch (a 3am
+// start on the fall-back Sunday would otherwise come out an hour early).
 export function localToUtc(date, time = '00:00') {
-  const guess = new Date(`${date}T${time}:00Z`);
-  return new Date(guess.getTime() - tzOffsetMinutes(guess) * 60_000).toISOString();
+  const wall = Date.parse(`${date}T${time}:00Z`);
+  const first = wall - tzOffsetMinutes(new Date(wall)) * 60_000;
+  return new Date(wall - tzOffsetMinutes(new Date(first)) * 60_000).toISOString();
 }
 
 function tzOffsetMinutes(date) {

@@ -102,7 +102,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 }
 .theme-btn svg { width: 22px; height: 22px; display: none; }
 :root:not([data-theme]) .theme-btn .i-auto, [data-theme="light"] .theme-btn .i-light, [data-theme="dark"] .theme-btn .i-dark { display: block; }
-.theme-btn:hover { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
 /* logo and nav share one row on desktop; the nav wraps under the logo on phones */
 .mast-body { display: grid; gap: 10px; padding: 14px 0 12px; border-bottom: 6px double var(--line); }
 .mast-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
@@ -123,7 +122,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   padding: 8px 12px 7px; border: 2px solid var(--line); margin: 0 -2px -2px 0; background: var(--paper);
 }
 .nav a[aria-current="page"] { background: var(--ink); color: var(--paper); }
-.nav a:hover:not([aria-current="page"]) { background: var(--pink-fill); color: var(--on-pink); }
 
 /* ---------- headliners (conferences in the next 30 days) ----------
    Phone: one slim strip each above the list, so this week stays on screen.
@@ -157,8 +155,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   .headliners .poster .stamp-days { position: static; order: 2; margin: 10px 6px 4px auto; }
 }
 .poster .go { display: inline-block; font: 800 15px/1 var(--display); text-transform: uppercase; text-decoration: none; border: 2px solid currentColor; padding: 7px 11px 6px; }
-.poster .go:hover { background: var(--on-pink); color: var(--pink-fill); border-color: var(--on-pink); }
-.poster.blue .go:hover { background: var(--on-blue); color: var(--blue-fill); border-color: var(--on-blue); }
 .poster .halftone {
   position: absolute; inset: 0; pointer-events: none; opacity: 0.2;
   background: radial-gradient(circle, currentColor 1.1px, transparent 1.6px) 0 0/7px 7px;
@@ -222,8 +218,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .chip .n { font-weight: 400; color: var(--ink-soft); }
 .chip[aria-pressed="true"] { background: var(--blue-fill); color: var(--on-blue); border-color: var(--blue-fill); }
 .chip[aria-pressed="true"] .n { color: var(--on-blue); }
-.chip:hover:not([aria-pressed="true"]) { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
-.chip:hover:not([aria-pressed="true"]) .n { color: var(--on-pink); }
 @media (min-width: 1060px) {
   .filter { padding: 10px 0 12px; }
   .chips { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; }
@@ -257,7 +251,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .band { margin: 0; display: flex; flex-wrap: wrap; gap: 0 8px; align-items: baseline; }
 .band a, .band span.b { font: 900 24px/0.95 var(--display); text-transform: uppercase; text-decoration: none; }
 @media (max-width: 759px) { .band a { padding-top: 4px; margin-top: -4px; } } /* 24px+ tap target, same layout; grows up, away from the title link below */
-.band a:hover { color: var(--blue-t); text-decoration: underline; text-decoration-thickness: 2px; }
 .band .with { font: 500 11.5px/1.2 var(--mono); color: var(--ink-soft); }
 .series {
   display: inline-block; margin: 4px 0 2px; font: 600 12px/1.3 var(--mono);
@@ -266,12 +259,10 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .series b { font: 800 14px/1 var(--display); text-transform: uppercase; color: var(--blue-t); margin-right: 4px; }
 .title { margin: 3px 0; font: 600 16.5px/1.3 var(--sans); text-wrap: pretty; overflow-wrap: anywhere; }
 .title a { text-decoration: none; }
-.title a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .meta { margin: 0; font: 13px/1.45 var(--mono); }
 .meta .t { font-weight: 700; }
 .meta .addr { color: var(--ink-soft); }
 .meta a.map { color: inherit; text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.meta a.map:hover { text-decoration-style: solid; }
 .meta .tag-online { font-weight: 600; background: var(--paper-2); padding: 0 4px; }
 .show.addr-seen .meta .addr { display: none; }
 
@@ -289,7 +280,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   display: inline-flex; align-items: center; gap: 8px; font: 800 16px/1 var(--display); text-transform: uppercase;
   text-decoration: none; background: var(--ink); color: var(--paper); padding: 7px 10px 6px;
 }
-.rsvp:hover { background: var(--blue-fill); color: var(--on-blue); }
 .rsvp span { font: 700 13px/1 var(--mono); }
 .more { background: none; border: 0; padding: 4px 0; min-height: 24px; margin-block: -1.75px; /* 24px target, old 20.5px footprint */ font: 600 12.5px/1 var(--mono); text-decoration: underline; text-underline-offset: 3px; }
 .more::before { content: "+ "; content: "+ " / ""; font-weight: 700; }
@@ -348,7 +338,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .setlist li { display: grid; grid-template-columns: 50px minmax(0, 1fr) auto; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--rule-soft); }
 .setlist .d { font-weight: 700; white-space: nowrap; }
 .setlist a { text-decoration: none; min-width: 0; }
-.setlist a:hover .tt { text-decoration: underline; }
 .setlist .g { display: block; font: 800 15px/1.1 var(--display); text-transform: uppercase; }
 .setlist .tt { display: block; }
 .setlist .v { display: block; color: var(--ink-soft); }
@@ -363,7 +352,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .recent li.extra { display: none; }
 .recent .setlist.open li.extra { display: grid; }
 .recent .all { margin-top: 10px; font: 800 15px/1 var(--display); text-transform: uppercase; background: transparent; border: 1.5px solid var(--line); padding: 6px 10px 5px; }
-.recent .all:hover { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
 @media (min-width: 1060px) { .recent { margin-top: 0; } }
 
 /* ---------- mini month (desktop rail) ---------- */
@@ -378,8 +366,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .mini-grid button.conf::after { background: var(--on-pink); }
 .mini-grid button.today { outline: 2px solid var(--line); outline-offset: -2px; }
 .mini-grid button.past { color: var(--ink-soft); }
-.mini-grid button:hover { background: var(--paper-2); }
-.mini-grid button.conf:hover { background: var(--pink-fill); }
 
 /* ---------- calendar view ---------- */
 .cal-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 10px; margin-bottom: 8px; }
@@ -387,7 +373,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .cal-head h2 span { font-size: 0.4em; color: var(--blue-t); margin-left: calc(6px - 0.22em); } /* minus the space before the year */
 .cal-nav { display: flex; }
 .cal-nav button { border: 2px solid var(--line); background: var(--paper); min-width: 44px; height: 40px; padding: 0 10px; margin-left: -2px; font: 800 16px/1 var(--display); text-transform: uppercase; }
-.cal-nav button:hover { background: var(--pink-fill); color: var(--on-pink); }
 @media (max-width: 359px) { .cal-nav button { min-width: 36px; height: 36px; padding: 0 7px; } }
 .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 2px solid var(--line); border-left: 2px solid var(--line); }
 .grid .wd { font: 700 11.5px/1 var(--mono); text-transform: uppercase; padding: 6px 5px; border-right: 2px solid var(--line); border-bottom: 2px solid var(--line); background: var(--head-fill); color: #f3ede1; }
@@ -400,10 +385,8 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .day.outside { color: var(--ink-soft); background: var(--paper-2); }
 .day.past:not(.outside) .n { color: var(--ink-soft); }
 .day.today .n { background: var(--ink); color: var(--paper); padding: 2px 4px 0; align-self: flex-start; }
-.day.has:hover { background: var(--paper-2); }
 .day.conf { background: var(--pink-fill); color: var(--on-pink); }
 .day.conf .n { color: var(--on-pink); }
-.day.conf:hover { background: var(--pink-fill); }
 .day[aria-pressed="true"] { outline: 4px solid var(--blue-t); outline-offset: -4px; }
 .day.conf[aria-pressed="true"], .day.conf:focus-visible { outline-color: var(--on-pink); }
 .day .pills { display: none; }
@@ -458,7 +441,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 .flyer .last { grid-column: 1 / -1; margin: 6px 0 0; font: 11.5px/1.3 var(--mono); color: var(--ink-soft); }
 .flyer .links { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
 .flyer .links a { font: 800 15px/1 var(--display); text-transform: uppercase; text-decoration: none; border: 1.5px solid var(--line); padding: 6px 9px 5px; }
-.flyer .links a:hover { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
 .flyer .links .primary { background: var(--ink); color: var(--paper); }
 
 /* ---------- misc pages ---------- */
@@ -490,7 +472,6 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
 @media (min-width: 760px) { .foot .wrap { grid-template-columns: 1fr auto; align-items: end; } }
 .foot .big { font: 900 clamp(36px, 9vw, 64px)/0.85 var(--display); text-transform: uppercase; margin: 0; }
 .foot .big a { text-decoration: none; background: var(--pink-fill); color: var(--on-pink); padding: 2px 8px 0; display: inline-block; transform: rotate(-1deg); }
-.foot .big a:hover { background: var(--on-blue); color: var(--blue-fill); }
 .foot p { margin: 0; font-size: 13.5px; }
 .foot :focus-visible { outline-color: var(--on-blue); }
 @media (min-width: 760px) { .foot .fine { text-align: right; } }
@@ -512,4 +493,28 @@ html.has-hint { scroll-padding-bottom: 96px; } /* keep focus out from under the 
   .mis::before { transform: translate(3px, 2px) !important; }
   .logo .mis::before { transform: translate(5px, 4px) !important; }
   .refresh-note { transform: translateX(-50%) !important; }
+}
+
+/* Hover styles only where there's a real pointer. Phones keep :hover stuck on
+   whatever was last tapped (a group name stayed blue and underlined). */
+@media (hover: hover) {
+  .theme-btn:hover { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
+  .nav a:hover:not([aria-current="page"]) { background: var(--pink-fill); color: var(--on-pink); }
+  .poster .go:hover { background: var(--on-pink); color: var(--pink-fill); border-color: var(--on-pink); }
+  .poster.blue .go:hover { background: var(--on-blue); color: var(--blue-fill); border-color: var(--on-blue); }
+  .chip:hover:not([aria-pressed="true"]) { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
+  .chip:hover:not([aria-pressed="true"]) .n { color: var(--on-pink); }
+  .band a:hover { color: var(--blue-t); text-decoration: underline; text-decoration-thickness: 2px; }
+  .title a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .meta a.map:hover { text-decoration-style: solid; }
+  .rsvp:hover { background: var(--blue-fill); color: var(--on-blue); }
+  .setlist a:hover .tt { text-decoration: underline; }
+  .recent .all:hover { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
+  .mini-grid button:hover { background: var(--paper-2); }
+  .mini-grid button.conf:hover { background: var(--pink-fill); }
+  .cal-nav button:hover { background: var(--pink-fill); color: var(--on-pink); }
+  .day.has:hover { background: var(--paper-2); }
+  .day.conf:hover { background: var(--pink-fill); }
+  .flyer .links a:hover { background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); }
+  .foot .big a:hover { background: var(--on-blue); color: var(--blue-fill); }
 }

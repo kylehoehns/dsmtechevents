@@ -37,6 +37,7 @@ const slides = await Promise.all(events.map(async (e) => ({
     <div class="tv-stage">
       <section class="slide overview is-on">
         <h1 class="mis" data-t="Coming up">Coming up</h1>
+        <p class="tv-empty" hidden>Nothing on the calendar right now. New events show up here as groups post them.</p>
         <ol>
           {slides.slice(0, 7).map(({ e, hosts }) => (
             <li class:list={{ conf: e.featured }} data-end={e.end}>
@@ -106,6 +107,7 @@ const slides = await Promise.all(events.map(async (e) => ({
 
   .overview { flex-direction: column; gap: 2vh; padding-top: 3vh; }
   .overview h1 { margin: 0; font: 900 9vh/0.85 var(--display); text-transform: uppercase; color: var(--ink); }
+  .tv-empty { margin: 0; font: 600 3.4vh/1.3 var(--sans); color: var(--soft); }
   .overview ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.4vh; }
   .overview li { display: grid; grid-template-columns: 14vw 14vw 1fr auto; align-items: baseline; gap: 2vw; padding-bottom: 1.2vh; border-bottom: 2px dashed #5d5966; font-size: 3.2vh; }
   .overview li.conf .t { color: var(--pink); }
@@ -173,6 +175,8 @@ const slides = await Promise.all(events.map(async (e) => ({
       tag.textContent = label;
       tag.hidden = !label;
     }
+    const empty = document.querySelector<HTMLElement>('.tv-empty')!;
+    empty.hidden = !!document.querySelector('.overview li');
     clock.textContent = clockFmt.format(new Date());
   }
 
@@ -199,7 +203,12 @@ const slides = await Promise.all(events.map(async (e) => ({
   function next() {
     // Reload between slides once an hour, to pick up new events.
     if (Date.now() - loadedAt > RELOAD_MS && index === slides.length - 1) return location.reload();
-    show(index + 1);
+    // refresh() may remove ended slides, so step from where the current one
+    // ends up rather than by position (which would skip a slide).
+    const current = slides[index];
+    refresh();
+    const at = [...document.querySelectorAll<HTMLElement>('.slide')].indexOf(current);
+    show(at < 0 ? index : at + 1);
   }
 
   document.addEventListener('keydown', (e) => {

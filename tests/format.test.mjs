@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { dayKey, weekday, shortTime, shortRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
+import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
 test('dates are Des Moines dates, not UTC dates', () => {
   // 6:30pm Monday in Des Moines is already Tuesday in UTC.
@@ -90,4 +91,23 @@ test('month and day names, and plurals', () => {
   assert.equal(plural(3, 'event'), '3 events');
   assert.equal(addDays('2026-11-01', 1), '2026-11-02');
   assert.equal(daysBetween('2026-10-31', '2026-11-02'), 2);
+});
+
+test('localToUtc gets early-morning times right on DST switch days', () => {
+  assert.equal(localToUtc('2026-11-01', '03:00'), '2026-11-01T09:00:00.000Z', '3am CST, after fall-back');
+  assert.equal(localToUtc('2026-11-01', '05:30'), '2026-11-01T11:30:00.000Z');
+  assert.equal(localToUtc('2027-03-14', '04:00'), '2027-03-14T09:00:00.000Z', '4am CDT, after spring-forward');
+});
+
+test('an event ending at midnight is a one-day event', () => {
+  assert.equal(lastDay('2026-10-23T02:00:00.000Z', '2026-10-23T05:00:00.000Z'), '2026-10-22', '9p–12a CDT');
+  assert.equal(lastDay('2026-10-15T13:00:00.000Z', '2026-10-16T22:00:00.000Z'), '2026-10-16');
+});
+
+test('isDayKey accepts only real dates', () => {
+  assert.equal(isDayKey('2026-10-22'), true);
+  assert.equal(isDayKey('2026-13-45'), false);
+  assert.equal(isDayKey('2026-02-30'), false);
+  assert.equal(isDayKey('yesterday'), false);
+  assert.equal(isDayKey(null), false);
 });

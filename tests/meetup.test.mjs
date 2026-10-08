@@ -79,6 +79,7 @@ test('enrich fills feed events from the page and adds recent past events', () =>
 
   assert.equal(upcoming[0].going, 20);
   assert.equal(upcoming[0].venue, 'Online');
+  assert.equal(upcoming[0].title, '.NET@Noon - Build a Voice Agent', "the feed's title wins over the page's");
   assert.deepEqual(recent.map((e) => e.id), ['iadnug-299999990'], 'cancelled and older-than-cutoff events are left out');
 });
 
@@ -131,4 +132,19 @@ test('mergeCache keeps the typical turnout and leaves it out when unknown', () =
   assert.ok(!('typical' in mergeCache({ events: [] }, { events: [], enriched: true }, { now, cutoff })));
   const facts = mergeCache({ events: [], members: 300 }, { events: [], members: 326, pastCount: 19, enriched: true }, { now, cutoff });
   assert.deepEqual([facts.members, facts.pastCount], [326, 19]);
+});
+
+test('enrich drops an upcoming event the page says is cancelled, and ignores missing page fields', () => {
+  const upcoming = [
+    { id: 'g-1', sourceId: '1', title: 'Kept', start: '2026-10-20T23:00:00Z', end: '2026-10-21T01:00:00Z' },
+    { id: 'g-2', sourceId: '2', title: 'Called off', start: '2026-10-21T23:00:00Z', end: '2026-10-22T01:00:00Z' },
+  ];
+  const details = { events: new Map([
+    ['1', { title: undefined, going: 7, venue: undefined, status: 'ACTIVE', end: '2026-10-21T01:00:00Z' }],
+    ['2', { status: 'CANCELLED', end: '2026-10-22T01:00:00Z' }],
+  ]) };
+  enrich(upcoming, details, { id: 'g' }, { now, cutoff });
+  assert.deepEqual(upcoming.map((e) => e.title), ['Kept']);
+  assert.equal(upcoming[0].going, 7);
+  assert.ok(!('venue' in upcoming[0]), 'an undefined page field does not overwrite');
 });
