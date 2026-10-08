@@ -82,3 +82,20 @@ test('group logos and TV photos work offline without opening those pages first',
   await page.goto('/tv/');
   await expect.poll(() => loaded(page.locator('.tv-photo').first())).toBe(true);
 });
+
+test('a page saved a moment ago opens without waiting on the network', async ({ page, context }) => {
+  await installWorker(page);
+  await page.goto('/about/');
+  // A slow connection: every page request now takes 4s to answer.
+  await context.route((url) => url.pathname.endsWith('/'), async (route) => {
+    if (route.request().resourceType() !== 'document' && !route.request().serviceWorker()) return route.fallback();
+    await new Promise((r) => setTimeout(r, 4000));
+    await route.fallback();
+  });
+  for (const path of ['/groups/', '/about/']) {
+    const t0 = Date.now();
+    await page.goto(path);
+    await expect(page.locator('h1')).toBeVisible();
+    expect(Date.now() - t0, path).toBeLessThan(2000);
+  }
+});

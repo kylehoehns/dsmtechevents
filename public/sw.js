@@ -1,6 +1,8 @@
-// Pages (and the card pool): try the network first so data refreshes show
-// up, fall back to the cached copy when offline (or after 3s on a bad
-// connection).
+// Pages (and the card pool): a copy saved in the last 15 minutes is shown at
+// once and refreshed in the background, so moving between pages is instant.
+// An older copy waits for the network first, so opening the app later shows
+// fresh data; it falls back to the saved copy when offline (or after 3s on a
+// bad connection).
 // Our CSS, JS and fonts: every file the build made is listed in ASSETS, saved
 // on install, and anything else under /_astro/ is dropped once this worker
 // takes over. Served stale-while-revalidate.
@@ -8,13 +10,17 @@
 // Group logos and the TV page's photos: saved with their page, on install and
 // whenever it loads online.
 // Bump VERSION to start every cache fresh; activate deletes the old ones.
-const VERSION = 'v5';
+const VERSION = 'v6';
 const CACHE = `dsmtechevents-${VERSION}`;
 const IMAGES = `dsmtechevents-images-${VERSION}`;
 const LOGOS = `dsmtechevents-logos-${VERSION}`;
 const MAX_IMAGES = 60;
 const MAX_LOGOS = 40;
 const PHOTO_HOST = 'https://secure.meetupstatic.com';
+// How long a saved page counts as fresh enough to show without waiting.
+const FRESH_MS = 15 * 60 * 1000;
+// When a page was saved, kept as a header on the saved copy.
+const SAVED_AT = 'x-sw-saved-at';
 // Saved on install. /cards/ is the card pool the calendar's day panel reads.
 const PAGES = ['/', '/groups/', '/tv/', '/cards/'];
 // The build fills this in (scripts/sw-precache.mjs): every file in /_astro/.
@@ -25,6 +31,11 @@ const PAGE_IMAGES = { '/groups/': ['logo-img', LOGOS], '/tv/': ['tv-photo', IMAG
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then(async (cache) => {
     await cache.addAll([...PAGES, ...ASSETS]);
+    // Stamp the pages as just saved, so the first move between them is instant too.
+    await Promise.all(PAGES.map(async (page) => {
+      const res = await cache.match(page);
+      if (res) await cache.put(page, stamped(res, await res.blob()));
+    }));
     // Pages saved here may never be opened online, so save their images now too.
     await Promise.all(Object.keys(PAGE_IMAGES).map(async (page) => saveImages(page, await (await cache.match(page)).text()).catch(() => {})));
   }));
@@ -35,12 +46,14 @@ self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
     const keep = [CACHE, IMAGES, LOGOS];
     await Promise.all((await caches.keys()).filter((k) => !keep.includes(k)).map((k) => caches.delete(k)));
-    // Files an older build made: no page of this build asks for them.
+    // Files an older build made: no page of this build asks for them. Pages
+    // saved under the older build go too (install saved this build's PAGES):
+    // shown from the cache, they'd ask for those deleted files.
     const cache = await caches.open(CACHE);
     const current = new Set(ASSETS);
     for (const k of await cache.keys()) {
       const path = new URL(k.url).pathname;
-      if (path.startsWith('/_astro/') && !current.has(path)) await cache.delete(k);
+      if (path.startsWith('/_astro/') ? !current.has(path) : !PAGES.includes(path)) await cache.delete(k);
     }
     await self.clients.claim();
   })());
@@ -65,19 +78,37 @@ async function networkFirst(e) {
   const cache = await caches.open(CACHE);
   // One cached copy per page: /?group=pyowa and / are the same HTML.
   const key = new URL(req.url).pathname;
+  const saved = await cache.match(key);
+  const fetched = fetch(req).then(async (res) => {
+    if (res.ok) await save(cache, key, res.clone(), e);
+    return res;
+  });
+  // Saved a moment ago: show it now, and let the fetch update it for next time.
+  if (saved && Date.now() - Number(saved.headers.get(SAVED_AT) ?? 0) < FRESH_MS) {
+    e.waitUntil(fetched.catch(() => {}));
+    return saved;
+  }
   try {
-    const res = await Promise.race([
-      fetch(req),
+    return await Promise.race([
+      fetched,
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
     ]);
-    if (res.ok) {
-      await cache.put(key, res.clone());
-      if (Object.hasOwn(PAGE_IMAGES, key)) e.waitUntil(res.clone().text().then((html) => saveImages(key, html)).catch(() => {}));
-    }
-    return res;
   } catch {
-    return (await cache.match(key)) ?? offlinePage();
+    return saved ?? offlinePage();
   }
+}
+
+// Save a page with the time it was saved (a header on the copy), and its images.
+async function save(cache, key, res, e) {
+  const body = await res.blob();
+  await cache.put(key, stamped(res, body));
+  if (Object.hasOwn(PAGE_IMAGES, key)) e.waitUntil(body.text().then((html) => saveImages(key, html)).catch(() => {}));
+}
+
+function stamped(res, body) {
+  const headers = new Headers(res.headers);
+  headers.set(SAVED_AT, String(Date.now()));
+  return new Response(body, { status: res.status, statusText: res.statusText, headers });
 }
 
 // A page never visited while online has no saved copy; say so rather than
