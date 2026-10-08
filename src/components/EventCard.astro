@@ -52,11 +52,11 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
       {hosts.length
         ? hosts.map((g: any, i: number) => (
             <>
-              {i > 0 && <span class="with">w/</span>}
+              {i > 0 && <span class="with">+</span>}
               <a href={`/?group=${g.id}`} data-group={g.id}>{g.short}</a>
             </>
           ))
-        : <span class="band-name">{e.tags.includes('conference') ? 'Headliner · conference' : 'Community event'}</span>}
+        : <span class="band-name">{e.hostsLabel}</span>}
       {hosts.length === 1 && lead.showFullName && <span class="with">{lead.name}</span>}
     </p>
     {e.series && (
@@ -78,7 +78,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
 
   <div class="acts">
     {e.going > 0 && <span class="going"><b>{e.going}</b> going</span>}
-    {e.url && <a class="rsvp" href={e.url} target="_blank" rel="noopener" data-click="rsvp" aria-label={`${cta}: ${e.title} (opens in new tab)`}>{cta} <span aria-hidden="true">→</span></a>}
+    {e.url && <a class="rsvp" href={e.url} target="_blank" rel="noopener" data-click="rsvp" aria-label={`${cta}: ${e.title} (opens in new tab)`}>{cta} <span aria-hidden="true">↗</span></a>}
     {(e.description || e.photo) && <button type="button" class="more" aria-expanded="false" aria-controls={descId}>About<span class="sr-only"> {e.title}</span></button>}
   </div>
   {(e.description || e.photo) && (

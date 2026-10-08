@@ -48,7 +48,7 @@ const headliners = upcoming.filter((e) => e.headliner && daysBetween(today, dayK
 const counts = Object.fromEntries(groups.map((g) => [g.id, listed.filter((e) => e.groupIds.includes(g.id)).length]));
 // Only groups with something coming up get a chip; the groups page lists them all.
 const filterGroups = groups.filter((g) => counts[g.id] > 0).sort((a, b) => counts[b.id] - counts[a.id] || a.short.localeCompare(b.short));
-// Recent events shows the last few; "All N →" opens the rest (90 days' worth).
+// Recent events shows the last few; "+ All N" opens the rest (90 days' worth).
 const PAST_SHOWN = 3;
 
 const calendarData = {
@@ -84,7 +84,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
                 <p class="when">{e.multiDay ? dateRange(e.start, e.end) : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
                 <span class="stamp-days countdown" data-start={e.start}>{countdown(e.start)}</span>
                 <p class="where">{e.venue}{e.address && <><br />{e.address}</>}</p>
-                <a class="go" href={e.url} target="_blank" rel="noopener" data-click="poster">Tickets & info<span class="sr-only">: {e.title} (opens in new tab)</span> <span aria-hidden="true">→</span></a>
+                <a class="go" href={e.url} target="_blank" rel="noopener" data-click="poster">Tickets & info<span class="sr-only">: {e.title} (opens in new tab)</span> <span aria-hidden="true">↗</span></a>
               </div>
             </article>
           ))}
@@ -122,10 +122,10 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
                 <li data-groups={e.groupIds.join(' ')} data-end={e.end} data-id={e.id}>
                   <span class="row-date">{month(e.start)} {day(e.start)}</span>
                   <a href={e.url} target="_blank" rel="noopener" data-click="later">
-                    <span class="row-group">{e.groupIds.map((id) => byId[id]?.short).join(' + ') || 'Conference'}</span>
+                    <span class="row-group">{e.hostsLabel}</span>
                     {e.series && <span class="row-series">{e.series.rule} · {e.series.count} dates</span>}
                     <span class="row-title">{e.title}</span>
-                    <span class="row-where">{e.allDay ? 'All day' : shortTime(e.start)} · {e.online ? 'Online' : `@ ${e.venue ?? 'TBA'}`}</span>
+                    <span class="row-where">{e.allDay ? 'All day' : shortTime(e.start)} · {e.online ? 'Online' : `@ ${e.venue ?? 'Venue TBA'}`}</span>
                     <span class="sr-only"> (opens in new tab)</span>
                   </a>
                   <span class="row-going">{e.going ? <><b>{e.going}</b> going</> : ''}</span>
@@ -151,16 +151,16 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
             <li class:list={{ extra: i >= PAST_SHOWN }} data-groups={e.groupIds.join(' ')} data-id={e.id} data-going={e.going ?? 0}>
               <span class="row-date">{month(e.start)} {day(e.start)}</span>
               <a href={e.url} target="_blank" rel="noopener" data-click="past">
-                <span class="row-group">{e.groupIds.map((id) => byId[id]?.short).join(' + ')}</span>
+                <span class="row-group">{e.hostsLabel}</span>
                 <span class="row-title">{e.title}</span>
-                <span class="row-where">{e.online ? 'Online' : `@ ${e.venue ?? ''}`}</span>
+                <span class="row-where">{e.online ? 'Online' : e.venue ? `@ ${e.venue}` : ''}</span>
                 <span class="sr-only"> (opens in new tab)</span>
               </a>
               <span class="row-going">{e.going ? <><b>{e.going}</b> went</> : ''}</span>
             </li>
           ))}
         </ol>
-        {past.length > PAST_SHOWN && <button type="button" class="all" id="recent-all" aria-expanded="false">All {past.length} →</button>}
+        {past.length > PAST_SHOWN && <button type="button" class="all" id="recent-all" aria-expanded="false">+ All {past.length}</button>}
       </section>
     </aside>
   </div>
