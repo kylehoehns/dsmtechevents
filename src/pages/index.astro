@@ -123,6 +123,13 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         <p class="empty" id="list-empty" hidden>Nothing on the books for this group right now. Check their page for what's next.</p>
       </section>
 
+      {/* A search's past matches, newest first. The rows come with the card
+          pool (/cards/), which a search fetches, so they cost the page nothing. */}
+      <section class="sec past-results" id="past-results" aria-labelledby="past-h" hidden>
+        <div class="sec-head"><h2 id="past-h">Past</h2><span class="count" data-count></span></div>
+        <ol class="setlist far"></ol>
+      </section>
+
       <section id="calendar-view" aria-label="Calendar" hidden></section>
     </div>
 

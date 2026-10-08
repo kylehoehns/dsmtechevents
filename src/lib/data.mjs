@@ -24,7 +24,9 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
 
   for (const e of events) describe(e, byId);
   foldSeries(upcoming);
-  const archived = lastArchived(dataDir);
+  const archive = readArchive(dataDir);
+  const archived = {};
+  for (const r of archive) if (!(archived[r.group] >= r.start)) archived[r.group] = r.start;
   for (const g of groups) {
     summarize(g, upcoming, past);
     markQuiet(g, archived[g.id], now);
@@ -35,24 +37,19 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
     // Quiet groups are hidden everywhere but /status/; they come back on their own.
     groups: groups.filter((g) => !g.quiet),
     allGroups: groups,
-    byId, events, upcoming, past,
+    byId, events, upcoming, past, archive,
     updatedAt: fetched.at(-1) ?? new Date(now).toISOString(),
     ...readStatus(dataDir, groups),
   };
 }
 
-// The newest archived event for each group. The archive (data/archive/) has
-// every ended event since the site launched; the cache only keeps 90 days.
-function lastArchived(dataDir) {
+// Every archived event record. The archive (data/archive/) has every ended
+// event since the site launched; the cache only keeps 90 days.
+function readArchive(dataDir) {
   const dir = path.join(dataDir, 'archive');
-  const last = {};
-  if (!fs.existsSync(dir)) return last;
-  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('.json'))) {
-    for (const r of JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'))) {
-      if (!(last[r.group] >= r.start)) last[r.group] = r.start;
-    }
-  }
-  return last;
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter((f) => f.endsWith('.json'))
+    .flatMap((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
 }
 
 const YEAR = 365 * 86_400_000;
