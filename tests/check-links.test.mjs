@@ -6,18 +6,19 @@ const ok = { url: 'https://www.meetup.com/pyowa/', where: 'groups.yaml: pyowa me
 const bad = { url: 'https://gone.example/', where: 'groups.yaml: x website', ok: false, detail: '404 from GET' };
 const issue = { number: 7, title: 'Broken links on the site' };
 
-test('collects meetup, website and event links once each, skipping blanks', () => {
+test('collects meetup, website, logo and event links once each, skipping blanks', () => {
   const links = collectLinks(
     [
       { id: 'a', meetup: 'https://www.meetup.com/a/', website: 'https://a.example/' },
-      { id: 'b', source: 'b', website: 'https://a.example/' },
+      { id: 'b', source: 'b', website: 'https://a.example/', logo: 'https://b.example/logo.png' },
       { id: 'c', meetup: 'https://www.meetup.com/c/' },
     ],
     [{ title: 'Conf', url: 'https://conf.example/' }, { title: 'No link' }],
   );
-  assert.deepEqual(links.map((l) => l.url), ['https://www.meetup.com/a/', 'https://a.example/', 'https://www.meetup.com/c/', 'https://conf.example/']);
+  assert.deepEqual(links.map((l) => l.url), ['https://www.meetup.com/a/', 'https://a.example/', 'https://b.example/logo.png', 'https://www.meetup.com/c/', 'https://conf.example/']);
   assert.equal(links[1].where, 'groups.yaml: a website');
-  assert.equal(links[3].where, 'events.yaml: Conf');
+  assert.equal(links[2].where, 'groups.yaml: b logo');
+  assert.equal(links[4].where, 'events.yaml: Conf');
 });
 
 test('all links fine and no issue open: nothing to do', () => {
