@@ -61,6 +61,11 @@ phone vs computer (Cloudflare Web Analytics), then the outbound clicks above
 time with `gh workflow run site-report.yml`. It needs a repository secret
 `CF_ANALYTICS_TOKEN`: a Cloudflare API token with **Account Analytics: Read**.
 
+The same run ends with a **Lighthouse** table (`scripts/lighthouse-report.mjs`):
+phone and desktop scores and load times for the home page, calendar view,
+groups page and TV screen, with last week's change shown only when it is bigger
+than normal run-to-run noise.
+
 ### Querying
 
 Analytics Engine has a SQL API. Make an API token with the **Account

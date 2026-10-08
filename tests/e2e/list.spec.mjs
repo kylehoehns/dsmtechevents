@@ -78,6 +78,15 @@ test('headliner poster counts down to the conference', async ({ page }) => {
   await expect(poster).toContainText('Oct 22–23');
 });
 
+test('a conference row says its start date once, and "@" stays with the venue', async ({ page }) => {
+  await page.goto('/');
+  const conf = row(page, 'Test Conf 2026');
+  // The date block already says THU 22 OCT; the time line adds only the last day.
+  await expect(conf.locator('.time')).toHaveText('through Fri Oct 23 · 8a–5p');
+  // No-break spaces: "·" stays with the time and "@" with the venue on a narrow card.
+  expect(await conf.locator('.meta').textContent()).toContain('8a–5p\u00a0· @\u00a0Convention Center'); // raw text: toContainText would fold the no-break spaces
+});
+
 test('overnight between conference days, the poster stamp agrees with the row', async ({ page }) => {
   // Thu Oct 22, 9pm: day one (8a–5p) is over, day two is tomorrow.
   await page.clock.setFixedTime(new Date('2026-10-23T02:00:00Z'));

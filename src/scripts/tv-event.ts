@@ -87,6 +87,8 @@ function eventPoster(e: TvEvent) {
     const img = el('img', 'tv-photo');
     img.src = e.photo;
     img.alt = '';
+    // Meetup's copies are 600x338 (see EventCard.astro); hold that shape while it loads.
+    if (e.photo.includes('meetupstatic.com')) Object.assign(img, { width: 600, height: 338 });
     side.append(img);
   }
   if (e.url) side.append(qr(e.url, rsvpLabel(e)));
