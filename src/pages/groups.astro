@@ -9,13 +9,15 @@ const sorted = [...groups].sort((a, b) =>
   (a.nextEvent?.start ?? '9999').localeCompare(b.nextEvent?.start ?? '9999') || a.short.localeCompare(b.short));
 const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
 ---
-<Layout title="Groups" nav="groups" updatedAt={updatedAt}>
+<Layout nav="groups" updatedAt={updatedAt}
+  headTitle="Des Moines tech meetup groups · DSM Tech Events"
+  description={`${groups.length} Des Moines and central Iowa tech user groups, including ${groups.slice(0, 5).map((g) => g.name).join(', ')} and more, with each one's next meetup.`}>
   <h1 class="sr-only">Des Moines tech groups</h1>
   <div class="board">
     {sorted.map((g, i) => (
-      <article class:list={['flyer', { 'has-logo': !!g.logo }]}>
+      <article id={g.id} class:list={['flyer', { 'has-logo': !!g.logo }]}>
         {g.logo && <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />}
-        <h2>{g.short}</h2>
+        <h2>{g.short}{!g.showFullName && <span class="sr-only"> ({g.name})</span>}</h2>
         {g.showFullName && <p class="full">{g.name}</p>}
         <p class="tags">{g.tags.map((t: string) => <b>{t}</b>)}</p>
         <p class="next">
