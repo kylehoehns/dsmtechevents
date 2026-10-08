@@ -87,7 +87,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
                 <p class="when">{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
                 <span class="stamp-days countdown" data-start={e.start}>{daysOut(e)} days out</span>
                 <p class="where">{e.venue}{e.address && <><br />{e.address}</>}</p>
-                <a class="go" href={e.url} target="_blank" rel="noopener">{e.multiDay ? 'Tickets & lineup' : 'Register'}<span class="sr-only">: {e.title} (opens in new tab)</span> <span aria-hidden="true">→</span></a>
+                <a class="go" href={e.url} target="_blank" rel="noopener">Tickets & info<span class="sr-only">: {e.title} (opens in new tab)</span> <span aria-hidden="true">→</span></a>
               </div>
             </article>
           ))}
