@@ -10,7 +10,6 @@
 <p align="center">
   <a href="https://github.com/kylehoehns/dsmtechevents/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/kylehoehns/dsmtechevents/actions/workflows/ci.yml/badge.svg"></a>
   <a href="https://github.com/kylehoehns/dsmtechevents/actions/workflows/refresh.yml"><img alt="Event refresh" src="https://github.com/kylehoehns/dsmtechevents/actions/workflows/refresh.yml/badge.svg"></a>
-  <a href="https://github.com/kylehoehns/dsmtechevents/actions/workflows/links.yml"><img alt="Link check" src="https://github.com/kylehoehns/dsmtechevents/actions/workflows/links.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-ff4fa3"></a>
 </p>
 
