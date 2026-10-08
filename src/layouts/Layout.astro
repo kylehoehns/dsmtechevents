@@ -82,8 +82,11 @@ const builtOn = fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format
     <footer class="foot">
       <div class="wrap">
         <div>
-          <p class="big"><a href={site.repo + '#adding-things'}>Add your group →</a></p>
-          <p style="margin-top:10px">Run a tech meetup in central Iowa? We'll list it.</p>
+          <p class="big"><a href={`mailto:${site.email}?subject=${encodeURIComponent('Add to DSM Tech Events')}`}>Add your group →</a></p>
+          <p style="margin-top:10px">
+            Run a tech meetup or conference in central Iowa? Email <a href={`mailto:${site.email}`}>{site.email}</a>,
+            or <a href={site.repo + '#adding-things'}>open a pull request</a> if that's more your speed.
+          </p>
         </div>
         <div class="fine">
           {updated && <p>Last updated {updated}.</p>}
