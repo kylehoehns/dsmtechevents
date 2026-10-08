@@ -78,10 +78,10 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
       {featured.length > 0 && (
         <section class="headliners" id="headliners" aria-label="Coming up soon">
           {featured.map((e, i) => (
-            <article class:list={['poster', i % 2 ? 'blue' : 'taped']} data-end={e.end} data-groups={e.groupIds.join(' ')}>
+            <article class:list={['poster', { blue: i % 2 }]} data-end={e.end} data-groups={e.groupIds.join(' ')}>
               <div class="poster-full">
                 <span class="halftone" aria-hidden="true" />
-                {i % 2 === 0 && <span class="tape" aria-hidden="true" />}
+                <span class="tape" aria-hidden="true" />
                 <div class="bill"><span>Headliner</span><span>{e.multiDay ? 'Two-day conference' : 'One-day conference'}</span></div>
                 <h2>{e.title}</h2>
                 <p class="when">{e.multiDay ? `${month(e.start)} ${day(e.start)}–${day(e.end)}` : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
