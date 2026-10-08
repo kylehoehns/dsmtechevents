@@ -43,4 +43,4 @@ Everything displays in Des Moines time (`site.timeZone`) wherever the viewer is.
 ## Verifying UI work
 
 Build, then check the result in a real browser at 1280 and 390 wide, in light and dark. For date-dependent views (headliners, Today/Tonight labels, the TV page), build with a faked clock and set the browser's clock to match: `scripts/fake-now.mjs` shows how, with Playwright's `page.clock.install`.
-Run `npm run test:e2e` (Playwright + axe on a fixture build, see README "Browser tests") and add a test in `tests/e2e/` for new interactive behaviour.
+Run `npm run test:e2e` (Playwright + axe on a fixture build, see CONTRIBUTING.md "Browser tests") and add a test in `tests/e2e/` for new interactive behaviour.

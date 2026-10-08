@@ -113,3 +113,18 @@ Everything is shown in Des Moines time, wherever the viewer is.
 - Display and day math go through `src/lib/format.mjs`, used by the build,
   `app.js` and the TV page.
 - `refresh.yml` writes `built-on.txt` with `TZ=America/Chicago`.
+
+## Running it
+
+- **Refresh now** instead of waiting for the next scheduled run:
+  `gh workflow run refresh.yml`.
+- **The deploy key.** `main` takes no direct pushes; the refresh workflow is
+  the one exception. It pushes event data with a deploy key (secret
+  `REFRESH_DEPLOY_KEY`), and the ruleset lets deploy keys bypass it. To
+  rotate it, make a new key with `ssh-keygen -t ed25519`, add the public half
+  under Settings → Deploy keys with write access, and replace the secret.
+- **A broken source** opens one `source-broken` issue for that group
+  (`scripts/source-issues.mjs`), updated rather than duplicated, and closed
+  automatically once the group fetches cleanly. Fix it by saving a trimmed
+  copy of the new page in `tests/fixtures/` and updating the reader until its
+  test passes.
