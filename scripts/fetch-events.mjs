@@ -35,19 +35,26 @@ const BACKFILL_DAYS = 90;
 const groups = YAML.parse(await fs.readFile(path.join(root, 'data/groups.yaml'), 'utf8'));
 await fs.mkdir(cacheDir, { recursive: true });
 
+// What went wrong this run, for scripts/source-issues.mjs to turn into GitHub
+// issues. One group failing never stops the others: its last cache stays.
+const report = { ok: [], problems: [] };
 let failures = 0;
 for (const group of groups) {
   try {
-    const result = await fetchGroup(group);
+    const { enrichError, ...result } = await fetchGroup(group);
     await fs.writeFile(path.join(cacheDir, `${group.id}.json`), JSON.stringify(result, null, 2) + '\n');
     const past = result.events.filter((e) => Date.parse(e.end) < Date.now()).length;
     console.log(`✓ ${group.id}: ${result.events.length - past} upcoming, ${past} past${result.enriched ? '' : ' (no enrichment)'}`);
+    if (enrichError) report.problems.push({ id: group.id, name: group.name, kind: 'details', message: enrichError });
+    else report.ok.push(group.id);
   } catch (err) {
     failures++;
     console.warn(`✗ ${group.id}: ${err.message} — keeping previous cache`);
+    report.problems.push({ id: group.id, name: group.name, kind: 'fetch', message: err.message });
   }
   await new Promise((r) => setTimeout(r, 500)); // be polite to Meetup
 }
+await fs.writeFile(path.join(root, 'fetch-report.json'), JSON.stringify(report, null, 2) + '\n');
 if (failures === groups.length) {
   console.error('Every feed failed. Building from cache only.');
 }
@@ -66,7 +73,7 @@ async function fetchGroup(group) {
     fresh = await fetchFeed(group, now, cutoff);
   }
 
-  return mergeCache(await readCache(group.id), fresh, { now, cutoff });
+  return { ...mergeCache(await readCache(group.id), fresh, { now, cutoff }), enrichError: fresh.enrichError };
 }
 
 // Meetup groups and plain iCal feeds.
@@ -81,6 +88,7 @@ async function fetchFeed(group, now, cutoff) {
   let logo = null;
   let typical = null;
   let facts = {};
+  let enrichError = null;
   let enriched = false;
   if (slug) {
     try {
@@ -92,11 +100,12 @@ async function fetchFeed(group, now, cutoff) {
       enriched = true;
     } catch (err) {
       console.warn(`  ${group.id}: enrichment skipped (${err.message})`);
+      enrichError = `Meetup events page: ${err.message}`;
     }
   }
 
   // The feed's copy of an upcoming event wins over the page's.
-  return { events: [...recent, ...upcoming], logo, typical, ...facts, enriched };
+  return { events: [...recent, ...upcoming], logo, typical, ...facts, enriched, enrichError };
 }
 
 async function readCache(id) {
