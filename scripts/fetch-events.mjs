@@ -110,7 +110,7 @@ async function fetchFeed(group, now, cutoff) {
       const details = parseEventsPage(await get(meetupUrl(slug, 'events/')), slug);
       logo = details.logo;
       recent = enrich(upcoming, details, group, { now, cutoff });
-      facts = { members: details.members, pastCount: details.pastCount };
+      facts = { members: details.members, pastCount: details.pastCount, lastMet: details.lastMet };
     } catch (err) {
       console.warn(`  ${group.id}: enrichment skipped (${err.message})`);
       enrichError = `Meetup events page: ${err.message}`;

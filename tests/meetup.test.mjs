@@ -42,10 +42,11 @@ test('parseFeed rejects something that is not a calendar', () => {
 });
 
 test('parseEventsPage reads venue, photo, RSVPs and the group logo', () => {
-  const { logo, events, members, pastCount } = parseEventsPage(fixture('meetup-events-page.html'), 'iadnug');
+  const { logo, events, members, pastCount, lastMet } = parseEventsPage(fixture('meetup-events-page.html'), 'iadnug');
   assert.equal(logo, 'https://secure.meetupstatic.com/photos/event/a/b/600_111.jpeg');
   assert.equal(members, 1543);
   assert.equal(pastCount, 120, 'the all-time PAST count, not the dated 10-event window');
+  assert.equal(lastMet, '2026-09-15T23:00:00.000Z', 'the newest PAST event; the later cancelled one does not count');
 
   const online = events.get('300000001');
   assert.equal(online.venue, 'Online');
@@ -145,6 +146,8 @@ test('mergeCache keeps group facts and leaves them out when unknown', () => {
   assert.ok(!('pastCount' in mergeCache({ events: [] }, { events: [] }, { now, cutoff })));
   const facts = mergeCache({ events: [], members: 300 }, { events: [], members: 326, pastCount: 19 }, { now, cutoff });
   assert.deepEqual([facts.members, facts.pastCount], [326, 19]);
+  assert.ok(!('lastMet' in facts), 'lastMet is left out when unknown, like the others');
+  assert.equal(mergeCache({ events: [], lastMet: '2024-08-28T23:00:00.000Z' }, { events: [], enriched: false }, { now, cutoff }).lastMet, '2024-08-28T23:00:00.000Z', 'kept when the page fails');
 });
 
 test('enrich drops an upcoming event the page says is cancelled, and ignores missing page fields', () => {

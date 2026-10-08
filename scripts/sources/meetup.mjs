@@ -56,10 +56,16 @@ export function parseEventsPage(html, slug) {
   const group = Object.entries(state).find(([k, v]) => k.startsWith('Group:') && v.urlname?.toLowerCase() === slug.toLowerCase())?.[1];
   // Total past meetups lives under a key like events({"filter":{"status":["PAST"]},"first":1}).
   const pastKey = group && Object.keys(group).find((k) => k.startsWith('events(') && k.includes('"status":["PAST"]') && !k.includes('DateTime'));
+  // When the group last met: its newest PAST event (cancelled ones don't
+  // count). The page lists the last ten events however old they are, so this
+  // reaches further back than the cache's 90 days. The site uses it to hide
+  // quiet groups and to say "Back!" when one returns.
+  const lastMet = [...events.values()].filter((e) => e.status === 'PAST').map((e) => e.start).sort().at(-1) ?? null;
   return {
     logo: photo(group?.keyGroupPhoto),
     members: group?.stats?.memberCounts?.all ?? null,
     pastCount: (pastKey && group[pastKey]?.totalCount) ?? null,
+    lastMet,
     events,
   };
 }
@@ -107,7 +113,7 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
   // Group facts from Meetup: kept from the last run if this one missed them,
   // and left out when unknown so files without them don't change.
   const facts = {};
-  for (const k of ['members', 'pastCount']) {
+  for (const k of ['members', 'pastCount', 'lastMet']) {
     const v = fresh[k] ?? previous[k];
     if (v != null) facts[k] = v;
   }
