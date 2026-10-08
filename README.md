@@ -3,7 +3,7 @@
 https://dsmtechevents.com
 
 One place to see every upcoming Des Moines tech meetup, user group and
-conference. A static site on Cloudflare, refreshed every night from each group's Meetup
+conference. A static site on Cloudflare, refreshed four times a day from each group's Meetup
 calendar (and a couple of groups' own websites).
 
 ## How it works
@@ -12,14 +12,17 @@ calendar (and a couple of groups' own websites).
    the public Meetup iCal feed (`meetup.com/<group>/events/ical/`), plus venue,
    photo and RSVP count from the group's events page. Results land in
    `data/cache/<group>.json`.
-2. If a feed fails, that group's previous cache file is kept, so a bad night
+2. If a feed fails, that group's previous cache file is kept, so a bad run
    never empties the site. The cache is committed so builds work even if
    Meetup is unreachable.
 3. `astro build` merges the cache with the hand-added events in
    `data/events.yaml` and writes static HTML to `dist/`.
-4. A GitHub Action (`.github/workflows/refresh.yml`) runs the fetch every
-   night and commits `data/cache/` when anything changed. That push is what
-   deploys the site, so the live site always matches what's in git.
+4. A GitHub Action (`.github/workflows/refresh.yml`) runs the fetch four
+   times a day (5:20am, 10:20am, 2:20pm and 6:20pm Des Moines summer time) and
+   commits `data/cache/` when anything changed. It also commits once a day no
+   matter what (`data/cache/built-on.txt`), because the "This week" headings
+   are set at build time. That push is what deploys the site, so the live site
+   always matches what's in git.
 
 ## Adding things
 
@@ -46,9 +49,9 @@ npm run build    # what Cloudflare runs (no fetching, just the committed data)
 
 Cloudflare Workers static assets, connected to `main` with Workers Builds.
 `wrangler.jsonc` holds the config and lists the dashboard build settings.
-Every push to `main` deploys, including the nightly data commits.
+Every push to `main` deploys, including the data refresh commits.
 
-To refresh events right away instead of waiting for the night run:
+To refresh events right away instead of waiting for the next scheduled run:
 
 ```sh
 gh workflow run refresh.yml

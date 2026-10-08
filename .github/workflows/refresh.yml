@@ -1,15 +1,18 @@
 name: refresh events
 
-# Pulls fresh events for every group and commits data/cache/ if anything
-# changed. That push is what makes Cloudflare rebuild and deploy the site.
+# Pulls fresh events for every group four times a day and commits data/cache/
+# if anything changed. That push is what makes Cloudflare rebuild and deploy
+# the site.
 # Run it by hand from the Actions tab (or `gh workflow run refresh.yml`) to
 # refresh right away.
 
 on:
   schedule:
-    # 10:20 UTC = 5:20am Des Moines in summer, 4:20am in winter. Off the hour
-    # because GitHub queues on-the-hour schedules and runs them late.
-    - cron: '20 10 * * *'
+    # 10:20, 15:20, 19:20, 23:20 UTC = 5:20am, 10:20am, 2:20pm, 6:20pm
+    # Des Moines in summer (an hour earlier in winter): before the workday,
+    # mid-morning, mid-afternoon, and just before evening meetups start. Off
+    # the hour because GitHub queues on-the-hour schedules and runs them late.
+    - cron: '20 10,15,19,23 * * *'
   workflow_dispatch:
 
 permissions:
@@ -34,6 +37,11 @@ jobs:
       - run: npm run build
       - name: commit changed event data
         run: |
+          # The page's "This week" / "Next week" headings are fixed at build
+          # time, so the site has to rebuild at least once a day even when no
+          # group posted anything. Recording the Des Moines date makes the
+          # first run each day commit.
+          TZ=America/Chicago date +%F > data/cache/built-on.txt
           git add data/cache
           if git diff --cached --quiet; then
             echo "No event changes."

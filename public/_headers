@@ -1,5 +1,5 @@
 # Pages and the service worker must never be held by a cache: the site changes
-# every night, and a stale sw.js can't be replaced by a newer one it never fetches.
+# several times a day, and a stale sw.js can't be replaced by a newer one it never fetches.
 #
 # CSP: Cloudflare Web Analytics loads its beacon from static.cloudflareinsights.com
 # and reports to cloudflareinsights.com. connect-src also covers fetch() inside
