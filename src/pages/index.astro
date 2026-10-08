@@ -7,7 +7,7 @@ import { splitEvents } from '../lib/pool.mjs';
 import { eventJsonLd, websiteJsonLd, toScript } from '../lib/jsonld.mjs';
 import { dayKey, lastDay, weekday, day, month, shortTime, addDays, daysBetween, monthName, plural, countdown, dateRange, recentSummary } from '../lib/format.mjs';
 
-const { events, upcoming, past, groups, byId, updatedAt } = loadData();
+const { events, upcoming, past, endingSoon, groups, byId, updatedAt } = loadData();
 
 // Section labels are relative to the build, which runs at least once a day
 // (see refresh.yml); the browser re-labels Today/Tonight/Tomorrow itself.
@@ -41,6 +41,9 @@ const headliners = upcoming.filter((e) => e.headliner && daysBetween(today, dayK
 
 // Recent events shows the last few; "+ All N" opens the rest (90 days' worth).
 const PAST_SHOWN = 3;
+// Events ending in the next day or two are there too, hidden until they're
+// over (data-after; app.js), so one doesn't vanish between the list and here.
+const recentRows = [...endingSoon, ...past].sort((a, b) => b.start.localeCompare(a.start));
 
 const calendarData = {
   events: events.map((e) => ({
@@ -133,8 +136,8 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         <h2 id="recent-h">Recent events</h2>
         <p class="sub" id="recent-sub">{recentSummary(past.length, past.reduce((n, e) => n + (e.going ?? 0), 0))}</p>
         <ol class="setlist" id="recent-list" data-shown={PAST_SHOWN}>
-          {past.map((e, i) => (
-            <li class:list={{ extra: i >= PAST_SHOWN }} data-groups={e.groupIds.join(' ')} data-id={e.id} data-going={e.going ?? 0}>
+          {recentRows.map((e) => (
+            <li class:list={{ extra: past.indexOf(e) >= PAST_SHOWN }} data-groups={e.groupIds.join(' ')} data-id={e.id} data-going={e.going ?? 0} data-after={endingSoon.includes(e) ? e.end : undefined} hidden={endingSoon.includes(e)}>
               <span class="row-date">{month(e.start)} {day(e.start)}</span>
               <a href={e.url} target="_blank" rel="noopener" data-click="past">
                 <span class="row-group">{e.hostsLabel}</span>
@@ -146,7 +149,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
             </li>
           ))}
         </ol>
-        {past.length > PAST_SHOWN && <button type="button" class="all btn btn-outline" id="recent-all" aria-expanded="false">+ All {past.length}</button>}
+        {recentRows.length > PAST_SHOWN && <button type="button" class="all btn btn-outline" id="recent-all" aria-expanded="false">+ All {past.length}</button>}
       </section>
     </aside>
   </div>

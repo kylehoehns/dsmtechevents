@@ -209,7 +209,8 @@ function renderSide() {
   const limit = Number(list.dataset.shown);
   let shown = 0;
   for (const li of $$('li', list)) {
-    li.hidden = !shows(li);
+    // data-after: an event that was still on when the page was built.
+    li.hidden = !shows(li) || Date.parse(li.dataset.after) > Date.now();
     if (!li.hidden) li.classList.toggle('extra', ++shown > limit);
   }
   // The summary and the "All N" button count what the filter left.

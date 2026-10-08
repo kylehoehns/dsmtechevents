@@ -147,3 +147,17 @@ test('source health comes from status.json; no file means not checked yet', () =
   assert.equal(bare.byId.webgeeks.health, null);
   assert.equal(bare.checkedOn, null);
 });
+
+test('a group card is printed as it reads now and as it will once an event ending soon is over', () => {
+  // Monday Oct 12, 9am: Hacktoberfest is tonight, the monthly series starts in November.
+  const monday = loadData({ dataDir, now: Date.parse('2026-10-12T14:00:00Z') });
+  const states = monday.byId.webgeeks.states.map((s) => [s.next?.title, s.last?.title, s.count, s.attrs]);
+  assert.deepEqual(states, [
+    ['Hacktoberfest', 'Spring recap', 2, { 'data-after': undefined, 'data-end': '2026-10-13T01:00:00.000Z', hidden: false }],
+    ['Web Geeks Monthly Meeting', 'Hacktoberfest', 1, { 'data-after': '2026-10-13T01:00:00.000Z', 'data-end': undefined, hidden: true }],
+  ], 'the series still counts once, and November is too far off to print what follows it');
+  assert.equal(monday.byId.webgeeks.states[0].count, monday.byId.webgeeks.upcomingCount);
+  // Nothing coming up: one state, the "Nothing scheduled" one.
+  assert.deepEqual(monday.byId.uxdsm.states.map((s) => [s.next, s.count, s.attrs.hidden]), [[null, 0, false]]);
+  assert.deepEqual(monday.endingSoon.map((e) => e.title), ['Hacktoberfest'], 'Recent events gets it once it ends');
+});
