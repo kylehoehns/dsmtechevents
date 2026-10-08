@@ -108,3 +108,7 @@ gh workflow run refresh.yml
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): the data flow, with a diagram
 - [docs/decisions/](docs/decisions/): why it's built this way
 - [SECURITY.md](SECURITY.md): reporting a security problem
+
+## License
+
+MIT. See [LICENSE](LICENSE). Event details belong to the groups that post them; the site links to each group's own page.
