@@ -44,15 +44,21 @@ export function delta(key, now, before) {
   return '';
 }
 
-const fmt = (key, v) => (v == null ? '—' : key in SCORES ? String(v) : key === 'cls' ? v.toFixed(3) : `${Math.round(v)} ms`);
+// Lighthouse's own colors: green 90+, orange 50-89, red below.
+const dot = (score) => (score >= 90 ? '🟢' : score >= 50 ? '🟠' : '🔴');
+const fmt = (key, v) => (v == null ? '—' : key in SCORES ? `${dot(v)}\u00a0${v}` : key === 'cls' ? v.toFixed(3) : `${Math.round(v)} ms`);
+const NAMES = { perf: 'Performance', a11y: 'Accessibility', bp: 'Best practices', seo: 'SEO' };
 
 // rows: [{ page, device, perf, a11y, bp, seo, lcp, cls, tbt, fcp }]; prev: same shape or null.
 export function renderTable(rows, prev = null) {
   const keys = [...Object.keys(SCORES), ...Object.keys(TIMINGS)];
   const before = (r) => prev?.find((p) => p.page === r.page && p.device === r.device);
+  const scores = rows.flatMap((r) => Object.keys(SCORES).filter((k) => r[k] != null).map((k) => ({ r, k, v: r[k] })));
+  const low = scores.length && scores.reduce((a, b) => (b.v < a.v ? b : a));
   return [
     '## Lighthouse',
     '',
+    ...(low ? [`${dot(low.v)} **Lowest score: ${low.v}**, ${NAMES[low.k]} on \`${low.r.page}\` (${low.r.device}).`, ''] : []),
     `Median of ${RUNS} runs against ${SITE}. Scores are out of 100.${prev ? ' Changes on last week show in brackets when they are bigger than normal noise.' : ''}`,
     '',
     '| Page | Device | Perf | A11y | Best practices | SEO | LCP | CLS | TBT | FCP |',

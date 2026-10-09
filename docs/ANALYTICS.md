@@ -61,9 +61,17 @@ phone vs computer (Cloudflare Web Analytics), then the outbound clicks above
 time with `gh workflow run site-report.yml`. It needs a repository secret
 `CF_ANALYTICS_TOKEN`: a Cloudflare API token with **Account Analytics: Read**.
 
+The report opens with a one-row summary (visits, page views and clicks out,
+each with ▲/▼ against the week before, and a small chart of visits per day).
+Run pages don't allow styles or images, so the charts are text: bars made of
+`█░` blocks and the `▁▃█` line. Long lists are folded and open on a click. The
+helpers are in `scripts/report-md.mjs`.
+
 The same run ends with a **Lighthouse** table (`scripts/lighthouse-report.mjs`):
 phone and desktop scores and load times for the home page, calendar view,
-groups page and TV screen, with last week's change shown only when it is bigger
+groups page and TV screen, each score marked 🟢 90+, 🟠 50–89 or 🔴 below 50
+the way Lighthouse marks them, the lowest score called out above the table, and
+last week's change shown only when it is bigger
 than normal run-to-run noise.
 
 Between those, a **Google Search** section (`scripts/search-report.mjs`): for

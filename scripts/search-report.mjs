@@ -11,6 +11,7 @@
 // No key, or a Google error: the section says so and the run carries on.
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import { fold, num, table, trend } from './report-md.mjs';
 
 // The property: a Domain property, or else the URL-prefix one.
 const SITES = ['sc-domain:dsmtechevents.com', 'https://dsmtechevents.com/'];
@@ -41,16 +42,8 @@ export function assertion({ client_email, private_key }, now = Date.now()) {
   return `${head}.${body}.${sig}`;
 }
 
-const num = (n) => n.toLocaleString('en-US');
 const pct = (n) => `${(n * 100).toFixed(1)}%`;
 const pos = (n) => n.toFixed(1);
-const table = (head, rows) => [`| ${head.join(' | ')} |`, `|${head.map((_, i) => (i ? '---:' : '---')).join('|')}|`, ...rows.map((r) => `| ${r.join(' | ')} |`)].join('\n');
-// "+3" or "-12%": a change worth showing, else ''.
-const change = (now, before) => {
-  if (!before) return '';
-  const d = now - before;
-  return Math.abs(d) < 3 ? '' : ` (${d > 0 ? '+' : ''}${num(d)})`;
-};
 // Paths read better than full URLs in a table.
 const shortPage = (url) => { try { return new URL(url).pathname + new URL(url).search; } catch { return url; } };
 
@@ -62,18 +55,26 @@ export function renderSearch({ week, prev, totals, prevTotals, queries, pages })
     out.push(`_No Google results recorded for ${week.startDate} to ${week.endDate} yet._`, '');
     return out.join('\n');
   }
+  const cell = (now, before) => `**${num(now)}** ${trend(now, before)}`.trim();
   out.push(
-    `${week.startDate} to ${week.endDate} (Google's numbers settle about three days late): the site showed up **${num(totals.impressions)}** times${change(totals.impressions, prevTotals?.impressions)} and got **${num(totals.clicks)}** clicks${change(totals.clicks, prevTotals?.clicks)}, ${pct(totals.ctr)} of the time. Average position ${pos(totals.position)}${prevTotals?.impressions ? ` (${pos(prevTotals.position)} the week before ${prev.startDate})` : ''}.`,
+    table(['Shown in Google', 'Clicks', 'Click rate', 'Average position'], [[
+      cell(totals.impressions, prevTotals?.impressions),
+      cell(totals.clicks, prevTotals?.clicks),
+      pct(totals.ctr),
+      `**${pos(totals.position)}**${prevTotals?.impressions ? ` (was ${pos(prevTotals.position)})` : ''}`,
+    ]]),
     '',
-    '### Searches that showed the site',
+    `${week.startDate} to ${week.endDate}; ▲▼ compare with the week from ${prev.startDate}. Google's numbers settle about three days late. A lower position is better: 1 is the top result.`,
     '',
-    'Google leaves out rare searches, so these add up to less than the total.',
-    '',
-    queries.length ? table(['Search', 'Clicks', 'Shown', 'Click rate', 'Position'], queries.map((r) => [r.keys[0], r.clicks, r.impressions, pct(r.ctr), pos(r.position)])) : '_None yet._',
+    queries.length
+      ? fold(`<b>Searches that showed the site</b>: top is "${queries[0].keys[0]}", shown ${num(queries[0].impressions)} times`,
+        'Google leaves out rare searches, so these add up to less than the total.\n\n'
+        + table(['Search', 'Clicks', 'Shown', 'Click rate', 'Position'], queries.map((r) => [r.keys[0], num(r.clicks), num(r.impressions), pct(r.ctr), pos(r.position)])))
+      : '_No searches listed yet._',
     '',
     '### Pages people reached from Google',
     '',
-    pages.length ? table(['Page', 'Clicks', 'Shown', 'Position'], pages.map((r) => [`\`${shortPage(r.keys[0])}\``, r.clicks, r.impressions, pos(r.position)])) : '_None yet._',
+    pages.length ? table(['Page', 'Clicks', 'Shown', 'Position'], pages.map((r) => [`\`${shortPage(r.keys[0])}\``, num(r.clicks), num(r.impressions), pos(r.position)])) : '_None yet._',
     '',
   );
   return out.join('\n');

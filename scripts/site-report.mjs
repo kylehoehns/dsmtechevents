@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { loadData } from '../src/lib/data.mjs';
+import { bar, fold, num, spark, table, trend } from './report-md.mjs';
 
 const ACCOUNT = 'd62c22c8dbe2380b540a92580ef4de5c';
 const DATASET = 'dsmtechevents_clicks';
@@ -21,26 +22,53 @@ const KIND_NAMES = {
   later: '"Further out" row', past: '"Recently" row', meetup: 'Groups page: Meetup', website: 'Groups page: website',
 };
 
-const table = (head, rows) => [`| ${head.join(' | ')} |`, `|${head.map((_, i) => (i ? '---:' : '---')).join('|')}|`, ...rows.map((r) => `| ${r.join(' | ')} |`)].join('\n');
-const change = (now, before) => (before ? `${now >= before ? '+' : ''}${Math.round(((now - before) / before) * 100)}% on the week before` : 'no data for the week before');
-
-// Pure: Web Analytics rows in, Markdown out. Each row is { key, visits, views }.
-export function renderTraffic({ week, prevWeek, month, days, pages, referrers, devices }) {
+// Pure: the summary that opens the report. Visits and views come as Web
+// Analytics rows ({ key, visits, views }); clicks and prevClicks are totals.
+export function renderHeadline({ week, prevWeek, month, days, clicks, prevClicks }) {
   const sum = (rows, k) => rows.reduce((n, r) => n + r[k], 0);
-  const [v7, p7, v30] = [sum(week, 'visits'), sum(week, 'views'), sum(month, 'visits')];
-  const share = (rows) => { const t = sum(rows, 'visits') || 1; return rows.map((r) => [r.key || '(unknown)', r.visits, `${Math.round((r.visits / t) * 100)}%`]); };
+  const cell = (now, before) => `**${num(now)}** ${trend(now, before)}`.trim();
   return [
     '# Site report',
     '',
-    `**${v7}** visits and **${p7}** page views in the last 7 days (${change(v7, sum(prevWeek, 'visits'))}). **${v30}** visits in the last 30.`,
+    table(['Visits', 'Page views', 'Clicks out', 'Visits by day'], [[
+      cell(sum(week, 'visits'), sum(prevWeek, 'visits')),
+      cell(sum(week, 'views'), sum(prevWeek, 'views')),
+      cell(clicks, prevClicks),
+      days.length ? `\`${spark(daily(days).map((r) => r.visits))}\`` : '—',
+    ]]),
     '',
-    '## Visits per day (UTC days)',
+    `The last 7 days; ▲▼ compare with the 7 before. **${num(sum(month, 'visits'))}** visits in the last 30.`,
     '',
-    days.length ? table(['Day', 'Visits', 'Page views'], days.map((r) => [r.key, r.visits, r.views])) : '_No visits yet._',
+  ].join('\n');
+}
+
+// Days rows oldest first, with the days nobody visited filled in as 0.
+function daily(days) {
+  const by = Object.fromEntries(days.map((r) => [r.key, r]));
+  const keys = days.map((r) => r.key).sort();
+  const out = [];
+  for (let d = new Date(`${keys[0]}T00:00:00Z`); d <= new Date(`${keys.at(-1)}T00:00:00Z`); d = new Date(d.getTime() + 86_400_000)) {
+    const key = d.toISOString().slice(0, 10);
+    out.push(by[key] ?? { key, visits: 0, views: 0 });
+  }
+  return out;
+}
+
+// Pure: Web Analytics rows in, Markdown out. Each row is { key, visits, views }.
+export function renderTraffic({ days, pages, referrers, devices }) {
+  const sum = (rows, k) => rows.reduce((n, r) => n + r[k], 0);
+  const max = (rows, k) => Math.max(...rows.map((r) => r[k]));
+  const share = (rows) => { const t = sum(rows, 'visits') || 1; return rows.map((r) => [r.key || '(unknown)', num(r.visits), `${bar(r.visits, t)} ${Math.round((r.visits / t) * 100)}%`]); };
+  const busiest = days.length && days.reduce((a, b) => (b.visits > a.visits ? b : a));
+  return [
+    days.length
+      ? fold(`Visits per day (UTC days): busiest ${busiest.key}, ${num(busiest.visits)} visits`,
+        table(['Day', 'Visits', 'Page views'], daily(days).reverse().map((r) => [r.key, num(r.visits), num(r.views)])))
+      : '_No visits yet._',
     '',
     '## Top pages, last 7 days',
     '',
-    pages.length ? table(['Page', 'Views', 'Visits'], pages.map((r) => [`\`${r.key}\``, r.views, r.visits])) : '_No page views yet._',
+    pages.length ? table(['Page', 'Views', '', 'Visits'], pages.map((r) => [`\`${r.key}\``, num(r.views), bar(r.views, max(pages, 'views')), num(r.visits)])) : '_No page views yet._',
     '',
     '## Where visits come from, last 30 days',
     '',
@@ -56,27 +84,31 @@ export function renderTraffic({ week, prevWeek, month, days, pages, referrers, d
 }
 
 // Pure: query results in, Markdown out. rows are { key, clicks } with clicks a number.
-export function renderReport({ week, month, kinds, events }, { groupNames = {}, eventTitles = {} } = {}) {
+export function renderReport({ week, prevWeek = [], month, kinds, events }, { groupNames = {}, eventTitles = {} } = {}) {
   const total = (rows) => rows.reduce((n, r) => n + r.clicks, 0);
+  const max = (rows) => Math.max(...rows.map((r) => r.clicks));
   const groupName = (id) => (id ? groupNames[id] ?? id : 'No group (conference / community event)');
   const weekBy = Object.fromEntries(week.map((r) => [r.key, r.clicks]));
+  const top = (rows, name) => `${name(rows[0].key)}, ${num(rows[0].clicks)}`;
   const lines = [
     '## Outbound clicks',
     '',
-    `**${total(week)}** clicks in the last 7 days, **${total(month)}** in the last 30.`,
+    `**${num(total(week))}** clicks in the last 7 days${trend(total(week), total(prevWeek)) && ` (${trend(total(week), total(prevWeek))})`}, **${num(total(month))}** in the last 30.`,
     'Each click on a joint meetup counts once for every host.',
     '',
     '### By group',
     '',
-    month.length ? table(['Group', 'Last 7 days', 'Last 30 days'], month.map((r) => [groupName(r.key), weekBy[r.key] ?? 0, r.clicks])) : '_No clicks yet._',
+    month.length ? table(['Group', 'Last 7 days', 'Last 30 days', ''], month.map((r) => [groupName(r.key), num(weekBy[r.key] ?? 0), num(r.clicks), bar(r.clicks, max(month))])) : '_No clicks yet._',
     '',
-    '### Listings people clicked through to, last 30 days',
+    events.length
+      ? fold(`<b>Listings people clicked through to, last 30 days</b>: top is ${top(events, (k) => eventTitles[k] ?? k)}`,
+        table(['Meetup or conference', 'Clicks'], events.map((r) => [eventTitles[r.key] ?? r.key, num(r.clicks)])))
+      : '_No clicks on listings yet._',
     '',
-    events.length ? table(['Meetup or conference', 'Clicks'], events.map((r) => [eventTitles[r.key] ?? r.key, r.clicks])) : '_No clicks on listings yet._',
-    '',
-    '### Which links get used, last 30 days',
-    '',
-    kinds.length ? table(['Link', 'Clicks'], kinds.map((r) => [KIND_NAMES[r.key] ?? r.key, r.clicks])) : '_No clicks yet._',
+    kinds.length
+      ? fold(`<b>Which links get used, last 30 days</b>: top is ${top(kinds, (k) => KIND_NAMES[k] ?? k)}`,
+        table(['Link', 'Clicks', ''], kinds.map((r) => [KIND_NAMES[r.key] ?? r.key, num(r.clicks), bar(r.clicks, max(kinds))])))
+      : '_No clicks yet._',
     '',
   ];
   return lines.join('\n');
@@ -138,8 +170,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   }
   // Launch-day test clicks are tagged smoke-test; leave them out.
   const since = (days) => `FROM ${DATASET} WHERE timestamp > NOW() - INTERVAL '${days}' DAY AND blob3 != 'smoke-test'`;
-  const [week, month, kinds, events] = await Promise.all([
+  const [week, prevWeek, month, kinds, events] = await Promise.all([
     query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${since(7)} GROUP BY key ORDER BY clicks DESC`, token),
+    query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${since(14)} AND timestamp <= NOW() - INTERVAL '7' DAY GROUP BY key ORDER BY clicks DESC`, token),
     query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${since(30)} GROUP BY key ORDER BY clicks DESC`, token),
     query(`SELECT blob1 AS key, SUM(_sample_interval) AS clicks ${since(30)} GROUP BY key ORDER BY clicks DESC`, token),
     query(`SELECT blob3 AS key, SUM(_sample_interval) AS clicks ${since(30)} AND blob3 != '' GROUP BY key ORDER BY clicks DESC LIMIT 10`, token),
@@ -157,8 +190,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   ]);
   // Visits from our own pages (moving between pages) aren't "where from".
   const referrers = tRefs.filter((r) => r.key !== 'dsmtechevents.com' && r.visits > 0);
-  const report = renderTraffic({ week: tWeek, prevWeek: tPrev, month: tMonth, days: tDays, pages: tPages, referrers, devices: tDevices })
-    + '\n' + renderReport({ week, month, kinds, events }, names(path.resolve(import.meta.dirname, '..')));
+  const total = (rows) => rows.reduce((n, r) => n + r.clicks, 0);
+  const report = renderHeadline({ week: tWeek, prevWeek: tPrev, month: tMonth, days: tDays, clicks: total(week), prevClicks: total(prevWeek) })
+    + '\n' + renderTraffic({ days: tDays, pages: tPages, referrers, devices: tDevices })
+    + '\n' + renderReport({ week, prevWeek, month, kinds, events }, names(path.resolve(import.meta.dirname, '..')));
   if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, report);
   console.log(report);
 }
