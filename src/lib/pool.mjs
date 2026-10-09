@@ -4,6 +4,7 @@
 // between them every event has exactly one card.
 import { dayKey } from './format.mjs';
 
+/** @param {{ upcoming: any[], past: any[] }} data */
 export function splitEvents({ upcoming, past }, now = Date.now()) {
   const today = dayKey(now);
   // Full rows through the end of next month; anything later is a compact set list.
@@ -24,6 +25,7 @@ export function splitEvents({ upcoming, past }, now = Date.now()) {
 // can show a "Past" section without the home page carrying them.
 // Archive records are slim (one host each, no address or About text). A
 // joint meetup is one record per host, so those fold together like mergeJoint.
+/** @param {{ past: any[], archive?: any[], byId: Record<string, any> }} data */
 export function pastEvents({ past, archive = [], byId }) {
   const key = (e) => `${e.start}|${e.title.toLowerCase().replace(/\W+/g, '')}`;
   const seen = new Set(past.flatMap((e) => [e.id, key(e)]));

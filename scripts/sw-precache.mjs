@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const PLACEHOLDER = /^const ASSETS = \[\];.*$/m;
+const PLACEHOLDER = /^const ASSETS = \[\];.*$/m;
 
 export function assetList(dist) {
   const dir = path.join(dist, '_astro');
