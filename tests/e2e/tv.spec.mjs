@@ -28,6 +28,20 @@ test('the overview shows every day of a multi-day event, with its hours apart', 
   await expect(page.locator('.poster-slide', { hasText: 'Test Conf 2026' }).locator('.time')).toHaveText('through Fri Oct 23 · 8a–5p');
 });
 
+test('overview rows carry the Tonight / Happening now stamp, and a headliner poster its countdown', async ({ page }) => {
+  await page.goto('/tv/?fx=off');
+  const tag = (title) => page.locator('.overview li', { hasText: title }).locator('.when-tag');
+  await expect(tag('Coding Dojo')).toHaveText('Tonight');
+  await expect(tag('Python Office Hours')).toHaveText('Tomorrow');
+  await expect(tag('Remote DevOps Chat')).toBeHidden();
+  // Test Conf is 8 days out: its poster says so, like its poster on the home page.
+  await expect(page.locator('.poster-slide.headliner', { hasText: 'Test Conf 2026' }).locator('.when-tag')).toHaveText('8 days out');
+
+  await page.clock.fastForward('09:00:00'); // 6pm, Coding Dojo is on
+  await page.keyboard.press('ArrowRight'); // the next slide change re-checks
+  await expect(tag('Coding Dojo')).toHaveText('Happening now');
+});
+
 test('drops events once they have ended', async ({ page }) => {
   await page.goto('/tv/');
   await expect(page.locator('.slide', { hasText: 'Coding Dojo' })).toHaveCount(2); // overview row + poster

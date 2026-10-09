@@ -209,7 +209,7 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 .poster .tape { position: absolute; top: -12px; left: 50%; width: 96px; height: 24px; margin-left: -48px; transform: rotate(-3deg); filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.28)); }
 /* Masking tape: torn zigzag ends, paper fibers and a light sheen across the
    middle. The shape is clipped on ::before so the shadow on .tape survives. */
-.poster .tape::before {
+.tape::before {
   content: ""; position: absolute; inset: 0;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.05)),

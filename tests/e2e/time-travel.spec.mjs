@@ -307,7 +307,7 @@ test('TV event mode across a whole event: Tomorrow, Tonight, the countdown, Happ
   await expect(stamp).toHaveText('Starts in 24 min');
   await page.clock.fastForward('00:30:00'); // 5:36pm
   await expect(stamp).toHaveText('Happening now');
-  await expect(stamp).toHaveClass(/\blive\b/);
+  await expect(stamp).toHaveCSS('background-color', 'rgb(224, 96, 159)'); // pink, like the rotation and home
 
   await page.clock.fastForward('02:00:00'); // 7:36pm, over
   await expect(slide.getByRole('heading', { name: 'Thanks for coming' })).toBeVisible();

@@ -186,7 +186,6 @@ export function eventMode(stage: HTMLElement, data: TvData, id: string, now = Da
         if (stamp) {
           stamp.textContent = liveLabel(e, t);
           stamp.hidden = !stamp.textContent;
-          stamp.classList.toggle('live', stamp.textContent === 'Happening now');
         }
       });
     } else {
