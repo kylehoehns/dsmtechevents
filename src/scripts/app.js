@@ -410,17 +410,21 @@ function renderDayPanel() {
   const list = eventsOn(state.day);
   const n = daysBetween(today, state.day);
   const rel = n === 0 ? ' · today' : n === 1 ? ' · tomorrow' : '';
-  dayPanel.innerHTML = `<h2>${dayName(state.day)}</h2>
+  // Built off to the side and swapped in at once: emptying the panel first
+  // let Safari lay out the short page and jump the scroll before refilling it.
+  const box = document.createElement('div');
+  const show = () => dayPanel.replaceChildren(...box.childNodes);
+  box.innerHTML = `<h2>${dayName(state.day)}</h2>
     <p class="sub">${list.length ? plural(list.length, 'event') : 'A quiet day'}${rel}</p>`;
   if (!list.length) {
-    dayPanel.insertAdjacentHTML('beforeend', '<p class="none">Nothing on the books. Pick a day with a mark.</p>');
-    return;
+    box.insertAdjacentHTML('beforeend', '<p class="none">Nothing on the books. Pick a day with a mark.</p>');
+    return show();
   }
   // A card still on its way: say so for the moment it takes.
   if (!poolFailed && list.some((e) => !cards.has(e.id))) {
     loadPool();
-    dayPanel.insertAdjacentHTML('beforeend', '<p class="none" aria-busy="true">Loading events…</p>');
-    return;
+    box.insertAdjacentHTML('beforeend', '<p class="none" aria-busy="true">Loading events…</p>');
+    return show();
   }
   const ul = document.createElement('ul');
   ul.className = 'shows';
@@ -456,7 +460,8 @@ function renderDayPanel() {
     }
     ul.append(card);
   }
-  dayPanel.append(ul);
+  box.append(ul);
+  show();
 }
 
 function renderMinical() {
@@ -644,7 +649,10 @@ document.addEventListener('click', (ev) => {
     if (!state.day.startsWith(state.month)) state.month = state.day.slice(0, 7);
     render();
     announce(dayStatus());
-    if (matchMedia('(max-width: 1059px)').matches) dayPanel.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    // Below the grid on a phone: bring the day's heading on screen only if it
+    // isn't already, so the grid stays put for the next tap. ('start' scrolled
+    // the grid away every time, landing wherever that day's panel height let it.)
+    if (matchMedia('(max-width: 1059px)').matches) $('.sub', dayPanel)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
   }
 });
 

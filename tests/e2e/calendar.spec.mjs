@@ -45,6 +45,20 @@ test('picking a day lists that day\'s events', async ({ page }) => {
   await expect(dayPanel(page)).toContainText('A quiet day');
 });
 
+test('picking day after day on a phone leaves the grid where it is', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'the day panel sits beside the grid on desktop');
+  await page.goto('/?view=calendar');
+  const grid = page.getByRole('group', { name: 'October 2026' });
+  // A busy day, a quiet one, a conference day: each panel is a different height,
+  // which used to leave the page scrolled somewhere different after every tap.
+  for (const day of ['Tuesday, October 20', 'Monday, October 19', 'Thursday, October 22', 'Tuesday, October 27']) {
+    await page.getByRole('button', { name: new RegExp(`^${day},`) }).tap();
+    await expect(dayPanel(page).getByRole('heading', { name: day })).toBeInViewport();
+    await expect(grid).toBeInViewport({ ratio: 1 });
+    expect(await page.evaluate(() => scrollY)).toBe(0);
+  }
+});
+
 test('the "Pick a day" hint goes once a day is picked', async ({ page }) => {
   const hint = page.locator('.cal-key').getByText('Pick a day to see its events');
   await page.goto('/?view=calendar');
