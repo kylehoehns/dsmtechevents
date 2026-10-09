@@ -78,7 +78,9 @@ const health = (h: any) => !h ? ['unknown', 'Not checked yet']
   .sources .facts { flex-basis: 100%; color: var(--ink-soft); }
   .quiet { margin-left: 8px; font: 600 var(--fs-label)/1 var(--mono); text-transform: none; color: var(--ink-soft); border: 1.5px solid var(--line); padding: 1px 5px; vertical-align: middle; }
   .health.ok { color: var(--blue-t); font-weight: 600; }
-  .health.partial, .health.failing { font-weight: 700; }
+  .health.partial { font-weight: 700; }
+  /* rare, so it gets the hand-lettered pink tag; Healthy stays quiet */
+  .sources .health.failing { font: 400 var(--fs-small)/1 var(--marker); color: var(--on-pink); background: var(--pink-fill); padding: 4px 6px 2px; transform: rotate(-2.5deg); }
   .health.unknown { color: var(--ink-soft); }
   section h2 { margin: 0 0 6px; font: 900 var(--fs-title)/1 var(--display); text-transform: uppercase; }
   dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; }

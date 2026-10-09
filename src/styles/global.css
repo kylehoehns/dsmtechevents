@@ -227,6 +227,10 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 }
 .poster .bill { display: flex; justify-content: space-between; gap: 8px; font: 700 var(--fs-label)/1 var(--mono); border-bottom: 2px solid currentColor; padding-bottom: 7px; }
 .poster h2 { font: 900 var(--fs-title-xl)/0.82 var(--display); text-transform: uppercase; margin: 8px 0 6px; }
+/* the title gets the other ink printed a little off, like the logo; full width so a wrapped title wraps the same in both */
+.poster h2 .misprint { display: block; }
+.poster h2 .misprint::before { right: 0; color: var(--blue-fill); mix-blend-mode: normal; opacity: 0.55; }
+.poster.blue h2 .misprint::before { color: var(--pink-fill); opacity: 1; }
 .poster .when { display: inline-block; font: 900 var(--fs-title)/0.9 var(--display); text-transform: uppercase; margin: 0 0 10px; background: var(--on-pink); color: var(--pink-fill); padding: 4px 8px 2px; }
 .poster.blue .when { background: var(--on-blue); color: var(--blue-fill); }
 .poster .where { margin: 0 0 10px; font: 600 var(--fs-meta)/1.35 var(--mono); }
