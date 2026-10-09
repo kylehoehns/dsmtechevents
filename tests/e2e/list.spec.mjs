@@ -136,6 +136,12 @@ test('while its poster is up, a conference row is a pink outline, and the venue 
   if (isMobile) await expect(conf.getByRole('link', { name: /Convention Center/ })).toBeVisible();
   else await expect(conf.getByRole('link', { name: /Convention Center/ })).toBeHidden();
 
+  // On its first day the poster's stamp says "Today" / "Happening now", so the row's tag stays hidden.
+  await page.clock.setFixedTime(new Date('2026-10-22T15:00:00Z'));
+  await page.reload();
+  await expect(page.locator('.poster .stamp-days')).toHaveClass(/\bday-of\b/);
+  await expect(conf.locator('.when-tag')).toBeHidden();
+
   // In the calendar (no posters there) the same card keeps its full pink fill.
   await page.goto('/?view=calendar&day=2026-10-22');
   const card = page.locator('#day-panel .show', { hasText: 'Test Conf 2026' });
@@ -159,7 +165,10 @@ test('overnight between conference days, the poster stamp agrees with the row', 
   await page.goto('/');
   const poster = page.getByRole('region', { name: 'Coming up soon' });
   await expect(poster.locator('.countdown')).toHaveText('Tomorrow');
-  await expect(row(page, 'Test Conf 2026').getByText('Tomorrow', { exact: true })).toBeVisible();
+  // The row's tag agrees, but stays hidden while the poster says it.
+  const tag = row(page, 'Test Conf 2026').locator('.when-tag');
+  await expect(tag).toHaveText('Tomorrow');
+  await expect(tag).toBeHidden();
 });
 
 test('a venue already listed above drops its street address', async ({ page }) => {
