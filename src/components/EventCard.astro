@@ -42,7 +42,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
 >
   <div class="date" aria-hidden="true">
     <span class="dow">{weekday(e.start)}</span>
-    <span class="num misprint" data-t={day(e.start)}>{day(e.start)}</span>
+    <span class:list={['num', { misprint: e.headliner }]} data-t={day(e.start)}>{day(e.start)}</span>
     <span class="mon">{month(e.start)}</span>
   </div>
 

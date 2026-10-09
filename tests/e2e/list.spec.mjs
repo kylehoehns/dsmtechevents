@@ -194,3 +194,9 @@ test.describe('on an iPhone', () => {
     await expect(map).toHaveAttribute('href', /^https:\/\/maps\.apple\.com\/\?q=Source%20Allies%2C%204501/);
   });
 });
+
+test('the offset ink stays on conference dates, not every row', async ({ page }) => {
+  await page.goto('/');
+  await expect(row(page, 'Test Conf 2026').locator('.date .num')).toHaveClass(/\bmisprint\b/);
+  await expect(row(page, 'Coding Dojo').locator('.date .num')).not.toHaveClass(/\bmisprint\b/);
+});
