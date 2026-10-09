@@ -481,20 +481,6 @@ function syncSearchBox() {
 }
 
 // ---- events ----
-// Switching between the list and the calendar, or picking a day, animates
-// (global.css, "list <-> calendar transitions"). The DOM has to change
-// inside the callback, so whatever reads the new page (focus, scrolling) goes
-// in there too. Without view transitions, or with reduced motion, it just runs.
-function transition(update, types) {
-  if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return update();
-  let vt;
-  try { vt = document.startViewTransition({ update, types }); } catch { vt = document.startViewTransition(update); }
-  // A transition cut short (another click) rejects; that's fine, the update still ran.
-  vt.finished.catch(() => {});
-  vt.ready.catch(() => {});
-  vt.updateCallbackDone.catch(() => {});
-}
-
 document.addEventListener('click', (ev) => {
   const t = ev.target;
 
@@ -511,7 +497,8 @@ document.addEventListener('click', (ev) => {
     if (nav.dataset.nav === state.view) { scrollTo({ top: 0 }); return; }
     state.view = nav.dataset.nav;
     if (state.view === 'calendar') { state.month = (state.day ?? today).slice(0, 7); state.q = ''; }
-    transition(() => { render(); scrollTo({ top: 0 }); }, state.view === 'calendar' ? ['view'] : ['view', 'back']);
+    render();
+    scrollTo({ top: 0 });
     announce(state.view === 'calendar' ? `Calendar, ${monthName(state.month, true)}` : 'Event list');
     return;
   }
@@ -559,13 +546,11 @@ document.addEventListener('click', (ev) => {
     state.day = goto.dataset.goto;
     dayPicked = true;
     state.month = state.day.slice(0, 7);
-    transition(() => {
-      render();
-      // The mini calendar is hidden in calendar view; move focus to the same day.
-      $(`.day[data-day="${state.day}"]`, calView)?.focus({ preventScroll: true });
-      scrollTo({ top: 0 });
-    }, ['view']);
+    render();
+    // The mini calendar is hidden in calendar view; move focus to the same day.
+    $(`.day[data-day="${state.day}"]`, calView)?.focus({ preventScroll: true });
     announce(dayStatus());
+    scrollTo({ top: 0 });
     return;
   }
 
@@ -585,11 +570,9 @@ document.addEventListener('click', (ev) => {
     state.day = cell.dataset.day;
     dayPicked = true;
     if (!state.day.startsWith(state.month)) state.month = state.day.slice(0, 7);
-    transition(() => {
-      render();
-      if (matchMedia('(max-width: 1059px)').matches) dayPanel.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-    }, ['day']);
+    render();
     announce(dayStatus());
+    if (matchMedia('(max-width: 1059px)').matches) dayPanel.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
   }
 });
 
@@ -628,9 +611,7 @@ addEventListener('popstate', () => {
     showSearchBox(false);
     if (hadFocus) searchBtn.focus();
   }
-  // Back or Forward between the list and the calendar animates like a Back.
-  if (state.view !== before.split('|')[0]) transition(render, ['view', 'back']);
-  else render();
+  render();
   announceFilter();
 });
 
