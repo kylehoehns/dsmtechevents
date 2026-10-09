@@ -2,6 +2,6 @@
   "fetchedAt": "2026-10-14T10:20:00.000Z",
   "logo": "https://secure.meetupstatic.com/photos/event/1/2/3/highres_111.jpeg",
   "events": [
-    { "id": "aws-dec", "title": "re:Invent Recap", "start": "2026-12-03T23:30:00.000Z", "end": "2026-12-04T01:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/aws-user-group-des-moines/events/1/", "venue": "Gravitate" }
+    { "id": "aws-dec", "title": "re:Invent Recap", "start": "2026-12-03T23:30:00.000Z", "end": "2026-12-04T01:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/aws-user-group-des-moines/events/1/", "venue": "Gravitate", "description": "What shipped at re:Invent, and a demo of the **Copilot** workflow our team built on Bedrock." }
   ]
 }
