@@ -275,14 +275,13 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 
 /* ---------- page layout: main column + side rail on desktop ---------- */
 /* Source order is the phone order: headliners, (mini calendar, desktop only),
-   filter, main, day panel, recent. Desktop places the rail pieces in column 2,
+   main (the group filter bar on top), day panel, recent. Desktop places the rail pieces in column 2,
    one row each, with the day panel on top. The last row is 1fr so a tall main
    column doesn't spread the rail. */
 .layout { display: flex; flex-direction: column; margin-top: 22px; }
 .layout > .main { min-width: 0; }
 .lead, .side { display: contents; }
 .lead > .headliners { margin-bottom: 12px; }
-.lead > .filter { margin-bottom: 18px; }
 .lead > .minical { display: none; }
 @media (min-width: 1060px) {
   .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; grid-template-rows: repeat(5, auto) 1fr; gap: 0 40px; align-items: start; }
@@ -293,7 +292,6 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
   .side > .day-panel { grid-row: 1; margin-top: 0; }
   .lead > .headliners { grid-row: 2; margin-top: 0; }
   .lead > .minical { grid-row: 3; margin-top: 22px; display: block; }
-  .lead > .filter { grid-row: 4; margin-top: 22px; }
   .side > .recent { grid-row: 5; margin-top: 22px; }
   .layout:not(:has(#headliners:not([hidden]))) .lead > .minical { margin-top: 0; }
 }
@@ -311,9 +309,8 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 @media (min-width: 1060px) { [data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 650px; } }
 
 /* ---------- group filter note: only while filtered to one group ---------- */
-.filter { border-top: 2px solid var(--line); border-bottom: 2px solid var(--line); padding: 8px 0; }
-.filter-note { font-size: var(--fs-meta); margin: 0; }
-.filter-note button { background: none; border: 0; padding: 0; text-decoration: underline; font-weight: 600; }
+.filter { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 18px; padding: 10px 14px; background: var(--paper-2); border: 2px solid var(--line); }
+.filter-note { font-size: var(--fs-lede); margin: 0; }
 .filter-note a { color: inherit; font-weight: 600; }
 
 /* ---------- section heads ---------- */
