@@ -126,7 +126,8 @@ const eventData = {
   .tv {
     --bg: #1d1c22; --ink: #ece6da; --soft: #bdb6aa; --pink: #e0609f; --blue: #93c2ff; --misprint: #c04f87;
     position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr auto;
-    background: var(--bg); color: var(--ink); overflow: hidden;
+    background: var(--bg); color: var(--ink);
+    overflow: clip; overflow-clip-margin: 8px; /* lets the headliner's pink bleed past the edge the drift uncovers */
     padding: 3vh 4vw 2vh; font-family: var(--sans);
     animation: tv-drift 600s ease-in-out infinite alternate; /* nudges everything a few px against burn-in */
   }
@@ -159,7 +160,7 @@ const eventData = {
   .overview .when-tag { display: inline-block; margin: 0 1vw 0 0; font: 400 2.6vh/1 var(--marker); background: var(--pink); color: #1d1b2b; padding: 0.5vh 0.6vw 0.2vh; transform: rotate(-3deg); }
 
   .poster-slide { align-items: center; gap: 4vw; padding: 3vh 0; }
-  .poster-slide.headliner { background: var(--pink); color: #1d1b2b; margin: 2vh -4vw; padding: 3vh 4vw; }
+  .poster-slide.headliner { background: var(--pink); color: #1d1b2b; margin: 2vh calc(-4vw - 8px); padding: 3vh calc(4vw + 8px); }
   .date-block { display: flex; flex-direction: column; align-items: center; gap: 1.6vh; min-width: 16vw; }
   .date-block .dow, .date-block .mon { font: 900 6vh/1 var(--display); text-transform: uppercase; }
   .date-block .num { font: 900 30vh/0.8 var(--display); color: var(--blue); }
@@ -270,7 +271,7 @@ const eventData = {
     .overview .row-title { grid-column: 1 / -1; grid-row: 2; white-space: normal; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
     .poster-slide { flex-direction: column; align-items: stretch; justify-content: center; gap: 3vh; }
-    .poster-slide.headliner { margin: 1.5vh -5vw; padding: 3vh 5vw; }
+    .poster-slide.headliner { margin: 1.5vh calc(-5vw - 8px); padding: 3vh calc(5vw + 8px); }
     .date-block { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 1vh 4vw; min-width: 0; }
     .date-block .dow, .date-block .mon { font-size: 9vw; }
     .date-block .num { font-size: 26vw; }

@@ -61,7 +61,7 @@ const span = rows.length ? `${month(rows[0].start)} ${day(rows[0].start)} – ${
         <p>
           <b>{more > 0 ? `+ ${more} more, and every group` : 'Every group, every date'}:</b>
           <span class="url">{siteHost}</span>
-          RSVP on each group's own page. Updated daily.
+          RSVP on each group's own page. Always current online.
         </p>
       </footer>
 
@@ -109,7 +109,7 @@ const span = rows.length ? `${month(rows[0].start)} ${day(rows[0].start)} – ${
   .tabs span:last-child { border-left: 0; } /* rotate(180deg) puts each left border on the right */
   .tear-note { position: absolute; right: 0.6in; bottom: calc(1.3in + 6px); margin: 0; font: 400 17px/1 var(--marker); transform: rotate(-4deg); }
 
-  @media screen and (max-width: 8.6in) { .sheet { min-height: 0; } .sheet h1 { font-size: 48px; } .sheet-foot p { min-width: 0; } .sheet-foot .url { font-size: clamp(18px, 6vw, 28px); overflow-wrap: anywhere; } .lineup li { grid-template-columns: 1fr; grid-template-areas: 'd' 't' 'what' 'w'; } }
+  @media screen and (max-width: 8.6in) { .sheet { min-height: 0; } .sheet h1 { font-size: 48px; } .sheet-foot { flex-wrap: wrap; } .sheet-foot p { flex: 1 1 240px; } /* under the QR code when the URL (240px at most) won't fit beside it */ .sheet-foot .url { font-size: clamp(18px, 6vw, 28px); } .lineup li { grid-template-columns: 1fr; grid-template-areas: 'd' 't' 'what' 'w'; } }
 
   @page { size: letter; margin: 0; }
   @media print {

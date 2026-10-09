@@ -9,7 +9,7 @@ import { month, day, shortTime } from '../lib/format.mjs';
 // search: the events page's search button and box (app.js runs them). Every
 // other page gets the same button as a link to /?search, so the nav row never
 // shifts between pages and search works from anywhere.
-interface Props { bare?: boolean; search?: boolean; title?: string; headTitle?: string; description?: string; noindex?: boolean; nav?: 'list' | 'calendar' | 'groups' | 'about' | 'organizers' | null; updatedAt?: string; blurb?: string }
+interface Props { bare?: boolean; search?: boolean; title?: string; headTitle?: string; description?: string; noindex?: boolean; nav?: 'list' | 'calendar' | 'groups' | 'about' | 'organizers' | 'status' | null; updatedAt?: string; blurb?: string }
 const { bare = false, search = false, title, headTitle, description = site.tagline, noindex = false, nav = 'list', updatedAt, blurb } = Astro.props;
 const pageTitle = headTitle ?? (title ? `${title} · ${site.name}` : site.name);
 // Same time style as the event list: "Oct 8, 5:52a".

@@ -5,7 +5,7 @@ import EventCard from '../components/EventCard.astro';
 import { loadData } from '../lib/data.mjs';
 import { splitEvents } from '../lib/pool.mjs';
 import { eventJsonLd, websiteJsonLd, toScript } from '../lib/jsonld.mjs';
-import { dayKey, lastDay, weekday, day, month, shortTime, addDays, daysBetween, monthName, plural, countdown, dateRange, recentSummary } from '../lib/format.mjs';
+import { dayKey, lastDay, weekday, day, month, shortTime, addDays, daysBetween, monthName, plural, countdown, dayOf, dateRange, recentSummary } from '../lib/format.mjs';
 
 const { events, upcoming, past, endingSoon, groups, byId, updatedAt } = loadData();
 
@@ -38,6 +38,21 @@ const HEADLINER_DAYS = 30;
 const DAYS_WORD = ['One', 'Two', 'Three', 'Four', 'Five'];
 const conferenceLength = (e: any) => { const n = daysBetween(dayKey(e.start), lastDay(e.start, e.end)) + 1; return `${DAYS_WORD[n - 1] ?? n}-day conference`; };
 const headliners = upcoming.filter((e) => e.headliner && daysBetween(today, dayKey(e.start)) <= HEADLINER_DAYS);
+// Each poster is taped up its own way: a small tilt and where its tape sits,
+// from a hash of the event id, so a poster looks the same on every visit and
+// a third one doesn't copy the first. Ink (pink, blue) still alternates.
+function posterLook(id: string) {
+  let h = 2166136261; // FNV-1a
+  for (const c of id) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0;
+  const unit = (shift: number) => ((h >>> shift) & 0xff) / 255; // 0..1, from 8 bits of the hash
+  const sign = h & 1 ? 1 : -1;
+  return [
+    `--tilt: ${(sign * (0.3 + unit(1) * 0.7)).toFixed(2)}deg`, // 0.3-1deg either way
+    `--tape-x: ${(32 + unit(9) * 36).toFixed(1)}%`, // the tape's middle, 32-68% across
+    `--tape-w: ${Math.round(82 + unit(17) * 16)}px`,
+    `--tape-rot: ${(-sign * (1.5 + unit(24) * 3)).toFixed(1)}deg`, // leans against the tilt
+  ].join('; ');
+}
 
 // Recent events shows the last few; "+ All N" opens the rest (90 days' worth).
 const PAST_SHOWN = 3;
@@ -68,20 +83,20 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
     <div class="lead">
       {headliners.length > 0 && (
         <section class="headliners" id="headliners" aria-label="Coming up soon">
-          {headliners.map((e, i) => (
-            <article class:list={['poster', { blue: i % 2 }]} data-end={e.end} data-groups={e.groupIds.join(' ')} data-id={e.id}>
+          {headliners.map((e, i) => { const stamp = countdown(e.start, e.end, Date.now(), e); return (
+            <article class:list={['poster', { blue: i % 2 }]} style={posterLook(e.id)} data-end={e.end} data-groups={e.groupIds.join(' ')} data-id={e.id}>
               <div class="poster-full">
-                <span class="halftone" aria-hidden="true" />
                 <span class="tape" aria-hidden="true" />
                 <div class="bill"><span>Headliner</span><span>{conferenceLength(e)}</span></div>
                 <h2>{e.title}</h2>
                 <p class="when">{e.multiDay ? dateRange(e.start, e.end) : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
-                <span class="stamp-days countdown" data-start={e.start} data-end={e.end} data-days={e.multiDay && !e.allDay ? '' : undefined}>{countdown(e.start, e.end, Date.now(), e)}</span>
+                {/* On the day itself the hand-lettered note gives way to a pasted-up strip (app.js re-checks both). */}
+                <span class:list={['stamp-days', 'countdown', { 'day-of': dayOf(stamp) }]} data-start={e.start} data-end={e.end} data-days={e.multiDay && !e.allDay ? '' : undefined}>{stamp}</span>
                 <p class="where">{e.venue}{e.address && <><br />{e.address}</>}</p>
                 <a class="go btn btn-outline" href={e.url} target="_blank" rel="noopener" data-click="poster">RSVP & info<span class="sr-only">: {e.title} (opens in new tab)</span> <OutArrow /></a>
               </div>
             </article>
-          ))}
+          ); })}
         </section>
       )}
 
@@ -100,7 +115,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         {sections.map((s) => (
           <section class="sec" data-sec>
             <div class="sec-head"><h2>{s.title}</h2><span class="count" data-count>{plural(s.items.length, 'event')}</span></div>
-            <ul class="shows">{s.items.map((e) => <EventCard event={e} byId={byId} />)}</ul>
+            <ul class="shows">{s.items.map((e) => <EventCard event={e} byId={byId} posted={headliners.some((h) => h.id === e.id)} />)}</ul>
           </section>
         ))}
         {far.length > 0 && (
