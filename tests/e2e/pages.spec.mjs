@@ -31,7 +31,7 @@ test('status page lists every group, quiet ones included, with source and health
   await expect(row('UX').getByRole('link')).toHaveCount(0); // no Groups card to link to
   await expect(row('AWS')).toContainText('Partial since Oct 12');
   await expect(row('Pyowa')).toContainText('Healthy');
-  await expect(row('Pyowa')).toContainText('Meetup · changed Oct 14 · 1 coming up');
+  await expect(row('Pyowa')).toContainText('Meetup · changed Oct 14, 5:20a · 1 coming up');
   await expect(page.getByText('most recently on Oct 14')).toBeVisible();
 });
 
