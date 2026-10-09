@@ -127,3 +127,18 @@ test.describe('on an iPhone', () => {
     await expect(map).toHaveAttribute('href', /^https:\/\/maps\.apple\.com\/\?q=Source%20Allies%2C%204501/);
   });
 });
+
+test("find-in-page can reach a closed About, and opening it that way keeps the card in step", async ({ page }) => {
+  await page.goto('/');
+  const card = row(page, 'Coding Dojo');
+  const about = card.locator('.desc');
+  // Closed, but findable: hidden="until-found", not display: none.
+  await expect(about).toHaveAttribute('hidden', 'until-found');
+  // What the browser does on a Ctrl/Cmd+F match inside it: fire beforematch, then reveal.
+  await about.evaluate((el) => { el.dispatchEvent(new Event('beforematch', { bubbles: true })); el.hidden = false; });
+  await expect(card.getByRole('button', { name: /About/ })).toHaveAttribute('aria-expanded', 'true');
+  await expect(about).toBeVisible();
+  // The button still closes it, back to findable.
+  await card.getByRole('button', { name: /About/ }).click();
+  await expect(about).toHaveAttribute('hidden', 'until-found');
+});

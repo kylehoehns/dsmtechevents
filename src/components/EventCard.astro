@@ -89,7 +89,7 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
     {(e.description || e.photo) && <button type="button" class="more" aria-expanded="false" aria-controls={descId}>About<span class="sr-only"> {e.title}</span></button>}
   </div>
   {(e.description || e.photo) && (
-    <div class="desc" id={descId} hidden>
+    <div class="desc" id={descId} hidden="until-found">
       {/* Phones hide the photo square, so the full-size flyer lives here. */}
       {e.photo && <img class="desc-photo" src={photo.large} {...size} alt={`Event image for ${e.title}`} loading="lazy" decoding="async" />}
       {e.description && <Fragment set:html={formatDescription(e.description)} />}

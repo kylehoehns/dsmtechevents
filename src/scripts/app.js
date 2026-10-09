@@ -440,7 +440,7 @@ function renderDayPanel() {
     const time = $('.time[data-full]', card);
     if (time) time.textContent = time.dataset.full;
     const desc = $('.desc', card);
-    if (desc) { desc.id += '-day'; desc.hidden = true; $('.more', card)?.setAttribute('aria-controls', desc.id); }
+    if (desc) { desc.id += '-day'; desc.hidden = 'until-found'; $('.more', card)?.setAttribute('aria-controls', desc.id); }
     // Over (a past day, or earlier today): read it like Recent events does.
     // "went", not "going", and no RSVP button; the title still links to it.
     if (Date.parse(e.end) <= now) {
@@ -722,6 +722,16 @@ setInterval(keepCurrent, 60_000);
 const EASE = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
 const MS = 380;
 
+// Find-in-page (Ctrl/Cmd+F) can reach a closed About (hidden="until-found"):
+// on a match the browser opens it itself, so bring the card along to match.
+document.addEventListener('beforematch', (ev) => {
+  const desc = ev.target.closest?.('.desc');
+  const card = desc?.closest('.show');
+  if (!card) return;
+  $('.more', card)?.setAttribute('aria-expanded', 'true');
+  card.classList.add('open');
+}, true);
+
 async function toggleAbout(more) {
   const card = more.closest('.show');
   if (card.dataset.animating) return;
@@ -729,7 +739,7 @@ async function toggleAbout(more) {
   const open = more.getAttribute('aria-expanded') !== 'true';
   const set = (isOpen) => {
     more.setAttribute('aria-expanded', String(isOpen));
-    desc.hidden = !isOpen;
+    desc.hidden = isOpen ? false : 'until-found';
     card.classList.toggle('open', isOpen);
   };
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return set(open);

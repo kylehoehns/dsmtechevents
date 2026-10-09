@@ -110,7 +110,10 @@ a { color: inherit; }
 h1, h2, h3 { overflow-wrap: break-word; } /* a word wider than the screen breaks instead of being cut off */
 button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 3px solid var(--blue-t); outline-offset: 2px; }
-[hidden] { display: none !important; }
+/* hidden="until-found" (an event's About text) stays findable by the
+   browser's find-in-page, which opens it on a match; display: none would
+   take it out of reach. */
+[hidden]:not([hidden="until-found"]) { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .skip:focus { position: fixed; top: 8px; left: 8px; width: auto; height: auto; overflow: visible; clip-path: none; z-index: 200; background: var(--ink); color: var(--paper); font: 600 var(--fs-meta)/1.2 var(--mono); padding: 8px 12px; text-decoration: none; }
 html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* keep focus out from under the iOS install hint */
