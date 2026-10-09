@@ -124,9 +124,37 @@ async function query(sql, token) {
 
 // Web Analytics (GraphQL): visits and page views for dsmtechevents.com,
 // grouped by one dimension, between two dates.
+// Cloudflare answers a range longer than a week from a much thinner sample:
+// on 2026-10-09 a 7-day query counted about 4 in 5 page loads and a 30-day
+// one about 1 in 13, so 30-day visits came out lower than 7-day visits. A
+// long range is asked for a week at a time and the weeks added up.
+const WEEK = 7 * 86_400_000;
+async function traffic(token, dim, from, to, limit = 10, order = 'sum_visits_DESC') {
+  if (to - from <= WEEK) return trafficRetry(token, dim, from, to, limit, order);
+  const weeks = [];
+  // datetime_geq and datetime_leq both include their end, so each earlier
+  // week stops 1 ms short of the next.
+  for (let end = to; end > from; end = new Date(end - WEEK - 1)) weeks.push([new Date(Math.max(from, end - WEEK)), end]);
+  const parts = await Promise.all(weeks.map(([s, e]) => trafficRetry(token, dim, s, e, 1000, order)));
+  return mergeRows(parts.flat(), order).slice(0, limit);
+}
+
+// Rows from several weeks into one row per key, sorted the way the query asked.
+export function mergeRows(rows, order) {
+  const by = new Map();
+  for (const r of rows) {
+    const m = by.get(r.key) ?? { key: r.key, visits: 0, views: 0 };
+    m.visits += r.visits;
+    m.views += r.views;
+    by.set(r.key, m);
+  }
+  const sorts = { date_DESC: (a, b) => (a.key < b.key ? 1 : -1), count_DESC: (a, b) => b.views - a.views, sum_visits_DESC: (a, b) => b.visits - a.visits };
+  return [...by.values()].sort(sorts[order]);
+}
+
 // Cloudflare's analytics API sometimes answers "unable to execute query,
 // please try again later" (serviceUnavailable); try twice more before failing.
-async function traffic(token, ...args) {
+async function trafficRetry(token, ...args) {
   for (let attempt = 1; ; attempt++) {
     try { return await trafficOnce(token, ...args); } catch (e) {
       if (attempt === 3 || !/serviceUnavailable|try again later/.test(e.message)) throw e;
