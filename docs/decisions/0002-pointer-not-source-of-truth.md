@@ -13,15 +13,16 @@ from the original.
 
 DSM Tech Events lists events and links out. Each event links to its own
 page, and people sign up there. The site does not offer calendar exports
-(`.ics`), feeds, sign-up forms or its own per-event pages. The Add page says
-the same thing to organizers: "We link to your Meetup page or site, and
-people sign up there, not here."
+(`.ics`), feeds, sign-up forms or its own per-event pages. The organizers
+page says the same thing: "We link to your Meetup page or site, and people
+RSVP there, not here."
 
 ## Consequences
 
 - No accounts, no forms and no user data to look after.
 - A wrong detail is fixed at the source and shows up at the next refresh.
-- Feature requests for exports, feeds or event pages are out of scope; the
-  answer is to subscribe to the group's own calendar.
+- Feature requests for exports, feeds or event pages are out of scope (see
+  [decision 6](0006-ideas-turned-down.md) for these and other ideas turned
+  down, and what would reopen each).
 - The outbound links matter a lot, so they are checked weekly
   (`scripts/check-links.mjs`).

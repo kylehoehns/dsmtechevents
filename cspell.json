@@ -6,8 +6,8 @@
   "files": ["src/pages/**/*.astro", "src/components/**/*.astro", "src/layouts/**/*.astro", "*.md", "docs/**/*.md", ".github/**/*.md"],
   "ignoreRegExpList": ["Urls", "/%[0-9A-F]{2}\\w*/g", "/\\b(?:FBAN|FBAV|EdgiOS)\\b/g"],
   "words": [
-    "appinstalled", "beforeinstallprompt", "checkdist", "coworking", "dsmtechevents", "ical", "kyhoehns", "lede",
+    "appinstalled", "beforeinstallprompt", "checkdist", "coworking", "dsmtechevents", "ical", "kyhoehns", "lede", "llms",
     "meetupstatic", "minical", "Moines", "precached", "prerendered", "pyowa", "qrcode", "setlist",
-    "speculationrules", "subgrid", "urlname", "zizmor"
+    "speculationrules", "subgrid", "urlname", "webcal", "zizmor"
   ]
 }
