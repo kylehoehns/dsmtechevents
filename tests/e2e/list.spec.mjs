@@ -195,9 +195,8 @@ test.describe('on an iPhone', () => {
   });
 });
 
-test('the offset ink stays on the headliners: poster titles and conference dates, not every row', async ({ page }) => {
+test('the offset ink stays on conference dates, not every row', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.poster h2 .misprint')).toHaveAttribute('data-t', 'Test Conf 2026');
   await expect(row(page, 'Test Conf 2026').locator('.date .num')).toHaveClass(/\bmisprint\b/);
   await expect(row(page, 'Coding Dojo').locator('.date .num')).not.toHaveClass(/\bmisprint\b/);
 });

@@ -88,7 +88,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
               <div class="poster-full">
                 <span class="tape" aria-hidden="true" />
                 <div class="bill"><span>Headliner</span><span>{conferenceLength(e)}</span></div>
-                <h2><span class="misprint" data-t={e.title}>{e.title}</span></h2>
+                <h2>{e.title}</h2>
                 <p class="when">{e.multiDay ? dateRange(e.start, e.end) : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`}</p>
                 {/* On the day itself the hand-lettered note gives way to a pasted-up strip (app.js re-checks both). */}
                 <span class:list={['stamp-days', 'countdown', { 'day-of': dayOf(stamp) }]} data-start={e.start} data-end={e.end} data-days={e.multiDay && !e.allDay ? '' : undefined}>{stamp}</span>
