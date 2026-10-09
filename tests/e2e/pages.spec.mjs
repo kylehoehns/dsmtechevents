@@ -35,6 +35,13 @@ test('status page lists every group, quiet ones included, with source and health
   await expect(page.getByText('most recently on Oct 14')).toBeVisible();
 });
 
+test('the status page keeps the main nav, with no tab marked current', async ({ page }) => {
+  await page.goto('/status/');
+  const nav = page.getByRole('navigation', { name: 'Main' });
+  await expect(nav.getByRole('link')).toHaveText(['Events', 'Calendar', 'Groups']);
+  await expect(nav.locator('[aria-current]')).toHaveCount(0);
+});
+
 test('the about page links to the status page', async ({ page }) => {
   await page.goto('/about/');
   await page.getByRole('link', { name: "see each source's status" }).click();
@@ -97,6 +104,13 @@ test('the footer links to the organizers page, which links the TV and print page
 test('the print flyer is kept out of search, like the TV and status pages', async ({ page }) => {
   await page.goto('/print/');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+});
+
+test('the print flyer keeps the site address on one line', async ({ page }) => {
+  await page.goto('/print/');
+  const url = page.locator('.sheet-foot .url');
+  const { height, size } = await url.evaluate((el) => ({ height: el.getBoundingClientRect().height, size: parseFloat(getComputedStyle(el).fontSize) }));
+  expect(height).toBeLessThan(size * 1.5);
 });
 
 test('security.txt expires a year after the build', async ({ request }) => {

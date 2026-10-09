@@ -23,7 +23,7 @@ const health = (h: any) => !h ? ['unknown', 'Not checked yet']
   : h.kind === 'details' ? ['partial', `Partial since ${onDay(h.since)}`]
   : ['failing', `Failing since ${onDay(h.since)}`];
 ---
-<Layout nav={null} updatedAt={updatedAt} noindex headTitle="Status · DSM Tech Events"
+<Layout nav="status" updatedAt={updatedAt} noindex headTitle="Status · DSM Tech Events"
   description="Where each group's events come from on DSM Tech Events, when they last changed, and whether the latest refresh could read them.">
   <div class="page-head"><h1>Status</h1></div>
 
