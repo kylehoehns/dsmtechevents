@@ -100,7 +100,9 @@ async function query(access, site, body) {
 }
 
 async function main() {
-  const out = (md) => (process.env.GITHUB_STEP_SUMMARY ? fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${md}\n`) : console.log(md));
+  // The run's summary page, and the log too: the summary can't be read
+  // from the command line, the log can (gh run view --log).
+  const out = (md) => { console.log(md); if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${md}\n`); };
   if (!process.env.GSC_SERVICE_ACCOUNT) {
     out('## Google Search\n\n_Not set up: add the GSC_SERVICE_ACCOUNT secret (see docs/ANALYTICS.md)._\n');
     return;
