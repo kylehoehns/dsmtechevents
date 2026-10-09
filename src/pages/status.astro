@@ -9,7 +9,7 @@
 // are listed here too, since every other page hides them.
 import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
-import { month, day } from '../lib/format.mjs';
+import { month, day, shortTime } from '../lib/format.mjs';
 import { site } from '../lib/site.mjs';
 
 const { allGroups, updatedAt, checkedOn } = loadData();
@@ -41,7 +41,7 @@ const health = (h: any) => !h ? ['unknown', 'Not checked yet']
           <li>
             <h2>{g.quiet ? g.short : <a href={`/groups/#${g.id}`}>{g.short}</a>}{g.quiet && <span class="quiet">Quiet</span>}</h2>
             <p class={`health ${kind}`}>{label}</p>
-            <p class="facts">{[source(g), g.fetchedAt && `changed ${date(g.fetchedAt)}`].filter(Boolean).join(' · ')} · {g.states.map((s: any) => <span {...s.attrs}>{s.count} coming up</span>)}</p>
+            <p class="facts">{[source(g), g.fetchedAt && `changed ${date(g.fetchedAt)}, ${shortTime(g.fetchedAt)}`].filter(Boolean).join(' · ')} · {g.states.map((s: any) => <span {...s.attrs}>{s.count} coming up</span>)}</p>
           </li>
         );
       })}
