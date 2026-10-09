@@ -4,7 +4,7 @@
 // State lives in the URL (?view=calendar&group=cijug&day=2026-10-15, ?q=java)
 // so any view can be shared or bookmarked.
 import { fold, queryTerms, matchesAll, matchSpans, excerpt } from '../lib/search.mjs';
-import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, recentSummary, plainText } from '../lib/format.mjs';
+import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, dayOf, recentSummary, plainText } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -74,7 +74,11 @@ function freshen(t) {
     if (tag.textContent !== label) tag.textContent = label;
     tag.hidden = !label;
   }
-  for (const el of $$('.countdown[data-start]')) el.textContent = countdown(el.dataset.start, el.dataset.end, t, { multiDay: 'days' in el.dataset });
+  for (const el of $$('.countdown[data-start]')) {
+    const stamp = countdown(el.dataset.start, el.dataset.end, t, { multiDay: 'days' in el.dataset });
+    el.textContent = stamp;
+    el.classList.toggle('day-of', dayOf(stamp));
+  }
   return dropped;
 }
 freshen(now);
@@ -432,7 +436,7 @@ function renderDayPanel() {
       continue;
     }
     card.hidden = false;
-    card.classList.remove('same-day', 'addr-seen');
+    card.classList.remove('same-day', 'addr-seen', 'posted'); // the calendar shows no posters, so a conference keeps its full fill here
     const tag = $('.when-tag', card);
     if (tag) tag.hidden = true;
     // The panel hides the card's date block, so a conference's time line

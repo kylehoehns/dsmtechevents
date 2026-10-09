@@ -86,6 +86,10 @@ export function countdown(start, end, now = Date.now(), opts = {}) {
   const n = daysBetween(dayKey(now), dayKey(start));
   return n <= 0 ? 'Today' : n === 1 ? 'Tomorrow' : `${n} days out`;
 }
+// A countdown() stamp that says it's on the day ("Today", "In 25 min",
+// "Happening now"). The poster pastes those up as a loud strip instead of the
+// hand-lettered note; the build and app.js both ask this, about countdown()'s answer.
+export const dayOf = (stamp) => stamp !== 'Tomorrow' && !stamp.endsWith(' days out');
 
 // The stamp on the event-mode TV slide (/tv/?event=): "Starts in 25 min" in
 // the last hour, "Tonight at 6p" / "Tomorrow at 6p" from whenLabel(), the

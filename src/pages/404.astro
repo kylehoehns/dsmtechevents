@@ -3,5 +3,27 @@ import Layout from '../layouts/Layout.astro';
 ---
 <Layout title="Not found" nav={null} noindex blurb="That page isn't on the sheet.">
   <div class="page-head"><h1>Nothing here</h1></div>
-  <p class="empty"><a href="/">See what's coming up</a> or <a href="/groups/">browse the groups</a>.</p>
+  {/* Where a poster used to be: a clean patch of wall, the tape still up,
+      a scrap of the poster under one strip. */}
+  <div class="torn">
+    <span class="scrap" aria-hidden="true"></span>
+    <span class="tape left" aria-hidden="true"></span>
+    <span class="tape right" aria-hidden="true"></span>
+    <p class="torn-note">Someone tore this one down.</p>
+    <p class="empty"><a href="/">See what's coming up</a> or <a href="/groups/">browse the groups</a>.</p>
+  </div>
 </Layout>
+
+<style>
+  .torn { position: relative; max-width: 420px; margin: 40px 0 8px; padding: 44px 22px 22px; background: var(--paper-2); }
+  .torn-note { margin: 0; font: 900 var(--fs-title)/1 var(--display); text-transform: uppercase; }
+  .torn .empty { padding: 10px 0 0; }
+  .tape { top: -12px; }
+  .tape.left { left: -18px; --tape-w: 92px; transform: rotate(-38deg); }
+  .tape.right { right: -16px; --tape-w: 84px; transform: rotate(33deg); }
+  /* the corner of the poster that wouldn't come off: pink stock, torn edges */
+  .scrap {
+    position: absolute; top: -6px; left: -8px; width: 74px; height: 58px; background: var(--pink-fill);
+    clip-path: polygon(0 0, 100% 0, 93% 14%, 97% 27%, 84% 38%, 78% 55%, 62% 61%, 51% 78%, 36% 80%, 22% 96%, 9% 89%, 0 100%);
+  }
+</style>
