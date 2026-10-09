@@ -543,6 +543,7 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 /* no logo of their own: a monogram in our type, so the card still has its tile */
 .flyer .logo-mono { display: grid; place-items: center; background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); font: 900 26px/1 var(--display); letter-spacing: -0.01em; }
 .flyer h2 { margin: 0; font: 900 var(--fs-title-l)/0.9 var(--display); text-transform: uppercase; overflow-wrap: anywhere; }
+.flyer h2 a { text-decoration: none; }
 .flyer .full { margin: 0; font-size: var(--fs-label); line-height: 1.35; }
 .flyer .facts { grid-column: -2 / -1; margin: 3px 0 0; font: var(--fs-label)/1.3 var(--mono); color: var(--ink-soft); }
 .flyer .next { margin: 10px 0 0; padding-top: 8px; border-top: 1.5px dashed var(--line); font-size: var(--fs-meta); }
@@ -618,11 +619,12 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
    tall without looking any bigger. A see-through ::after box, centered on the
    control, takes the tap; the layout doesn't move. (min() keeps a control
    that is already taller at its own size.) The group name on a card grows
-   up, away from the title link just below it. The organizers' event picker
+   up, away from the title link just below it; a Groups card's name grows
+   both ways (nothing else on the card is a link near it). The organizers' event picker
    is a real form field, so it simply gets taller. */
 @media (pointer: coarse) {
-  :is(.btn, .more, .band a) { position: relative; }
-  :is(.btn, .more)::after { content: ""; position: absolute; left: 0; right: 0; top: min(0px, calc(50% - 22px)); bottom: min(0px, calc(50% - 22px)); }
+  :is(.btn, .more, .band a, .flyer h2 a) { position: relative; }
+  :is(.btn, .more, .flyer h2 a)::after { content: ""; position: absolute; left: 0; right: 0; top: min(0px, calc(50% - 22px)); bottom: min(0px, calc(50% - 22px)); }
   .band a::after { content: ""; position: absolute; left: 0; right: 0; top: min(0px, calc(100% - 41px)); bottom: -3px; }
   .builder select { min-height: 44px; }
 }
@@ -643,7 +645,7 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
   .btn-solid:hover { background: var(--btn-hover-bg, var(--blue-fill)); color: var(--btn-hover-fg, var(--on-blue)); border-color: var(--btn-hover-bg, var(--blue-fill)); }
   .btn-outline:hover { background: var(--btn-hover-bg, var(--pink-fill)); color: var(--btn-hover-fg, var(--on-pink)); border-color: var(--btn-hover-bg, var(--pink-fill)); }
   .cal-nav .btn[aria-disabled="true"]:hover { background: var(--paper); color: var(--ink-soft); border-color: var(--line); }
-  .band a:hover { color: var(--blue-t); text-decoration: underline; text-decoration-thickness: 2px; }
+  :is(.band a, .flyer h2 a):hover { color: var(--blue-t); text-decoration: underline; text-decoration-thickness: 2px; }
   .title a:hover { text-decoration: underline; text-underline-offset: 3px; }
   .meta a.map:hover .venue { text-decoration-style: solid; }
   .setlist a:hover .row-title { text-decoration: underline; }
