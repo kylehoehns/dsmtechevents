@@ -31,7 +31,7 @@ const events = (soon.length >= 3 ? soon : upcoming.filter((e) => !e.repeat)).sli
 // On the overview slide: one code to the whole site.
 const siteQr = await QRCode.toString(site.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#1d1b2b', light: '#0000' } });
 
-const whereOf = (e) => (e.online ? 'Online' : [e.venue, e.address].filter(Boolean).join(' · ') || 'Venue TBA');
+const whereOf = (e: { online?: boolean; venue?: string; address?: string }) => (e.online ? 'Online' : [e.venue, e.address].filter(Boolean).join(' · ') || 'Venue TBA');
 const slides = await Promise.all(events.map(async (e) => ({
   e,
   hosts: e.hostsLabel,

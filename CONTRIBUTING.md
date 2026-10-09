@@ -48,12 +48,23 @@ npm run dev      # http://localhost:4321
 npm test         # unit tests, on saved fixtures, no network
 npm run build    # tests, then astro build, then scripts/check-dist.mjs
 npm run spell    # spelling in page copy and docs (not event text)
+npm run check    # lint, knip, typecheck and spell: run before a PR
 ```
 
 The spelling check runs in CI next to the build. It covers the words we write
 (`src/pages`, `src/components`, `src/layouts` and the Markdown docs), never the
 event titles and descriptions that come from the groups. If it flags a real
 word, like a group's name, add it to `words` in `cspell.json`.
+
+`npm run check` runs the spelling check plus three code checks. `lint` is
+ESLint with correctness rules only (unused variables, undefined names,
+`==`), not style. `knip` finds files, exports and dependencies nothing
+uses; delete them rather than keeping them "just in case". `typecheck`
+(`astro check`) catches a wrong prop or a misspelled field in `.astro` and
+`.ts` files. CI also lints the workflows with actionlint and zizmor. When a
+check is wrong about something deliberate, switch it off as narrowly as you
+can (one rule, one file) in `eslint.config.mjs` or `knip.jsonc`, with a
+comment that says why.
 
 ### Browser tests
 
@@ -78,7 +89,7 @@ add an event to the fixture data.
 
 1. Branch from `main` and open a pull request. Nobody pushes to `main`
    directly.
-2. Two checks run: `test-and-build` (`npm run build` and `npm run spell`) and
+2. Two checks run: `test-and-build` (`npm run build` and `npm run check`) and
    `e2e` (the browser tests below). A PR can merge only when both are green.
 3. Each PR branch gets a preview at
    `<branch>-dsmtechevents.kyhoehns.workers.dev`. Merging deploys to

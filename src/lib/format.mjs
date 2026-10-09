@@ -25,7 +25,7 @@ export const isDayKey = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s ?? '') && !Number.is
 export const weekday = (iso) => weekdayShort.format(new Date(iso));
 export const month = (iso) => monthShort.format(new Date(iso));
 export const day = (iso) => dayNum.format(new Date(iso));
-export const fullDate = (iso) => longDate.format(new Date(iso));
+const fullDate = (iso) => longDate.format(new Date(iso));
 // Day keys ("2026-10-22") are plain dates, so day math on them is UTC-safe.
 export const addDays = (key, n) => new Date(Date.parse(key) + n * DAY).toISOString().slice(0, 10);
 export const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / DAY);
@@ -136,13 +136,13 @@ export const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&
 // and *** / --- rule lines (dropped; they only separate paragraphs).
 export function formatDescription(text = '') {
   return escapeHtml(text)
-    .replace(/\\([*_#\[\]()-])/g, '$1')
+    .replace(/\\([*_#[\]()-])/g, '$1')
     .replace(/^[ \t]*([-*_])(?:[ \t]*\1){2,}[ \t]*$/gm, '') // a *** / --- / ___ rule line: a paragraph break
     .split(/\n{2,}/)
     .map((para) => para.trim())
     .filter(Boolean)
     .map((para) => {
-      let html = para
+      const html = para
         .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" rel="noopener" target="_blank">$1<span class="sr-only"> (opens in new tab)</span></a>')
         .replace(/(^|[\s(])(https?:\/\/[^\s<)]+?)(?=[.,;:!?]*(?:[\s<)]|$))/g, '$1<a href="$2" rel="noopener" target="_blank">$2<span class="sr-only"> (opens in new tab)</span></a>')
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
@@ -158,7 +158,7 @@ export function formatDescription(text = '') {
 // [{ time: '7p', title, speaker }], or [] when there's no lineup.
 const TALK = /^\*\*\s*(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m\.?\s*[·•|–—-]\s*(.+?)\s*\*\*\s*(?:[—–-]\s*(.+?))?\s*$/gim;
 export function lineup(text = '') {
-  return [...String(text ?? '').replace(/\\([*_#\[\]()-])/g, '$1').matchAll(TALK)].map(([, h, m, ap, title, speaker]) => ({
+  return [...String(text ?? '').replace(/\\([*_#[\]()-])/g, '$1').matchAll(TALK)].map(([, h, m, ap, title, speaker]) => ({
     time: `${Number(h)}${m && m !== '00' ? `:${m}` : ''}${ap.toLowerCase()}`,
     title,
     speaker: speaker ?? '',

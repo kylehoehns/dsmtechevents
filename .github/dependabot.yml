@@ -13,6 +13,10 @@ updates:
       time: '06:00'
       timezone: America/Chicago
     open-pull-requests-limit: 5
+    # Skip releases younger than a week: a hijacked package version is
+    # usually caught and pulled within days (zizmor checks for this).
+    cooldown:
+      default-days: 7
     groups:
       # One PR for every minor and patch update. Major updates still get
       # their own PR each, since those are the ones that break things.
@@ -27,6 +31,8 @@ updates:
       time: '06:00'
       timezone: America/Chicago
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     groups:
       # One PR for all workflow action updates.
       actions:

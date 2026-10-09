@@ -1,6 +1,6 @@
 // Copy buttons (/organizers/). Without clipboard access, select
 // the text on the page instead, so it can be copied by hand.
-export async function copyText(text: string, shown: HTMLElement) {
+async function copyText(text: string, shown: HTMLElement) {
   try {
     await navigator.clipboard.writeText(text);
     return true;

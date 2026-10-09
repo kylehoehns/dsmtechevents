@@ -18,7 +18,7 @@ const monogram = (name: string) => name.split(/\s+/).filter(Boolean)
   description={`${groups.length} Des Moines and central Iowa tech user groups: Python, Java, .NET, AI, AWS, security, UX and more, with each one's next meetup.`}>
   <h1 class="sr-only">Des Moines tech groups</h1>
   <div class="board">
-    {sorted.map((g, i) => (
+    {sorted.map((g) => (
       <article id={g.id} data-groups={g.id} class="flyer has-logo">
         <div class="flyer-head">
           {g.logo

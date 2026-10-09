@@ -14,6 +14,7 @@ const CATCH_UP = 2 * 86_400_000;
 // whole site from a fixture folder by setting DSM_DATA_DIR (see
 // playwright.config.mjs); unset, it's the real data/.
 export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'data'), now = Date.now() } = {}) {
+  /** @type {(f: string) => any[]} */
   const readYaml = (f) => YAML.parse(fs.readFileSync(path.join(dataDir, f), 'utf8')) ?? [];
   const groups = readYaml('groups.yaml').map((g) => readGroup(g, dataDir));
   const byId = Object.fromEntries(groups.map((g) => [g.id, g]));

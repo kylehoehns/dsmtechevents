@@ -8,7 +8,7 @@ import { loadData } from '../lib/data.mjs';
 import { weekday, day, month, shortTime, monthName, dateRange } from '../lib/format.mjs';
 import { site } from '../lib/site.mjs';
 
-const { upcoming, byId } = loadData();
+const { upcoming } = loadData();
 const DAYS = 28;
 const MAX = 11; // what fits above the QR code and tear-off tabs on one page
 const horizon = Date.now() + DAYS * 86_400_000;

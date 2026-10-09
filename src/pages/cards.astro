@@ -17,7 +17,7 @@ import { dayKey, month, day } from '../lib/format.mjs';
 const data = loadData();
 const { pooled, today } = splitEvents(data);
 const pastRows = pastEvents({ ...data, past: [...data.endingSoon, ...data.past] });
-const year = (e) => (dayKey(e.start).slice(0, 4) === today.slice(0, 4) ? '' : `, ${dayKey(e.start).slice(0, 4)}`);
+const year = (e: { start: string }) => (dayKey(e.start).slice(0, 4) === today.slice(0, 4) ? '' : `, ${dayKey(e.start).slice(0, 4)}`);
 ---
 <!doctype html>
 <html lang="en">
