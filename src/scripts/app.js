@@ -3,6 +3,7 @@
 // the month calendar and the mini calendar in the side rail.
 // State lives in the URL (?view=calendar&group=cijug&day=2026-10-15, ?q=java)
 // so any view can be shared or bookmarked.
+import './catch-up.js';
 import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, recentSummary } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -11,6 +12,7 @@ const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const { events, groups } = JSON.parse($('#calendar-data').textContent);
 const listView = $('#list-view');
 const calView = $('#calendar-view');
+const groupsView = $('#groups-view');
 const dayPanel = $('#day-panel');
 const minical = $('#minical');
 const recent = $('#recent');
@@ -91,10 +93,13 @@ const lastMonth = events.reduce((m, e) => { const k = lastDay(e.start, e.end).sl
 const inRange = (key) => key.slice(0, 7) >= firstMonth && key.slice(0, 7) <= lastMonth;
 
 // ---- state ----
+// The tabs, left to right: a switch to the right wipes forward, to the left
+// wipes back (global.css, "list <-> calendar transitions").
+const VIEWS = ['list', 'calendar', 'groups'];
 const state = {};
 function readUrl() {
   const params = new URLSearchParams(location.search);
-  state.view = params.get('view') === 'calendar' ? 'calendar' : 'list';
+  state.view = VIEWS.includes(params.get('view')) ? params.get('view') : 'list';
   // Ignore unknown groups (and inherited names like ?group=constructor) and
   // dates that don't exist, rather than rendering an empty or broken page.
   state.group = Object.hasOwn(groups, params.get('group') ?? '') ? params.get('group') : '';
@@ -103,6 +108,8 @@ function readUrl() {
   // A search looks through every group, and shows its results in the list.
   state.q = (params.get('q') ?? '').trim().slice(0, 100);
   if (state.q) { state.group = ''; state.view = 'list'; }
+  // The Groups view shows every group; a filter or search doesn't carry into it.
+  if (state.view === 'groups') { state.group = ''; state.day = null; }
 }
 readUrl();
 
@@ -115,7 +122,7 @@ function announce(text) { status.textContent = text; }
 let synced = null;
 function syncUrl() {
   const p = new URLSearchParams();
-  if (state.view === 'calendar') p.set('view', 'calendar');
+  if (state.view !== 'list') p.set('view', state.view);
   if (state.group) p.set('group', state.group);
   if (state.view === 'calendar' && state.day) p.set('day', state.day);
   if (state.q) p.set('q', state.q);
@@ -234,7 +241,7 @@ function renderSide() {
   for (const p of $$('.poster')) p.hidden = !shows(p);
   // The calendar already shows conference days in pink; skip the posters there.
   const headliners = $('#headliners');
-  if (headliners) headliners.hidden = state.view === 'calendar' || $$('.poster', headliners).every((p) => p.hidden);
+  if (headliners) headliners.hidden = state.view !== 'list' || $$('.poster', headliners).every((p) => p.hidden);
 
   const list = $('#recent-list');
   const limit = Number(list.dataset.shown);
@@ -253,8 +260,8 @@ function renderSide() {
     if (all.getAttribute('aria-expanded') !== 'true') all.textContent = `+ All ${shown}`;
   }
   // A search or one group's view shows past events in the Past section instead.
-  recent.hidden = state.view === 'calendar' || shown === 0 || !!state.q || !!state.group;
-  minical.hidden = state.view === 'calendar';
+  recent.hidden = state.view !== 'list' || shown === 0 || !!state.q || !!state.group;
+  minical.hidden = state.view !== 'list';
   dayPanel.hidden = state.view !== 'calendar';
 }
 
@@ -403,7 +410,7 @@ function renderMinical() {
 // ---- render ----
 let listShown = 0;
 function render() {
-  const viewName = state.view === 'calendar' ? 'Calendar' : '';
+  const viewName = { calendar: 'Calendar', groups: 'Groups' }[state.view] ?? '';
   const groupName = state.group ? groups[state.group].short : state.q ? `'${state.q}'` : '';
   document.title = groupName || viewName ? [groupName, viewName, siteName].filter(Boolean).join(' · ') : siteTitle;
   for (const a of $$('.nav a[data-nav]')) {
@@ -411,13 +418,15 @@ function render() {
   }
   listView.hidden = state.view !== 'list';
   calView.hidden = state.view !== 'calendar';
-  // Layout.astro sets this before first paint for ?view=calendar links; the
-  // CSS that reads it must agree with the hidden flags above.
-  if (state.view === 'calendar') document.documentElement.dataset.view = 'calendar';
+  groupsView.hidden = state.view !== 'groups';
+  // Layout.astro sets this before first paint for ?view= links; the CSS that
+  // reads it must agree with the hidden flags above.
+  if (state.view !== 'list') document.documentElement.dataset.view = state.view;
   else delete document.documentElement.dataset.view;
   // The calendar, a search and one group's past all read the card pool.
   if (state.view === 'calendar' || state.q || state.group) loadPool();
-  if (state.view === 'list') { listShown = renderList(); renderMinical(); } else { pastResults.hidden = true; renderCalendar(); }
+  if (state.view === 'list') { listShown = renderList(); renderMinical(); }
+  else { pastResults.hidden = true; if (state.view === 'calendar') renderCalendar(); }
   renderSide();
   syncSearchBox();
   syncUrl();
@@ -485,6 +494,9 @@ function syncSearchBox() {
 // (global.css, "list <-> calendar transitions"). The DOM has to change
 // inside the callback, so whatever reads the new page (focus, scrolling) goes
 // in there too. Without view transitions, or with reduced motion, it just runs.
+// 'back' when the new view's tab is left of the old one's.
+const viewTypes = (from, to) => (VIEWS.indexOf(to) < VIEWS.indexOf(from) ? ['view', 'back'] : ['view']);
+
 function transition(update, types) {
   if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return update();
   let vt;
@@ -505,14 +517,16 @@ document.addEventListener('click', (ev) => {
     return;
   }
 
-  const nav = t.closest('[data-nav="list"], [data-nav="calendar"]');
-  if (nav) {
+  const nav = t.closest('[data-nav]');
+  if (nav && VIEWS.includes(nav.dataset.nav) && !ev.metaKey && !ev.ctrlKey) {
     ev.preventDefault();
     if (nav.dataset.nav === state.view) { scrollTo({ top: 0 }); return; }
+    const from = state.view;
     state.view = nav.dataset.nav;
     if (state.view === 'calendar') { state.month = (state.day ?? today).slice(0, 7); state.q = ''; }
-    transition(() => { render(); scrollTo({ top: 0 }); }, state.view === 'calendar' ? ['view'] : ['view', 'back']);
-    announce(state.view === 'calendar' ? `Calendar, ${monthName(state.month, true)}` : 'Event list');
+    if (state.view === 'groups') { state.group = ''; state.q = ''; }
+    transition(() => { render(); scrollTo({ top: 0 }); }, viewTypes(from, state.view));
+    announce({ calendar: `Calendar, ${monthName(state.month, true)}`, groups: 'Groups' }[state.view] ?? 'Event list');
     return;
   }
 
@@ -529,11 +543,13 @@ document.addEventListener('click', (ev) => {
   const groupLink = t.closest('a[data-group]');
   if (groupLink && !ev.metaKey && !ev.ctrlKey) {
     ev.preventDefault();
+    const from = state.view;
     state.group = groupLink.dataset.group;
     state.view = 'list';
     state.q = '';
-    render();
-    $('#filter').scrollIntoView({ block: 'start' });
+    // From a card in the Groups view: back to the list, filtered.
+    if (from !== 'list') transition(() => { render(); $('#filter').scrollIntoView({ block: 'start' }); }, viewTypes(from, 'list'));
+    else { render(); $('#filter').scrollIntoView({ block: 'start' }); }
     announceFilter();
     return;
   }
@@ -628,8 +644,9 @@ addEventListener('popstate', () => {
     showSearchBox(false);
     if (hadFocus) searchBtn.focus();
   }
-  // Back or Forward between the list and the calendar animates like a Back.
-  if (state.view !== before.split('|')[0]) transition(render, ['view', 'back']);
+  // Back or Forward between views animates in the direction of the tabs.
+  const from = before.split('|')[0];
+  if (state.view !== from) transition(render, viewTypes(from, state.view));
   else render();
   announceFilter();
 });

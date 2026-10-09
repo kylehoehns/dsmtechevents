@@ -2,6 +2,7 @@
 import OutArrow from '../components/OutArrow.astro';
 import Layout from '../layouts/Layout.astro';
 import EventCard from '../components/EventCard.astro';
+import GroupBoard from '../components/GroupBoard.astro';
 import { loadData } from '../lib/data.mjs';
 import { splitEvents } from '../lib/pool.mjs';
 import { eventJsonLd, websiteJsonLd, toScript } from '../lib/jsonld.mjs';
@@ -134,6 +135,12 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
       </section>
 
       <section id="calendar-view" aria-label="Calendar" hidden></section>
+
+      {/* The Groups tab, switched to in place like the calendar (?view=groups);
+          /groups/ prints the same cards for direct links and search. */}
+      <section id="groups-view" aria-label="Groups" hidden>
+        <GroupBoard groups={groups} />
+      </section>
     </div>
 
     <aside class="side" aria-label="Day details and recent events">

@@ -297,6 +297,12 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 @media (min-width: 760px) { [data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 860px; } }
 @media (min-width: 1060px) { [data-view="calendar"] .main:has(> #calendar-view[hidden]) { min-height: 650px; } }
 
+/* Groups view (?view=groups): the group cards across the full width, with no
+   side rail. Layout.astro sets data-view before first paint, as for the calendar. */
+[data-view="groups"] :is(#list-view, #headliners, #minical, #recent, #filter, #day-panel, #past-results) { display: none; }
+[data-view="groups"] #groups-view > .board { margin-top: 0; }
+@media (min-width: 1060px) { [data-view="groups"] .layout { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
 /* ---------- group filter note: only while filtered to one group ---------- */
 .filter { border-top: 2px solid var(--line); border-bottom: 2px solid var(--line); padding: 8px 0; }
 .filter-note { font-size: var(--fs-meta); margin: 0; }

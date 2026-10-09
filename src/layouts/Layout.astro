@@ -77,7 +77,8 @@ const speculation = JSON.stringify({
       try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}
       // A shared calendar link hides the list before first paint, so it never
       // flashes up and then jumps away. app.js keeps this in sync after that.
-      if (new URLSearchParams(location.search).get('view') === 'calendar') document.documentElement.dataset.view = 'calendar';
+      const view = new URLSearchParams(location.search).get('view');
+      if (view === 'calendar' || view === 'groups') document.documentElement.dataset.view = view;
     </script>
     {!bare && <script type="speculationrules" is:inline set:html={speculation} />}
   </head>
@@ -97,14 +98,14 @@ const speculation = JSON.stringify({
                 <a href="/groups/" data-nav="groups" aria-current={nav === 'groups' ? 'page' : undefined}>Groups</a>
               </nav>
               )}
-              {/* /?view=calendar is the same page as the list, built with Events as
-                  the current tab; fix the tab now, before first paint, rather than
+              {/* /?view=calendar and /?view=groups are the same page as the list,
+                  built with Events as the current tab; fix the tab now, before first paint, rather than
                   when app.js runs (which made Events flash on). */}
               {nav === 'list' && (
               <script is:inline>
-                if (document.documentElement.dataset.view === 'calendar') {
+                if (document.documentElement.dataset.view) {
                   document.querySelector('[data-nav="list"]').removeAttribute('aria-current');
-                  document.querySelector('[data-nav="calendar"]').setAttribute('aria-current', 'page');
+                  document.querySelector(`[data-nav="${document.documentElement.dataset.view}"]`).setAttribute('aria-current', 'page');
                 }
               </script>
               )}

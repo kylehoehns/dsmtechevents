@@ -1,0 +1,52 @@
+---
+// The group cards: the /groups/ page and the home page's Groups view
+// (?view=groups, which app.js switches to in place) both print this, so the
+// two can't drift apart. "See events" carries data-group so app.js can switch
+// to that group's list in place too; on /groups/ it's a plain link.
+import OutArrow from './OutArrow.astro';
+import { weekday, day, month, shortTime } from '../lib/format.mjs';
+
+interface Props { groups: any[] }
+const { groups } = Astro.props;
+// Alphabetical by the name on the card, so a group is easy to find.
+const sorted = [...groups].sort((a, b) => a.short.localeCompare(b.short, 'en', { sensitivity: 'base' }));
+const when = (e: any) => `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
+// A group with no logo gets a monogram tile instead, so every card lines up:
+// "Iowans of Things" -> "IoT" (small joining words stay lowercase).
+const monogram = (name: string) => name.split(/\s+/).filter(Boolean)
+  .map((w) => (/^(of|the|and|&|for|in)$/i.test(w) ? w[0].toLowerCase() : w[0].toUpperCase())).join('').slice(0, 4);
+---
+<div class="board">
+  {sorted.map((g, i) => (
+    <article id={g.id} data-groups={g.id} class="flyer has-logo">
+      <div class="flyer-head">
+        {g.logo
+          ? <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />
+          : <span class="logo-img logo-mono" aria-hidden="true">{monogram(g.short)}</span>}
+        <h2>{g.short}{!g.showFullName && g.name !== g.short && <span class="sr-only"> ({g.name})</span>}{g.returning && <> <span class="back-tag" data-end={g.nextEvent.end}>Back!</span></>}</h2>
+        {g.showFullName && <p class="full">{g.name}</p>}
+        {(g.members || g.pastCount) && (
+          <p class="facts">{[g.members && `${g.members.toLocaleString('en-US')} members`, g.pastCount && `${g.pastCount} meetups`].filter(Boolean).join(' · ')}</p>
+        )}
+      </div>
+      {/* Next, last and the button, now and after each of the next few events ends (g.states in lib/data.mjs). */}
+      {g.states.map((s: any) => (
+        <p class="next" {...s.attrs}>
+          {s.next
+            ? <><span class="next-when">Next: {when(s.next)}</span><span class="sr-only">, </span><span class="next-title">{s.next.title}</span><span class="sr-only">, </span>{s.next.online ? 'Online' : `@\u00a0${s.next.venue ?? 'Venue TBA'}`} · {s.next.allDay ? 'All day' : shortTime(s.next.start)}</>
+            : <><span class="next-when idle">Nothing scheduled</span>Check their page for what's next.</>}
+        </p>
+      ))}
+      {g.states.map((s: any) => s.last && (
+        <p class="last" {...s.attrs}>Last event {month(s.last.start)} {day(s.last.start)}{s.last.going ? ` · ${s.last.going} went` : ''}</p>
+      ))}
+      <div class="links">
+        {g.states.map((s: any) => s.count > 0
+          ? <a class="primary btn btn-solid btn-small" href={`/?group=${g.id}`} data-group={g.id} {...s.attrs}>See events<span class="sr-only"> from {g.short}</span></a>
+          : s.last && <a class="btn btn-outline btn-small" href={`/?group=${g.id}`} data-group={g.id} {...s.attrs}>See events<span class="sr-only"> from {g.short}</span></a>)}
+        {g.meetupUrl && <a class="btn btn-outline btn-small" href={g.meetupUrl} target="_blank" rel="noopener" data-click="meetup">Meetup<span class="sr-only"> page for {g.short} (opens in new tab)</span> <OutArrow /></a>}
+        {g.website && <a class="btn btn-outline btn-small" href={g.website} target="_blank" rel="noopener" data-click="website">Website<span class="sr-only"> for {g.short} (opens in new tab)</span> <OutArrow /></a>}
+      </div>
+    </article>
+  ))}
+</div>
