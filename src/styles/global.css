@@ -166,7 +166,9 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 @media (max-width: 259px) { .nav a { font-size: var(--fs-ui); padding: 7px 8px 6px; } }
 
 /* search (events page): opens under the nav from the magnifier button; app.js runs it */
-.search { display: flex; }
+/* Above the logo: its big letters (and their pink copy) hang a few pixels
+   below its box on desktop, over the top of this row, and took the clicks. */
+.search { display: flex; position: relative; z-index: 1; }
 .search input {
   flex: 1; min-width: 0; height: 44px; padding: 0 12px; margin: 0; border: 2px solid var(--line); border-radius: 0;
   background: var(--sheet); color: var(--ink); font: 600 var(--fs-ui)/1 var(--mono); -webkit-appearance: none; appearance: none;
