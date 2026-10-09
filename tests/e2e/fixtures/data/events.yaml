@@ -10,3 +10,20 @@
   description: Two days of talks.
   tags: [conference]
   headliner: true
+
+# Evenings on the two daylight-saving Sundays, for time-travel.spec.mjs:
+# clocks fall back at 2am on Nov 1 2026 and spring forward on Mar 14 2027.
+- title: Fall Back Hack Night
+  url: https://example.com/fall-back
+  start: 2026-11-01
+  time: "18:00"
+  endTime: "20:00"
+  venue: Gravitate
+  address: 1250 SE Gateway Dr, Grimes, IA 50111
+- title: Spring Forward Hack Night
+  url: https://example.com/spring-forward
+  start: 2027-03-14
+  time: "18:00"
+  endTime: "20:00"
+  venue: Gravitate
+  address: 1250 SE Gateway Dr, Grimes, IA 50111

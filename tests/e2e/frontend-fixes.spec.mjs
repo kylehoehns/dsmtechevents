@@ -145,7 +145,7 @@ test('This week shows on a phone held sideways', async ({ page }) => {
 });
 
 test('the calendar stops at the months the data covers', async ({ page }) => {
-  // Fixture data runs from September 2026 to January 2027.
+  // Fixture data runs from September 2026 to March 2027.
   await page.goto('/?view=calendar&day=1999-01-01');
   await expect(page.getByRole('heading', { name: 'October 2026' })).toBeVisible();
 
@@ -159,7 +159,7 @@ test('the calendar stops at the months the data covers', async ({ page }) => {
   // August days in the first row can't be picked either.
   await expect(page.locator('.day[data-day="2026-08-31"]')).toBeDisabled();
 
-  await page.goto('/?view=calendar&day=2027-01-14');
-  await expect(page.getByRole('heading', { name: 'January 2027' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Nothing listed after January 2027' })).toHaveAttribute('aria-disabled', 'true');
+  await page.goto('/?view=calendar&day=2027-03-14');
+  await expect(page.getByRole('heading', { name: 'March 2027' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Nothing listed after March 2027' })).toHaveAttribute('aria-disabled', 'true');
 });

@@ -21,7 +21,7 @@ test('switches to the calendar and pages through months', async ({ page }) => {
   await page.getByRole('button', { name: 'Previous month' }).click();
   await expect(page.getByRole('heading', { name: 'November 2026' })).toBeVisible();
   // November's first day with something on it.
-  await expect(dayPanel(page)).toContainText('AI Study Group');
+  await expect(dayPanel(page)).toContainText('Fall Back Hack Night');
   await page.getByRole('button', { name: 'Today', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'October 2026' })).toBeVisible();
 });
