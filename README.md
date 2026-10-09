@@ -92,7 +92,7 @@ aren't on Meetup.
 
 ## Run it yourself
 
-You need Node 22 or newer.
+You need Node 26 or newer.
 
 ```sh
 npm install

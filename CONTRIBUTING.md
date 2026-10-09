@@ -39,7 +39,7 @@ change. Why things are the way they are: [docs/decisions/](docs/decisions/).
 
 ### Setup
 
-You need Node 22 or newer; CI uses Node 24, the version in `.nvmrc`.
+You need Node 26 or newer, the version in `.nvmrc` (CI and Cloudflare's build use it too).
 
 ```sh
 npm install
