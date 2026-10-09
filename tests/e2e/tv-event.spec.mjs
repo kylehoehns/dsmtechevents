@@ -60,7 +60,7 @@ test("CIJUG's event slide stays up longer than the rest", async ({ page }) => {
 test("Up next lists events after CIJUG's, by date, not CIJUG's own", async ({ page }) => {
   await page.goto(`/tv/?event=${EVENT}`);
   const rows = page.locator('.ev-next li');
-  await expect(rows.locator('.row-title')).toHaveText(['Test Conf 2026', 'Remote DevOps Chat', 'AI Study Group', 're:Invent Recap']);
+  await expect(rows.locator('.row-title')).toHaveText(['Test Conf 2026', 'Remote DevOps Chat', 'Fall Back Hack Night', 'AI Study Group', 're:Invent Recap']);
   await expect(rows.first()).toContainText('Thu Oct 22');
   await expect(rows.first().locator('.row-group')).toHaveText('Conference');
   await expect(page.locator('.ev-next-all .qr-code svg')).toBeAttached();

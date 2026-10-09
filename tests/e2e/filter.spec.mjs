@@ -24,7 +24,7 @@ test('a group link filters the list, and the note offers the group and a way out
   await expect(page.locator('#filter')).toBeHidden();
   await expect(list(page)).toBeFocused();
   await expect(event(page, 'Python Office Hours')).toBeVisible();
-  await expect(page.getByRole('status')).toHaveText('Showing 7 events');
+  await expect(page.getByRole('status')).toHaveText('Showing 9 events');
 });
 
 test('there is no group picker until a group is chosen', async ({ page }) => {

@@ -628,7 +628,18 @@ if (openSearch) { showSearchBox(true); searchInput.focus(); }
 function keepCurrent() {
   if (document.hidden) return;
   const t = Date.now();
-  if (dayKey(t) !== today) { location.reload(); return; }
+  if (dayKey(t) !== today) {
+    // A calendar on this month with a day it picked for itself (not one
+    // someone chose) put that day in the address; drop it, so the reload
+    // picks again for the new today instead of reopening on yesterday.
+    if (state.view === 'calendar' && !dayPicked && state.month === today.slice(0, 7)) {
+      const url = new URL(location.href);
+      url.searchParams.delete('day');
+      history.replaceState(null, '', url);
+    }
+    location.reload();
+    return;
+  }
   if (freshen(t)) { listShown = renderList(); renderSide(); }
 }
 document.addEventListener('visibilitychange', keepCurrent);

@@ -114,7 +114,7 @@ test('no match shows a friendly note that clears the search', async ({ page }) =
   await expect(box(page)).toBeFocused();
   await expect(box(page)).toHaveValue('');
   await expect(event(page, 'Coding Dojo')).toBeVisible();
-  await expect(page.getByRole('status')).toHaveText('Showing 7 events');
+  await expect(page.getByRole('status')).toHaveText('Showing 9 events');
 });
 
 test('past matches read as past and link out; Recent events steps aside', async ({ page }) => {
