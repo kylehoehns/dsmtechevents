@@ -369,6 +369,9 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 .more::before { content: "+ "; content: "+ " / ""; font-weight: 700; }
 .more[aria-expanded="true"]::before { content: "– "; content: "– " / ""; }
 .desc { grid-column: 1 / -1; margin-top: 8px; padding: 10px 12px; background: var(--paper-2); font-size: var(--fs-small); line-height: 1.55; max-width: 72ch; overflow-wrap: anywhere; }
+/* Closed (hidden="until-found"): the browser still lays the box out, only
+   skipping what's inside, so it takes no room until it opens. */
+.desc[hidden="until-found"] { margin: 0; padding: 0; background: none; }
 .desc p { margin: 0 0 0.7em; }
 .desc p:last-child { margin: 0; }
 .desc h4 { margin: 12px 0 4px; font: 800 var(--fs-ui)/1 var(--display); text-transform: uppercase; }
