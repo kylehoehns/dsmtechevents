@@ -274,3 +274,13 @@ test('every page has the search button in the same spot; elsewhere it opens sear
   await expect(page).toHaveURL(/\/(\?search)?$/);
   await expect(page.getByRole('searchbox', { name: 'Search events' })).toBeFocused();
 });
+
+test('a click anywhere on the search box lands in it, not on the logo above', async ({ page }) => {
+  await page.goto('/?search');
+  const input = page.getByRole('searchbox', { name: 'Search events' });
+  const box = await input.boundingBox();
+  for (const f of [0.05, 0.25, 0.5]) {
+    const hit = await page.evaluate(([x, y]) => document.elementFromPoint(x, y)?.closest('a, input')?.tagName, [box.x + 30, box.y + box.height * f]);
+    expect(hit, `${f} of the way down`).toBe('INPUT');
+  }
+});
