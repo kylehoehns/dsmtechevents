@@ -86,15 +86,22 @@ test('a highlight covers just what matched', () => {
   assert.deepEqual(marked('dont', 'We don’t stop'), ['don’t']);
 });
 
-test('an excerpt shows about a dozen words around the first match', () => {
+const shown = (x) => x.parts.map((p) => (p.mark ? `[${p.text}]` : p.text)).join('');
+
+test('an excerpt shows about a dozen words around the match', () => {
   const text = 'Bring a laptop and some questions. We will spend the evening pairing with Copilot on a small kata, then talk about what worked and what did not.';
   const x = excerpt(text, queryTerms('ai'));
-  assert.equal(x.match, 'Copilot');
-  assert.equal(`${x.before}[${x.match}]${x.after}`, '…spend the evening pairing with [Copilot] on a small kata, then talk…');
-  const words = `${x.before} ${x.match} ${x.after}`.split(/\s+/).filter(Boolean).length;
+  assert.equal(shown(x), '…spend the evening pairing with [Copilot] on a small kata, then talk…');
+  const words = shown(x).split(/\s+/).length;
   assert.ok(words >= 11 && words <= 13, `${words} words`);
   // Short text: no ellipses. A match inside a word keeps the whole word.
-  const y = excerpt('Tracing with OpenTelemetry, and the agent.', queryTerms('telemetry'));
-  assert.deepEqual(y, { before: 'Tracing with Open', match: 'Telemetry', after: ', and the agent.' });
+  assert.equal(shown(excerpt('Tracing with OpenTelemetry, and the agent.', queryTerms('telemetry'))), 'Tracing with Open[Telemetry], and the agent.');
   assert.equal(excerpt('Nothing here', queryTerms('ai')), null);
+});
+
+test('with several words, the excerpt quotes where most of them appear together, all marked', () => {
+  const text = 'Leaders across industries are working out how to uniquely and durably unlock value with AI, and build reliable agentic systems. Join us as Priya Murthy, AI GTM & Strategic Partnerships with AWS will unpack the state of agents.';
+  assert.equal(shown(excerpt(text, queryTerms('partnerships with'))), '…Murthy, AI GTM & Strategic [Partnerships] [with] AWS will unpack the state…');
+  // One word alone still quotes its first match.
+  assert.match(shown(excerpt(text, queryTerms('with'))), /^…uniquely and durably unlock value \[with\] AI/);
 });

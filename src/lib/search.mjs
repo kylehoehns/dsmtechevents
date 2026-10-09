@@ -77,26 +77,41 @@ export function matchSpans(text, terms) {
   return spans.filter((s, k) => !spans.slice(0, k).some((p) => p[1] > s[0]));
 }
 
-// About a dozen words of text around its first match, for showing why an
-// event matched when the match is only in its About text:
-// { before, match, after }, with "…" where it was cut. Null when nothing matches.
+// About a dozen words of text showing why an event matched, when the match
+// is only in its About text. With several search words, the stretch where the
+// most of them appear together wins ("partnerships with" quotes "Strategic
+// Partnerships with AWS", not a stray "with" earlier on), earliest first on a
+// tie. { parts: [{ text, mark }] }, with "…" where it was cut. Null when
+// nothing matches.
 export function excerpt(text, terms, around = 12) {
-  const [hit] = matchSpans(text, terms);
-  if (!hit) return null;
-  const words = (s) => s.split(/\s+/).filter(Boolean);
-  const pre = words(text.slice(0, hit[0]));
-  const post = words(text.slice(hit[1]));
-  const keepPre = Math.min(pre.length, Math.max(Math.floor((around - 1) / 2), around - 1 - post.length));
-  const keepPost = Math.min(post.length, around - 1 - keepPre);
-  // Keep a word that runs into the match whole ("Open" of "OpenTelemetry").
-  const glued = (s, end) => (end ? /\S$/ : /^\S/).test(s);
-  const before = pre.slice(pre.length - keepPre).join(' ');
-  const after = post.slice(0, keepPost).join(' ');
-  const gapBefore = glued(text.slice(0, hit[0]), true) ? '' : ' ';
-  const gapAfter = glued(text.slice(hit[1]), false) ? '' : ' ';
-  return {
-    before: `${keepPre < pre.length ? '…' : ''}${before}${before ? gapBefore : ''}`,
-    match: text.slice(hit[0], hit[1]),
-    after: `${after ? gapAfter : ''}${after}${keepPost < post.length ? '…' : ''}`,
+  const spans = matchSpans(text, terms);
+  if (!spans.length) return null;
+  const tokens = [...text.matchAll(/\S+/g)].map((m) => [m.index, m.index + m[0].length]);
+  const tokenAt = (pos) => { let t = 0; while (t + 1 < tokens.length && tokens[t + 1][0] <= pos) t++; return t; };
+  // A window of `around` words, with the anchor match about five words in.
+  const windowFor = ([a]) => {
+    const w0 = Math.max(0, Math.min(tokenAt(a) - 5, tokens.length - around));
+    return [w0, Math.min(tokens.length, w0 + around)];
   };
+  let best = null;
+  for (const span of spans) {
+    const [w0, w1] = windowFor(span);
+    const [from, to] = [tokens[w0][0], tokens[w1 - 1][1]];
+    const inside = spans.filter(([a, b]) => a >= from && b <= to);
+    const score = new Set(inside.map(([, , n]) => n)).size;
+    if (!best || score > best.score) best = { score, w0, w1, from, to, inside };
+  }
+  const { w0, w1, from, to, inside } = best;
+  const flat = (s) => s.replace(/\s+/g, ' ');
+  const parts = [];
+  let at = from;
+  for (const [a, b] of inside) {
+    if (a > at) parts.push({ text: flat(text.slice(at, a)), mark: false });
+    parts.push({ text: flat(text.slice(a, b)), mark: true });
+    at = b;
+  }
+  if (to > at) parts.push({ text: flat(text.slice(at, to)), mark: false });
+  if (w0 > 0) parts.unshift({ text: '…', mark: false });
+  if (w1 < tokens.length) parts.push({ text: '…', mark: false });
+  return { parts };
 }

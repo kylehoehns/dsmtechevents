@@ -248,9 +248,12 @@ function highlight() {
     if (!x) continue;
     const line = document.createElement(card ? 'p' : 'span');
     line.className = 'excerpt';
-    const m = document.createElement('mark');
-    m.textContent = x.match;
-    line.append(x.before, m, x.after);
+    line.append(...x.parts.map((part) => {
+      if (!part.mark) return part.text;
+      const m = document.createElement('mark');
+      m.textContent = part.text;
+      return m;
+    }));
     if (card) $('.body', el).append(line); else el.append(line);
     marked.add(el);
   }
