@@ -37,8 +37,8 @@ test('pick reads scores and timings, and leaves SEO out for /tv/', () => {
 test('the table without last week has no brackets', () => {
   const md = renderTable([row('/', 'mobile'), row('/tv/', 'desktop', { seo: null })]);
   assert.match(md, /^## Lighthouse/);
-  assert.match(md, /\| `\/` \| mobile \| 99 \| 100 \| 96 \| 100 \| 1791 ms \| 0\.075 \| 6 ms \| 991 ms \|/);
-  assert.match(md, /\| `\/tv\/` \| desktop \| 99 \| 100 \| 96 \| — \|/);
+  assert.match(md, /\| `\/` \| mobile \| 🟢\u00a099 \| 🟢\u00a0100 \| 🟢\u00a096 \| 🟢\u00a0100 \| 1791 ms \| 0\.075 \| 6 ms \| 991 ms \|/);
+  assert.match(md, /\| `\/tv\/` \| desktop \| 🟢\u00a099 \| 🟢\u00a0100 \| 🟢\u00a096 \| — \|/);
   assert.doesNotMatch(md, /\(\+|\(-/);
   assert.doesNotMatch(md, /last week/);
 });
@@ -47,6 +47,12 @@ test('the table with last week shows only the real moves', () => {
   const prev = [row('/', 'mobile', { perf: 90, lcp: 1700 }), row('/groups/', 'mobile')];
   const md = renderTable([row('/', 'mobile'), row('/groups/', 'desktop')], prev);
   assert.match(md, /last week/);
-  assert.match(md, /\| `\/` \| mobile \| 99 \(\+9\) \| 100 \| 96 \| 100 \| 1791 ms \| /); // LCP +5%: hidden
-  assert.match(md, /\| `\/groups\/` \| desktop \| 99 \| 100 \| 96 \| 100 \| 1791 ms \|/); // no desktop row last week
+  assert.match(md, /\| `\/` \| mobile \| 🟢\u00a099 \(\+9\) \| 🟢\u00a0100 \| 🟢\u00a096 \| 🟢\u00a0100 \| 1791 ms \| /); // LCP +5%: hidden
+  assert.match(md, /\| `\/groups\/` \| desktop \| 🟢\u00a099 \| 🟢\u00a0100 \| 🟢\u00a096 \| 🟢\u00a0100 \| 1791 ms \|/); // no desktop row last week
+});
+
+test('the lowest score leads, colored the way Lighthouse colors it', () => {
+  const md = renderTable([row('/', 'mobile', { perf: 72 }), row('/tv/', 'desktop', { a11y: 41, seo: null })]);
+  assert.match(md, /🔴 \*\*Lowest score: 41\*\*, Accessibility on `\/tv\/` \(desktop\)\./);
+  assert.match(md, /\| `\/` \| mobile \| 🟠\u00a072 \|/);
 });

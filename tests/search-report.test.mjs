@@ -32,7 +32,9 @@ test('the section: totals with real changes, top searches and pages', () => {
     queries: [{ keys: ['des moines tech events'], clicks: 7, impressions: 40, ctr: 0.175, position: 1.2 }],
     pages: [{ keys: ['https://dsmtechevents.com/groups/'], clicks: 3, impressions: 90, ctr: 0.033, position: 6 }],
   });
-  assert.match(md, /showed up \*\*340\*\* times \(\+140\) and got \*\*12\*\* clicks, 3\.5% of the time\. Average position 8\.4 \(11\.2 the week before 2026-10-10\)\./);
+  assert.match(md, /\| \*\*340\*\* ▲ 70% \| \*\*12\*\* ▲ 9% \| 3\.5% \| \*\*8\.4\*\* \(was 11\.2\) \|/);
+  assert.match(md, /compare with the week from 2026-10-10/);
+  assert.match(md, /<summary><b>Searches that showed the site<\/b>: top is "des moines tech events", shown 40 times<\/summary>/);
   assert.match(md, /\| des moines tech events \| 7 \| 40 \| 17\.5% \| 1\.2 \|/);
   assert.match(md, /\| `\/groups\/` \| 3 \| 90 \| 6\.0 \|/);
 });
