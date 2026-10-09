@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { updateArchive } from '../scripts/archive.mjs';
+import { updateArchive, brief } from '../scripts/archive.mjs';
 
 const now = Date.parse('2026-10-08T12:00:00Z');
 const ev = (id, start, extra = {}) => ({ id, title: id, start, end: new Date(Date.parse(start) + 7_200_000).toISOString(), venue: 'Source Allies', url: `https://x/${id}`, ...extra });
@@ -48,4 +48,16 @@ test('ended hand-added events are archived: no group without hosts, the first ho
   ]);
   assert.ok(!('group' in changed['2026'][1]), 'no group key at all, rather than null');
   assert.deepEqual(updateArchive(changed, {}, now, [conf, joint, later]), {}, 'a quiet refresh changes nothing');
+});
+
+test('an archived record keeps a short plain-text description for search', () => {
+  const long = `**Agenda**\n\n## The talk\n${'word '.repeat(200)}`;
+  const d = brief(long);
+  assert.ok(d.startsWith('Agenda The talk word'), d.slice(0, 30));
+  assert.ok(d.length <= 600 && !d.endsWith(' '), `${d.length} chars`);
+  assert.equal(brief(''), '');
+  const caches = { pyowa: { events: [{ id: 'pyowa-1', title: 'Talk', start: '2026-01-05T18:00:00Z', end: '2026-01-05T20:00:00Z', description: 'Our speaker walks through it.' }, { id: 'pyowa-2', title: 'Social', start: '2026-01-06T18:00:00Z', end: '2026-01-06T20:00:00Z', description: '' }] } };
+  const [r1, r2] = updateArchive({}, caches, Date.parse('2026-02-01T00:00:00Z'))[2026];
+  assert.equal(r1.description, 'Our speaker walks through it.');
+  assert.equal('description' in r2, false, 'no description, no field (byte-stable records)');
 });

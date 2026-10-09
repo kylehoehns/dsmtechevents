@@ -33,6 +33,8 @@ const year = (e: { start: string }) => (dayKey(e.start).slice(0, 4) === today.sl
       <span class="sr-only"> (opens in new tab)</span>
     </a>
     <span class="row-going">{e.going ? <><b>{e.going}</b> went</> : ''}</span>
+    {/* An archived event has no card to search, so its short description rides along, hidden. */}
+    {e.archived && e.description && <span class="desc" hidden>{e.description}</span>}
   </li>
 ))}</ol></body>
 </html>

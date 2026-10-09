@@ -34,7 +34,7 @@ export function pastEvents({ past, archive = [], byId }) {
     if (seen.has(r.id) || seen.has(key(r))) continue;
     const had = older.get(key(r));
     if (had) { if (r.group && !had.groupIds.includes(r.group)) had.groupIds.push(r.group); continue; }
-    older.set(key(r), { id: r.id, title: r.title, start: r.start, end: r.end, venue: r.venue ?? null, online: !!r.online, going: r.going, url: r.url ?? null, groupIds: r.group ? [r.group] : [], headliner: !!r.headliner });
+    older.set(key(r), { id: r.id, title: r.title, start: r.start, end: r.end, venue: r.venue ?? null, online: !!r.online, going: r.going, url: r.url ?? null, groupIds: r.group ? [r.group] : [], headliner: !!r.headliner, description: r.description ?? '', archived: true });
   }
   // A hand-added event with no host reads like its card did (data.mjs describe).
   for (const e of older.values()) e.hostsLabel = e.groupIds.map((id) => byId[id]?.short).filter(Boolean).join(' + ') || (e.headliner ? 'Conference' : 'Community event');
