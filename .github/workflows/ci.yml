@@ -28,6 +28,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # Spelling in our own words: page copy and the docs (cspell.json). Event
+      # text from the groups isn't checked. Here rather than in the build, so
+      # a typo never blocks a data refresh or a deploy.
+      - run: npm run spell
       # The share image, icons and badge come from scripts the build doesn't
       # run, so a dependency update could break them unnoticed. Run them here
       # (the output isn't committed).

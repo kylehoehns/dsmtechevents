@@ -47,7 +47,13 @@ npm run fetch    # pull fresh events into data/cache/
 npm run dev      # http://localhost:4321
 npm test         # unit tests, on saved fixtures, no network
 npm run build    # tests, then astro build, then scripts/check-dist.mjs
+npm run spell    # spelling in page copy and docs (not event text)
 ```
+
+The spelling check runs in CI next to the build. It covers the words we write
+(`src/pages`, `src/components`, `src/layouts` and the Markdown docs), never the
+event titles and descriptions that come from the groups. If it flags a real
+word, like a group's name, add it to `words` in `cspell.json`.
 
 ### Browser tests
 
@@ -72,8 +78,8 @@ add an event to the fixture data.
 
 1. Branch from `main` and open a pull request. Nobody pushes to `main`
    directly.
-2. Two checks run: `test-and-build` (`npm run build`) and `e2e` (the browser
-   tests below). A PR can merge only when both are green.
+2. Two checks run: `test-and-build` (`npm run build` and `npm run spell`) and
+   `e2e` (the browser tests below). A PR can merge only when both are green.
 3. Each PR branch gets a preview at
    `<branch>-dsmtechevents.kyhoehns.workers.dev`. Merging deploys to
    dsmtechevents.com. Never deploy from your machine.
