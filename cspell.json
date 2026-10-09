@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en-US",
+  "//": "Spellcheck for the words we write: page copy and the docs. Event titles and descriptions come from the groups' own pages and aren't checked (they aren't in these files). Add a real word the checker doesn't know to `words`.",
+  "files": ["src/pages/**/*.astro", "src/components/**/*.astro", "src/layouts/**/*.astro", "*.md", "docs/**/*.md", ".github/**/*.md"],
+  "ignoreRegExpList": ["Urls", "/%[0-9A-F]{2}\\w*/g", "/\\b(?:FBAN|FBAV|EdgiOS)\\b/g"],
+  "words": [
+    "appinstalled", "beforeinstallprompt", "checkdist", "coworking", "dsmtechevents", "ical", "kyhoehns", "lede",
+    "meetupstatic", "minical", "Moines", "precached", "prerendered", "pyowa", "qrcode", "setlist",
+    "speculationrules", "subgrid", "urlname"
+  ]
+}
