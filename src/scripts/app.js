@@ -464,6 +464,23 @@ function renderDayPanel() {
   show();
 }
 
+// A shorter day makes the page shorter. Scrolled far enough down, the browser
+// would pull the page up in one frame; instead the panel shrinks over 0.3s and
+// the page glides up with it. Scrolled near the top, nothing moves, so the
+// panel just takes its new size.
+function settlePanel(held) {
+  const y = scrollY;
+  dayPanel.style.minHeight = '';
+  const natural = dayPanel.offsetHeight;
+  if (natural >= held || y <= document.documentElement.scrollHeight - innerHeight) return;
+  dayPanel.style.minHeight = `${held}px`;
+  scrollTo(0, y);
+  void dayPanel.offsetHeight; // start the transition from the held height
+  dayPanel.style.transition = 'min-height 0.3s ease-out';
+  dayPanel.style.minHeight = `${natural}px`;
+  dayPanel.addEventListener('transitionend', () => { dayPanel.style.transition = ''; dayPanel.style.minHeight = ''; }, { once: true });
+}
+
 function renderMinical() {
   const ym = today.slice(0, 7);
   const cells = monthCells(ym).map((key) => {
@@ -647,12 +664,20 @@ document.addEventListener('click', (ev) => {
     state.day = cell.dataset.day;
     dayPicked = true;
     if (!state.day.startsWith(state.month)) state.month = state.day.slice(0, 7);
+    const phone = matchMedia('(max-width: 1059px)').matches;
+    const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Hold the old panel's height through the swap, so a shorter day can't
+    // snap the page up before settlePanel decides how to shrink it.
+    const held = phone && smooth && dayPanel.offsetHeight;
+    dayPanel.style.transition = '';
+    dayPanel.style.minHeight = held ? `${held}px` : '';
     render();
     announce(dayStatus());
+    if (held) settlePanel(held);
     // Below the grid on a phone: bring the day's heading on screen only if it
     // isn't already, so the grid stays put for the next tap. ('start' scrolled
     // the grid away every time, landing wherever that day's panel height let it.)
-    if (matchMedia('(max-width: 1059px)').matches) $('.sub', dayPanel)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
+    if (phone) $('.sub', dayPanel)?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'nearest' });
   }
 });
 
