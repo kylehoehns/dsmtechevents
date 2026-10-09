@@ -2,10 +2,13 @@ name: site report
 
 # Once a week, a site report on the run's own page: visits, page views, top
 # pages and where visits come from (Cloudflare Web Analytics), then outbound
-# clicks (which groups and events the site sends people to), then Lighthouse
-# scores for a few key pages (scripts/lighthouse-report.mjs). Open the latest
+# clicks (which groups and events the site sends people to), then Google
+# Search results (scripts/search-report.mjs), then Lighthouse scores for a few
+# key pages (scripts/lighthouse-report.mjs). Open the latest
 # run under Actions → site report, or run it with `gh workflow run site-report.yml`.
-# Needs the CF_ANALYTICS_TOKEN secret (Cloudflare "Account Analytics: Read").
+# Needs the CF_ANALYTICS_TOKEN secret (Cloudflare "Account Analytics: Read")
+# and GSC_SERVICE_ACCOUNT (a read-only Search Console service account's key;
+# docs/ANALYTICS.md).
 
 on:
   schedule:
@@ -34,6 +37,14 @@ jobs:
         env:
           CF_ANALYTICS_TOKEN: ${{ secrets.CF_ANALYTICS_TOKEN }}
         run: node scripts/site-report.mjs
+      # Google Search after the Cloudflare part (and even if that failed); a
+      # Search Console problem shows in the section but never fails the run.
+      - name: add Google Search results to this run's summary
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        env:
+          GSC_SERVICE_ACCOUNT: ${{ secrets.GSC_SERVICE_ACCOUNT }}
+        run: node scripts/search-report.mjs
       # Lighthouse runs after the analytics part (and even if that failed); a
       # Lighthouse problem never fails the run.
       - name: download last week's Lighthouse numbers

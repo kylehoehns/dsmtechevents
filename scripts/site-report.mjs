@@ -92,7 +92,18 @@ async function query(sql, token) {
 
 // Web Analytics (GraphQL): visits and page views for dsmtechevents.com,
 // grouped by one dimension, between two dates.
-async function traffic(token, dim, from, to, limit = 10, order = 'sum_visits_DESC') {
+// Cloudflare's analytics API sometimes answers "unable to execute query,
+// please try again later" (serviceUnavailable); try twice more before failing.
+async function traffic(token, ...args) {
+  for (let attempt = 1; ; attempt++) {
+    try { return await trafficOnce(token, ...args); } catch (e) {
+      if (attempt === 3 || !/serviceUnavailable|try again later/.test(e.message)) throw e;
+      await new Promise((r) => setTimeout(r, attempt * 5000));
+    }
+  }
+}
+
+async function trafficOnce(token, dim, from, to, limit = 10, order = 'sum_visits_DESC') {
   const query = `query($a: String!, $s: Time!, $e: Time!) { viewer { accounts(filter: { accountTag: $a }) {
     rumPageloadEventsAdaptiveGroups(limit: ${limit}, orderBy: [${order}], filter: { siteTag: "${SITE_TAG}", datetime_geq: $s, datetime_leq: $e }) {
       count sum { visits } dimensions { ${dim} } } } } }`;
