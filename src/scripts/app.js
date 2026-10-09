@@ -482,7 +482,7 @@ function syncSearchBox() {
 
 // ---- events ----
 // Switching between the list and the calendar, or picking a day, animates
-// like a page change (global.css, "page transitions"). The DOM has to change
+// (global.css, "list <-> calendar transitions"). The DOM has to change
 // inside the callback, so whatever reads the new page (focus, scrolling) goes
 // in there too. Without view transitions, or with reduced motion, it just runs.
 function transition(update, types) {
