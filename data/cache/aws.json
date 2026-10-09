@@ -1,10 +1,21 @@
 {
-  "fetchedAt": "2026-10-08T23:46:55.772Z",
+  "fetchedAt": "2026-10-09T17:02:06.017Z",
   "logo": "https://secure.meetupstatic.com/photos/event/b/2/0/e/600_461265582.jpeg",
   "members": 1349,
   "pastCount": 38,
   "lastMet": "2026-06-24T22:00:00.000Z",
   "events": [
+    {
+      "id": "aws-316911568",
+      "sourceId": "316911568",
+      "title": "Pre RE:Invent Virtual Get Together",
+      "start": "2026-11-11T00:00:00.000Z",
+      "end": "2026-11-11T01:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/aws-user-group-des-moines/events/316911568/",
+      "description": "Let's get together virtually before Re: Invent.\n\nIs anyone going who wants to meet up there?\n\nAre there specific sessions you are excited about?",
+      "venue": null
+    },
     {
       "id": "aws-316828991",
       "sourceId": "316828991",

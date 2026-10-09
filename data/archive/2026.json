@@ -809,5 +809,26 @@
   "going": 32,
   "url": "https://www.meetup.com/iadnug/events/316779818/",
   "description": "Agenda This will be a Zoom meeting at Noon 11:50am-12:00pm - Pre-Session Waiting Room 12:00pm-1:00pm - Presentation, JetBrains giveaway Build Your First Real-Time Voice Agent Real‑time voice agents sound simple in demos but fall apart the moment real users show up. Latency creeps in, people talk over the agent, accents and background noise wreck the transcript, and the whole experience slides straight into the uncanny valley. This hands‑on session walks through building a production‑ready voice agent end to end using .NET, low‑latency speech‑to‑text, responsive LLM orchestration, and fast"
+ },
+ {
+  "id": "iot-ff-october-2026",
+  "group": "iot",
+  "title": "Firmware Fellowship - October 2026",
+  "start": "2026-10-09T00:00:00.000Z",
+  "end": "2026-10-09T01:00:00.000Z",
+  "venue": "Area515, Des Moines Maker Space",
+  "url": "https://iowansofthings.com/ff-october-2026",
+  "description": "Join us for Firmware Fellowship for our summer series! This technical discussion series focuses on embedded firmware development best practices and provides a forum for developers to share expertise and learn from each other. We meet in a casual setting to share what we know and to learn from you! Don’t be afraid to join us, there won’t be any pop quizzes! Come nerd out with us on October 8th! We’ll be doing an open-source project review for a hydrostat controller project. You are welcome to bring your current projects, in any state of completion to share! Learn more and register…"
+ },
+ {
+  "id": "alf-316515631",
+  "group": "alf",
+  "title": "The Agentic Enterprise: From Intelligence to Trusted Action",
+  "start": "2026-10-09T13:30:00.000Z",
+  "end": "2026-10-09T15:30:00.000Z",
+  "venue": "Corteva Carver Research Center",
+  "going": 26,
+  "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/316515631/",
+  "description": "Agentic AI is shifting how we work and redefining our roles. Agents are moving from answering questions to understanding, reasoning, and acting alongside people. As intelligence becomes abundant, the new leadership questions are: how can you uniquely and durably unlock value with AI, and build reliable agentic systems at scale? [Sagar Murthy](https://www.linkedin.com/in/sagar-murthy-13064a8/), AI GTM & Strategic Partnerships with AWS will unpack the state of agentic AI, the emerging patterns, and real production deployment outcomes. You will leave with a practical framework to take your"
  }
 ]
