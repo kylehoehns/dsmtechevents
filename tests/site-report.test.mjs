@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderHeadline, renderReport, renderTraffic } from '../scripts/site-report.mjs';
+import { mergeRows, renderHeadline, renderReport, renderTraffic } from '../scripts/site-report.mjs';
 import { bar, spark, trend } from '../scripts/report-md.mjs';
 
 const day = (key, visits, views) => ({ key, visits, views });
@@ -72,4 +72,11 @@ test('the traffic part folds the days, draws shares and calls blank referrers di
   assert.match(md, /\| mobile \| 30 \| ████████░░ 75% \|/);
   assert.match(md, /\| `\/` \| 1,070 \| ██████████ \| 40 \|/);
   assert.match(md, /\| `\/groups\/` \| 535 \| █████░░░░░ \| 5 \|/);
+});
+
+test('weeks of traffic add up into one row per key, in the order asked for', () => {
+  const rows = [day('direct', 300, 500), day('google', 10, 12), day('direct', 200, 400), day('linkedin', 40, 900)];
+  assert.deepEqual(mergeRows(rows, 'sum_visits_DESC').map((r) => [r.key, r.visits, r.views]), [['direct', 500, 900], ['linkedin', 40, 900], ['google', 10, 12]]);
+  assert.deepEqual(mergeRows(rows, 'count_DESC').map((r) => r.key).slice(0, 2).sort(), ['direct', 'linkedin']);
+  assert.deepEqual(mergeRows([day('2026-10-07', 1, 1), day('2026-10-09', 1, 1), day('2026-10-08', 1, 1)], 'date_DESC').map((r) => r.key), ['2026-10-09', '2026-10-08', '2026-10-07']);
 });
