@@ -10,7 +10,10 @@ for this site and turned down, mostly because of three rules in AGENTS.md:
 the site is a **pointer, not the source of truth** (people RSVP on the
 group's page, which organizers need for headcount; see
 [decision 2](0002-pointer-not-source-of-truth.md)), it stays **hands-off**
-(nothing hand-kept), and it **says each thing once**. How often an idea is
+(nothing hand-kept), and it **says each thing once**. Feeds and digests
+also work against the site's own point: a feed carries one group's next
+meetup, while a visit shows the headliner conferences, a group that's back
+after a quiet year, and everything else on this week. How often an idea is
 suggested isn't evidence people want it; what reopens one is listed below.
 
 ## Decision
