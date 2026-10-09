@@ -66,6 +66,16 @@ phone and desktop scores and load times for the home page, calendar view,
 groups page and TV screen, with last week's change shown only when it is bigger
 than normal run-to-run noise.
 
+Between those, a **Google Search** section (`scripts/search-report.mjs`): for
+the last full week Google has settled (its numbers run about three days
+late), how many times the site showed up in results, clicks, click rate and
+average position against the week before, then the top searches and the
+pages people reached. It reads Search Console with a Google Cloud service
+account whose JSON key is the repository secret `GSC_SERVICE_ACCOUNT`; the
+account is a **Restricted** (read-only) user on the Search Console property,
+and needs the Search Console API turned on in its Cloud project. Without the
+secret the section just says it isn't set up.
+
 ### Querying
 
 Analytics Engine has a SQL API. Make an API token with the **Account
