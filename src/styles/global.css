@@ -627,20 +627,17 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
   .builder select { min-height: 44px; }
 }
 
-/* ---------- page transitions ----------
-   Moving between pages, or between the list and the calendar, pulls the new
-   page through like a squeegee: it wipes in left to right, landing slightly
-   off register before it settles, while the old page lifts away. Back wipes
-   right to left. The masthead stays put, the current tab slides to its new
-   spot, and the page title morphs. Picking a calendar day only swaps the day
-   panel. Reduced motion, or a browser without view
-   transitions, just changes pages. */
-@media (prefers-reduced-motion: no-preference) {
-  @view-transition { navigation: auto; types: page; }
-}
+/* ---------- list <-> calendar transitions ----------
+   Switching between the list and the calendar (the same page, app.js
+   transition()) pulls the new view through like a squeegee: it wipes in left
+   to right, landing slightly off register before it settles, while the old
+   view lifts away. Going back to the list wipes right to left. The masthead
+   stays put and the current tab slides to its new spot. Picking a calendar day
+   only swaps the day panel. Moving to another page is a plain page change:
+   cross-page transitions waited on the next page and were skipped often
+   enough to feel uneven. Reduced motion, or no support, just switches. */
 .mast { view-transition-name: mast; }
 .nav a[aria-current="page"] { view-transition-name: nav-current; }
-.page-head h1 { view-transition-name: page-title; }
 #day-panel { view-transition-name: day-panel; }
 ::view-transition-group(*) { animation-duration: 320ms; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
 ::view-transition-old(root) { animation: 240ms ease-in both ink-lift; }

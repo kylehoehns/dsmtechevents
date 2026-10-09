@@ -78,18 +78,6 @@ const speculation = JSON.stringify({
       // A shared calendar link hides the list before first paint, so it never
       // flashes up and then jumps away. app.js keeps this in sync after that.
       if (new URLSearchParams(location.search).get('view') === 'calendar') document.documentElement.dataset.view = 'calendar';
-      // Page transitions (global.css): mark a Back/Forward to an earlier page
-      // so it wipes the other way. A transition the browser drops (the next
-      // page can't take part, or another click cuts it short) rejects its
-      // promises; that's fine.
-      const settle = (vt) => { for (const p of [vt.ready, vt.updateCallbackDone, vt.finished]) p.catch(() => {}); };
-      addEventListener('pageswap', (e) => { if (e.viewTransition) settle(e.viewTransition); });
-      addEventListener('pagereveal', (e) => {
-        if (!e.viewTransition) return;
-        settle(e.viewTransition);
-        const a = window.navigation && navigation.activation;
-        if (a && a.navigationType === 'traverse' && a.from && a.entry.index < a.from.index) e.viewTransition.types.add('back');
-      });
     </script>
     {!bare && <script type="speculationrules" is:inline set:html={speculation} />}
   </head>
