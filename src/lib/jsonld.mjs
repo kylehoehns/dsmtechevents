@@ -2,6 +2,7 @@
 // the site. Every event points at its own Meetup (or conference) page: we're
 // a pointer to where people sign up, never the sign-up itself.
 import { site } from './site.mjs';
+import { plainText } from './format.mjs';
 
 const offsetFmt = new Intl.DateTimeFormat('en-US', {
   timeZone: site.timeZone, hourCycle: 'h23', timeZoneName: 'longOffset',
@@ -41,8 +42,7 @@ export function eventJsonLd(e, byId) {
     location,
     image: [e.image ?? hosts[0]?.logo ?? new URL('/og-image-dark.png', site.url).href],
   };
-  // Plain text: no Markdown **bold** or ## heading marks.
-  if (e.description) ld.description = e.description.replace(/\*{2,}|^[ \t]*#{1,6}[ \t]+/gm, '').replace(/\s+/g, ' ').trim().slice(0, 300);
+  if (e.description) ld.description = plainText(e.description).slice(0, 300);
   if (hosts.length) ld.organizer = hosts.map((g) => ({ '@type': 'Organization', name: g.name, url: g.meetupUrl ?? g.website }));
   return ld;
 }

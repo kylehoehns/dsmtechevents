@@ -42,6 +42,7 @@
   --link-t: #0a5aa0; /* blue-t is 4.2:1 on paper-2; links in descriptions need 4.5 */
   --head-fill: #1d1b2b; /* calendar weekday strip */
   --mis: #ff4fa3;
+  --mark: #ffb3d6; /* a search's highlighter: ink 10:1, ink-soft 5.5:1 on it */
   --mis-blend: multiply;
   --tape: rgba(236, 222, 186, 0.8); /* masking tape: warm, see-through */
   --grain-alpha: 0.09;
@@ -76,7 +77,7 @@
     --paper: #1d1c22; --paper-2: #282630; --sheet: #24222a;
     --ink: #ece6da; --ink-soft: #bdb6aa; --line: #7a7584; --head-fill: #5d5966; --rule-soft: rgba(236, 230, 218, 0.18);
     --pink-fill: #e0609f; --blue-fill: #2f6db5;
-    --pink-t: #ff9cca; --blue-t: #93c2ff; --link-t: #93c2ff; --mis: #c04f87; --mis-blend: normal;
+    --pink-t: #ff9cca; --blue-t: #93c2ff; --link-t: #93c2ff; --mis: #c04f87; --mis-blend: normal; --mark: #6e1f48; /* ink 8.6:1, ink-soft 5.3:1 */
     --tape: rgba(222, 208, 172, 0.74); --grain-alpha: 0;
     color-scheme: dark;
   }
@@ -85,7 +86,7 @@
   --paper: #1d1c22; --paper-2: #282630; --sheet: #24222a;
   --ink: #ece6da; --ink-soft: #bdb6aa; --line: #7a7584; --head-fill: #5d5966; --rule-soft: rgba(236, 230, 218, 0.18);
   --pink-fill: #e0609f; --blue-fill: #2f6db5;
-  --pink-t: #ff9cca; --blue-t: #93c2ff; --link-t: #93c2ff; --mis: #c04f87; --mis-blend: normal;
+  --pink-t: #ff9cca; --blue-t: #93c2ff; --link-t: #93c2ff; --mis: #c04f87; --mis-blend: normal; --mark: #6e1f48; /* ink 8.6:1, ink-soft 5.3:1 */
   --tape: rgba(222, 208, 172, 0.74); --grain-alpha: 0;
   color-scheme: dark;
 }
@@ -421,6 +422,20 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 .show.headliner :focus-visible { outline-color: var(--on-pink); }
 @container (min-width: 640px) { .show.headliner .title { font-size: 2.625rem; } }
 
+/* ---------- a search: what matched ---------- */
+/* A pink highlighter swipe, as if marked up on the printed sheet. The shadow
+   runs it a little past the letters without moving them. */
+mark {
+  --hl: var(--mark);
+  color: inherit; background: var(--hl); box-shadow: 0.12em 0 0 var(--hl), -0.12em 0 0 var(--hl);
+  border-radius: 0.25em 0.4em 0.3em 0.45em; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.show.headliner mark { --hl: var(--sheet); color: var(--ink); }
+/* A match only the About text has: the words around it, under the result. */
+.excerpt { display: block; margin: 4px 0 0; font: var(--fs-small)/1.45 var(--sans); color: var(--ink-soft); overflow-wrap: anywhere; }
+.show.headliner .excerpt { color: inherit; }
+.setlist .excerpt { grid-column: 2 / -1; margin: -4px 0 0; }
+
 /* ---------- set lists: far-future and past events ---------- */
 .setlist { list-style: none; margin: 0; padding: 0; font: var(--fs-meta)/1.4 var(--mono); }
 .setlist .row-title { display: block; font: 500 var(--fs-small)/1.3 var(--sans); }
@@ -436,6 +451,7 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 @media (max-width: 259px) {
   .setlist li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .setlist .row-going { text-align: left; }
+  .setlist .excerpt { grid-column: 1; }
   .recent h2 { font-size: min(var(--fs-title-l), 14vw); }
 }
 .far { columns: 1; }

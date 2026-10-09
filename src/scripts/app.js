@@ -3,7 +3,8 @@
 // the month calendar and the mini calendar in the side rail.
 // State lives in the URL (?view=calendar&group=cijug&day=2026-10-15, ?q=java)
 // so any view can be shared or bookmarked.
-import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, recentSummary } from '../lib/format.mjs';
+import { fold, queryTerms, matchesAll, matchSpans, excerpt } from '../lib/search.mjs';
+import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, recentSummary, plainText } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -131,18 +132,8 @@ const hostsOf = (el) => (el.dataset.groups ?? '').split(' ');
 
 // ---- search ----
 // Matches what a card says (title, hosts, venue, address, About text) plus
-// each host's short and full name. Built from the page on first use. Every
-// word typed must be found in there:
-// - A short word (under 4 characters) or one with ".", "#" or "+" must start
-//   a word: "ai" finds "AI" but not "said".
-// - A longer plain word may sit inside a word ("telemetry" finds
-//   "OpenTelemetry"), and a trailing "s" is dropped ("agents" finds "agent").
-// ".", "#" and "+" count as part of a word, so ".net" or "c#" don't match
-// "networking" or every "C"; the text is also kept without them, so "net"
-// still finds ".NET".
-const fold = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’]/g, '').toLowerCase();
-const words = (s) => { const t = fold(s).replace(/[^\p{L}\p{N}.#+]+/gu, ' '); return ` ${t} ${t.replace(/[.#+]+/g, ' ')} `; };
-const queryWords = (q) => fold(q).split(/[^\p{L}\p{N}.#+]+/u).map((w) => w.replace(/\.+$/, '')).filter((w) => /[\p{L}\p{N}]/u.test(w));
+// each host's short and full name, built from the page on first use. The
+// rules, synonyms included, are in src/lib/search.mjs.
 // A past event's row is indexed only when it has no card: the cache's past
 // events have one (with their About text), older archived ones don't.
 let searchIndex = null;
@@ -152,22 +143,18 @@ function haystack(id) {
     const index = (el, sel) => {
       const names = hostsOf(el).flatMap((g) => groups[g] ? [groups[g].short, groups[g].name] : []);
       const text = $$(sel, el).map((t) => t.textContent);
-      searchIndex.set(el.dataset.id, words([...names, ...text].join(' ')));
+      searchIndex.set(el.dataset.id, fold([...names, ...text].join(' ')));
     };
     for (const card of cards.values()) index(card, '.band, .series, .title, .venue, .addr, .tag-online, .desc');
     for (const li of $$('li', pastResults)) if (!searchIndex.has(li.dataset.id)) index(li, '.row-group, .row-title, .row-where');
   }
   return searchIndex.get(id) ?? '';
 }
-const loose = (w) => /^[\p{L}\p{N}]{4,}$/u.test(w); // a longer plain word: the looser rules above
-const found = (el) => {
-  if (!state.q) return true;
-  // Only emoji or punctuation ("🎉", "-", "..."): nothing to look for, so
-  // nothing matches (every() on no words would match everything).
-  const qw = queryWords(state.q);
-  const hay = qw.length && haystack(el.dataset.id);
-  return qw.length > 0 && qw.every((w) => hay.includes(loose(w) ? w.replace(/s$/, '') : ` ${w}`));
-};
+// The query's terms, worked out once per query.
+let terms = [];
+let termsFor = '';
+const queryNow = () => { if (termsFor !== state.q) { terms = queryTerms(state.q); termsFor = state.q; } return terms; };
+const found = (el) => !state.q || matchesAll(haystack(el.dataset.id), queryNow());
 const shows = (el) => matches(hostsOf(el)) && found(el);
 
 // ---- list ----
@@ -207,6 +194,7 @@ function renderList() {
       : 'Check their page for what\'s next.'}`;
   }
   squashRepeats();
+  highlight();
   return total;
 }
 
@@ -223,6 +211,82 @@ function squashRepeats() {
     el.classList.toggle('addr-seen', !!v && seenVenues.has(v));
     if (v) seenVenues.add(v);
   }
+}
+
+// ---- what matched ----
+// While a search is on, each result marks what matched in the text it shows:
+// a card's title, group, venue and address; a row's group, title and place.
+// A word that matched only in the hidden About text gets a line under the
+// result quoting it. Each search undoes the last one's marks first, so
+// clearing it leaves the page as it was built (and the calendar's day panel,
+// which copies the cards, never gets them).
+const marked = new Set();
+const aboutText = new WeakMap();
+function unmark() {
+  for (const el of marked) {
+    for (const m of $$('mark', el)) { const parent = m.parentNode; m.replaceWith(...m.childNodes); parent.normalize(); }
+    $('.excerpt', el)?.remove();
+  }
+  marked.clear();
+}
+function highlight() {
+  unmark();
+  if (!state.q || state.view !== 'list') return;
+  queryNow();
+  const results = [...$$('.show, .far > li', listView), ...$$('li', pastResults)].filter((el) => !el.hidden && !el.closest('[hidden]'));
+  for (const el of results) {
+    const card = el.classList.contains('show');
+    // squashRepeats may have hidden the address: it isn't showing to mark.
+    const fields = card ? `.band, .title, .venue${el.classList.contains('addr-seen') ? '' : ', .addr'}` : '.row-group, .row-title, .row-where';
+    const hit = new Set();
+    for (const f of $$(fields, el)) markText(f, hit);
+    if (hit.size) marked.add(el);
+    if (hit.size === terms.length) continue;
+    // Archived rows have no card, so no About text.
+    const desc = $('.desc', cards.get(el.dataset.id) ?? el);
+    const x = desc && excerpt(plainAbout(desc), terms.filter((_, n) => !hit.has(n)));
+    if (!x) continue;
+    const line = document.createElement(card ? 'p' : 'span');
+    line.className = 'excerpt';
+    const m = document.createElement('mark');
+    m.textContent = x.match;
+    line.append(x.before, m, x.after);
+    if (card) $('.body', el).append(line); else el.append(line);
+    marked.add(el);
+  }
+}
+// Wrap each match in this element's text (not its screen-reader-only words) in <mark>.
+function markText(root, hit) {
+  const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walk.nextNode()) if (!walk.currentNode.parentElement.closest('.sr-only')) nodes.push(walk.currentNode);
+  for (const node of nodes) {
+    const spans = matchSpans(node.data, terms);
+    if (!spans.length) continue;
+    const parts = [];
+    let at = 0;
+    for (const [a, b, n] of spans) {
+      if (a > at) parts.push(node.data.slice(at, a));
+      const m = document.createElement('mark');
+      m.textContent = node.data.slice(a, b);
+      parts.push(m);
+      at = b;
+      hit.add(n);
+    }
+    if (at < node.data.length) parts.push(node.data.slice(at));
+    node.replaceWith(...parts);
+  }
+}
+// A card's About text as plain words: no photo, links' "(opens in new tab)"
+// or leftover Markdown marks.
+function plainAbout(desc) {
+  if (!aboutText.has(desc)) {
+    const copy = desc.cloneNode(true);
+    for (const el of $$('.sr-only, img', copy)) el.remove();
+    for (const br of $$('br', copy)) br.replaceWith('\n');
+    aboutText.set(desc, plainText([...copy.children].map((b) => b.textContent).join('\n')));
+  }
+  return aboutText.get(desc);
 }
 
 // ---- side rail: filter, recent, headliners ----
@@ -417,7 +481,7 @@ function render() {
   else delete document.documentElement.dataset.view;
   // The calendar, a search and one group's past all read the card pool.
   if (state.view === 'calendar' || state.q || state.group) loadPool();
-  if (state.view === 'list') { listShown = renderList(); renderMinical(); } else { pastResults.hidden = true; renderCalendar(); }
+  if (state.view === 'list') { listShown = renderList(); renderMinical(); } else { pastResults.hidden = true; highlight(); renderCalendar(); }
   renderSide();
   syncSearchBox();
   syncUrl();

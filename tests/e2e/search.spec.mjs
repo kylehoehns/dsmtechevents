@@ -5,6 +5,7 @@ import { test, expect } from './fixtures.mjs';
 const list = (page) => page.getByRole('region', { name: 'Upcoming events' });
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const event = (page, title) => list(page).getByRole('heading', { name: new RegExp(`^${escape(title)}`) });
+const card = (page, title) => list(page).locator('.show').filter({ has: page.getByRole('heading', { name: new RegExp(`^${escape(title)}`) }) });
 const pastSec = (page) => page.getByRole('region', { name: 'Past' });
 const past = (page, title) => pastSec(page).getByRole('listitem').filter({ hasText: title });
 const box = (page) => page.getByRole('searchbox', { name: 'Search events' });
@@ -85,6 +86,55 @@ test('the address is searched, so a town name works', async ({ page }) => {
   await expect(event(page, 'Python Office Hours')).toBeVisible();
   await expect(event(page, 'Joint night - JVM vs. CLR')).toBeHidden();
   await expect(page.getByRole('status')).toHaveText("Showing 2 events matching 'urbandale', plus 1 past event");
+});
+
+test('synonyms: "ai" finds an event that only says Copilot, and marks what matched', async ({ page }) => {
+  await page.goto('/');
+  // Each row's HTML, and how many text nodes it has (marks split them up).
+  const html = () => list(page).locator('.show, .far > li').evaluateAll((els) => els.map((el) => {
+    const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let n = 0;
+    while (walk.nextNode()) n++;
+    return [el.innerHTML, n];
+  }));
+  const before = await html();
+  await search(page, 'ai');
+  // re:Invent Recap (a Further out row) never says "AI": its About text says "Copilot".
+  const recap = list(page).locator('.far > li').filter({ hasText: 're:Invent Recap' });
+  await expect(recap).toBeVisible();
+  // Nothing on the row matches, so a line quotes the About text, match marked.
+  await expect(recap.locator('a mark')).toHaveCount(0);
+  await expect(recap.locator('.excerpt')).toHaveText('…and a demo of the Copilot workflow our team built on Bedrock.');
+  await expect(recap.locator('.excerpt mark')).toHaveText('Copilot');
+  // A title that says it: the word is marked there, and no extra line.
+  const study = card(page, 'AI Study Group').first();
+  await expect(study.locator('.title mark')).toHaveText('AI');
+  await expect(study.locator('.excerpt')).toHaveCount(0);
+  await expect(past(page, 'Hiring in the Age of AI').locator('.row-title mark')).toHaveText('AI');
+  // One-way: "copilot" doesn't find the AI Study Group.
+  await box(page).fill('copilot');
+  await expect(recap).toBeVisible();
+  await expect(study).toBeHidden();
+
+  // Clearing the search leaves every card as it was built.
+  await box(page).press('Escape');
+  await expect(page.locator('mark, .excerpt')).toHaveCount(0);
+  expect(await html()).toEqual(before);
+});
+
+test('synonyms: "otel" finds OpenTelemetry in the About text', async ({ page }) => {
+  await page.goto('/');
+  await search(page, 'otel');
+  const chat = card(page, 'Remote DevOps Chat');
+  await expect(chat).toBeVisible();
+  await expect(event(page, 'Coding Dojo')).toBeHidden();
+  await expect(chat.locator('.excerpt')).toHaveText('Tracing with OpenTelemetry, and the agent that files our tickets.');
+  await expect(chat.locator('.excerpt mark')).toHaveText('OpenTelemetry');
+  // About still opens, its text unmarked.
+  await chat.getByRole('button', { name: /About/ }).click();
+  await expect(chat.locator('.desc')).toBeVisible();
+  await expect(chat.locator('.desc mark')).toHaveCount(0);
+  await expect(page.getByRole('status')).toHaveText("Showing 1 event matching 'otel'");
 });
 
 test('".net" finds the .NET group', async ({ page }) => {
@@ -191,7 +241,7 @@ test('a search covers every group and shows the list, even from the calendar', a
 for (const colorScheme of ['light', 'dark']) {
   test.describe(`${colorScheme} mode`, () => {
     test.use({ colorScheme });
-    for (const q of ['java', 'cobol']) {
+    for (const q of ['java', 'cobol', 'ai', 'otel']) {
       test(`an open search for '${q}' has no axe violations`, async ({ page }) => {
         await page.goto('/');
         await search(page, q);

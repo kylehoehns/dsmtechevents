@@ -153,6 +153,10 @@ export function formatDescription(text = '') {
     .join('');
 }
 
+// A description as one line of plain text: no Markdown **bold** or ## heading
+// marks. For the search's excerpts and the structured data.
+export const plainText = (text) => text.replace(/\*{2,}|^[ \t]*#{1,6}[ \t]+/gm, '').replace(/\s+/g, ' ').trim();
+
 // The talk lineup in a description, when it has one: SecDSM lists its talks
 // as bold "7:00 PM · Title" lines followed by "— Speaker".
 // [{ time: '7p', title, speaker }], or [] when there's no lineup.
