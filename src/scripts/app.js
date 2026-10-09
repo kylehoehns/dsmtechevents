@@ -301,7 +301,7 @@ function plainAbout(desc) {
 function renderSide() {
   // Filtered to one group: say which, with a way to the group and a way out.
   $('#filter').hidden = !state.group;
-  if (state.group) $('#filter-note').innerHTML = `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <a href="/groups/#${encodeURIComponent(state.group)}">About the group</a> · <button type="button" data-show-all>Show all groups</button>`;
+  if (state.group) $('#filter-note').innerHTML = `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <a href="/groups/#${encodeURIComponent(state.group)}">About the group</a>`;
 
   for (const p of $$('.poster')) p.hidden = !shows(p);
   // The calendar already shows conference days in pink; skip the posters there.
@@ -518,6 +518,17 @@ function render() {
 }
 
 const monthCount = () => events.filter((e) => dayKey(e.start).startsWith(state.month) && matches(e.groups)).length;
+// Back to every group. The button just hid itself with the bar; land on
+// the full list (or the calendar, which shows every group too).
+function showAll() {
+  state.group = '';
+  render();
+  const view = state.view === 'calendar' ? calView : listView;
+  view.tabIndex = -1;
+  view.focus();
+  announceFilter();
+}
+
 function announceFilter() {
   const who = state.group ? ` from ${groups[state.group].short}` : '';
   if (state.q) announce(searchSummary());
@@ -588,7 +599,8 @@ document.addEventListener('click', (ev) => {
   const nav = t.closest('[data-nav="list"], [data-nav="calendar"]');
   if (nav) {
     ev.preventDefault();
-    if (nav.dataset.nav === state.view) { scrollTo({ top: 0 }); return; }
+    // The tab you're already on: while filtered, it means "everything".
+    if (nav.dataset.nav === state.view) { if (state.group) showAll(); else scrollTo({ top: 0 }); return; }
     state.view = nav.dataset.nav;
     if (state.view === 'calendar') { state.month = (state.day ?? today).slice(0, 7); state.q = ''; }
     render();
@@ -597,15 +609,7 @@ document.addEventListener('click', (ev) => {
     return;
   }
 
-  if (t.closest('[data-show-all]')) {
-    state.group = '';
-    render();
-    // The button just hid itself with the note; land on the full list.
-    listView.tabIndex = -1;
-    listView.focus();
-    announceFilter();
-    return;
-  }
+  if (t.closest('[data-show-all]')) { showAll(); return; }
 
   const groupLink = t.closest('a[data-group]');
   if (groupLink && !ev.metaKey && !ev.ctrlKey) {

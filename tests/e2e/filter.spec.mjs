@@ -27,6 +27,26 @@ test('a group link filters the list, and the note offers the group and a way out
   await expect(page.getByRole('status')).toHaveText('Showing 9 events');
 });
 
+test('the tab you are on clears the filter: Events shows every group again', async ({ page }) => {
+  await page.goto('/?group=webgeeks');
+  // The bar sits above the list, where a filtered page can't be missed.
+  const bar = page.locator('#filter');
+  await expect(bar).toBeVisible();
+  expect((await bar.boundingBox()).y).toBeLessThan((await list(page).boundingBox()).y);
+
+  await page.locator('.nav a[data-nav="list"]').first().click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(bar).toBeHidden();
+  await expect(event(page, 'Python Office Hours')).toBeVisible();
+
+  // Switching to the other tab keeps the group.
+  await page.goto('/?group=webgeeks');
+  await page.locator('.nav a[data-nav="calendar"]').first().click();
+  await expect(page).toHaveURL(/\?view=calendar&group=webgeeks(&|$)/);
+  await page.locator('.nav a[data-nav="calendar"]').first().click();
+  await expect(page).toHaveURL(/\?view=calendar(&day=[0-9-]+)?$/);
+});
+
 test('there is no group picker until a group is chosen', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#filter')).toBeHidden();

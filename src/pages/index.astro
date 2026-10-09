@@ -103,14 +103,17 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
       {/* desktop only; phones hide it */}
       <section class="minical" id="minical" aria-label="This month"></section>
 
-      {/* Shows only while filtered to one group (?group=id, reached from a group
-          name on a card or the Groups page). Search is the way in otherwise. */}
-      <div class="filter" id="filter" hidden>
-        <p class="filter-note" id="filter-note"></p>
-      </div>
     </div>
 
     <div class="main">
+      {/* Shows only while filtered to one group (?group=id, reached from a group
+          name on a card or the Groups page). Search is the way in otherwise.
+          It sits on top of the list, not in the rail, so a filtered page
+          never passes for the whole list. */}
+      <div class="filter" id="filter" hidden>
+        <p class="filter-note" id="filter-note"></p>
+        <button type="button" class="btn btn-solid btn-small" data-show-all>Show all groups</button>
+      </div>
       <section id="list-view" aria-label="Upcoming events">
         {sections.map((s) => (
           <section class="sec" data-sec>
