@@ -59,6 +59,19 @@ test('picking day after day on a phone leaves the grid where it is', async ({ pa
   }
 });
 
+test('scrolled down on a phone, a shorter day lets the page glide up rather than snap', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'the day panel sits beside the grid on desktop');
+  await page.goto('/?view=calendar&day=2026-10-22');
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  const from = await page.evaluate(() => scrollY);
+  await page.evaluate(() => document.querySelector('.day[data-day="2026-10-19"]').click()); // nothing on: a much shorter panel
+  // Right after the tap the old height is still held, so the page hasn't jumped...
+  expect(await page.evaluate(() => scrollY)).toBeGreaterThan(from - 20);
+  // ...then the panel settles at its own size and leaves no height behind.
+  await expect.poll(() => page.evaluate(() => document.getElementById('day-panel').style.minHeight)).toBe('');
+  expect(await page.evaluate(() => scrollY)).toBeLessThan(from);
+});
+
 test('the "Pick a day" hint goes once a day is picked', async ({ page }) => {
   const hint = page.locator('.cal-key').getByText('Pick a day to see its events');
   await page.goto('/?view=calendar');
