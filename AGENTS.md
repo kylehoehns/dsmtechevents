@@ -17,6 +17,7 @@ DSM Tech Events lists every public Des Moines tech meetup, user group and confer
 - **This week stays above the fold** on a phone and a desktop.
 - **Hands-off.** Prefer features that maintain themselves from data already fetched.
 - **TAI means TechBrew only.** Its reader allow-lists TechBrew; other TAI events are members-only or invite-only.
+- **Before proposing a feature, check `docs/decisions/0006-ideas-turned-down.md`**: calendar feeds, digests, topic tags, venue pages, animations and more were already turned down, with what would reopen each.
 
 ## Data
 
