@@ -1,0 +1,7 @@
+{
+  // `npm run typecheck` (astro check) uses this. Plain .mjs files aren't
+  // checked (no checkJs), but their inferred types are, wherever an .astro or
+  // .ts file uses them: a misspelled `site.emial` or a wrong prop fails.
+  "extends": "astro/tsconfigs/strict",
+  "exclude": ["dist", "dist-e2e"]
+}

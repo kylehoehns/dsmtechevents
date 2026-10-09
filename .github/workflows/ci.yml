@@ -32,6 +32,28 @@ jobs:
       # text from the groups isn't checked. Here rather than in the build, so
       # a typo never blocks a data refresh or a deploy.
       - run: npm run spell
+      # Code checks, also here and not in the build for the same reason:
+      # ESLint (eslint.config.mjs), unused files/exports/dependencies
+      # (knip.jsonc), and types in .astro/.ts files (astro check).
+      - run: npm run lint
+      - run: npm run knip
+      - run: npm run typecheck
+      # The workflows themselves: actionlint (syntax, expressions, and
+      # shellcheck on run: blocks) and zizmor (security).
+      - name: actionlint
+        env:
+          VERSION: 1.7.12
+          SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+        run: |
+          curl -fsSLo "$RUNNER_TEMP/actionlint.tgz" "https://github.com/rhysd/actionlint/releases/download/v${VERSION}/actionlint_${VERSION}_linux_amd64.tar.gz"
+          echo "$SHA256  $RUNNER_TEMP/actionlint.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/actionlint.tgz" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" -color
+      - uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        with:
+          version: 1.30.1
+          advanced-security: false
+          annotations: true
       # The share image, icons and badge come from scripts the build doesn't
       # run, so a dependency update could break them unnoticed. Run them here
       # (the output isn't committed).

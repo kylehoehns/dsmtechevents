@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  // knip's Astro, ESLint, Playwright, node:test and GitHub Actions plugins find
+  // the other entry points on their own (pages, npm scripts, workflow `run:` lines).
+  "entry": [
+    // Served as-is from public/ and registered by Layout.astro
+    // (navigator.serviceWorker.register('/sw.js')), so nothing imports it.
+    "public/sw.js"
+  ],
+  "ignoreDependencies": [
+    // astro.config.mjs loads the font files by a built path string
+    // (`@fontsource/${pkg}/files/…`), which knip can't follow.
+    "@fontsource/.+"
+  ]
+}
