@@ -497,15 +497,30 @@ function syncSearchBox() {
 // 'back' when the new view's tab is left of the old one's.
 const viewTypes = (from, to) => (VIEWS.indexOf(to) < VIEWS.indexOf(from) ? ['view', 'back'] : ['view']);
 
+let running = null;
 function transition(update, types) {
   if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return update();
   let vt;
   try { vt = document.startViewTransition({ update, types }); } catch { vt = document.startViewTransition(update); }
+  running = vt;
+  vt.finished.finally(() => { if (running === vt) running = null; }).catch(() => {});
   // A transition cut short (another click) rejects; that's fine, the update still ran.
   vt.finished.catch(() => {});
   vt.ready.catch(() => {});
   vt.updateCallbackDone.catch(() => {});
 }
+
+// While a transition plays, the page is a snapshot: a click lands on <html>,
+// not on the tab under the pointer, so quick tab-to-tab clicks were lost. Cut
+// the transition short and replay the click on whatever is there now.
+document.addEventListener('click', (ev) => {
+  if (!running || ev.target !== document.documentElement) return;
+  ev.preventDefault();
+  ev.stopImmediatePropagation();
+  const vt = running;
+  vt.skipTransition();
+  vt.finished.finally(() => requestAnimationFrame(() => document.elementFromPoint(ev.clientX, ev.clientY)?.closest('a, button')?.click())).catch(() => {});
+}, true);
 
 document.addEventListener('click', (ev) => {
   const t = ev.target;

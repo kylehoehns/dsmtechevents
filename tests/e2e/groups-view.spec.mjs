@@ -37,3 +37,19 @@ test('the /groups/ page prints the same cards', async ({ page }) => {
   await page.goto('/?view=groups');
   expect(await page.locator('#groups-view article.flyer').evaluateAll((els) => els.map((e) => e.id))).toEqual(onPage);
 });
+
+test('quick clicks between tabs all land, even mid-swipe', async ({ page }) => {
+  await page.goto('/');
+  // Click by position, 120ms apart, the way a quick human does: each lands
+  // while the last swipe is still playing (Playwright's own click would wait
+  // for the transition's snapshot layer to clear first).
+  const at = async (name) => { const b = await nav(page, name).boundingBox(); return [b.x + b.width / 2, b.y + b.height / 2]; };
+  const spots = { Events: await at('Events'), Calendar: await at('Calendar'), Groups: await at('Groups') };
+  for (const name of ['Calendar', 'Groups', 'Events', 'Groups']) {
+    await page.mouse.click(...spots[name]);
+    await page.waitForTimeout(120);
+  }
+  await expect(page).toHaveURL(/\?view=groups$/);
+  await expect(nav(page, 'Groups')).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('#groups-view')).toBeVisible();
+});
