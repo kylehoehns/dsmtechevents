@@ -46,6 +46,8 @@
   --mis-blend: multiply;
   --tape: rgba(236, 222, 186, 0.8); /* masking tape: warm, see-through */
   --grain-alpha: 0.09;
+  --poster-grain: 0; /* the page grain already covers posters in light mode */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .45 0 0 0 0 .4 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   /* --display, --mono, --sans and --marker (font stacks) come from <Font /> in Layout.astro */
   /* Type scale, in rem so it follows the reader's default text size (1rem is
      16px unless they raised it in browser settings). Use these instead of new
@@ -78,7 +80,7 @@
     --ink: #ece6da; --ink-soft: #bdb6aa; --line: #7a7584; --head-fill: #5d5966; --rule-soft: rgba(236, 230, 218, 0.18);
     --pink-fill: #e0609f; --blue-fill: #2f6db5;
     --pink-t: #ff9cca; --blue-t: #93c2ff; --link-t: #93c2ff; --mis: #c04f87; --mis-blend: normal; --mark: #6e1f48; /* ink 8.6:1, ink-soft 5.3:1 */
-    --tape: rgba(222, 208, 172, 0.74); --grain-alpha: 0;
+    --tape: rgba(222, 208, 172, 0.74); --grain-alpha: 0; --poster-grain: 0.22;
     color-scheme: dark;
   }
 }
@@ -87,7 +89,7 @@
   --ink: #ece6da; --ink-soft: #bdb6aa; --line: #7a7584; --head-fill: #5d5966; --rule-soft: rgba(236, 230, 218, 0.18);
   --pink-fill: #e0609f; --blue-fill: #2f6db5;
   --pink-t: #ff9cca; --blue-t: #93c2ff; --link-t: #93c2ff; --mis: #c04f87; --mis-blend: normal; --mark: #6e1f48; /* ink 8.6:1, ink-soft 5.3:1 */
-  --tape: rgba(222, 208, 172, 0.74); --grain-alpha: 0;
+  --tape: rgba(222, 208, 172, 0.74); --grain-alpha: 0; --poster-grain: 0.22;
   color-scheme: dark;
 }
 
@@ -103,7 +105,7 @@ body {
 }
 body::before { /* paper grain */
   content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: var(--grain-alpha);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .45 0 0 0 0 .4 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: var(--grain);
   mix-blend-mode: multiply;
 }
 a { color: inherit; }
@@ -202,14 +204,20 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 .headliners::-webkit-scrollbar { display: none; }
 .headliners:has(.poster + .poster) { grid-auto-columns: 86%; }
 .headliners .poster { scroll-snap-align: start; }
-/* every poster is taped up, each a little differently, so the stack looks hand-pinned */
-.poster { position: relative; display: block; color: var(--on-pink); background: var(--pink-fill); transform: rotate(-0.6deg); }
-.poster.blue { background: var(--blue-fill); color: var(--on-blue); transform: rotate(0.5deg); }
+/* every poster is taped up, each a little differently, so the stack looks
+   hand-pinned: --tilt, --tape-x, --tape-w and --tape-rot come from a hash of
+   the event id (posterLook in index.astro), so each keeps its look. */
+.poster { position: relative; display: block; color: var(--on-pink); background: var(--pink-fill); transform: rotate(var(--tilt, -0.6deg)); }
+.poster.blue { background: var(--blue-fill); color: var(--on-blue); }
+/* dark mode: the page grain is off, so the posters carry their own */
+.poster::after { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: var(--grain); opacity: var(--poster-grain); mix-blend-mode: multiply; }
 .poster-full { display: block; position: relative; padding: 12px 14px 14px; height: 100%; }
-.poster .tape { position: absolute; top: -12px; left: 50%; width: 96px; height: 24px; margin-left: -48px; transform: rotate(-3deg); filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.28)); }
+.poster .tape { top: -12px; left: var(--tape-x, 50%); margin-left: calc(var(--tape-w, 96px) / -2); transform: rotate(var(--tape-rot, -3deg)); }
 /* Masking tape: torn zigzag ends, paper fibers and a light sheen across the
-   middle. The shape is clipped on ::before so the shadow on .tape survives. */
-.poster .tape::before {
+   middle. The shape is clipped on ::before so the shadow on .tape survives.
+   Also what's left on the wall on the 404 page. */
+.tape { position: absolute; width: var(--tape-w, 96px); height: 24px; filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.28)); }
+.tape::before {
   content: ""; position: absolute; inset: 0;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.05)),
@@ -231,6 +239,7 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
   .headliners .poster-full > .when { flex-basis: auto; margin-right: 100%; }
   .headliners .poster .go { order: 1; }
   .headliners .poster .stamp-days { position: static; order: 2; margin: 10px 6px 4px auto; }
+  .headliners .poster .stamp-days.day-of { font-size: var(--fs-ui); margin: 10px 2px 4px auto; } /* fits on the button's line */
 }
 /* a phone on its side (short and not desktop-wide): the masthead already takes
    half the height, so each poster shrinks to one line (title, dates, button,
@@ -249,14 +258,15 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 /* the poster's button is outlined in the poster's own text color */
 .poster { --btn-line: currentColor; --btn-hover-bg: var(--on-pink); --btn-hover-fg: var(--pink-fill); }
 .poster.blue { --btn-hover-bg: var(--on-blue); --btn-hover-fg: var(--blue-fill); }
-.poster .halftone {
-  position: absolute; inset: 0; pointer-events: none; opacity: 0.2;
-  background: radial-gradient(circle, currentColor 1.1px, transparent 1.6px) 0 0/7px 7px;
-  -webkit-mask: linear-gradient(200deg, #000 0, transparent 50%); mask: linear-gradient(200deg, #000 0, transparent 50%);
-}
 .poster .stamp-days { position: absolute; right: 12px; bottom: 14px; white-space: nowrap; font: 400 var(--fs-lede)/1 var(--marker); transform: rotate(6deg); }
+/* On the day: a strip of cream stock pasted over the corner, rubber-stamped
+   in black. Same colors on both inks and in both themes. */
+.poster .stamp-days.day-of {
+  font: 900 var(--fs-title-s)/1 var(--display); text-transform: uppercase; letter-spacing: 0.01em;
+  background: var(--on-blue); color: var(--on-pink); padding: 5px 9px 3px; bottom: 12px;
+  box-shadow: inset 0 0 0 2px var(--on-pink), 0 1px 2px rgba(0, 0, 0, 0.3); transform: rotate(-4deg);
+}
 .poster :focus-visible { outline-color: currentColor; }
-.poster.blue .tape { left: 34%; width: 84px; transform: rotate(4deg); }
 @media (min-width: 1060px) {
   .headliners { grid-auto-flow: row; grid-auto-columns: auto; overflow: visible; gap: 18px; padding: 10px 0 0; margin: 0; }
   .headliners:has(.poster + .poster) { grid-auto-columns: auto; }
@@ -407,21 +417,26 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
   .acts { grid-column: 1; }
 }
 
-/* conference rows: a solid pink slab */
-.show.headliner { position: relative; background: var(--pink-fill); color: var(--on-pink); border-bottom: 0; margin: 8px 0 9.5px; padding-left: 8px; padding-right: 10px; }
+/* conference rows: a solid pink slab; while its poster is up (.posted), a pink
+   outline instead, so the poster is the loud one */
+.show.headliner { position: relative; border-bottom: 0; margin: 8px 0 9.5px; padding-left: 8px; padding-right: 10px; }
+.show.headliner:not(.posted) { background: var(--pink-fill); color: var(--on-pink); }
+.show.headliner.posted { box-shadow: inset 0 0 0 3px var(--pink-fill); padding-left: 11px; padding-right: 13px; }
+@media (min-width: 1060px) { .show.posted .meta .at { display: none; } } /* the poster beside it prints the venue */
+.show.posted .when-tag { display: none; } /* the poster's stamp already says it (Today, Happening now) */
 /* the slab can't carry the dashed separator itself, so draw it 8px below, matching the gap above */
 .show.headliner::after { content: ""; position: absolute; left: 0; right: 0; bottom: -9.5px; border-bottom: 1.5px dashed var(--line); }
-.show.headliner .date .num { color: var(--on-pink); }
-.show.headliner .date .num::before { color: var(--blue-fill); mix-blend-mode: normal; }
+.show.headliner:not(.posted) .date .num { color: var(--on-pink); }
+.show.headliner:not(.posted) .date .num::before { color: var(--blue-fill); mix-blend-mode: normal; }
 .show.headliner .band span.band-name { font-size: var(--fs-lede); }
 .show.headliner .title { font: 900 var(--fs-title-l)/0.9 var(--display); text-transform: uppercase; margin: 4px 0 6px; }
-.show.headliner .meta .addr { color: var(--on-pink); }
-.show.headliner .acts { border-top-color: rgba(29, 27, 43, 0.35); }
-.show.headliner .going { color: var(--on-pink); }
-.show.headliner .rsvp { --btn-bg: var(--on-pink); --btn-fg: var(--pink-fill); }
-.show.headliner .desc { background: rgba(243, 237, 225, 0.55); color: #1d1b2b; }
-.show.headliner .desc a { color: #0a5aa0; }
-.show.headliner :focus-visible { outline-color: var(--on-pink); }
+.show.headliner:not(.posted) .meta .addr { color: var(--on-pink); }
+.show.headliner:not(.posted) .acts { border-top-color: rgba(29, 27, 43, 0.35); }
+.show.headliner:not(.posted) .going { color: var(--on-pink); }
+.show.headliner:not(.posted) .rsvp { --btn-bg: var(--on-pink); --btn-fg: var(--pink-fill); }
+.show.headliner:not(.posted) .desc { background: rgba(243, 237, 225, 0.55); color: #1d1b2b; }
+.show.headliner:not(.posted) .desc a { color: #0a5aa0; }
+.show.headliner:not(.posted) :focus-visible { outline-color: var(--on-pink); }
 @container (min-width: 640px) { .show.headliner .title { font-size: 2.625rem; } }
 
 /* ---------- a search: what matched ---------- */
@@ -432,10 +447,10 @@ mark {
   color: inherit; background: var(--hl); box-shadow: 0.12em 0 0 var(--hl), -0.12em 0 0 var(--hl);
   border-radius: 0.25em 0.4em 0.3em 0.45em; -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
-.show.headliner mark { --hl: var(--sheet); color: var(--ink); }
+.show.headliner:not(.posted) mark { --hl: var(--sheet); color: var(--ink); }
 /* A match only the About text has: the words around it, under the result. */
 .excerpt { display: block; margin: 4px 0 0; font: var(--fs-small)/1.45 var(--sans); color: var(--ink-soft); overflow-wrap: anywhere; }
-.show.headliner .excerpt { color: inherit; }
+.show.headliner:not(.posted) .excerpt { color: inherit; }
 .setlist .excerpt { grid-column: 2 / -1; margin: -4px 0 0; }
 
 /* ---------- set lists: far-future and past events ---------- */

@@ -1,4 +1,5 @@
 // The events list, as the fixture data builds it on Wednesday Oct 14, 9am.
+import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from './fixtures.mjs';
 
 const row = (page, title) => page.getByRole('region', { name: 'Upcoming events' }).getByRole('listitem').filter({ hasText: title });
@@ -86,6 +87,69 @@ test('headliner poster counts down to the conference', async ({ page }) => {
   await expect(poster).toContainText('Oct 22–23');
 });
 
+test('on the day, the poster swaps its countdown note for one pasted-up strip', async ({ page, isMobile }) => {
+  const poster = page.getByRole('region', { name: 'Coming up soon' });
+  await page.goto('/');
+  await expect(poster.locator('.stamp-days')).toHaveText('8 days out');
+  await expect(poster.locator('.stamp-days')).not.toHaveClass(/\bday-of\b/);
+
+  // Thu Oct 22, 6:30am: the conference opens at 8.
+  await page.clock.setFixedTime(new Date('2026-10-22T11:30:00Z'));
+  await page.goto('/');
+  await expect(poster.locator('.stamp-days')).toHaveCount(1); // replaced, not a second stamp
+  await expect(poster.locator('.stamp-days')).toHaveText('Today');
+  await expect(poster.locator('.stamp-days')).toHaveClass(/\bday-of\b/);
+
+  await page.clock.setFixedTime(new Date('2026-10-22T15:00:00Z')); // 10am
+  await page.goto('/');
+  const stamp = poster.locator('.stamp-days');
+  await expect(stamp).toHaveText('Happening now');
+  await expect(stamp).toHaveClass(/\bday-of\b/);
+  // It keeps clear of the title and the button.
+  const box = await stamp.boundingBox();
+  for (const other of [poster.getByRole('heading'), poster.getByRole('link', { name: /RSVP/ })]) {
+    const o = await other.boundingBox();
+    const overlaps = box.x < o.x + o.width && o.x < box.x + box.width && box.y < o.y + o.height && o.y < box.y + box.height;
+    expect(overlaps, `stamp overlaps ${await other.textContent()}${isMobile ? ' on a phone' : ''}`).toBe(false);
+  }
+});
+
+for (const colorScheme of ['light', 'dark']) {
+  test(`the day-of strip reads on both poster inks (${colorScheme})`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.clock.setFixedTime(new Date('2026-10-22T15:00:00Z'));
+    await page.goto('/');
+    for (const ink of ['pink', 'blue']) {
+      if (ink === 'blue') await page.locator('.poster').evaluate((el) => el.classList.add('blue')); // the fixture has one poster; try it in the other ink
+      const { violations } = await new AxeBuilder({ page }).include('#headliners').withRules(['color-contrast']).analyze();
+      expect(violations.map((v) => `${ink}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
+    }
+  });
+}
+
+test('while its poster is up, a conference row is a pink outline, and the venue is said once', async ({ page, isMobile }) => {
+  await page.goto('/');
+  const conf = row(page, 'Test Conf 2026');
+  await expect(conf).toHaveClass(/\bposted\b/);
+  await expect(conf).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  // Desktop prints the venue on the poster beside the list; phones hide it there, so the row keeps it.
+  if (isMobile) await expect(conf.getByRole('link', { name: /Convention Center/ })).toBeVisible();
+  else await expect(conf.getByRole('link', { name: /Convention Center/ })).toBeHidden();
+
+  // On its first day the poster's stamp says "Today" / "Happening now", so the row's tag stays hidden.
+  await page.clock.setFixedTime(new Date('2026-10-22T15:00:00Z'));
+  await page.reload();
+  await expect(page.locator('.poster .stamp-days')).toHaveClass(/\bday-of\b/);
+  await expect(conf.locator('.when-tag')).toBeHidden();
+
+  // In the calendar (no posters there) the same card keeps its full pink fill.
+  await page.goto('/?view=calendar&day=2026-10-22');
+  const card = page.locator('#day-panel .show', { hasText: 'Test Conf 2026' });
+  await expect(card).not.toHaveClass(/\bposted\b/);
+  await expect(card).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(card.getByRole('link', { name: /Convention Center/ })).toBeVisible();
+});
+
 test('a conference row says its start date once, and "@" stays with the venue', async ({ page }) => {
   await page.goto('/');
   const conf = row(page, 'Test Conf 2026');
@@ -101,7 +165,10 @@ test('overnight between conference days, the poster stamp agrees with the row', 
   await page.goto('/');
   const poster = page.getByRole('region', { name: 'Coming up soon' });
   await expect(poster.locator('.countdown')).toHaveText('Tomorrow');
-  await expect(row(page, 'Test Conf 2026').getByText('Tomorrow', { exact: true })).toBeVisible();
+  // The row's tag agrees, but stays hidden while the poster says it.
+  const tag = row(page, 'Test Conf 2026').locator('.when-tag');
+  await expect(tag).toHaveText('Tomorrow');
+  await expect(tag).toBeHidden();
 });
 
 test('a venue already listed above drops its street address', async ({ page }) => {

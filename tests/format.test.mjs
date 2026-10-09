@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, dayOf, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
@@ -90,6 +90,10 @@ test('countdown on headliner posters', () => {
   assert.equal(countdown(start, end, Date.parse('2026-10-14T15:00:00Z')), 'Tomorrow');
   assert.equal(countdown(start, end, Date.parse('2026-10-15T05:30:00Z')), 'Today', 'just after midnight');
   assert.equal(countdown(start, end, Date.parse('2026-10-15T15:00:00Z')), 'Happening now');
+});
+
+test('dayOf: only the stamps on the day itself', () => {
+  assert.deepEqual(['8 days out', 'Tomorrow', 'Today', 'In 25 min', 'Happening now'].map(dayOf), [false, false, true, true, true]);
 });
 
 test('the poster stamp agrees with the row for a multi-day conference', () => {
