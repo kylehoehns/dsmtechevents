@@ -7,7 +7,8 @@
   "end": "2026-01-08T19:00:00.000Z",
   "online": true,
   "going": 19,
-  "url": "https://www.meetup.com/iadnug/events/312543699/"
+  "url": "https://www.meetup.com/iadnug/events/312543699/",
+  "description": "Responsibility Thinking Are you directing your life, or just reacting to it? The difference often comes down to one crucial skill: responsibility-thinking. It's the practice of shifting from a mindset of blame to one of ownership, transforming how you approach your goals, challenges, and relationships. Is your definition of \"responsibility\" holding you back? For many, it's a word associated with obligation, duty, and burden. This perspective can lead to a life of simply \"coping\" rather than truly thriving. This is one of the most powerful tools to building high performing teams and individual"
  },
  {
   "id": "webgeeks-306721560",
@@ -17,7 +18,8 @@
   "end": "2026-01-13T02:00:00.000Z",
   "venue": "Source Allies",
   "going": 25,
-  "url": "https://www.meetup.com/des-moines-web-geeks/events/306721560/"
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/306721560/",
+  "description": "Join DSM Web Geeks on Monday, January 12th from 6:30-8pm hosted at Source Allies (or online) for an exciting talk from Lara Newsom, Software Engineering Technical Leader with Cisco. Lara will present \"Signals Through Time and JavaScript\", exploring how signals power fine-grained reactivity in modern frameworks like Vue, Solid, and Angular. Learn the history of signals, including their origins long before the internet, and see how they shape the future of high performance web applications. Lara is an Angular GDE, NX Champion, and co-host of the Angular Plus Show. She brings deep experience"
  },
  {
   "id": "cijug-312394650",
@@ -27,7 +29,8 @@
   "end": "2026-01-16T01:00:00.000Z",
   "venue": "Lean Techniques, Inc.",
   "going": 28,
-  "url": "https://www.meetup.com/central-iowa-java-users-group/events/312394650/"
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/312394650/",
+  "description": "Join CIJUG on Thursday, January 15th, 2026 from 5:30-7pm at Lean Techniques (or online) for “Application Visibility and Monitoring with OpenTelemetry.” OpenTelemetry is an open-source standard for collecting metrics, logs, and traces, giving you real-time visibility into your applications without vendor lock-in. Joshua Angolano, Sr. Software Consultant with Lean Techniques, will walk through core observability concepts such as logs, traces, and metrics. He will take a deep dive into the OpenTelemetry Collector, exploring how pipelines work and how data flows through the system. During this"
  },
  {
   "id": "dsmai-311239028",
@@ -37,7 +40,8 @@
   "end": "2026-01-21T01:30:00.000Z",
   "venue": "We Write Code",
   "going": 17,
-  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239028/"
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239028/",
+  "description": "Hand‑writing prompts is hard so why not use DSPy instead? This session shows how to turn LLM work from prompt tinkering into structured, optimizable programs. It introduces DSPy’s core abstractions—signatures through typed input–output contracts, modules through composable building blocks, and optimization through selecting examples, synthesizing prompts, and tuning module parameters. A brief tour of the GEPA optimization explains how scoring and feedback generates optimized prompts. During the session we'll build a small pipeline end‑to‑end: define a signature, wire up a module, and"
  },
  {
   "id": "pyowa-312477848",
@@ -47,7 +51,8 @@
   "end": "2026-01-28T01:00:00.000Z",
   "venue": "Source Allies",
   "going": 17,
-  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/312477848/"
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/312477848/",
+  "description": "Kick off 2026 with Pyowa at our first meetup of the year, a hands on coding dojo. Bring your laptop and jump into solving Advent of Code puzzles in Python. Work solo, pair with someone new, or collaborate in a small group. We will wrap up by sharing solutions, challenges, and clever approaches together. This is an in-person only event, hosted at Source Allies from 5:30- 7pm. Food and drinks are provided. Pyowa Coding Dojo Date: Tuesday, January 27th Time: 5:30-7pm Location: Hosted at Source Allies"
  },
  {
   "id": "dsmdata-312737781",
@@ -57,7 +62,8 @@
   "end": "2026-01-28T23:30:00.000Z",
   "venue": "Pella Corporation - Urbandale Location",
   "going": 72,
-  "url": "https://www.meetup.com/des-moines-data-analytics/events/312737781/"
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/312737781/",
+  "description": "Pella Corporation has embraced the power of AI to transform how teams work. Their rollout of Microsoft 365 Copilot has been a game-changer, delivering both exceptional adoption and measurable business impact. Today, over 95% of licensed users actively engage with Copilot each month, and more than 75% return weekly. These results place Pella among the top 5–10% of companies leveraging Copilot, according to Microsoft benchmarks. Do you want to know how they did it? Come join us to find out how Pella starts with a people-first approach to AI based on the belief that AI should empower teams to"
  },
  {
   "id": "iadnug-313058429",
@@ -67,7 +73,8 @@
   "end": "2026-02-05T19:00:00.000Z",
   "venue": "Sammons Financial Group",
   "going": 131,
-  "url": "https://www.meetup.com/iadnug/events/313058429/"
+  "url": "https://www.meetup.com/iadnug/events/313058429/",
+  "description": "Agenda This will be a Hybrid event hosted on both Zoom and in-person at Sammons Financial Group. If you are coming in person, you will need to show an ID at the front desk. We will be providing Pizza and Beverages (Pop, Water) for those coming in person. 11:40am-12:00pm - Pizza, Beverages (Pop, Water), Socialize 12:00pm-1:00pm - Presentation, JetBrains giveaway Practical AI Tooling Tips For The Too Busy Developer AI is the hottest technology in the entire world, not just in the software industry. AI Tools like Copilot, Claude Code, and others allow software to be developed faster than ever"
  },
  {
   "id": "webgeeks-306721561",
@@ -77,7 +84,8 @@
   "end": "2026-02-10T02:00:00.000Z",
   "venue": "Source Allies",
   "going": 16,
-  "url": "https://www.meetup.com/des-moines-web-geeks/events/306721561/"
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/306721561/",
+  "description": "DSM Web Geeks is excited to welcome Neil Roberts for a dive into Convex, the reactive database and sync engine designed for building fast, real time web applications. Neil is a veteran front end engineer with more than 20 years of experience spanning everything from Atari BASIC to modern TypeScript. He has contributed to projects like Dojo and WordPress, taught developers around the world, and now focuses on building LLM powered tools that amplify human expertise through empathetic and sustainable design. This session is a practical crash course in Convex. You will learn how to model data"
  },
  {
   "id": "azure-313067793",
@@ -87,7 +95,8 @@
   "end": "2026-02-11T19:00:00.000Z",
   "online": true,
   "going": 13,
-  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/313067793/"
+  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/313067793/",
+  "description": "ntelligent agents are only as powerful as the tools they wield—and Model Context Protocol (MCP) is the key to unlocking their full potential. In this session, you’ll learn how MCP enables agents to seamlessly integrate external tools, APIs, and services, expanding their capabilities far beyond basic automation. We’ll explore how MCP works under the hood, demonstrate real-world scenarios where tool integration transforms agent performance, and share best practices for building secure, scalable, and extensible solutions. By the end, you’ll understand how to equip your agents with a robust"
  },
  {
   "id": "mobile-312539495",
@@ -97,7 +106,8 @@
   "end": "2026-02-12T01:00:00.000Z",
   "venue": "Corteva Agriscience (Shull Building)",
   "going": 7,
-  "url": "https://www.meetup.com/des-moines-mobile-developers/events/312539495/"
+  "url": "https://www.meetup.com/des-moines-mobile-developers/events/312539495/",
+  "description": "Join us for an exciting DM Mobile Engineering Meetup! Calling all mobile enthusiasts, professionals, students, and software engineers to come together for an evening of networking, knowledge-sharing, and innovation on Feb 11, 2026, from 5 PM to 7 PM at [7200 NW 62nd Ave, Johnston, IA 50131](https://maps.app.goo.gl/m42P28pmkaaSGe2z7). Whether you're a seasoned professional or just starting your journey in iOS or Android development, this event promises insightful discussions and opportunities to connect with like-minded individuals. Why Attend? * Networking: Connect with professionals and"
  },
  {
   "id": "producttank-313133560",
@@ -107,7 +117,8 @@
   "end": "2026-02-18T00:00:00.000Z",
   "venue": "Lean Techniques, Inc.",
   "going": 23,
-  "url": "https://www.meetup.com/producttank-des-moines-ames/events/313133560/"
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/313133560/",
+  "description": "Products Built on Relationships Dan Zegers challenges the idea that great products start with perfect roadmaps. In this talk, he’ll unpack why strong relationships are the real foundation of successful product work and how trust, context, and shared understanding shape better outcomes. You’ll hear practical stories and lessons on putting people first to create products that last. This session is a reminder that product excellence is built with humans, not just frameworks. Thanks to our sponsor - Lean TECHniques Schedule 4:30 - 5:00 Networking 5:00 - 6:00 Presentation and Discussion"
  },
  {
   "id": "dsmai-311239035",
@@ -117,7 +128,8 @@
   "end": "2026-02-18T01:30:00.000Z",
   "venue": "We Write Code",
   "going": 33,
-  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239035/"
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239035/",
+  "description": "Multi-agent architectures are rapidly reshaping how agentic AI systems work. When data moves between agents, there is an implicit trust established. We’ll explore what that means, what trust actually looks like in multi-agent architectures, and how we can lean on decades of security research and best practices to mitigate potential issues that stem from that implicit trust. Join us for the next AI Group! 5:30 - 6:00 - Socializing/Networking 6:00 - Speaker begins"
  },
  {
   "id": "pyowa-313174348",
@@ -127,7 +139,8 @@
   "end": "2026-02-25T01:00:00.000Z",
   "venue": "Source Allies",
   "going": 27,
-  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/313174348/"
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/313174348/",
+  "description": "Join Pyowa for our February meetup featuring Pat Hawks, Lead Software Engineer at Coviance, for a talk on structured logging in Python. Logging is often written for humans, but machines are far better at reading structured data. This session explores why structured logging matters, when it’s worth adopting, and how to introduce it into existing Python applications without a full rewrite. Expect practical guidance, real-world examples, and advice you can apply right away. The event is on Tuesday, February 24th from 5:30-7pm, hosted at Source Allies with a live online stream available. Food and"
  },
  {
   "id": "devopsdsm-313190329",
@@ -137,7 +150,8 @@
   "end": "2026-02-26T01:00:00.000Z",
   "venue": "Source Allies",
   "going": 16,
-  "url": "https://www.meetup.com/devopsdsm/events/313190329/"
+  "url": "https://www.meetup.com/devopsdsm/events/313190329/",
+  "description": "Join DevOps DSM on Wednesday, February 25th, 6-7pm, where Carl Soderlund from Athene will be sharing his expertise and knowledge about FinOps. FinOps (Financial Operations) brings together engineering, finance, and business teams to make data-driven decisions about cloud spending. Carl began his career in IT as an infrastructure engineer working in traditional on-premises data center environments. As organizations moved to the cloud, his focus shifted from infrastructure to cloud platform engineering, giving him firsthand experience with both legacy and modern operating models. Over time,"
  },
  {
   "id": "cijug-313066806",
@@ -147,7 +161,8 @@
   "end": "2026-02-27T01:00:00.000Z",
   "venue": "Lean Techniques, Inc.",
   "going": 11,
-  "url": "https://www.meetup.com/central-iowa-java-users-group/events/313066806/"
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/313066806/",
+  "description": "Building Engineers or Teaching Technicians? Organizations often focus on creating software technicians instead of engineers. Platform and enablement teams frequently impose standardized tools and patterns that limit ownership, critical thinking, and real problem solving. In this talk, Jonathon Graf of Lean TECHniques explores how shifting the focus to developing true engineers leads to better decisions, more adaptable systems, and faster progress. Engineers who understand their problems, choose appropriate tools, and design solutions for their context drive innovation. CIJUG welcomes"
  },
  {
   "id": "alf-313080304",
@@ -157,7 +172,8 @@
   "end": "2026-02-27T16:30:00.000Z",
   "venue": "Corteva Carver Research Center",
   "going": 32,
-  "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/313080304/"
+  "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/313080304/",
+  "description": "Continued advances in AI will bring new challenges in 2026 to Data & Analytics leaders looking to build their team. A shift is occurring in how AI talent is sourced, what skills need to be developed, what AI roles become more specialized and strategic, and who (or what) is able to do entry-level work. The demand for complex problem solving and emotional intelligence in AI teams increases the importance of having a talent strategy. Join us for a panel discussion on the talent reality of 2026. Panelists include: [Jacey Heuer](https://www.linkedin.com/in/jaceyheuer/), Senior Head of AI, Data"
  },
  {
   "id": "dsmdata-313524885",
@@ -167,7 +183,8 @@
   "end": "2026-03-10T01:00:00.000Z",
   "venue": "Source Allies",
   "going": 15,
-  "url": "https://www.meetup.com/des-moines-data-analytics/events/313524885/"
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/313524885/",
+  "description": "Are you ready to do come coding? We have the opportunity to partner with the DSM Tech Community's Code & Collaborate, a community event that connects several other tech communities (Python, DSM AI, etc.) from across Des Moines for an exciting coding event. Students, career changers, non-coders, and everyone who’s been meaning to get more involved in the local tech scene - you belong here too. This isn’t a “prove yourself” event. It’s a “meet your people” event. This event is free - food and drinks are provided. Raffle for free JetBrains Licenses. For more information and to RSVP go to [DSM"
  },
  {
   "id": "devopsdsm-313619115",
@@ -177,7 +194,8 @@
   "end": "2026-03-26T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 24,
-  "url": "https://www.meetup.com/devopsdsm/events/313619115/"
+  "url": "https://www.meetup.com/devopsdsm/events/313619115/",
+  "description": "Join DevOpsDSm on Wednesday, March 25th, 6-7pm, for a presentation by Cecil Williams on \"Testing Infrastructure as Code - Ensuring Reliability in Terraform and CloudFormation\". Many teams leverage infrastructure as code but don't test it. Learn how to test your infrastructure before you break production. He will cover Terraform and CloudFormation testing tools, from linting to integration tests, with live demos including Test-Driven Infrastructure (TDI). About our speaker: Cecil G. Williams is consultant with Source Allies, a technical consultancy based in Urbandale Iowa. Cecil is a software"
  },
  {
   "id": "azure-313926057",
@@ -187,7 +205,8 @@
   "end": "2026-03-26T18:00:00.000Z",
   "online": true,
   "going": 8,
-  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/313926057/"
+  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/313926057/",
+  "description": "Hi everyone, Sorry for the late notice. For this month we're going to be partnering with a talk at the virtual Microsoft reactor you can register for the reactor meetup page here https://www.meetup.com/microsoft-reactor-redmond/events/313286176 or the event itself here https://developer.microsoft.com/en-us/reactor/events/26826. If you have seen me give this talk before there will be some added demo content like RAG on your local machine and maybe even a MCP server? Still TBD on the MCP server calls, but check it out and we'll see you next month! What if you could build modern AI features"
  },
  {
   "id": "mobile-313728985",
@@ -197,7 +216,8 @@
   "end": "2026-04-09T18:00:00.000Z",
   "venue": "Source Allies",
   "going": 10,
-  "url": "https://www.meetup.com/des-moines-mobile-developers/events/313728985/"
+  "url": "https://www.meetup.com/des-moines-mobile-developers/events/313728985/",
+  "description": "Join us for an exciting DM Mobile Engineering Meetup at Source Allies! Calling all mobile enthusiasts, professionals, students, and software engineers to come together for a lunch & learn on Apr 9, 2026, from 12 PM to 1 PM - [4501 NW Urbandale Dr, Urbandale, IA 50322](https://maps.app.goo.gl/nuHMz1e9sSJDriUA6). Whether you're a seasoned professional or just starting your journey in iOS or Android development, this event promises insightful discussions and opportunities to connect with like-minded individuals. Topic * Building multi-platform apps with Kotlin Speaker * Turker Nessa Kucuk Why"
  },
  {
   "id": "iadnug-314148713",
@@ -207,7 +227,8 @@
   "end": "2026-04-09T18:10:00.000Z",
   "online": true,
   "going": 37,
-  "url": "https://www.meetup.com/iadnug/events/314148713/"
+  "url": "https://www.meetup.com/iadnug/events/314148713/",
+  "description": "Agenda This will be our usual noon Zoom meeting presentation by one of our leaders, Dustin Thostenson! 11:50am-12:00pm - Pre-Session Waiting Room 12:00pm-1:00pm - Presentation, JetBrains giveaway “The Past Didn’t Go Anywhere”: Fundamentals > AI From COBOL to .COM to DevOps to AI, our industry has repeatedly promised a future where programmers are no longer needed. And yet -- developers remain critical. Each wave didn’t eliminate developers—it forced them to evolve. As AI accelerates code generation, many developers will face a hard truth: we’ve optimized for syntax instead of solving real"
  },
  {
   "id": "webgeeks-311473701",
@@ -217,7 +238,8 @@
   "end": "2026-04-14T01:00:00.000Z",
   "venue": "Source Allies",
   "going": 21,
-  "url": "https://www.meetup.com/des-moines-web-geeks/events/311473701/"
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/311473701/",
+  "description": "The Power of Common Knowledge: Why Teams Break When Information Isn’t Shared We often assume that sharing information is enough to keep teams aligned. In reality, successful collaboration depends on something deeper: common knowledge. This happens when everyone knows something, and knows that everyone else knows it too. In this presentation, Mackenzie Ostrem will explore how a lack of shared understanding leads to misalignment, slow decisions, and broken trust in software teams. Drawing on ideas from cognitive scientist Steven Pinker, she will examine why coordination fails when information"
  },
  {
   "id": "producttank-313733522",
@@ -227,7 +249,8 @@
   "end": "2026-04-21T23:00:00.000Z",
   "venue": "The Venue",
   "going": 45,
-  "url": "https://www.meetup.com/producttank-des-moines-ames/events/313733522/"
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/313733522/",
+  "description": "Bridging the Gap: Scaling Product Strategy for the AI-Accelerated Team: AI has exponentially accelerated our ability to build software, but it has also increased the risk of building the wrong things at record speed. To stay ahead, product leaders must evolve how they funnel work to engineering. This session explores a framework for using AI to define clear strategy while shifting engineers further into the discovery and problem-solving phases. We will look at real-world results from a heavily AI-enabled team, showing how a focus on high-level problem clarity leads to more autonomous teams,"
  },
  {
   "id": "dsmai-311239044",
@@ -237,7 +260,8 @@
   "end": "2026-04-22T00:30:00.000Z",
   "venue": "We Write Code",
   "going": 48,
-  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239044/"
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239044/",
+  "description": "Note: There will be no March event. We'll see you in April! Hear from Curt Winegar from Pella Corporation, and hear how they have embraced the power of AI to transform how their teams work. Their rollout of Microsoft 365 Copilot has been a game-changer, delivering both exceptional adoption and measurable business impact. Today, over 95% of licensed users actively engage with Copilot each month, and more than 75% return weekly. These results place Pella among the top 5–10% of companies leveraging Copilot, according to Microsoft benchmarks. What sets Pella apart is their people-first approach"
  },
  {
   "id": "azure-314166341",
@@ -247,7 +271,8 @@
   "end": "2026-04-22T18:00:00.000Z",
   "online": true,
   "going": 11,
-  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/314166341/"
+  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/314166341/",
+  "description": "Provision infrastructure and environments with ease. Learn how developers can use the Azure Developer CLI and GitHub Copilot to scaffold Bicep or Terraform templates, while infra and security teams refine them for production. This session highlights how AI helps teams bridge developer speed with enterprise governance. Kevin Kraus and Mark Hoiland are both Principal Solution Engineer"
  },
  {
   "id": "devopsdsm-314055212",
@@ -257,7 +282,8 @@
   "end": "2026-04-23T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 26,
-  "url": "https://www.meetup.com/devopsdsm/events/314055212/"
+  "url": "https://www.meetup.com/devopsdsm/events/314055212/",
+  "description": "Join us on Wednesday, April 22nd from 6-7pm for our next DevOpsDSM meetup featuring Casey Howard from Torq, presenting “Serve, Protect, Automate: Building Better AI Agents with RoboCops Prime Directives.” This session will share practical, real-world insights into AI driven security automation agents and what they mean for the future of the SOC. Casey will explore how teams can use automation and AI to improve detection, response, and overall security outcomes in modern environments. If you are interested in DevOps, security, or the growing role of AI in operations, this session will offer"
  },
  {
   "id": "dsmdata-314214648",
@@ -267,7 +293,8 @@
   "end": "2026-04-28T22:30:00.000Z",
   "venue": "Wellabe",
   "going": 36,
-  "url": "https://www.meetup.com/des-moines-data-analytics/events/314214648/"
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/314214648/",
+  "description": "Zach Umsted, Data Governance Manager at Wellabe, will share their story of creating a single source of truth using Data Lakehouse architecture on Databricks to get the organization's data ready for AI. Join us to learn some lessons learned in adoption and governance as well as insights into supporting Analytics, AI and business needs."
  },
  {
   "id": "pyowa-314040501",
@@ -277,7 +304,8 @@
   "end": "2026-04-29T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 15,
-  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/314040501/"
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/314040501/",
+  "description": "Join Pyowa on Tuesday, April 28th from 5:30-7pm to hear Daryle Foulke from Source Allies present “From TypeScript to Python: AI Powered Code Migration Magic.” In this live demo, we will take a real TypeScript application and watch AI transform it into idiomatic Python code in real time. You will see how modern AI tools handle code structure, types, async patterns, and language specific idioms across languages. The session will explore both the strengths and limitations of AI powered code translation. You will learn practical tips for guiding AI, improving results, and handling post migration"
  },
  {
   "id": "aws-313625045",
@@ -287,7 +315,8 @@
   "end": "2026-04-30T00:00:00.000Z",
   "venue": "Lean Techniques",
   "going": 13,
-  "url": "https://www.meetup.com/aws-user-group-des-moines/events/313625045/"
+  "url": "https://www.meetup.com/aws-user-group-des-moines/events/313625045/",
+  "description": "The core objective is to showcase how a select combination of AWS serverless and managed services—specifically Amazon SQS, AWS Lambda, Amazon Aurora PostgreSQL with the Data API, and Amazon Bedrock—can be integrated to create a robust, high-concurrency data enrichment pipeline. Key Focus Areas: 1. Parallelization: The presentation highlights the use of Amazon SQS and AWS Lambda to decouple the ingestion process from the analysis process, allowing thousands of individual data points (political opinions) to be processed simultaneously by independent Worker Lambdas. 2. Generative AI Integration:"
  },
  {
   "id": "alf-314214712",
@@ -297,7 +326,8 @@
   "end": "2026-05-01T15:30:00.000Z",
   "venue": "Corteva Carver Research Center",
   "going": 26,
-  "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/314214712/"
+  "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/314214712/",
+  "description": "What does it take to move AI from proof-of-concept to real enterprise value? Join Matt Smalley, R&D Data Science & Data Engineering Lead, and Bryce Hemme, R&D Architecture & Foundational Infrastructure Lead, as they share how Corteva is putting AI into practice across multiple processes in the seed business. They will discuss how their teams are integrating both generative and traditional AI into end-to-end workflows and scaling those capabilities across the organization. The session will highlight lessons learned and spark discussion among ALFI leaders looking to operationalize AI across"
  },
  {
   "id": "webgeeks-314385247",
@@ -307,7 +337,8 @@
   "end": "2026-05-12T01:00:00.000Z",
   "venue": "Source Allies",
   "going": 14,
-  "url": "https://www.meetup.com/des-moines-web-geeks/events/314385247/"
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/314385247/",
+  "description": "DSM Web Geeks is excited to welcome Finley Blakeman for our May meetup. In this talk, 'Access Granted: Accessibility in the Modern Web', Finley will explore how the modern software engineering landscape has transformed the way we build for everyone. From the early history of human and computer interaction to recent advancements in accessibility, this session highlights how far we have come and where we still have work to do. Topics will include how accessibility has evolved alongside modern web development and how today’s tools and practices can help you build more inclusive, user-friendly"
  },
  {
   "id": "cijug-314300787",
@@ -317,7 +348,8 @@
   "end": "2026-05-20T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 22,
-  "url": "https://www.meetup.com/central-iowa-java-users-group/events/314300787/"
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/314300787/",
+  "description": "Join us for our May CIJUG meetup as we welcome Daniel Hinojosa from No Fluff Just Stuff for an in depth look at what is new in Java. This session, 'What’s New In Java Live: Simplicity and Vector API', explores how Java continues to evolve by becoming easier to use while pushing performance forward. Daniel will walk through features designed to simplify how programs are written and executed, alongside APIs that unlock modern hardware capabilities. Topics include Simple Source Files and Instance Main Methods, Launching Multi File Source Code Programs, the built in Java WebServer, Value Objects,"
  },
  {
   "id": "dsmai-313494233",
@@ -327,7 +359,8 @@
   "end": "2026-05-20T00:30:00.000Z",
   "venue": "We Write Code",
   "going": 44,
-  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/313494233/"
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/313494233/",
+  "description": "Claimable is a health insurance appeals platform that helps patients overturn denied medication and treatment claims. This talk is a case study of building AI systems that do real, high-stakes work in healthcare. It covers how Claimable uses AI to generate appeal letters grounded in clinical evidence, insurer policy, and patients' legal rights, and digs into how the team has matured its AI systems over the past year: iterating on evaluation pipelines to measure letter quality, creating AI-powered feedback loops that use appeal outcomes to improve future letters, and developing internal AI"
  },
  {
   "id": "producttank-314181001",
@@ -337,7 +370,8 @@
   "end": "2026-05-20T23:00:00.000Z",
   "venue": "The Venue",
   "going": 19,
-  "url": "https://www.meetup.com/producttank-des-moines-ames/events/314181001/"
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/314181001/",
+  "description": "People are a complex mix of experiences and emotions as well as logic and reason. Emotional intelligence (EI) was on Plato’s mind 2000 years ago when he wrote “All learning has an emotional base.\" Learning to understand our own and others' emotions is vital as we leverage the capabilities of AI. Machines excel in data analysis and logical reasoning that will replace some human tasks, however, they will not replace understanding the complexity of human emotions. Developing skills in self-awareness, self-regulation, empathy, motivation and social skills is vital in the world of AI. We will"
  },
  {
   "id": "iadnug-314693266",
@@ -347,7 +381,8 @@
   "end": "2026-05-21T18:00:00.000Z",
   "venue": "ITA Group",
   "going": 52,
-  "url": "https://www.meetup.com/iadnug/events/314693266/"
+  "url": "https://www.meetup.com/iadnug/events/314693266/",
+  "description": "Agenda This will be hosted both on Zoom and in person at ITA Group in West Des Moines! 11:45am-12:00pm - Pizza, Drinks, Socialize 12:00pm-1:00pm - Presentation, JetBrains giveaway \"From Fear to Flow: Seven Weeks That Changed My Mind About AI\" In only seven weeks, our team moved from simply using AI in the IDE to a full blown workflow. Working alongside Lean Techniques, three ITA Group engineers and two Lean Techniques partners built Journey with Claude Code — 279 PRs merged, 95%+ test coverage, and an AI-native workflow that genuinely changed how we think about this technology. Speakers Mike"
  },
  {
   "id": "pyowa-314738462",
@@ -357,7 +392,8 @@
   "end": "2026-05-27T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 11,
-  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/314738462/"
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/314738462/",
+  "description": "Join Pyowa on Tuesday, May 26th from 5:30 to 7pm for a special Lightning Talks edition featuring speakers from the local Python and technology community! Michael Driscoll will present “Textual-cogs Lightning Talk,” a quick look at one of his open source Python projects. Michael has been writing Python since 2006, contributes to the Python community through his blog “The Mouse vs The Python,” and has written multiple books on Python topics ranging from Jupyter Notebook to image processing. He is also a member of the Python Software Foundation. Jonathan Stoner from Source Allies will present"
  },
  {
   "id": "devopsdsm-314508493",
@@ -367,7 +403,8 @@
   "end": "2026-05-28T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 20,
-  "url": "https://www.meetup.com/devopsdsm/events/314508493/"
+  "url": "https://www.meetup.com/devopsdsm/events/314508493/",
+  "description": "Join DevOpsDSM on Wednesday, May 27th from 6 to 7pm for a session with Dan Sepich from Nobl9 titled “Beyond Firefighting: Managing Reliability with Service Level Objectives.” As delivery speeds increase, especially with AI assisted development, reliability often becomes reactive. This session explores how Service Level Objectives can make reliability measurable, enforceable, and part of everyday engineering decisions. Dan will share how SLOs, SLIs, and error budgets help teams align on expectations, validate whether systems are meeting reliability targets, and shift from responding to"
  },
  {
   "id": "iadnug-315100213",
@@ -377,7 +414,8 @@
   "end": "2026-06-04T18:00:00.000Z",
   "online": true,
   "going": 10,
-  "url": "https://www.meetup.com/iadnug/events/315100213/"
+  "url": "https://www.meetup.com/iadnug/events/315100213/",
+  "description": "Agenda This will be a Zoom meeting at Noon 11:50am-12:00pm - Pre-Session Waiting Room 12:00pm-1:00pm - Presentation, JetBrains giveaway Resilience Isn’t a Buzzword: Real-World + Research-Backed Tactics for Building Stronger Teams Most technical teams don’t fail because they lack talent — they fail because they don’t recover well. While training for a week-long, 500-kilometer running race and conducting doctoral research on team resilience, I’ve reached the same conclusion in both domains: sustained performance is driven by recovery, pacing, and system design — not grit alone. After 25+ years"
  },
  {
   "id": "webgeeks-312416814",
@@ -387,7 +425,8 @@
   "end": "2026-06-09T01:00:00.000Z",
   "venue": "Source Allies",
   "going": 16,
-  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416814/"
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416814/",
+  "description": "Why do some teams instantly click while others struggle with friction and misalignment? Often, the difference comes down to the unwritten rules that shape how teams communicate, collaborate, and hold each other accountable. Join DSM Web Geeks on Monday, June 8th for an interactive session with Whitney Lovelace as she explores the art of the Team Charter. In this talk, Whitney will share her personal methodology for aligning diverse personalities into cohesive, high functioning teams. Together, we will discuss how to facilitate honest conversations about working styles, establish team"
  },
  {
   "id": "dsmai-313494263",
@@ -397,7 +436,8 @@
   "end": "2026-06-17T00:30:00.000Z",
   "venue": "We Write Code",
   "going": 25,
-  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/313494263/"
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/313494263/",
+  "description": "Drake University's Artificial Intelligence program has just concluded its sixth year. In this talk, Chris Porter will share insights from his time directing the program, discussing what's worked well, what hasn't, new challenges the program is facing, and how the program trying to build bridges with local industry partners. Join us for the next DSM AI Group! 5:30 - 6:00 - Socializing/Networking 6:00 - Speaker begins"
  },
  {
   "id": "producttank-315016710",
@@ -407,7 +447,8 @@
   "end": "2026-06-17T23:00:00.000Z",
   "venue": "The Venue",
   "going": 17,
-  "url": "https://www.meetup.com/producttank-des-moines-ames/events/315016710/"
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/315016710/",
+  "description": "You did discovery. You validated the problem. You wrote beautiful user stories, hit the deadline, and shipped something you’re proud of. But users don’t care about what you shipped, they care about what it does for them. Real magic happens when a product reaches the right people, solves the right problems, and becomes part of their lives. The hard truth is that shipping a product and building something people will actually adopt are two very different problems. Both require the same rigor, curiosity, and user obsession, but most product teams are built to launch. This talk is about the gap"
  },
  {
   "id": "pyowa-315056917",
@@ -417,7 +458,8 @@
   "end": "2026-06-24T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 9,
-  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315056917/"
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315056917/",
+  "description": "Pyowa returns on Tuesday, June 23rd from 5:30- 7pm at Source Allies with a hands on Python workshop and friendly competition. This month, attendees will build Tic-Tac-Toe bots in Python and face off against one another for ultimate Pyowa Tic-Tac-Toe bot champion bragging rights. Participants should bring a laptop and be ready to write some Python code. Attendees are also welcome to pair up and collaborate during the workshop. The event is designed to be approachable for all experience levels. Whether you are new to Python or have years of experience, this will be a fun opportunity to"
  },
  {
   "id": "azure-315288786",
@@ -427,7 +469,8 @@
   "end": "2026-06-24T18:00:00.000Z",
   "online": true,
   "going": 12,
-  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/315288786/"
+  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/315288786/",
+  "description": "Whether you couldn't attend Microsoft Build 2026 or want a streamlined overview of the biggest news, this session highlights the most important announcements, demos, and innovations from the event. Learn about the latest AI capabilities, cloud technologies, developer tools, and platform updates shaping the future of Microsoft technology."
  },
  {
   "id": "aws-314736069",
@@ -437,7 +480,8 @@
   "end": "2026-06-25T00:00:00.000Z",
   "venue": "Lean Techniques",
   "going": 13,
-  "url": "https://www.meetup.com/aws-user-group-des-moines/events/314736069/"
+  "url": "https://www.meetup.com/aws-user-group-des-moines/events/314736069/",
+  "description": "This will be a workshop event!! Bring your laptop and an open mind!! You have used agentic AI to develop your applications. Now take it to the next level and start developing agents to power your business!"
  },
  {
   "id": "devopsdsm-315056758",
@@ -447,7 +491,8 @@
   "end": "2026-06-25T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 20,
-  "url": "https://www.meetup.com/devopsdsm/events/315056758/"
+  "url": "https://www.meetup.com/devopsdsm/events/315056758/",
+  "description": "DevOpsDSM returns on Wednesday, June 24th from 6 to 7pm at Source Allies with “AI in DevOps: Real World Practices Roundtable.” This event will be a community driven discussion focused on how teams are actually using AI in DevOps, platform engineering, operations, and software delivery workflows. Rather than a traditional presentation, this roundtable format is designed to encourage open conversation, shared learning, and practical discussion. Attendees are encouraged to bring their own experiences, experiments, lessons learned, successes, and frustrations. Whether you are using AI for"
  },
  {
   "id": "dsmdata-315064557",
@@ -457,7 +502,8 @@
   "end": "2026-06-26T18:00:00.000Z",
   "online": true,
   "going": 111,
-  "url": "https://www.meetup.com/des-moines-data-analytics/events/315064557/"
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/315064557/",
+  "description": "What happens when GenAI becomes part of your everyday work? How is GenAI changing the way you work? Join this webinar for an honest conversation from our panelists about how GenAI has changed the way they work along with lessons learned, challenges encountered, and what these changes mean for the future of data careers. Panelists: [Blake Ryner](https://www.linkedin.com/in/blakeryner), Business Intelligence Developer at Merchants Bonding [Taylor Ferebee](https://www.linkedin.com/in/taylorferebee/), Senior Data Scientist at Corteva [Ejaz Syed](https://www.linkedin.com/in/ejaz-syed/), AI"
  },
  {
   "id": "mobile-314628745",
@@ -467,7 +513,8 @@
   "end": "2026-07-08T18:00:00.000Z",
   "venue": "QCI",
   "going": 18,
-  "url": "https://www.meetup.com/des-moines-mobile-developers/events/314628745/"
+  "url": "https://www.meetup.com/des-moines-mobile-developers/events/314628745/",
+  "description": "Join us for an exciting DM Mobile Engineering Meetup at QCI! Calling all mobile enthusiasts, professionals, students, and software engineers to come together for a lunch & learn on July 8, 2026, from 11:45 to 1 PM - [2929 Westown Pkwy, Suite 10](https://maps.app.goo.gl/Hsy1GwdkiHFf1pL39) [West Des Moines, IA 50266.](https://maps.app.goo.gl/Hsy1GwdkiHFf1pL39) Whether you're a seasoned professional or just starting your journey in iOS or Android development, this event promises insightful discussions and opportunities to connect with like-minded individuals. Topic * Practical AI Productivity"
  },
  {
   "id": "iadnug-315562317",
@@ -477,7 +524,8 @@
   "end": "2026-07-09T18:00:00.000Z",
   "online": true,
   "going": 25,
-  "url": "https://www.meetup.com/iadnug/events/315562317/"
+  "url": "https://www.meetup.com/iadnug/events/315562317/",
+  "description": "Agenda This will be a Zoom meeting at Noon 11:50am-12:00pm - Pre-Session Waiting Room 12:00pm-1:00pm - Presentation, JetBrains giveaway Advanced EF Core: High-Performance Data Access and Temporal Table Strategies Enterprise systems place extreme demands on data access layers. This session dives deep into advanced Entity Framework Core techniques for building high-throughput, low-latency applications while meeting auditing and compliance requirements with SQL Server temporal tables. Attendees will learn how to use compiled queries, efficient projections, batching, and controlled tracking to"
  },
  {
   "id": "webgeeks-312416819",
@@ -487,7 +535,8 @@
   "end": "2026-07-14T01:00:00.000Z",
   "venue": "Source Allies",
   "going": 37,
-  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416819/"
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416819/",
+  "description": "What are companies actually looking for when they review your resume? Has the rise of AI coding assistants changed hiring expectations for developers? Are degrees still important? What skills stand out in today's market? DSM Web Geeks is hosting a panel discussion focused on the current state of hiring in software development and technology roles. Let's share our perspectives on what employers are looking for, how hiring practices are evolving, and how candidates can better position themselves in a rapidly changing industry. This will be an open conversation with opportunities for audience"
  },
  {
   "id": "cijug-315286709",
@@ -497,7 +546,8 @@
   "end": "2026-07-17T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 20,
-  "url": "https://www.meetup.com/central-iowa-java-users-group/events/315286709/"
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/315286709/",
+  "description": "AI-assisted development has come a long way from simple autocomplete, but most developers are only scratching the surface of what's possible today. Join us as Kyle Hoehns demonstrates how modern AI development tools have evolved from helpful coding assistants into capable agents that can help build complete features with minimal human intervention. Drawing from more than a year of daily use on real client projects, Kyle will share his insights into how these tools fit into modern software development workflows. This session is completely hands-on. Starting with an empty project, Kyle will"
  },
  {
   "id": "azure-315743826",
@@ -507,7 +557,8 @@
   "end": "2026-07-22T18:00:00.000Z",
   "online": true,
   "going": 5,
-  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/315743826/"
+  "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/315743826/",
+  "description": "Modern cloud-native development is often less about writing code and more about \"YAML plumbing.\" Between IaC templates, secret management, and Kubernetes manifests, the actual application logic gets buried under layers of infrastructure configuration. Why does our tooling force us to think about VPCs and subnets when we just want to connect a service to a database?"
  },
  {
   "id": "devopsdsm-315470117",
@@ -517,7 +568,8 @@
   "end": "2026-07-23T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 18,
-  "url": "https://www.meetup.com/devopsdsm/events/315470117/"
+  "url": "https://www.meetup.com/devopsdsm/events/315470117/",
+  "description": "DevOpsDSM returns on Wednesday, July 22nd from 6 to 7pm for a Lightning Talks night at Source Allies. Lightning talks are a chance to hear several quick presentations, giving everyone exposure to a variety of ideas, technologies, and real-world experiences. The format keeps the evening fast-paced while creating plenty of opportunities to discover something new. This month's speakers include Austin Adamson, Joel Miller, Kyle Wagner, and Mason Spree. Our Lightning Talks will cover a wide range of topics, including deploying a simple LLM pipeline on Kubernetes with Seldon Core, using time series"
  },
  {
   "id": "alf-315376050",
@@ -527,7 +579,8 @@
   "end": "2026-07-24T15:30:00.000Z",
   "venue": "Corteva Carver Research Center",
   "going": 34,
-  "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/315376050/"
+  "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/315376050/",
+  "description": "How are you using GenAI to amplify your analytics team's expertise? How much impact does domain knowledge or context have in the different roles between AI and the expert? Join us for a lively discussion following a presentation by Bill Schmarzo, ISU Professor, where he will talk about the integration of causal AI with Generative AI to amplify human domain expertise. Agenda: 8:30 - 8:45 Networking 8:45 - 9:45 Presentation & Open Q&A 9:45 - 10:15 Round Table Discussion 10:15 - 10:30 Networking"
  },
  {
   "id": "dsmdata-315499336",
@@ -537,7 +590,8 @@
   "end": "2026-07-28T22:30:00.000Z",
   "venue": "Wellmark Building",
   "going": 32,
-  "url": "https://www.meetup.com/des-moines-data-analytics/events/315499336/"
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/315499336/",
+  "description": "The Des Moines Data for Good group has been utilizing their talents to help our community over the past several years. We will get to hear about their work and impact, a deep dive into a recent project and hear about opportunities to join the group. This is an event you don't want to miss! For more information about this group, check out their website. https://www.dsmdataforgood.com/"
  },
  {
   "id": "pyowa-315470463",
@@ -547,7 +601,8 @@
   "end": "2026-07-29T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 14,
-  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315470463/"
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315470463/",
+  "description": "How do you turn noisy, inconsistent public health data into something genuinely informative? Aaron Hall with Source Allies walks us through the development of Sick Risk, a system that computes illness risk scores by zip code using CDC wastewater surveillance data. He will focus on extracting a stable, interpretable signal from messy real-world data, and the tradeoffs involved in doing so. Along the way, he will explore the Python-based, cloud-hosted architecture behind the application. Finally, he taks a look at how modern AI coding assistants accelerated development, without drifting into"
  },
  {
   "id": "webgeeks-312416822",
@@ -557,7 +612,8 @@
   "end": "2026-08-11T01:00:00.000Z",
   "online": true,
   "going": 16,
-  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416822/"
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416822/",
+  "description": "Join the Web Geeks March Meetup on Monday, August 10th, 6:30-8pm at Source Allies for a Coding Dojo! Are you ready to dive into a collaborative coding challenge and explore new trends and techniques in software development? Web Geeks invites you to our next tech meetup where learning, experimentation, and community are at the forefront. What’s Happening? In the spirit of a traditional coding kata done the old-fashioned dojo way, we'll break into groups based on the computers available—so please remember to bring your own laptop. Each group will be given 60 minutes to tackle a fun and"
  },
  {
   "id": "techbrew-techbrew-august-2026",
@@ -566,7 +622,8 @@
   "start": "2026-08-13T13:00:00.000Z",
   "end": "2026-08-13T14:00:00.000Z",
   "venue": "West End Architectural Salvage",
-  "url": "https://www.technologyiowa.org/events/techbrew-august-2026/"
+  "url": "https://www.technologyiowa.org/events/techbrew-august-2026/",
+  "description": "Connect over coffee and dive into a tech discussion with Kevin Larkin, Chief Information and Operations Officer Federal Home Loan Bank of Des Moines What to Expect: 8:00 – 8:15 a.m. | Networking 8:15 – 8:45 a.m. | Interview with Featured Guest Stick around after for more networking! ☕ Drip coffee provided by West End Salvage. Specialty drinks available for purchase. TechBrew is presented by Zirous"
  },
  {
   "id": "producttank-315588233",
@@ -576,7 +633,8 @@
   "end": "2026-08-18T23:00:00.000Z",
   "venue": "Source Allies",
   "going": 21,
-  "url": "https://www.meetup.com/producttank-des-moines-ames/events/315588233/"
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/315588233/",
+  "description": "What if the PM’s job isn’t to write — it’s to ask the right questions? In this session, we explore how one team is using AI not to automate product management, but to make it sharper. Come for a demonstration of the tooling Jon Harcey uses every day to build production products. Attendees will leave with: a new frame for AI as a thinking partner (not a replacement), practical guidance on enterprise-safe AI infrastructure, and a workflow they can adapt for their own team immediately. Thanks to our sponsor: [Source Allies](https://www.sourceallies.com/) 4:30 - 5:00 Networking 5:00 - 6:00"
  },
  {
   "id": "dsmai-311239023",
@@ -586,7 +644,8 @@
   "end": "2026-08-19T00:30:00.000Z",
   "venue": "We Write Code",
   "going": 35,
-  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239023/"
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239023/",
+  "description": "AI agents are getting good at taking action. The hard part isn't making them capable, it's knowing when to make them stop. In this talk we'll walk through the full spectrum of human-in-the-loop patterns, from lightweight inline confirmations to out-of-band permission gates to handing your agent a wallet with real money in it and more. Each pattern fits a different level of consequence, and knowing which to reach for is what separates demo agents from production ones. We'll cover the honest tradeoffs of latency, user experience, and trust so you can make the right call for your specific use"
  },
  {
   "id": "cijug-315859295",
@@ -596,7 +655,8 @@
   "end": "2026-08-21T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 13,
-  "url": "https://www.meetup.com/central-iowa-java-users-group/events/315859295/"
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/315859295/",
+  "description": "For decades, our industry has predicted that the next wave of technology would replace software developers. From COBOL to the dot-com boom, DevOps, and now AI, each shift has promised to fundamentally change our profession. Yet developers are still here. The difference is that every wave has demanded new skills, not fewer developers. As AI continues to reshape software engineering, one thing has become increasingly clear: the developers who thrive will be the ones who understand the fundamentals. Join CIJUG as Dustin Thostenson explores why design patterns, system thinking, effective"
  },
  {
   "id": "pyowa-315907190",
@@ -606,7 +666,8 @@
   "end": "2026-08-26T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 17,
-  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315907190/"
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315907190/",
+  "description": "Roboflow: Building a Real-Time Computer Vision Checkout with Python Computer vision has become more accessible than ever, but what does it take to build a complete, real-time application from camera to customer? Join Pyowa on Tuesday, August 25th, as Zac Crane presents \"Roboflow.\" In this session, Zac will demonstrate a computer vision project that uses Python to recognize concession stand items and calculate an order total in real time. You'll get a behind-the-scenes look at how Python and Roboflow work together to connect a camera feed, edge computing, an object detection model, pricing"
  },
  {
   "id": "devopsdsm-315859296",
@@ -616,7 +677,8 @@
   "end": "2026-08-27T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 17,
-  "url": "https://www.meetup.com/devopsdsm/events/315859296/"
+  "url": "https://www.meetup.com/devopsdsm/events/315859296/",
+  "description": "Launching a SaaS product takes much more than writing great code. Before customers can sign up, there are business, financial, security, and infrastructure decisions that all have to happen in the right order. Miss a dependency, and you can lose days untangling problems that could have been avoided. Join us on Tuesday, August 26th, as Travis Smith presents \"The SaaS Startup Dependency Graph.\" Travis will walk through the real sequence of tasks involved in launching a SaaS business, from forming an LLC and obtaining an EIN to setting up banking, cloud identity, payment processing, and a secure"
  },
  {
   "id": "iadnug-316281444",
@@ -626,7 +688,8 @@
   "end": "2026-09-04T00:30:00.000Z",
   "venue": "Gilroy's Kitchen + Pub + Patio",
   "going": 12,
-  "url": "https://www.meetup.com/iadnug/events/316281444/"
+  "url": "https://www.meetup.com/iadnug/events/316281444/",
+  "description": "Agenda No technical agenda! Come join us at Gilroy's to catch up, start up new conversations, and enjoy each other's company! We will have appetizers to enjoy on the patio, so if you have the time, stop by and say hello! 05:30pm-07:30pm - Social Time Platinum Sponsor – QCI Since 1995, QCI has grown to be one of the largest, Iowa-based, technology consulting firms, one client at a time. There is no secret to our success. We simply hire the best people and support a culture that is obsessed with delivering excellent service to our clients. In QCI, our clients have a partner that is large enough"
  },
  {
   "id": "mobile-316098796",
@@ -636,7 +699,8 @@
   "end": "2026-09-10T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 5,
-  "url": "https://www.meetup.com/des-moines-mobile-developers/events/316098796/"
+  "url": "https://www.meetup.com/des-moines-mobile-developers/events/316098796/",
+  "description": "Join us for an exciting DM Mobile Engineering Meetup at Source Allies! Calling all mobile enthusiasts, professionals, students, and software engineers to come together for our next meetup on Sep 9, 2026, from 5:30 to 7 PM - [4501 NW Urbandale Dr, Urbandale, IA 50322](https://maps.app.goo.gl/LCSWNL5jHCJeuvTP6)[.](https://maps.app.goo.gl/Hsy1GwdkiHFf1pL39) Whether you're a seasoned professional or just starting your journey in iOS or Android development, this event promises insightful discussions and opportunities to connect with like-minded individuals. Topic * From Code to Pixel: How Mobile"
  },
  {
   "id": "techbrew-techbrew-september-2026",
@@ -645,7 +709,8 @@
   "start": "2026-09-10T13:00:00.000Z",
   "end": "2026-09-10T14:00:00.000Z",
   "venue": "West End Architectural Salvage",
-  "url": "https://www.technologyiowa.org/events/techbrew-september-2026/"
+  "url": "https://www.technologyiowa.org/events/techbrew-september-2026/",
+  "description": "Connect over coffee and dive into a tech focused discussion with Ted Hughes, Senior Vice President & Chief Information Officer at F&G What to Expect: 8:00 – 8:15 a.m. | Networking 8:15 – 8:45 a.m. | Interview with Ted Hughes Stick around after for more networking! ☕ Drip coffee provided by West End Salvage. Specialty drinks available for purchase. TechBrew is presented by Zirous"
  },
  {
   "id": "dsmdata-316271371",
@@ -655,7 +720,8 @@
   "end": "2026-09-14T22:30:00.000Z",
   "venue": "John Deere Financial",
   "going": 33,
-  "url": "https://www.meetup.com/des-moines-data-analytics/events/316271371/"
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/316271371/",
+  "description": "Most teams relearn the same lessons over and over. Every investigation ends in a chat window or a one off notebook, and the hard won context evaporates the moment it closes. Knowledge Graphs turn an organization's scattered, hard-won expertise into a durable, machine-readable asset that both people and AI agents can use; continuously mined, source-attributed, and self-improving. Every answer you find once, you never have to find again. Learn once. Know forever. Join Everette Petsinger, Data Scientist at John Deere, to see how it works and how your life will be changed forever."
  },
  {
   "id": "webgeeks-312416823",
@@ -665,7 +731,8 @@
   "end": "2026-09-15T01:00:00.000Z",
   "online": true,
   "going": 16,
-  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416823/"
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416823/",
+  "description": "Migrating an application from one programming language to another has traditionally been a time-consuming and risky process. But what changes when AI becomes part of the development team? DSM Web Geeks welcomes Daryle Foulke on Monday, September 14th from 6:30-8pm for a look at migrating a TypeScript application to Python with modern AI coding assistants. Through a live demonstration, Daryle will walk through the migration process, showing where AI can accelerate the translation of business logic and application structure and where human expertise remains essential. He’ll also cover some of"
  },
  {
   "id": "dsmai-316356573",
@@ -675,7 +742,8 @@
   "end": "2026-09-16T00:30:00.000Z",
   "venue": "We Write Code",
   "going": 23,
-  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/316356573/"
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/316356573/",
+  "description": "We’ll explore the real world tradeoffs of parallel processing through a case study of an AI pipeline that processes and analyzes large volumes of user-submitted political opinions. The system performs moderation, embedding generation, and downstream analysis using a distributed, event-driven architecture built on AWS. In this session attendees will learn how to design scalable, resilient pipelines using parallel processing while avoiding common pitfalls like rate limits, throttling, and cascading failures. They’ll leave with practical patterns for building fault-tolerant systems, balancing"
  },
  {
   "id": "cijug-316358683",
@@ -685,7 +753,8 @@
   "end": "2026-09-17T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 13,
-  "url": "https://www.meetup.com/central-iowa-java-users-group/events/316358683/"
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/316358683/",
+  "description": "Join the Central Iowa Java User Group on Wednesday, September 16th from 5:30 – 7pm at Source Allies for food, drinks, and conversation at a CIJUG social! No presentations. No coding sessions. Just a chance to spend some time with our local CIJUG members. Our regular meetups give us opportunities to learn about Java, the JVM, software engineering, and new technologies. This month, we're setting the technical topics aside and making time to get to know the people who make up our community. Come meet other developers from around Iowa, catch up with people you've met at past CIJUG events, make"
  },
  {
   "id": "producttank-316421956",
@@ -695,7 +764,8 @@
   "end": "2026-09-22T23:00:00.000Z",
   "venue": "Big Grove Brewery",
   "going": 15,
-  "url": "https://www.meetup.com/producttank-des-moines-ames/events/316421956/"
+  "url": "https://www.meetup.com/producttank-des-moines-ames/events/316421956/",
+  "description": "ProductTank Des Moines/Ames invites you to our End of Summer Networking mixer * Tuesday, Sept 22nd * 4:30 - 6 pm * Big Grove Brewery * Address: 555 17th St, Des Moines, IA 50309 * Pay your own way; come as you are! Grab a beverage and unwind with fellow Product folks as we move into Fall! Casual conversation about Product, Tech, and Design."
  },
  {
   "id": "pyowa-316355128",
@@ -705,7 +775,8 @@
   "end": "2026-09-23T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 5,
-  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/316355128/"
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/316355128/",
+  "description": "Pyowa returns on Tuesday, September 22nd from 5:30-7pm for a hands-on evening of Python coding with “Pybites Coding Exercises.” Instead of a traditional presentation, this meetup will give attendees time to work through coding exercises using Pybites, experiment with different approaches, and learn alongside other members of the local Python community. Bring your laptop and work through challenges independently or pair with others! The evening is an opportunity to sharpen your skills, practice problem-solving, and learn from fellow developers. Hosted in person at Source Allies. Food and"
  },
  {
   "id": "devopsdsm-316404457",
@@ -715,7 +786,8 @@
   "end": "2026-09-24T00:00:00.000Z",
   "venue": "Source Allies",
   "going": 10,
-  "url": "https://www.meetup.com/devopsdsm/events/316404457/"
+  "url": "https://www.meetup.com/devopsdsm/events/316404457/",
+  "description": "SaltStack: Configuration Management From Cloud Images to Developer Desktops Configuration management doesn’t stop at servers. On Wednesday, September 23rd, DevOpsDSM welcomes John Lengeling from Source Allies for a look at how SaltStack can provide a consistent approach to configuration across cloud infrastructure, servers, and developer workstations. John will explore SaltStack’s architecture and how it can be used to build Azure images and AWS AMIs, manage server configurations, and provision developer desktops. He’ll also discuss how Infrastructure as Code and configuration automation can"
  },
  {
   "id": "techbrew-techbrew-october-2026",
@@ -724,7 +796,8 @@
   "start": "2026-10-08T13:00:00.000Z",
   "end": "2026-10-08T14:00:00.000Z",
   "venue": "West End Architectural Salvage",
-  "url": "https://www.technologyiowa.org/events/techbrew-october-2026/"
+  "url": "https://www.technologyiowa.org/events/techbrew-october-2026/",
+  "description": "Join us for coffee and a tech discussion with featured guest, Todd Herren, Senior Vice President, Technology and Operations at Delta Dental of Iowa. What to Expect: 8:00 – 8:15 a.m. | Networking 8:15 – 8:45 a.m. | Interview with Todd Herren Stick around after for more networking! ☕ Drip coffee provided by West End Salvage. Specialty drinks available for purchase. TechBrew is presented by Zirous"
  },
  {
   "id": "iadnug-316779818",
@@ -734,6 +807,7 @@
   "end": "2026-10-08T18:00:00.000Z",
   "online": true,
   "going": 32,
-  "url": "https://www.meetup.com/iadnug/events/316779818/"
+  "url": "https://www.meetup.com/iadnug/events/316779818/",
+  "description": "Agenda This will be a Zoom meeting at Noon 11:50am-12:00pm - Pre-Session Waiting Room 12:00pm-1:00pm - Presentation, JetBrains giveaway Build Your First Real-Time Voice Agent Real‑time voice agents sound simple in demos but fall apart the moment real users show up. Latency creeps in, people talk over the agent, accents and background noise wreck the transcript, and the whole experience slides straight into the uncanny valley. This hands‑on session walks through building a production‑ready voice agent end to end using .NET, low‑latency speech‑to‑text, responsive LLM orchestration, and fast"
  }
 ]

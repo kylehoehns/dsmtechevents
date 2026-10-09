@@ -146,7 +146,7 @@ function haystack(id) {
       searchIndex.set(el.dataset.id, fold([...names, ...text].join(' ')));
     };
     for (const card of cards.values()) index(card, '.band, .series, .title, .venue, .addr, .tag-online, .desc');
-    for (const li of $$('li', pastResults)) if (!searchIndex.has(li.dataset.id)) index(li, '.row-group, .row-title, .row-where');
+    for (const li of $$('li', pastResults)) if (!searchIndex.has(li.dataset.id)) index(li, '.row-group, .row-title, .row-where, .desc');
   }
   return searchIndex.get(id) ?? '';
 }
@@ -242,7 +242,7 @@ function highlight() {
     for (const f of $$(fields, el)) markText(f, hit);
     if (hit.size) marked.add(el);
     if (hit.size === terms.length) continue;
-    // Archived rows have no card, so no About text.
+    // A row with no card carries its short description itself (an archived one).
     const desc = $('.desc', cards.get(el.dataset.id) ?? el);
     const x = desc && excerpt(plainAbout(desc), terms.filter((_, n) => !hit.has(n)));
     if (!x) continue;
@@ -287,7 +287,8 @@ function plainAbout(desc) {
     const copy = desc.cloneNode(true);
     for (const el of $$('.sr-only, img', copy)) el.remove();
     for (const br of $$('br', copy)) br.replaceWith('\n');
-    aboutText.set(desc, plainText([...copy.children].map((b) => b.textContent).join('\n')));
+    // A card's About is paragraphs; an archived row's is one plain line.
+    aboutText.set(desc, plainText(copy.children.length ? [...copy.children].map((b) => b.textContent).join('\n') : copy.textContent));
   }
   return aboutText.get(desc);
 }

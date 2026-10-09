@@ -167,6 +167,17 @@ test('no match shows a friendly note that clears the search', async ({ page }) =
   await expect(page.getByRole('status')).toHaveText('Showing 9 events');
 });
 
+test('an archived event is found by words in its description, with the excerpt to show why', async ({ page }) => {
+  await page.goto('/');
+  await search(page, 'okafor');
+  const old = past(page, 'Pyowa holiday social');
+  await expect(old).toBeVisible();
+  await expect(old.locator('.excerpt')).toContainText('packaging by Grace Okafor');
+  await expect(old.locator('.excerpt mark')).toHaveText('Okafor');
+  // The description itself stays hidden.
+  await expect(old.locator('.desc')).toBeHidden();
+});
+
 test('past matches read as past and link out; Recent events steps aside', async ({ page }) => {
   await page.goto('/');
   await search(page, 'pyowa');

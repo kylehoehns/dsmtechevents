@@ -4,7 +4,18 @@
 //
 // Records are slim and sorted, and a file is only rewritten when something in
 // it actually changed, so a quiet refresh leaves the archive alone.
-import { dayKey } from '../src/lib/format.mjs';
+import { dayKey, plainText } from '../src/lib/format.mjs';
+
+// Enough of an event's description, as plain text, for search to find a
+// talk by its speaker or topic once the cache has let it go (after about 90
+// days); not the whole thing, so the past-events file search loads stays small.
+const DESCRIPTION_CHARS = 600;
+export function brief(text = '') {
+  const plain = plainText(text).replace(/\s+/g, ' ').trim();
+  if (plain.length <= DESCRIPTION_CHARS) return plain;
+  const cut = plain.slice(0, DESCRIPTION_CHARS);
+  return cut.slice(0, cut.lastIndexOf(' ') > 0 ? cut.lastIndexOf(' ') : DESCRIPTION_CHARS);
+}
 
 // A hand-added event with no host group (a conference) has no `group`.
 const slim = (e, group) => ({
@@ -17,6 +28,7 @@ const slim = (e, group) => ({
   ...(e.going != null && { going: e.going }),
   ...(e.url && { url: e.url }),
   ...(e.headliner && { headliner: true }),
+  ...(brief(e.description) && { description: brief(e.description) }),
 });
 
 // Merge ended events into the archive. `archive` maps year → records;
