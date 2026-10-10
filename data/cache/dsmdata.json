@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-09T23:19:09.975Z",
+  "fetchedAt": "2026-10-10T02:26:29.366Z",
   "logo": "https://secure.meetupstatic.com/photos/event/6/c/d/1/600_491667857.jpeg",
   "members": 2626,
   "pastCount": 109,
@@ -51,7 +51,8 @@
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/a/c/e/d/600_535964269.jpeg",
-      "going": 5
+      "going": 5,
+      "added": "2026-09-02T18:46:06.000Z"
     },
     {
       "id": "dsmdata-316665472",
@@ -67,7 +68,8 @@
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/b/9/d/0/600_536267568.jpeg",
-      "going": 21
+      "going": 21,
+      "added": "2026-09-22T16:12:59.000Z"
     }
   ]
 }
