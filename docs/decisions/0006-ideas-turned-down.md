@@ -25,7 +25,7 @@ suggested isn't evidence people want it; what reopens one is listed below.
 | Auto-posting "this week" to Bluesky, LinkedIn or X | Same as the digest. | Organizers asking for it |
 | Speakers wanted / open calls for speakers | Needs hand-kept data; no evidence anyone would use it. | A group asking to list a CFP |
 | Topic tags and filter chips | Needs a hand-kept topic list or guessing from scraped titles. Search covers it, past talks included. Chips were built and removed. | Search data showing people can't find topics |
-| "New since your last visit" / "just added" | Tried as an idea and turned down by the owner. | Not planned |
+| "New since your last visit" | Needs to remember each visitor in their browser; tried as an idea and turned down by the owner. (Not the same as the "New" tag on an event posted in the last day, which is the same for everyone and comes from the refresh.) | Not planned |
 | A /week/ share link with a this-week preview image | Duplicates the home page; Slack and Messages cache previews, so last week's image sticks; no sign people share links. | The weekly report showing traffic from shared links |
 | Open-nights planner / clash checker | Dropped by the owner; "check the calendar for clashes" on /organizers/ covers it. | Organizers asking for it |
 | Venue pages or notes (parking, which door), a "rooms that have hosted" list | Hand-kept notes; the automatic list needs venue names from different groups to match, and they don't. | Not planned |

@@ -29,6 +29,19 @@ test('tags tonight and tomorrow, and sums up a repeating series', async ({ page 
   await expect(row(page, 'AI Study Group')).toContainText('3 dates through Jan 2027');
 });
 
+// Python Office Hours went up Tue 3pm (fixture `added`), so it's new until
+// Wed 3pm. The joint night's IADNUG copy went up this morning, but CIJUG
+// posted it in September: not new.
+test('tags an event put up in the last day as New, and takes it down after', async ({ page }) => {
+  await page.clock.setSystemTime(new Date('2026-10-14T19:50:00Z')); // Wed 2:50p
+  await page.goto('/');
+  await expect(row(page, 'Python Office Hours').getByText('New', { exact: true })).toBeVisible();
+  await expect(row(page, 'Joint night - JVM vs. CLR').getByText('New', { exact: true })).toHaveCount(0);
+  await expect(row(page, 'Coding Dojo').getByText('New', { exact: true })).toHaveCount(0);
+  await page.clock.runFor('15:00');
+  await expect(row(page, 'Python Office Hours').getByText('New', { exact: true })).toHaveCount(0);
+});
+
 test('the browser re-labels a page opened on a later day', async ({ page }) => {
   // Same build, opened Thursday morning: tonight's event is over and gone,
   // and Thursday's lunch is now "Today".
