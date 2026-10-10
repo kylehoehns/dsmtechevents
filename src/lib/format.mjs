@@ -71,6 +71,12 @@ export function whenLabel(start, end, now = Date.now(), { multiDay = false, allD
   return daysBetween(today, dayKey(start)) === 1 ? 'Tomorrow' : '';
 }
 
+// The "New" tag: an event that went up in the last day, so someone who
+// checks the site daily spots it among the ones they've seen. `added` is when
+// the refresh first saw it (mergeCache). The build prints it and the browser
+// re-checks, so both must call this.
+export const isNew = (added, now = Date.now()) => !!added && now - Date.parse(added) < DAY;
+
 // The stamp on a headliner poster: "8 days out", "Tomorrow", "Today",
 // "In 25 min", "Happening now".
 // Once it has started it follows whenLabel(), so a conference's poster says

@@ -7,7 +7,7 @@ import OutArrow from './OutArrow.astro';
 // real event photo (not the group's logo), the group's full name only when it
 // says more than its short name, and the browser hides the date and street
 // address when the row above already showed them (see app.js).
-import { weekday, day, month, shortRange, formatDescription, dayKey, whenLabel } from '../lib/format.mjs';
+import { weekday, day, month, shortRange, formatDescription, dayKey, whenLabel, isNew } from '../lib/format.mjs';
 
 // posted: a conference with its headliner poster up, so its row steps back to an outline.
 const { event: e, byId, posted = false } = Astro.props;
@@ -65,6 +65,8 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
           ))
         : <span class="band-name">{e.hostsLabel}</span>}
       {hosts.length === 1 && lead.showFullName && <span class="with">{lead.name}</span>}
+      {/* app.js takes it down once the day is up; the page can be hours old. */}
+      {isNew(e.added) && <span class="new-tag" data-added={e.added}>New</span>}
     </p>
     {e.series && (
       <p class="series"><b>{e.series.rule}</b>{e.series.count} dates through {e.series.until}</p>

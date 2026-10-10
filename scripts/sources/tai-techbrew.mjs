@@ -8,7 +8,7 @@
 // conferences), so titles must also match an allow-list. TechBrews outside
 // the Des Moines metro are skipped, based on the venue's city.
 import { toText } from './html.mjs';
-import { calendarEvents, times, eventUrl } from './ical.mjs';
+import { calendarEvents, times, created, eventUrl } from './ical.mjs';
 
 const FEED = 'https://www.technologyiowa.org/events/calendar/techbrews/ics/';
 const TECHBREW = /tech\s*brew/i;
@@ -39,6 +39,7 @@ export default async function taiTechbrew(group, { get, now = Date.now(), since 
       description: page.description,
       venue: page.venue,
       address: page.address,
+      created: created(e),
     });
   }
   // Every TechBrew outside the metro is far likelier to be a changed address

@@ -342,6 +342,12 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
   display: inline-block; font: 400 var(--fs-small)/1 var(--marker); color: var(--on-pink); background: var(--pink-fill);
   padding: 4px 6px 2px; transform: rotate(-2.5deg); text-transform: none; letter-spacing: normal; vertical-align: middle;
 }
+/* "New": posted in the last day (isNew in format.mjs). Blue, so it doesn't
+   read as one more "Tonight". */
+.new-tag {
+  display: inline-block; font: 400 var(--fs-small)/1 var(--marker); color: var(--on-blue); background: var(--blue-fill);
+  padding: 4px 6px 2px; transform: rotate(2deg); vertical-align: middle;
+}
 .band { margin: 0; display: flex; flex-wrap: wrap; gap: 0 8px; align-items: baseline; }
 .band a, .band span.band-name { font: 900 var(--fs-title)/0.95 var(--display); text-transform: uppercase; text-decoration: none; }
 @media (max-width: 759px) { .band a { padding-top: 4px; margin-top: -4px; } } /* 24px+ tap target, same layout; grows up, away from the title link below */

@@ -1,7 +1,7 @@
 // Reading Meetup data, with no network calls, so tests can feed it saved pages.
 // fetch-events.mjs does the fetching and hands the text to these.
 import { meetupUrl } from '../../src/lib/meetup.mjs';
-import { calendarEvents, isUpcoming, times, eventUrl } from './ical.mjs';
+import { calendarEvents, isUpcoming, times, created, eventUrl } from './ical.mjs';
 
 // Upcoming events from an iCal feed (Meetup's or any public calendar).
 export function parseFeed(ics, group, { slug, now }) {
@@ -17,6 +17,7 @@ export function parseFeed(ics, group, { slug, now }) {
         url: slug ? meetupUrl(slug, `events/${id}/`) : (eventUrl(e) ?? group.website),
         description: cleanDescription(e.description, group.name),
         venue: e.location || null,
+        created: created(e),
       };
     });
 }
@@ -121,7 +122,20 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
     : fresh.events;
   const byId = new Map();
   for (const e of [...carried, ...freshEvents]) byId.set(e.id, { ...byId.get(e.id), ...e });
-  const events = [...byId.values()].map(({ status, ...e }) => e).sort((a, b) => a.start.localeCompare(b.start));
+  const { fetchedAt: lastFetched, enriched, ...previousResult } = previous;
+  // `added`: when an upcoming event first showed up, for its "New" tag
+  // (isNew in format.mjs). Set once and then kept, so files stay the same
+  // run to run. An event this run is the first to see is new as of now; we
+  // go by when we saw it rather than the feed's created time, since an
+  // event drafted weeks ago and announced today is news today. An event we
+  // have no record of appearing (a group's first fetch, or a cache from
+  // before this was kept) takes the feed's created time, or goes without:
+  // better no tag than a new group's whole calendar tagged New.
+  const events = [...byId.values()].map(({ status, created, ...e }) => {
+    const appeared = lastFetched && !before.has(e.id) && Date.parse(e.end) >= now;
+    const added = before.get(e.id)?.added ?? (appeared ? fetchedAt : created);
+    return added ? { ...e, added } : e;
+  }).sort((a, b) => a.start.localeCompare(b.start));
 
   // Group facts from Meetup: kept from the last run if this one missed them,
   // and left out when unknown so files without them don't change.
@@ -131,9 +145,8 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
     if (v != null) facts[k] = v;
   }
   const result = { logo: fresh.logo ?? previous.logo ?? null, ...facts, events };
-  // `enriched` was written by older versions; ignoring it here means dropping
-  // it rewrites each file once without moving fetchedAt.
-  const { fetchedAt: lastFetched, enriched, ...previousResult } = previous;
+  // `enriched` was written by older versions; ignoring it (above) means
+  // dropping it rewrites each file once without moving fetchedAt.
   const unchanged = lastFetched && JSON.stringify(previousResult) === JSON.stringify(result);
   return { fetchedAt: unchanged ? lastFetched : fetchedAt, ...result };
 }

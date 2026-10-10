@@ -4,7 +4,7 @@
 // State lives in the URL (?view=calendar&group=cijug&day=2026-10-15, ?q=java)
 // so any view can be shared or bookmarked.
 import { fold, queryTerms, matchesAll, matchSpans, excerpt } from '../lib/search.mjs';
-import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, dayOf, recentSummary, plainText } from '../lib/format.mjs';
+import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, dayOf, recentSummary, plainText, isNew } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -74,6 +74,7 @@ function freshen(t) {
     if (tag.textContent !== label) tag.textContent = label;
     tag.hidden = !label;
   }
+  for (const el of $$('.new-tag[data-added]')) if (!isNew(el.dataset.added, t)) el.remove();
   for (const el of $$('.countdown[data-start]')) {
     const stamp = countdown(el.dataset.start, el.dataset.end, t, { multiDay: 'days' in el.dataset });
     el.textContent = stamp;

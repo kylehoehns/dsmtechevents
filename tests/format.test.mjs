@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, dayOf, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, dayOf, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary, isNew } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
@@ -231,4 +231,12 @@ test('lineup reads bold "time · title — speaker" lines', () => {
 test('formatDescription drops *** / --- / ___ rule lines instead of printing them', () => {
   assert.equal(formatDescription('One\n***\nTwo\n\n- - -\n\nThree\n___'), '<p>One</p><p>Two</p><p>Three</p>');
   assert.equal(formatDescription('**Agenda**\n- Pizza'), '<p><strong>Agenda</strong><br>- Pizza</p>', 'a list dash is not a rule');
+});
+
+test('isNew: put up in the last day', () => {
+  const added = '2026-10-13T20:00:00.000Z';
+  assert.equal(isNew(added, Date.parse('2026-10-13T20:00:00Z')), true);
+  assert.equal(isNew(added, Date.parse('2026-10-14T19:59:00Z')), true);
+  assert.equal(isNew(added, Date.parse('2026-10-14T20:00:00Z')), false, 'a day later it is just another event');
+  assert.equal(isNew(undefined), false, 'no record of when it went up');
 });

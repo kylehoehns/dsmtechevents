@@ -3,6 +3,6 @@
   "logo": null,
   "events": [
     { "id": "iadnug-past", "title": "Minimal APIs", "start": "2026-09-21T23:00:00.000Z", "end": "2026-09-22T01:00:00.000Z", "allDay": false, "url": "https://www.meetup.com/iadnug/events/1/", "venue": "Court Avenue Hub", "going": 18 },
-    { "id": "iadnug-joint", "title": "Joint night - JVM vs. CLR", "start": "2026-10-20T22:30:00.000Z", "end": "2026-10-21T00:30:00.000Z", "allDay": false, "url": "https://www.meetup.com/iadnug/events/3/", "venue": "Court Avenue Hub", "address": "100 Court Ave, Des Moines, IA 50309" }
+    { "id": "iadnug-joint", "title": "Joint night - JVM vs. CLR", "start": "2026-10-20T22:30:00.000Z", "end": "2026-10-21T00:30:00.000Z", "allDay": false, "url": "https://www.meetup.com/iadnug/events/3/", "venue": "Court Avenue Hub", "address": "100 Court Ave, Des Moines, IA 50309", "added": "2026-10-14T13:00:00.000Z" }
   ]
 }

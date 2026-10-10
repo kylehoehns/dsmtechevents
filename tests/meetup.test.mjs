@@ -35,6 +35,7 @@ test('parseFeed keeps upcoming, confirmed events', () => {
   assert.equal(e.start, '2026-10-08T17:00:00.000Z');
   assert.equal(e.url, 'https://www.meetup.com/iadnug/events/300000001/');
   assert.equal(e.description, 'Bring your laptop.\n\nPizza provided.', 'group name line is stripped');
+  assert.equal(e.created, '2026-10-01T15:00:00.000Z', "the feed's CREATED, for mergeCache");
 });
 
 test('parseFeed rejects something that is not a calendar', () => {
@@ -142,6 +143,31 @@ test('mergeCache keeps the page details of upcoming events when the page read fa
 
   const plainFeed = mergeCache(previous, { events: [{ ...feedCopy }] }, { now, cutoff, fetchedAt: 'NOW' });
   assert.equal(plainFeed.events[0].venue, 'feed location', 'without a page failure the fresh copy wins');
+});
+
+test('mergeCache dates each event by when it first showed up, once', () => {
+  const next = { id: 'g-2', title: 'Next', start: '2026-10-20T23:00:00.000Z', end: '2026-10-21T01:00:00.000Z' };
+  const fresh = { id: 'g-3', title: 'Fresh', start: '2026-11-03T23:00:00.000Z', end: '2026-11-04T01:00:00.000Z', created: '2026-09-01T12:00:00.000Z' };
+  const previous = { fetchedAt: 'THEN', logo: null, events: [{ ...next, added: '2026-10-01T12:00:00.000Z' }] };
+
+  const merged = mergeCache(previous, { events: [{ ...next, created: '2026-09-30T00:00:00.000Z' }, fresh] }, { now, cutoff, fetchedAt: 'NOW' });
+  assert.equal(merged.events[0].added, '2026-10-01T12:00:00.000Z', 'kept from the last run');
+  assert.equal(merged.events[1].added, 'NOW', 'new to us: this run, not a created time from weeks ago (drafted, then announced)');
+  assert.ok(merged.events.every((e) => !('created' in e)), 'created is not stored');
+
+  const again = mergeCache(merged, { events: [{ ...next }, { ...fresh }] }, { now: now + 6 * 3_600_000, cutoff, fetchedAt: 'LATER' });
+  assert.equal(JSON.stringify(again), JSON.stringify(merged), 'the next run leaves the file alone');
+
+  const first = mergeCache({ events: [] }, { events: [fresh, next] }, { now, cutoff, fetchedAt: 'NOW' });
+  assert.equal(first.events.find((e) => e.id === 'g-3').added, fresh.created, "a group's first fetch takes the feed's created time");
+  assert.ok(!('added' in first.events.find((e) => e.id === 'g-2')), 'or nothing, rather than the whole calendar new');
+
+  const older = mergeCache({ fetchedAt: 'THEN', logo: null, events: [next, fresh].map(({ created, ...e }) => e) }, { events: [next, fresh] }, { now, cutoff, fetchedAt: 'NOW' });
+  assert.equal(older.events[1].added, fresh.created, 'a cache from before added was kept is backfilled from the feed');
+  assert.ok(!('added' in older.events[0]));
+
+  const pastNews = { id: 'g-1', title: 'Old', start: '2026-09-01T23:00:00.000Z', end: '2026-09-02T01:00:00.000Z' };
+  assert.ok(!('added' in mergeCache(previous, { events: [pastNews, next] }, { now, cutoff, fetchedAt: 'NOW' }).events[0]), 'an event already over is never new');
 });
 
 test('mergeCache drops the old enriched flag without moving fetchedAt', () => {

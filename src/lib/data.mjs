@@ -136,7 +136,7 @@ function mergeJoint(all) {
   for (const e of all) {
     const key = `${e.start}|${e.title.toLowerCase().replace(/\W+/g, '')}`;
     const existing = merged.get(key);
-    if (existing) existing.groupIds = [...new Set([...existing.groupIds, ...e.groupIds])];
+    if (existing) fold(existing, e);
     else merged.set(key, { ...e });
   }
   // Co-hosts sometimes title the same night differently ("Joint night - JVM vs.
@@ -147,11 +147,18 @@ function mergeJoint(all) {
     for (let j = i + 1; j < list.length; j++) {
       const [a, b] = [list[i], list[j]];
       if (!a || !b || !sameNight(a, b)) continue;
-      a.groupIds = [...new Set([...a.groupIds, ...b.groupIds])];
+      fold(a, b);
       list[j] = null;
     }
   }
   return [...new Map(list.filter(Boolean).map((e) => [e.id, e])).values()];
+}
+
+// One co-host's copy of a joint event into another's. It's new when the
+// first co-host posted it.
+function fold(into, e) {
+  into.groupIds = [...new Set([...into.groupIds, ...e.groupIds])];
+  if (e.added && !(into.added <= e.added)) into.added = e.added;
 }
 
 function tidy(e) {

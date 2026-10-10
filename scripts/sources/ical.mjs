@@ -19,5 +19,9 @@ export const times = (e) => ({
   allDay: e.datetype === 'date',
 });
 
+// When the event was put on the calendar, if the feed says (Meetup's do).
+// mergeCache uses it to date events it has no record of seeing appear.
+export const created = (e) => e.created?.toISOString();
+
 // node-ical gives URL as a string or as { val }.
 export const eventUrl = (e) => e.url?.val ?? e.url ?? null;
