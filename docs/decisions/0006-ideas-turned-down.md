@@ -37,6 +37,7 @@ suggested isn't evidence people want it; what reopens one is listed below.
 | Page and tab animations (view transitions) | Built and removed: cross-page ones were uneven, in-page ones swallowed quick clicks. | Not planned |
 | An MCP server, agent skill or llms.txt | Agents read the plain HTML fine; nobody would wire it up. | AI tools starting to fetch llms.txt on their own |
 | A personal bio on /about/ | Felt out of place. | Not planned |
+| A "Usually meets" line on group cards ("Usually 2nd Mondays, evenings, online", worked out from the archive) | Built as a mockup (PR #174) and turned down by the owner. | Not planned |
 | A "may be out of date" banner | The footer's last-updated time covers it; the refresh failing emails the owner. | Not planned |
 
 ## Consequences
