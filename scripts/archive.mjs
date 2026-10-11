@@ -46,13 +46,12 @@ export function updateArchive(archive, caches, now, manual = []) {
     const year = dayKey(e.start).slice(0, 4);
     if (!years.has(year)) years.set(year, new Map());
     const byId = years.get(year);
-    // Keep anything already recorded and let a fresher copy fill in or update
-    // fields, except the RSVP count: the larger one is the final count, and a
-    // stale cache copy can be lower.
-    const had = byId.get(e.id);
-    const next = { ...had, ...slim(e, group) };
-    if (had?.going > (next.going ?? -1)) next.going = had.going;
-    byId.set(e.id, next);
+    // The fresher copy replaces the record, so a field it no longer has (an
+    // event moved from online to a venue) goes too. The exception is the RSVP
+    // count: the larger one is the final count, and a stale cache copy can be
+    // lower.
+    const had = byId.get(e.id)?.going;
+    byId.set(e.id, slim(had > (e.going ?? -1) ? { ...e, going: had } : e, group));
   }
   const changed = {};
   for (const [year, byId] of years) {

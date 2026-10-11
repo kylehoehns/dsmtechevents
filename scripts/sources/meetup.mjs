@@ -95,6 +95,12 @@ export function enrich(upcoming, details, group, { now, cutoff }) {
   return recent;
 }
 
+// Ids of the events the page says are cancelled, so mergeCache can drop a
+// cached copy that ended before the next run noticed the cancellation.
+export function cancelledIds(details, group) {
+  return [...details.events].filter(([, e]) => e.status === 'CANCELLED').map(([id]) => `${group.id}-${id}`);
+}
+
 // A Meetup feed with nothing coming up, for a group whose last run had events
 // coming up. Fine if the events page agrees (the events were called off or
 // taken down); broken if the page still lists upcoming events, or couldn't be
@@ -114,8 +120,10 @@ export function checkEmptyFeed(upcoming, details, { now, hadUpcoming }) {
 // `fresh.pageFailed`: the Meetup events page couldn't be read this run, so the
 // feed-only copies lack what the page adds; those fields come from the
 // previous copy of the same event instead of vanishing until the next run.
+// `fresh.cancelled`: ids the page says are cancelled, never carried forward.
 export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(now).toISOString() }) {
-  const carried = previous.events.filter((e) => Date.parse(e.end) < now && Date.parse(e.end) >= cutoff);
+  const cancelled = new Set(fresh.cancelled);
+  const carried = previous.events.filter((e) => Date.parse(e.end) < now && Date.parse(e.end) >= cutoff && !cancelled.has(e.id));
   const before = new Map(previous.events.map((e) => [e.id, e]));
   const freshEvents = fresh.pageFailed
     ? fresh.events.map((e) => ({ ...e, ...pick(before.get(e.id), FROM_PAGE) }))

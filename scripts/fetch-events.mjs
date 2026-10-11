@@ -23,7 +23,7 @@ import secdsm from './sources/secdsm.mjs';
 import pmiChapter from './sources/pmi-chapter.mjs';
 import taiTechbrew from './sources/tai-techbrew.mjs';
 import iowansOfThings from './sources/iowans-of-things.mjs';
-import { parseFeed, parseEventsPage, enrich, mergeCache, checkEmptyFeed } from './sources/meetup.mjs';
+import { parseFeed, parseEventsPage, enrich, cancelledIds, mergeCache, checkEmptyFeed } from './sources/meetup.mjs';
 import { updateArchive } from './archive.mjs';
 import { manualEvent } from '../src/lib/data.mjs';
 import { safeLinks, checkTimes } from './sources/html.mjs';
@@ -118,11 +118,13 @@ async function fetchFeed(group, now, cutoff, hadUpcoming) {
   let facts = {};
   let enrichError = null;
   let details = null;
+  let cancelled = [];
   if (slug) {
     try {
       details = parseEventsPage(await get(meetupUrl(slug, 'events/')), slug);
       logo = details.logo;
       recent = enrich(upcoming, details, group, { now, cutoff });
+      cancelled = cancelledIds(details, group);
       facts = { members: details.members, pastCount: details.pastCount, lastMet: details.lastMet };
     } catch (err) {
       console.warn(`  ${group.id}: enrichment skipped (${err.message})`);
@@ -133,7 +135,7 @@ async function fetchFeed(group, now, cutoff, hadUpcoming) {
 
   // The feed's copy of an upcoming event wins over the page's. If the page
   // failed, mergeCache keeps the page details from the previous run.
-  return { events: [...recent, ...upcoming], logo, ...facts, pageFailed: Boolean(enrichError), enrichError };
+  return { events: [...recent, ...upcoming], cancelled, logo, ...facts, pageFailed: Boolean(enrichError), enrichError };
 }
 
 async function readCache(id) {
