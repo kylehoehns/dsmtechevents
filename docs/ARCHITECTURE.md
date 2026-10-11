@@ -99,7 +99,10 @@ precached from a list of every file in `dist/_astro/`, which
 `scripts/sw-precache.mjs` writes into `dist/sw.js` at build time; the
 offline e2e project (`tests/e2e/offline.spec.mjs`) is the only one that
 lets the worker run. Up to 60 Meetup photos and the Groups page's
-Meetup-hosted logos are kept too.
+Meetup-hosted logos are kept too. Chunks that only a dynamic `import()`
+loads (the qrcode library for TV event mode) are listed as `LAZY` and saved
+on first use instead of on install, and pages register the worker after
+their `load` event, so its install never competes with a first visit.
 
 ## The cache stability rule
 
