@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 import { meetupSlug, meetupUrl, meetupPhoto } from './meetup.mjs';
-import { dayKey, lastDay, weekday, fmt } from './format.mjs';
+import { dayKey, spansDays, weekday, fmt } from './format.mjs';
 import { localToUtc } from './time.mjs';
 
 // The site rebuilds at least once a day (refresh.yml), so a page can be up to
@@ -110,14 +110,17 @@ export function manualEvent(e) {
   const startDate = String(e.start);
   const endDate = String(e.end ?? e.start);
   const allDay = !e.time;
+  if (!allDay && !e.endTime) throw new Error(`events.yaml: "${e.title}" has a time but no endTime`);
+  const start = localToUtc(startDate, e.time ?? '00:00');
+  const end = localToUtc(endDate, e.endTime ?? '23:59');
   return {
     // `id:` pins an event's id (shared /tv/?event= links use it) when its title changes.
     id: e.id ?? `manual-${slugify(e.title)}-${startDate}`,
     title: e.title,
-    start: localToUtc(startDate, e.time ?? '00:00'),
-    end: localToUtc(endDate, e.endTime ?? (allDay ? '23:59' : e.time)),
+    start,
+    end,
     allDay,
-    multiDay: endDate !== startDate,
+    multiDay: spansDays(start, end),
     url: e.url ?? null,
     venue: e.venue ?? null,
     address: e.address ?? null,
@@ -164,7 +167,7 @@ function fold(into, e) {
 function tidy(e) {
   return {
     ...e,
-    multiDay: e.multiDay ?? dayKey(e.start) !== lastDay(e.start, e.end),
+    multiDay: e.multiDay ?? spansDays(e.start, e.end),
     tags: e.tags ?? [],
     fullAddress: e.address ?? null, // the short one is for people, this one is for search engines
     address: shortAddress(e.address),

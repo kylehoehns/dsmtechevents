@@ -194,6 +194,19 @@ test('a two-day conference is only "Happening now" during its hours', () => {
   assert.equal(whenLabel(start, end, Date.parse('2026-10-16T02:00:00Z')), 'Happening now', 'without the flag it runs straight through, as before');
 });
 
+test('a meetup that runs past midnight is one night, not two days', () => {
+  // Fri Oct 16, 6pm to 2am Saturday.
+  const [start, end] = ['2026-10-16T23:00:00.000Z', '2026-10-17T07:00:00.000Z'];
+  assert.equal(lastDay(start, end), '2026-10-16');
+  const at = (iso) => whenLabel(start, end, Date.parse(iso));
+  assert.equal(at('2026-10-16T15:00:00Z'), 'Tonight', '10am Fri');
+  assert.equal(at('2026-10-17T01:00:00Z'), 'Happening now', '8pm Fri');
+  assert.equal(at('2026-10-17T06:00:00Z'), 'Happening now', '1am Sat, still on');
+  assert.equal(countdown(start, end, Date.parse('2026-10-17T06:00:00Z')), 'Happening now');
+  // A weekend hackathon ending 2am Sunday runs through Saturday night.
+  assert.equal(dateRange('2026-10-16T13:00:00.000Z', '2026-10-18T07:00:00.000Z'), 'Oct 16–17');
+});
+
 test('the hour before an event, the row and the poster count the minutes', () => {
   const [start, end] = ['2026-10-22T22:30:00.000Z', '2026-10-23T00:00:00.000Z']; // CIJUG, Thu 5:30p–7p
   const at = (iso) => whenLabel(start, end, Date.parse(iso));

@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { Font } from 'astro:assets';
 import { site } from '../lib/site.mjs';
 import { month, day, shortTime } from '../lib/format.mjs';
+import { toScript } from '../lib/jsonld.mjs';
 
 // headTitle replaces the whole <title> (for search); title gets " · DSM Tech Events".
 // bare: just the page itself (fonts and head, no masthead, footer or their scripts), for /tv/.
@@ -23,7 +24,7 @@ const build = process.env.WORKERS_CI_COMMIT_SHA;
 // prerendered page would run its scripts (and count a visit) before anyone
 // looked. Leaves out the TV and print pages, the API, and links that open a
 // new tab. Browsers without speculation rules ignore it.
-const speculation = JSON.stringify({
+const speculation = toScript({
   prefetch: [{
     where: { and: [
       { href_matches: '/*' },

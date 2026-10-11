@@ -19,6 +19,17 @@ export function toText(html = '') {
   return decode(html.replace(/<br\s*\/?>\n?/gi, '\n').replace(/<[^>]+>/g, '')).replace(/[ \t]+/g, ' ').replace(/\n\s*\n\s*/g, '\n\n').trim();
 }
 
+// Every fetched event needs a real start and an end no earlier than it; a
+// reader that gets the times wrong fails (and opens a source-broken issue)
+// instead of caching an event that vanishes before it starts.
+export function checkTimes(events) {
+  for (const e of events) {
+    if (Number.isNaN(Date.parse(e.start))) throw new Error(`"${e.title}" has no start time`);
+    if (!(Date.parse(e.end) >= Date.parse(e.start))) throw new Error(`"${e.title}" ends before it starts`);
+  }
+  return events;
+}
+
 // A link from a feed or page is kept only if it is a web address: a
 // `javascript:` or `data:` URL in someone's feed must never become a link on
 // our site. Everything fetched passes through safeLinks before it is cached.

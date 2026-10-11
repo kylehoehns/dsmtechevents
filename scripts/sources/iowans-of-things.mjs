@@ -2,6 +2,7 @@
 // "Upcoming Events" section with one `archive-item` per event, each with
 // "Date:", "Time:" and "Place:" lines followed by a short write-up.
 import { localToUtc } from '../../src/lib/time.mjs';
+import { addDays } from '../../src/lib/format.mjs';
 import { decode, toText } from './html.mjs';
 
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
@@ -42,7 +43,7 @@ export default async function iowansOfThings(group, { get }) {
     if (!link || !date) return [];
     const [from, to] = (field(item, 'Time') ?? '').split(/\s*[-–]\s*/);
     const startTime = hhmm(from);
-    const endTime = hhmm(to) ?? startTime;
+    const endTime = hhmm(to);
 
     // "Area515, Des Moines Maker Space - 108 Jefferson Avenue, Des Moines, IA 50314"
     const place = field(item, 'Place') ?? '';
@@ -58,12 +59,18 @@ export default async function iowansOfThings(group, { get }) {
 
     const banner = /<img src="([^"]+)"/.exec(item.slice(0, item.indexOf('Date:')))?.[1];
     const slug = link[1].replace(/^\/|\/$/g, '');
+    const startAt = localToUtc(date, startTime ?? '00:00');
+    // No end time: two hours, about one of their evenings. An end at or
+    // before the start ("7:00 PM - 12:00 AM") is the next day.
+    const endAt = !startTime ? localToUtc(date, '23:59')
+      : !endTime ? new Date(Date.parse(startAt) + 2 * 3_600_000).toISOString()
+      : localToUtc(endTime <= startTime ? addDays(date, 1) : date, endTime);
     return [{
       id: `${group.id}-${slug}`,
       sourceId: slug,
       title: decode(toText(link[2])),
-      start: localToUtc(date, startTime ?? '00:00'),
-      end: localToUtc(date, endTime ?? '23:59'),
+      start: startAt,
+      end: endAt,
       allDay: !startTime,
       url: new URL(link[1], base).href,
       description: paragraphs.join('\n\n').slice(0, 2000),

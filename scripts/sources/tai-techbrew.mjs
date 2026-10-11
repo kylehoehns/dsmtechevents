@@ -58,7 +58,8 @@ function readEventPage(html, url) {
   const location = toText(locationHtml.replace(/<a [^>]*>More info<\/a>/i, '')).replace(/\.$/, '');
   const city = location.includes(',') ? location.split(',').pop().trim() : null;
 
-  const body = /<!--end \.sc_event_details-->([\s\S]*?)(?:<div class="icon_social_holder"|<\/article>)/.exec(html)?.[1] ?? '';
+  const body = /<!--end \.sc_event_details-->([\s\S]*?)(?:<div class="icon_social_holder"|<\/article>)/.exec(html)?.[1];
+  if (body == null) throw new Error(`no event text on ${url}`);
   const description = toText(body.replace(/<iframe[\s\S]*?<\/iframe>/gi, '').replace(/<\/(p|li|ul|h\d)>/gi, '$&\n'))
     .replace(/\s*Register (Now|Today)[:!]?\s*$/i, '')
     .trim().slice(0, 2000);
