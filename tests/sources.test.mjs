@@ -5,7 +5,7 @@ import secdsm from '../scripts/sources/secdsm.mjs';
 import pmiChapter from '../scripts/sources/pmi-chapter.mjs';
 import taiTechbrew from '../scripts/sources/tai-techbrew.mjs';
 import iowansOfThings from '../scripts/sources/iowans-of-things.mjs';
-import { decode, toText, httpUrl, safeLinks } from '../scripts/sources/html.mjs';
+import { decode, toText, httpUrl, safeLinks, checkTimes } from '../scripts/sources/html.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
 const serve = (body) => ({ get: async () => body });
@@ -30,6 +30,10 @@ test('secdsm reads meetings, talks, venue and door time from the homepage', asyn
 
 test('secdsm fails loudly when the page layout changes', async () => {
   await assert.rejects(secdsm({ id: 'secdsm' }, serve('<html>redesigned</html>')), /no schedule blocks/);
+  // The venue box: without it, door time, venue and address would quietly go blank.
+  for (const [marker, broken] of [['doors=', 'opens='], ['addr=', 'where='], ['hosts us', 'welcomes us']]) {
+    await assert.rejects(secdsm({ id: 'secdsm' }, serve(fixture('secdsm.html').replaceAll(marker, broken))), /venue box/, marker);
+  }
   const noDates = fixture('secdsm.html').replaceAll('secdsm-job-date', 'secdsm-job-when');
   await assert.rejects(secdsm({ id: 'secdsm' }, serve(noDates)), /no date could be read/);
 });
@@ -121,6 +125,8 @@ test('tai-techbrew fails loudly when the feed or event page changes', async () =
   await assert.rejects(taiTechbrew({ id: 'techbrew' }, { get: async () => '<html>not a calendar</html>' }), /did not return a calendar/);
   const site = techbrewSite({ 'https://www.technologyiowa.org/events/techbrew-october-2026/': '<html>redesigned</html>' });
   await assert.rejects(taiTechbrew({ id: 'techbrew' }, site), /no venue\/location/);
+  const noBody = fixture('tai-techbrew-event.html').replace('<!--end .sc_event_details-->', '');
+  await assert.rejects(taiTechbrew({ id: 'techbrew' }, techbrewSite({ 'https://www.technologyiowa.org/events/techbrew-october-2026/': noBody })), /no event text/);
 });
 
 test('html helpers decode entities and strip tags', () => {
@@ -142,6 +148,21 @@ test('iowans-of-things reads the Upcoming Events section of the homepage', async
   assert.equal(ff.description, 'A technical discussion series on embedded firmware. Don’t be afraid to join us!\n\nThis month: an open-source project review.');
   assert.equal(hh.start, '2026-11-13T00:30:00.000Z', '6:30pm CST');
   assert.ok(!('image' in hh));
+});
+
+test('iowans-of-things never ends an event before it starts', async () => {
+  const read = (time) => iowansOfThings({ id: 'iot' }, serve(fixture('iowans-of-things.html').replace(/7:00 PM\s*-\s*8:00 PM/, time)));
+  const [late] = await read('7:00 PM - 12:00 AM');
+  assert.equal(late.end, '2026-10-09T05:00:00.000Z', 'midnight is the next day');
+  const [open] = await read('7:00 PM');
+  assert.equal(open.end, '2026-10-09T02:00:00.000Z', 'no end time: two hours');
+});
+
+test('checkTimes stops any source from writing an event that ends before it starts', () => {
+  const ok = { title: 'A', start: '2026-10-09T00:00:00.000Z', end: '2026-10-09T01:00:00.000Z' };
+  assert.deepEqual(checkTimes([ok]), [ok]);
+  assert.throws(() => checkTimes([{ ...ok, end: '2026-10-08T23:00:00.000Z' }]), /"A" ends before it starts/);
+  assert.throws(() => checkTimes([{ ...ok, start: 'soon' }]), /"A" has no start/);
 });
 
 test('iowans-of-things fails loudly when the homepage changes', async () => {

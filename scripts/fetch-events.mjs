@@ -26,7 +26,7 @@ import iowansOfThings from './sources/iowans-of-things.mjs';
 import { parseFeed, parseEventsPage, enrich, mergeCache, checkEmptyFeed } from './sources/meetup.mjs';
 import { updateArchive } from './archive.mjs';
 import { manualEvent } from '../src/lib/data.mjs';
-import { safeLinks } from './sources/html.mjs';
+import { safeLinks, checkTimes } from './sources/html.mjs';
 import { sourceStatus } from './source-status.mjs';
 
 const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew, 'iowans-of-things': iowansOfThings };
@@ -101,7 +101,7 @@ async function fetchGroup(group) {
     fresh = await fetchFeed(group, now, cutoff, hadUpcoming);
   }
 
-  fresh.events = safeLinks(fresh.events, group);
+  fresh.events = safeLinks(checkTimes(fresh.events), group);
   return { ...mergeCache(previous, fresh, { now, cutoff }), enrichError: fresh.enrichError };
 }
 

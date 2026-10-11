@@ -1,7 +1,7 @@
 # Hand-added events: conferences, joint meetups, anything not on a group's feed.
-# Times are Des Moines local time. Leave out `time` for an all-day event.
+# Times are Des Moines local time. Leave out `time` for an all-day event; a timed event needs `endTime` too (the build fails without it).
 #
-#   title (no year: the date shows it), url, start (YYYY-MM-DD), end (optional, multi-day), time / endTime ("HH:MM")
+#   title (no year: the date shows it), url, start (YYYY-MM-DD), end (optional, multi-day), time + endTime ("HH:MM"; an endTime at or before 6am the next day keeps it one night)
 #   venue, address, description, tags, hosts (group ids), headliner (a pink row, and a poster up top when it is close)
 #   id (optional): keeps an event's id, and so its /tv/?event= link, after a title change
 

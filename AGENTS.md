@@ -30,7 +30,7 @@ DSM Tech Events lists every public Des Moines tech meetup, user group and confer
 
 ## Time
 
-Everything displays in Des Moines time (`site.timeZone`) wherever the viewer is. Convert local dates and times with `localToUtc` (`src/lib/time.mjs`); format and do day math with `src/lib/format.mjs`, which the build, `app.js` and the TV page all import. The Today / Tonight / Tomorrow / Happening now tag is `whenLabel()` and the poster stamp is `countdown()`: the build prints them and the browser re-checks them, so both must call those functions rather than re-deriving the rules. The same goes for the "New" tag, `isNew()`, read from each event's `added` (set once by `mergeCache`, never rewritten). An event's last day is `lastDay()` (an event ending at midnight ends the day before).
+Everything displays in Des Moines time (`site.timeZone`) wherever the viewer is. Convert local dates and times with `localToUtc` (`src/lib/time.mjs`); format and do day math with `src/lib/format.mjs`, which the build, `app.js` and the TV page all import. The Today / Tonight / Tomorrow / Happening now tag is `whenLabel()` and the poster stamp is `countdown()`: the build prints them and the browser re-checks them, so both must call those functions rather than re-deriving the rules. The same goes for the "New" tag, `isNew()`, read from each event's `added` (set once by `mergeCache`, never rewritten). An event's last day is `lastDay()`: one ending by 6am ends the day before, so a night running past midnight is one day, and `multiDay` (`spansDays()`) means a real multi-day event.
 
 ## Front-end traps
 

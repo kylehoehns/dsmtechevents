@@ -18,8 +18,15 @@ const hhmm = fmt({ hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }); // "
 
 export const DAY = 86_400_000;
 export const dayKey = (when) => keyFmt.format(new Date(when)); // "2026-10-22"; takes an ISO string or a timestamp
-// The last day an event is on. An event ending at midnight ends the day before.
-export const lastDay = (start, end) => dayKey(Math.max(Date.parse(start), Date.parse(end) - 1));
+// The last day an event is on. One that ends by 6am ends the day before: a
+// social running to midnight or 2am is that evening's event, not the next day's.
+export function lastDay(start, end) {
+  const last = new Date(Math.max(Date.parse(start), Date.parse(end) - 1));
+  const key = dayKey(last);
+  return key > dayKey(start) && hhmm.format(last) < '06:00' ? addDays(key, -1) : key;
+}
+// On more than one day: a conference, not a late night.
+export const spansDays = (start, end) => dayKey(start) !== lastDay(start, end);
 // A real calendar date in YYYY-MM-DD form (rejects 2026-13-45 and 2026-02-30).
 export const isDayKey = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s ?? '') && !Number.isNaN(Date.parse(s)) && new Date(Date.parse(s)).toISOString().startsWith(s);
 export const weekday = (iso) => weekdayShort.format(new Date(iso));
@@ -68,6 +75,8 @@ export function whenLabel(start, end, now = Date.now(), { multiDay = false, allD
     }
     return Date.parse(start) <= now ? 'Happening now' : startsIn(start, now) || todayWord(start);
   }
+  // After midnight on a night that runs late.
+  if (Date.parse(start) <= now && now < Date.parse(end)) return 'Happening now';
   return daysBetween(today, dayKey(start)) === 1 ? 'Tomorrow' : '';
 }
 

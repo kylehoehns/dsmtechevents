@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { mkdtempSync, cpSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { loadData, shortAddress, sameNight } from '../src/lib/data.mjs';
+import { loadData, shortAddress, sameNight, manualEvent } from '../src/lib/data.mjs';
 
 const dataDir = fileURLToPath(new URL('./fixtures/data', import.meta.url));
 const now = Date.parse('2026-10-07T17:00:00Z');
@@ -49,6 +49,16 @@ test('hand-added events use Des Moines time and span days', () => {
   assert.equal(conf.multiDay, true);
   assert.equal(conf.headliner, true);
   assert.equal(conf.address, '833 5th Ave');
+});
+
+test('a hand-added timed event without endTime fails loudly instead of ending as it starts', () => {
+  assert.throws(() => manualEvent({ title: 'Breakfast', start: '2026-11-07', time: '08:00' }), /endTime/);
+  assert.equal(manualEvent({ title: 'Expo', start: '2026-11-07' }).allDay, true, 'an all-day event needs neither');
+});
+
+test('a hand-added event running past midnight is one night, not two days', () => {
+  assert.equal(manualEvent({ title: 'Hack night', start: '2026-10-16', end: '2026-10-17', time: '18:00', endTime: '02:00' }).multiDay, false);
+  assert.equal(manualEvent({ title: 'Conf', start: '2026-10-15', end: '2026-10-16', time: '08:00', endTime: '17:00' }).multiDay, true);
 });
 
 test('groups know their next event, upcoming count and last event', () => {
