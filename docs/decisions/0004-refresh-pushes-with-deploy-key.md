@@ -13,16 +13,23 @@ organization"), but deploy keys can bypass a ruleset.
 
 ## Decision
 
-`refresh.yml` checks out with `ssh-key: ${{ secrets.REFRESH_DEPLOY_KEY }}`, a
-deploy key with write access, so its `git push` goes over SSH as that key.
-The workflow's own `GITHUB_TOKEN` only needs `contents: read` (plus
-`issues: write` for source-broken issues).
+`refresh.yml` pushes over SSH with `REFRESH_DEPLOY_KEY`, a deploy key with
+write access. The workflow's own `GITHUB_TOKEN` only needs `contents: read`
+(plus `issues: write` for source-broken issues).
+
+Since 2026-10-11 the key lives in its own job. The `refresh` job runs
+`npm ci`, the fetch and the build, which is third-party code, and passes on
+only `data/cache` and `data/archive` as an artifact. The `publish` job starts
+on a fresh runner, runs nothing from npm, and is the only place the key is
+written to disk, just for the pull and push. In one job, an earlier step
+could plant a git hook or config, a line in `$GITHUB_ENV` or `$GITHUB_PATH`,
+or a process that reads the push step's environment.
 
 ## Consequences
 
 - People still go through pull requests; only the data refresh skips them.
 - The refresh runs `npm run build` before it commits, so data that breaks
   the build never reaches `main`.
-- It runs `git pull --rebase` before pushing, so a PR merged mid-run does
-  not lose that run's data.
+- It runs `git pull --rebase` before pushing, and tries up to 3 times, so a
+  PR merged mid-run neither loses that run's data nor fails the run.
 - The key must be rotated by hand; the README has the steps.

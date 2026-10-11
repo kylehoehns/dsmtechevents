@@ -64,9 +64,12 @@ test('scrolled down on a phone, a shorter day lets the page glide up rather than
   await page.goto('/?view=calendar&day=2026-10-22');
   await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
   const from = await page.evaluate(() => scrollY);
-  await page.evaluate(() => document.querySelector('.day[data-day="2026-10-19"]').click()); // nothing on: a much shorter panel
-  // Right after the tap the old height is still held, so the page hasn't jumped...
-  expect(await page.evaluate(() => scrollY)).toBeGreaterThan(from - 20);
+  // Nothing on the 19th: a much shorter panel. Right after the tap the old
+  // height is still held, so the page hasn't jumped. Read in the same task as
+  // the click: a separate round trip lands partway into the 0.3s ease-out
+  // glide, which moves fastest at the start (a slow CI runner saw 25px gone).
+  const right = await page.evaluate(() => { document.querySelector('.day[data-day="2026-10-19"]').click(); return scrollY; });
+  expect(right).toBeGreaterThan(from - 20);
   // ...then the panel settles at its own size and leaves no height behind.
   await expect.poll(() => page.evaluate(() => document.getElementById('day-panel').style.minHeight)).toBe('');
   expect(await page.evaluate(() => scrollY)).toBeLessThan(from);

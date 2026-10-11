@@ -24,13 +24,15 @@ permissions:
 jobs:
   report:
     runs-on: ubuntu-24.04
+    # About 6 minutes (Lighthouse runs each page several times).
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '26'
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - name: write the site report to this run's summary

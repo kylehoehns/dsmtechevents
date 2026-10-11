@@ -19,15 +19,19 @@ on:
   workflow_dispatch:
 
 # main is protected by a ruleset (changes go through PRs with a green ci
-# check). This job is the one exception: it pushes with a deploy key, which
-# the ruleset lets bypass the rules. The key's private half is the
+# check). This workflow is the one exception: it pushes with a deploy key,
+# which the ruleset lets bypass the rules. The key's private half is the
 # REFRESH_DEPLOY_KEY secret; the public half is under Settings → Deploy keys.
-# The key is handed only to the final commit step: `npm ci`, the fetch and the
-# build run third-party code, so checkout keeps no credentials in .git/config
-# and the key is written to a temp file just for the pull/push, then deleted.
+#
+# Two jobs, so the key never shares a machine with third-party code. `refresh`
+# runs `npm ci`, the fetch and the build (npm packages, group websites) and
+# hands over only data/cache and data/archive as an artifact. `publish` starts
+# on a fresh runner, installs and runs nothing from npm, and is the only job
+# that sees the key. In one job, an earlier step could leave something behind
+# for the push step: a git hook or config, a line in $GITHUB_ENV or
+# $GITHUB_PATH, or a process that reads the next step's environment.
 permissions:
   contents: read
-  issues: write # source-issues.mjs opens/closes "Source broken" issues
 
 concurrency:
   group: refresh
@@ -36,13 +40,18 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-24.04
+    # A run takes about a minute; the fetch caps each request at 20s.
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write # source-issues.mjs opens/closes "Source broken" issues
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '26'
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run fetch
@@ -55,19 +64,56 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: node scripts/source-issues.mjs
-      # Build before committing, so data that breaks the site never gets pushed.
+      # Build before handing the data over, so data that breaks the site never
+      # gets pushed.
       - run: npm run build
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: event-data
+          path: |
+            data/cache/
+            data/archive/
+          if-no-files-found: error
+          retention-days: 3
+
+  publish:
+    needs: refresh
+    runs-on: ubuntu-24.04
+    # The live check below waits up to 10 minutes.
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      # The commit the refresh job started from, not main as it is now: the
+      # data is mirrored over it below, so a cache file a PR added in between
+      # (a new group) would otherwise be committed as deleted. The rebase
+      # before the push replays the data commit on top of anything newer.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: event-data
+          path: ${{ runner.temp }}/event-data
       - name: commit changed event data
         id: commit
         env:
           DEPLOY_KEY: ${{ secrets.REFRESH_DEPLOY_KEY }}
+          NEW: ${{ runner.temp }}/event-data
         run: |
+          # Mirror the refresh job's data exactly, so a file it dropped is
+          # dropped here too.
+          test -d "$NEW/cache" && test -d "$NEW/archive"
+          rm -rf data/cache data/archive
+          cp -R "$NEW/cache" data/cache
+          cp -R "$NEW/archive" data/archive
           # The page's "This week" / "Next week" headings are fixed at build
           # time, so the site has to rebuild at least once a day even when no
           # group posted anything. Recording the Des Moines date makes the
           # first run each day commit.
           TZ=America/Chicago date +%F > data/cache/built-on.txt
-          git add data/cache data/archive
+          git add -A data/cache data/archive
           if git diff --cached --quiet; then
             echo "No event changes."
             exit 0
@@ -85,11 +131,19 @@ jobs:
           curl -fsS https://api.github.com/meta | jq -r '.ssh_keys[] | "github.com " + .' > "$ssh_dir/known_hosts"
           export GIT_SSH_COMMAND="ssh -i $ssh_dir/key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$ssh_dir/known_hosts"
           git remote set-url origin "git@github.com:${GITHUB_REPOSITORY}.git"
-          # A PR may have merged while this run fetched and built; replay the
-          # data commit on top instead of failing the push and losing the run.
-          git pull --rebase --quiet
-          git push
-          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          # A PR may merge while this run fetches and builds, or between the
+          # pull and the push. Replay the data commit on top and try again
+          # rather than fail the run.
+          for try in 1 2 3; do
+            if git pull --rebase --quiet && git push; then
+              echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Push attempt $try failed; retrying."
+            sleep $((try * 5))
+          done
+          echo "::error::Couldn't push the data commit after 3 tries."
+          exit 1
       # The push only asks Cloudflare to deploy. Wait for the live home page to
       # carry this commit (its <meta name="build">, which Cloudflare's build
       # fills in from WORKERS_CI_COMMIT_SHA), or a later one, and fail the run
