@@ -84,8 +84,13 @@ jobs:
     permissions:
       contents: read
     steps:
+      # The commit the refresh job started from, not main as it is now: the
+      # data is mirrored over it below, so a cache file a PR added in between
+      # (a new group) would otherwise be committed as deleted. The rebase
+      # before the push replays the data commit on top of anything newer.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
