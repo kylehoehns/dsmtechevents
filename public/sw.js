@@ -4,8 +4,9 @@
 // fresh data; it falls back to the saved copy when offline (or after 3s on a
 // bad connection).
 // Our CSS, JS and fonts: every file the build made is listed in ASSETS, saved
-// on install, and anything else under /_astro/ is dropped once this worker
-// takes over. Served stale-while-revalidate.
+// on install (the LAZY ones when first asked for), and anything else under
+// /_astro/ is dropped once this worker takes over. Served
+// stale-while-revalidate.
 // Meetup event photos: their own small cache, oldest dropped past 60.
 // Group logos and the TV page's photos: saved with their page, on install and
 // whenever it loads online.
@@ -25,12 +26,15 @@ const SAVED_AT = 'x-sw-saved-at';
 const PAGES = ['/', '/groups/', '/tv/', '/cards/'];
 // The build fills this in (scripts/sw-precache.mjs): every file in /_astro/.
 const ASSETS = [];
+// Also filled in by the build: the ones only a dynamic import() loads (the
+// qrcode library for TV event mode), saved when first used, not on install.
+const LAZY = [];
 // Images a saved page needs offline: <img class="..."> on it, and the cache they go in.
 const PAGE_IMAGES = { '/groups/': ['logo-img', LOGOS], '/tv/': ['tv-photo', IMAGES] };
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then(async (cache) => {
-    await cache.addAll([...PAGES, ...ASSETS]);
+    await cache.addAll([...PAGES, ...ASSETS.filter((a) => !LAZY.includes(a))]);
     // Stamp the pages as just saved, so the first move between them is instant too.
     await Promise.all(PAGES.map(async (page) => {
       const res = await cache.match(page);

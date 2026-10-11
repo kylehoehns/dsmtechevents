@@ -173,7 +173,7 @@ const eventData = {
   .poster-slide.headliner .info .hosts { color: #1d1b2b; }
   .info h2 { margin: 0 0 2.5vh; font: 700 6.4vh/1.08 var(--sans); text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .info .time { margin: 0; font: 700 4vh/1.2 var(--mono); }
-  .info .where { margin: 0.6vh 0 0; font: 500 3vh/1.3 var(--mono); color: var(--soft); }
+  .info .where { margin: 0.6vh 0 0; font: 400 3vh/1.3 var(--mono); color: var(--soft); }
   .poster-slide.headliner .info .where { color: inherit; }
   .info .going { margin: 2.5vh 0 0; font: 600 3vh/1 var(--mono); }
   .info .going b { font: 900 6vh/1 var(--display); vertical-align: -0.6vh; margin-right: 0.6vw; }
@@ -322,8 +322,9 @@ const eventData = {
   const loadedAt = Date.now();
   // The bare layout skips Layout's footer script, so register the service
   // worker here: a lobby screen that only ever opens /tv/ then has a saved copy
-  // to fall back on if the Wi-Fi drops during the hourly reload.
-  if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('/sw.js');
+  // to fall back on if the Wi-Fi drops during the hourly reload. After load, as
+  // in Layout.astro, so the install doesn't slow the first paint.
+  if ('serviceWorker' in navigator && import.meta.env.PROD) addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
   const bar = document.getElementById('tv-bar')!;
   const clock = document.getElementById('tv-clock')!;
   const clockFmt = fmt({ weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });

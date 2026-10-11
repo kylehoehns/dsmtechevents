@@ -34,8 +34,8 @@ export default defineConfig({
   integrations: [swPrecache()],
   fonts: [
     { name: 'Big Shoulders Display', cssVariable: '--display', fallbacks: ['DSM Display fallback', 'Arial Narrow', 'Impact', 'sans-serif'], ...fontsource('big-shoulders-display', [800, 900]) },
-    { name: 'IBM Plex Mono', cssVariable: '--mono', fallbacks: ['DSM Mono fallback', 'ui-monospace', 'Menlo', 'monospace'], ...fontsource('ibm-plex-mono', [400, 500, 600, 700]) },
-    { name: 'IBM Plex Sans', cssVariable: '--sans', fallbacks: ['DSM Sans fallback', 'ui-sans-serif', 'system-ui', 'sans-serif'], ...fontsource('ibm-plex-sans', [400, 500, 600, 700]) },
+    { name: 'IBM Plex Mono', cssVariable: '--mono', fallbacks: ['DSM Mono fallback', 'ui-monospace', 'Menlo', 'monospace'], ...fontsource('ibm-plex-mono', [400, 600, 700]) },
+    { name: 'IBM Plex Sans', cssVariable: '--sans', fallbacks: ['DSM Sans fallback', 'ui-sans-serif', 'system-ui', 'sans-serif'], ...fontsource('ibm-plex-sans', [400, 600, 700]) },
     // Only small stamps use it; swapping in late is fine.
     { name: 'Permanent Marker', cssVariable: '--marker', fallbacks: ['Comic Sans MS', 'cursive'], ...fontsource('permanent-marker', [400]) },
   ],

@@ -202,7 +202,9 @@ const speculation = toScript({
         try { navigator.sendBeacon('/api/click', JSON.stringify(body)); } catch {}
       });
 
-      if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('/sw.js');
+      // After the page has loaded: the worker's install downloads the whole site,
+      // which shouldn't compete with this page's own fonts and images.
+      if ('serviceWorker' in navigator && import.meta.env.PROD) addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 
       // An installed app can be resumed days later without reloading. If the page
       // is over an hour old when it comes back, reload it so events and the
