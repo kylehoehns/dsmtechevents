@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { meetupSlug, meetupPhoto } from '../src/lib/meetup.mjs';
-import { parseFeed, parseEventsPage, enrich, mergeCache, checkEmptyFeed, formatAddress, cleanDescription } from '../scripts/sources/meetup.mjs';
+import { parseFeed, parseEventsPage, enrich, cancelledIds, mergeCache, checkEmptyFeed, formatAddress, cleanDescription } from '../scripts/sources/meetup.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
 const group = { id: 'iadnug', name: 'Iowa .NET User Group' };
@@ -95,6 +95,17 @@ test('parseEventsPage throws when the page has no entry for the group', () => {
 test('parseEventsPage fails loudly when Meetup changes the page', () => {
   assert.throws(() => parseEventsPage('<html></html>', 'iadnug'), /no __NEXT_DATA__/);
   assert.throws(() => parseEventsPage('<script id="__NEXT_DATA__">{"props":{}}</script>', 'iadnug'), /no Apollo state/);
+});
+
+test('an event cancelled after its end time has passed is not carried forward', () => {
+  // The refresh before the cancellation cached it as upcoming; by the next
+  // refresh its end time has passed, so it would otherwise be kept as past.
+  const later = Date.parse('2026-10-08T21:00:00Z');
+  const page = parseEventsPage(fixture('meetup-events-page-cancelled.html'), 'iadnug');
+  const cached = { id: 'iadnug-300000001', title: '.NET@Noon', start: '2026-10-08T17:00:00.000Z', end: '2026-10-08T18:00:00.000Z' };
+  const recent = enrich([], page, group, { now: later, cutoff });
+  const merged = mergeCache({ fetchedAt: 'THEN', logo: null, events: [cached] }, { events: recent, cancelled: cancelledIds(page, group) }, { now: later, cutoff });
+  assert.ok(!merged.events.some((e) => e.id === 'iadnug-300000001'), 'the cancelled event is gone from the cache');
 });
 
 test('enrich fills feed events from the page and adds recent past events', () => {

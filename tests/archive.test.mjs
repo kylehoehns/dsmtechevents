@@ -61,3 +61,11 @@ test('an archived record keeps a short plain-text description for search', () =>
   assert.equal(r1.description, 'Our speaker walks through it.');
   assert.equal('description' in r2, false, 'no description, no field (byte-stable records)');
 });
+
+test('a field the fresher copy no longer has leaves the record', () => {
+  const first = updateArchive({}, { pyowa: { events: [ev('p-1', '2026-09-22T22:30:00Z', { online: true, venue: 'Online', description: 'Remote talk' })] } }, now);
+  const moved = updateArchive(first, { pyowa: { events: [ev('p-1', '2026-09-22T22:30:00Z', { venue: 'Hall' })] } }, now)['2026'][0];
+  assert.equal(moved.venue, 'Hall');
+  assert.ok(!('online' in moved), 'moved in person: no longer online');
+  assert.ok(!('description' in moved), 'a cleared description is cleared');
+});
