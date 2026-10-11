@@ -33,6 +33,7 @@ const monogram = (name: string) => name.split(/\s+/).filter(Boolean)
           {(g.members || g.pastCount) && (
             <p class="facts">{[g.members && `${g.members.toLocaleString('en-US')} members`, g.pastCount && `${g.pastCount} meetups`].filter(Boolean).join(' · ')}</p>
           )}
+          {g.usually && <p class="usually">Usually {g.usually}</p>}
         </div>
         {/* Next and last, now and after each of the next few events ends (g.states in lib/data.mjs). */}
         {g.states.map((s: any) => (

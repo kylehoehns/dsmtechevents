@@ -35,6 +35,7 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   for (const g of groups) {
     summarize(g, upcoming, past, now);
     markQuiet(g, archived[g.id], now);
+    g.usually = rhythm([...archive.filter((r) => r.group === g.id), ...events.filter((e) => e.groupIds.includes(g.id))]);
   }
 
   const fetched = groups.map((g) => g.fetchedAt).filter(Boolean).sort();
@@ -48,6 +49,33 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
     updatedAt: fetched.at(-1) ?? new Date(now).toISOString(),
     ...readStatus(dataDir, groups),
   };
+}
+
+// How a group usually meets, from its last six events: "2nd Mondays,
+// evenings, online". Each part shows only when at least four of the six
+// agree, and the line shows only with a weekday, so an irregular group gets
+// nothing rather than a guess.
+const ORD = ['1st', '2nd', '3rd', '4th'];
+const wdFmt = fmt({ weekday: 'long' });
+const dateFmt = fmt({ day: 'numeric' });
+const hourOf = fmt({ hour: 'numeric', hourCycle: 'h23' });
+function rhythm(list) {
+  const recent = [...new Map(list.map((e) => [e.id, e])).values()]
+    .filter((e) => !e.allDay && !e.multiDay).sort((a, b) => a.start.localeCompare(b.start)).slice(-6);
+  if (recent.length < 4) return null;
+  const top = (keyOf) => {
+    const counts = {};
+    for (const e of recent) { const k = keyOf(e); if (k != null) counts[k] = (counts[k] ?? 0) + 1; }
+    const [k, n] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0] ?? [];
+    return n >= 4 ? k : null;
+  };
+  const wd = (e) => wdFmt.format(new Date(e.start));
+  const nth = (e) => ORD[Math.ceil(Number(dateFmt.format(new Date(e.start))) / 7) - 1];
+  const day = top((e) => nth(e) && `${nth(e)} ${wd(e)}s`) ?? top((e) => `${wd(e)}s`);
+  if (!day) return null;
+  const when = top((e) => { const h = Number(hourOf.format(new Date(e.start))); return h < 11 ? 'mornings' : h < 14 ? 'lunchtime' : h < 16 ? 'afternoons' : 'evenings'; });
+  const online = top((e) => (e.online ? 'online' : null));
+  return [day, when, online].filter(Boolean).join(', ');
 }
 
 // Every archived event record. The archive (data/archive/) has every ended
