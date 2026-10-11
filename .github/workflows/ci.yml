@@ -9,22 +9,37 @@ on:
   pull_request:
   push:
     branches: [main]
+    # The refresh workflow's data commits: it already built the site from
+    # that data, and the browser tests use fixture data, so CI would only
+    # repeat work (and turn main red on a flaky test). Push only: a PR that
+    # adds a cache file must still report the required checks.
+    paths-ignore:
+      - 'data/cache/**'
+      - 'data/archive/**'
 
 # Read-only token: this workflow runs third-party code (npm packages) and
 # never needs to write anything.
 permissions:
   contents: read
 
+# A new push to a PR replaces the run for the old one. Runs on main always
+# finish.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test-and-build:
     runs-on: ubuntu-24.04
+    # Usually about 40 seconds.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '26'
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run build
@@ -40,6 +55,10 @@ jobs:
       - run: npm run typecheck
       # The workflows themselves: actionlint (syntax, expressions, and
       # shellcheck on run: blocks) and zizmor (security).
+      # Dependabot can't see these two versions (a release download and an
+      # action input), so update them by hand: actionlint's VERSION plus the
+      # SHA256 of its linux_amd64 tarball from the release's checksums file,
+      # and zizmor's `version:`.
       - name: actionlint
         env:
           VERSION: 1.7.12
@@ -72,7 +91,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '26'
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - id: pw

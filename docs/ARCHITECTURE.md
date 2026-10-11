@@ -59,7 +59,8 @@ flowchart TD
   `data/cache/` and `data/archive/` if they changed. It also writes the Des
   Moines date to `data/cache/built-on.txt`, so it commits at least once a
   day. It pushes
-  with a deploy key, the one thing allowed past `main`'s ruleset.
+  with a deploy key, the one thing allowed past `main`'s ruleset, from a
+  second job on a fresh runner that never runs npm code (decision 0004).
 - **Failures.** A group that fails keeps its previous cache file. The fetch
   writes `fetch-report.json`, and `scripts/source-issues.mjs` opens, updates
   or closes one `source-broken` issue per group.
