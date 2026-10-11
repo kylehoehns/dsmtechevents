@@ -163,3 +163,31 @@ plain('opening the calendar from another page never shows Events as the current 
   await plainExpect(nav.getByRole('link', { name: 'Calendar' })).toHaveAttribute('aria-current', 'page');
   await plainExpect(nav.getByRole('link', { name: 'Events' })).not.toHaveAttribute('aria-current');
 });
+
+// The day each calendar starts focus on already has a ring of its own (today
+// in the mini calendar, the picked day in the big one), so the focus ring has
+// to look different from it.
+const ring = (locator) => locator.evaluate((el) => {
+  const s = getComputedStyle(el);
+  return `${s.outlineStyle} ${s.outlineWidth} ${s.outlineColor} ${s.outlineOffset} | ${s.boxShadow}`;
+});
+
+test('focusing the picked day in the calendar changes how it looks', async ({ page }) => {
+  await page.goto('/?view=calendar');
+  const picked = page.getByRole('button', { name: /^Wednesday, October 14,/ });
+  await expect(picked).toHaveAttribute('aria-pressed', 'true');
+  const before = await ring(picked);
+  await page.keyboard.press('Tab'); // keyboard use, so focus() counts as :focus-visible
+  await picked.focus();
+  expect(await ring(picked)).not.toBe(before);
+});
+
+test('focusing today in the mini calendar changes how it looks', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the mini calendar is desktop only');
+  await page.goto('/');
+  const today = page.getByRole('group', { name: 'October 2026' }).getByRole('button', { name: /^Wednesday, October 14,/ });
+  const before = await ring(today);
+  await page.keyboard.press('Tab');
+  await today.focus();
+  expect(await ring(today)).not.toBe(before);
+});
