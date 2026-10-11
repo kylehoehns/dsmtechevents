@@ -1,13 +1,13 @@
 {
-  "fetchedAt": "2026-10-08T16:07:57.266Z",
+  "fetchedAt": "2026-10-11T22:58:26.552Z",
   "logo": "https://pmi-centraliowa.org/static/img/logo-login.jpg",
   "events": [
     {
       "id": "pmi-47587",
       "sourceId": "47587",
       "title": "AI as Your Partner: Plan Faster. Lead Smarter. Deliver Better.",
-      "start": "2026-10-27T22:00:00.000Z",
-      "end": "2026-10-28T00:30:00.000Z",
+      "start": "2026-10-27T22:30:00.000Z",
+      "end": "2026-10-28T01:00:00.000Z",
       "allDay": false,
       "url": "https://pmi-centraliowa.org/calendar?eventId=47587",
       "description": "",
