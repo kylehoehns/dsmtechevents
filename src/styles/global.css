@@ -68,7 +68,9 @@
      the floor gives way too, so one long word still fits: */
   --fs-h-section: clamp(min(2rem, 12vw), 8vw, 3.125rem); /* This week, Later */
   --fs-h-page: clamp(min(2.375rem, 14vw), 9.5vw, 4rem);  /* page titles, the footer's call to action */
-  --fs-h-cal: clamp(min(2.75rem, 15vw), 11vw, 4.75rem);  /* the calendar's month */
+  /* the calendar's month; on a phone, small enough that SEPTEMBER 2026 (~5.3em)
+     still fits beside the ~150px of arrows, so they never drop a row */
+  --fs-h-cal: clamp(min(1.75rem, 12vw), min(11vw, (100vw - 182px) / 5.3), 4.75rem);
   /* Oversize one-offs keep their own sizes: the logo, the date numerals,
      poster and conference titles on desktop, the email address on /organizers/.
      The logo (screen width) and date numerals (fixed column) stay in px. */
