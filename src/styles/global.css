@@ -574,8 +574,7 @@ mark {
 .flyer { position: relative; scroll-margin-top: 16px; background: var(--sheet); border: 1.5px solid var(--line); padding: 12px; display: flex; flex-direction: column; }
 /* Name, logo and facts; the rest of the card stacks under it, and the links
    sit at the bottom so every card in a row ends its buttons on one line. */
-.flyer-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px 12px; align-content: start; }
-.flyer.has-logo .flyer-head { grid-template-columns: 60px minmax(0, 1fr); }
+.flyer-head { display: grid; grid-template-columns: 60px minmax(0, 1fr); gap: 2px 12px; align-content: start; }
 /* /groups/#pyowa-style links: make the card you landed on obvious */
 .flyer:target { outline: 4px solid var(--pink-fill); outline-offset: 3px; }
 /* logos in their own colors: they're each group's identity, not ours to reprint */

@@ -36,13 +36,13 @@ export function inlineScripts(html) {
 
 export const scriptHash = (body) => `'sha256-${crypto.createHash('sha256').update(body, 'utf8').digest('base64')}'`;
 
-export function htmlFiles(dir) {
+function htmlFiles(dir) {
   return fs.readdirSync(dir, { recursive: true }).filter((f) => f.endsWith('.html')).map((f) => path.join(dir, f));
 }
 
 // Every distinct inline-script hash across the built pages, sorted so the
 // header is the same from build to build.
-export function siteHashes(dir) {
+function siteHashes(dir) {
   const hashes = new Set();
   for (const file of htmlFiles(dir)) for (const body of inlineScripts(fs.readFileSync(file, 'utf8'))) hashes.add(scriptHash(body));
   return [...hashes].sort();

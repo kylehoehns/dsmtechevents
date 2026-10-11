@@ -19,7 +19,7 @@ const monogram = (name: string) => name.split(/\s+/).filter(Boolean)
   <h1 class="sr-only">Des Moines tech groups</h1>
   <div class="board">
     {sorted.map((g) => (
-      <article id={g.id} data-groups={g.id} class="flyer has-logo">
+      <article id={g.id} data-groups={g.id} class="flyer">
         <div class="flyer-head">
           {g.logo
             ? <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />

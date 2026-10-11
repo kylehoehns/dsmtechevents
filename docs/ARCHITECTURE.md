@@ -93,8 +93,11 @@ page. The calendar's day panel and search fetch it the first time they need
 it. It also holds a one-line row for every past event, the archive
 included, which a search shows in its "Past" section.
 
-`public/sw.js` is the service worker. Pages and `/cards/` are network-first
-with a 3 second fallback to the cached copy. CSS, JS and fonts are
+`public/sw.js` is the service worker. A page or `/cards/` saved in the last
+15 minutes (`FRESH_MS`) is served straight from the cache while a fetch
+updates it in the background. An older copy is network-first: the worker
+waits up to 3 seconds for the network, then falls back to the saved copy (or
+an offline page). CSS, JS and fonts are
 precached from a list of every file in `dist/_astro/`, which
 `scripts/sw-precache.mjs` writes into `dist/sw.js` at build time; the
 offline e2e project (`tests/e2e/offline.spec.mjs`) is the only one that
