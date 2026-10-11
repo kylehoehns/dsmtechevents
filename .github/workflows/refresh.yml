@@ -140,6 +140,10 @@ jobs:
               echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
               exit 0
             fi
+            # A conflicting pull leaves a rebase half done, which would fail
+            # every later try without pulling again. A conflict that lasts
+            # fails the run; the next run starts from the new main.
+            git rebase --abort 2>/dev/null || true
             echo "Push attempt $try failed; retrying."
             sleep $((try * 5))
           done
