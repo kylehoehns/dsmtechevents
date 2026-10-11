@@ -6,7 +6,6 @@
 export const SYNONYMS = {
   ai: ['llm', 'gpt', 'genai', 'generative', 'copilot', 'agent', 'agentic', 'mcp', 'rag', 'chatgpt', 'claude', 'gemini', 'openai', 'machine learning', 'ml'],
   agent: ['agentic', 'mcp', 'multi-agent'],
-  agents: ['agentic', 'mcp', 'multi-agent'],
   ml: ['data science', 'computer vision', 'neural', 'model training'],
   'machine learning': ['data science', 'computer vision', 'neural', 'model training'],
   llm: ['gpt', 'genai', 'generative', 'chatgpt', 'claude', 'gemini', 'openai'],
@@ -25,7 +24,6 @@ export const SYNONYMS = {
   typescript: ['ts'],
   data: ['analytics', 'data science', 'bi', 'power bi', 'sql', 'database', 'data engineering'],
   career: ['hiring', 'interview', 'jobs', 'skills', 'mentoring', 'resume'],
-  careers: ['hiring', 'interview', 'jobs', 'skills', 'mentoring', 'resume'],
   leadership: ['cio', 'cto', 'executive', 'strategy', 'management'],
   product: ['product management', 'user story', 'roadmap', 'discovery'],
   mobile: ['ios', 'android', 'swift', 'kotlin', 'flutter', 'react native'],
