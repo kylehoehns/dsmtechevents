@@ -17,6 +17,10 @@
 // so history keeps building even if Meetup stops showing an event.
 // If a group's feed fails, its previous cache file is left alone, so one bad
 // run never empties the calendar.
+//
+// `--only <id>` fetches one group (or `luma-<slug>` event) and nothing else:
+// no status, archive or fetch report, and it exits 1 if that one fails.
+// scripts/add-listing.mjs uses it to fill in a new listing's cache.
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -42,7 +46,12 @@ const cacheDir = path.join(root, 'data/cache');
 const UA = 'dsmtechevents/1.0 (+https://dsmtechevents.com; community event calendar, fetched four times a day)';
 const BACKFILL_DAYS = 90;
 
-const groups = YAML.parse(await fs.readFile(path.join(root, 'data/groups.yaml'), 'utf8'));
+const only = process.argv.includes('--only') ? process.argv[process.argv.indexOf('--only') + 1] : null;
+const groups = YAML.parse(await fs.readFile(path.join(root, 'data/groups.yaml'), 'utf8'))
+  .filter((g) => !only || g.id === only);
+const eventsYaml = YAML.parse(await fs.readFile(path.join(root, 'data/events.yaml'), 'utf8')) ?? [];
+const lumaEntries = eventsYaml.filter((e) => e.luma && (!only || `luma-${lumaSlug(e.luma)}` === only));
+if (only && !groups.length && !lumaEntries.length) throw new Error(`--only ${only}: no such group or luma: event`);
 await fs.mkdir(cacheDir, { recursive: true });
 
 // What went wrong this run, for scripts/source-issues.mjs to turn into GitHub
@@ -64,8 +73,8 @@ for (const group of groups) {
   }
   await new Promise((r) => setTimeout(r, 500)); // be polite to Meetup
 }
-const eventsYaml = YAML.parse(await fs.readFile(path.join(root, 'data/events.yaml'), 'utf8')) ?? [];
-await fetchLuma(eventsYaml.filter((e) => e.luma));
+await fetchLuma(lumaEntries);
+if (only) process.exit(report.problems.length ? 1 : 0);
 await fs.writeFile(path.join(root, 'fetch-report.json'), JSON.stringify(report, null, 2) + '\n');
 
 // The same facts, committed for the /status/ page (see source-status.mjs).
@@ -155,7 +164,8 @@ async function fetchLuma(entries) {
   const file = path.join(cacheDir, 'luma.json');
   const before = await fs.readFile(file, 'utf8').catch(() => null);
   const previous = JSON.parse(before ?? '{}');
-  const next = {};
+  // With --only, every other entry stays as it was.
+  const next = only ? { ...previous } : {};
   for (const e of entries) {
     const slug = lumaSlug(e.luma);
     const id = `luma-${slug}`;

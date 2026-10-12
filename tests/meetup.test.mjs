@@ -51,6 +51,11 @@ test('an empty feed throws when the events page still lists upcoming events, or 
   assert.doesNotThrow(() => checkEmptyFeed(upcoming, null, { now, hadUpcoming: 0 }), 'a group with nothing scheduled before stays quiet');
 });
 
+test('the events page says who and where the group is, for add-listing', () => {
+  const { name, city, state, isPrivate } = parseEventsPage(fixture('meetup-events-page.html'), 'iadnug');
+  assert.deepEqual({ name, city, state, isPrivate }, { name: 'Iowa .NET User Group', city: 'Des Moines', state: 'IA', isPrivate: false });
+});
+
 test('an empty feed is fine when the page shows the event cancelled, and the event drops out', () => {
   const upcoming = parseFeed(fixture('meetup-feed-empty.ics'), group, { slug: 'iadnug', now });
   const page = parseEventsPage(fixture('meetup-events-page-cancelled.html'), 'iadnug');
