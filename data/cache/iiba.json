@@ -1,0 +1,42 @@
+{
+  "fetchedAt": "2026-10-12T13:59:25.290Z",
+  "logo": "https://clubrunner.blob.core.windows.net/00000400579/Favicon/macIcon.png",
+  "events": [
+    {
+      "id": "iiba-a7d77fec-a49d-4b20-b264-76e5956205e6",
+      "sourceId": "a7d77fec-a49d-4b20-b264-76e5956205e6",
+      "title": "Exile Brewing Trivia Night with IIBA",
+      "start": "2026-07-30T23:00:00.000Z",
+      "end": "2026-07-31T01:00:00.000Z",
+      "allDay": false,
+      "url": "https://centraliowa.iiba.org/Events",
+      "description": "",
+      "venue": "1514 Walnut Street",
+      "address": "Des Moines, IA"
+    },
+    {
+      "id": "iiba-9879fbf8-5df5-4fcc-86bc-3d5b0d860eec",
+      "sourceId": "9879fbf8-5df5-4fcc-86bc-3d5b0d860eec",
+      "title": "AI as Your BA Partner: Plan Faster. Lead Smarter. Deliver Better.",
+      "start": "2026-08-27T16:00:00.000Z",
+      "end": "2026-08-27T18:00:00.000Z",
+      "allDay": false,
+      "url": "https://centraliowa.iiba.org/Events",
+      "description": "AI can bring speed, structure, and fresh ideas, but you bring the experience, judgment, leadership, and credibility that move a project forward. This session puts the project manager firmly in control and shows how AI can strengthen the work without replacing the person behind it.\n\nAttendees will see practical ways to use AI for project plans, roadmaps, budgets, risk matrices, status updates, stakeholder communication, and decision support. The goal is simple: reduce busywork, improve clarity, and help project managers lead with greater confidence and deliver stronger results.\n\n**Speaker Bio**\n\nAngie Weller is a product, business analysis, and delivery leader with more than 15 years of experience turning complex business needs into actionable plans and measurable results. Her background includes Agile leadership, project and product delivery, stakeholder alignment, roadmaps, budgeting, risk management, process improvement, and large-scale technology transformation.\n\nAngie is actively involved in Central Iowa’s business analysis and project management communities and is passionate about helping professionals use AI to work smarter while keeping human judgment, personality, and leadership at the core.",
+      "venue": "3001 Westown Parkway",
+      "address": "West Des Moines, IA"
+    },
+    {
+      "id": "iiba-4015ea6b-10a3-436a-8d9f-5ebdc822aa32",
+      "sourceId": "4015ea6b-10a3-436a-8d9f-5ebdc822aa32",
+      "title": "IIBA Trunk or Treat",
+      "start": "2026-10-22T22:00:00.000Z",
+      "end": "2026-10-23T01:00:00.000Z",
+      "allDay": false,
+      "url": "https://centraliowa.iiba.org/Events/iiba-trunk-or-treat",
+      "description": "🎃 Trick or treat, Des Moines Analysts!\n\nCentral Iowa IIBA and PMI Central Iowa will be at Trunk or Treat trunk handing out candy.\n\nExpect a live DJ, mini-games, and treats from local trunk-decorating pros. It's a family-friendly night, and no registration is needed. Just show up!\n\nCome find our trunk, say hello, and meet fellow members of our Central Iowa business analysis community. Costumes encouraged. Bring the family and a friend who might enjoy meeting us.\n\nEvent details: **https://lnkd.in/gcAqJHA2**",
+      "venue": "Genesis Health Clubs",
+      "address": "4875 Mills Civic Parkway, West Des Moines, IA"
+    }
+  ]
+}

@@ -103,6 +103,20 @@
   website: https://pmi-centraliowa.org/
   logo: https://pmi-centraliowa.org/static/img/logo-login.jpg
 
+- id: iiba
+  name: IIBA Central Iowa Chapter
+  short: IIBA
+  source: iiba-chapter
+  website: https://centraliowa.iiba.org/
+  logo: https://clubrunner.blob.core.windows.net/00000400579/Favicon/macIcon.png
+
+- id: issa
+  name: ISSA Des Moines Chapter
+  short: ISSA
+  source: issa-chapter
+  website: https://issadesmoines.org/
+  logo: https://issadesmoines.org/wp-content/uploads/2020/03/apple-touch-icon.png
+
 - id: techbrew
   name: Technology Association of Iowa
   short: TAI
