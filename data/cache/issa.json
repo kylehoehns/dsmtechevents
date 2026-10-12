@@ -1,0 +1,18 @@
+{
+  "fetchedAt": "2026-10-12T13:59:26.179Z",
+  "logo": "https://issadesmoines.org/wp-content/uploads/2020/03/apple-touch-icon.png",
+  "events": [
+    {
+      "id": "issa-september-quarterly-issa-meeting",
+      "sourceId": "september-quarterly-issa-meeting",
+      "title": "September Quarterly ISSA Meeting",
+      "start": "2026-09-29T16:30:00.000Z",
+      "end": "2026-09-29T18:00:00.000Z",
+      "allDay": false,
+      "url": "https://issadesmoines.org/events/september-quarterly-issa-meeting/",
+      "description": "**Presenting:** Lucy Berry & Kaylee Fletcher (DEFCON Talk) | Andrew Leef (Why the model you use, has little effect on the outcome - AI)\n\nWhat:  Free lunch and networking with your peers!\n\nWhy:  If you’re interested in hearing more about AI, please come join us for AI topics….more to share soon!  Sign up early!\n\nDon’t forget, by attending ISSA meetings you can earn free CEU credits!  Also, parking is free if you register by September 23rd,",
+      "venue": "Principal Financial Group",
+      "address": "750 Park Street, Des Moines IA 50309"
+    }
+  ]
+}

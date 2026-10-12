@@ -1,0 +1,194 @@
+BEGIN:VCALENDAR
+PRODID:-//github.com/ical-org/ical.net//NONSGML ical.net 5.1.4//EN
+VERSION:2.0
+BEGIN:VEVENT
+DTEND:20260115T183000Z
+DTSTAMP:20261012T134428Z
+DTSTART:20260115T173000Z
+SEQUENCE:1
+SUMMARY:Annual General Meeting - 2026
+UID:a3f42088-b20c-46cc-bcaa-45a2dde53741
+END:VEVENT
+BEGIN:VEVENT
+DTEND:20260123T123000Z
+DTSTAMP:20261012T134428Z
+DTSTART:20260123T120000Z
+SEQUENCE:1
+SUMMARY:Test
+UID:5631d0b1-cd39-4af3-a388-95eca9844823
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Join us for an engaging session with Aaron Matthews as he share
+ s practical strategies for leveraging AI to amplify human potential and dr
+ ive meaningful results in your organization. In this interactive presentat
+ ion\, you'll discover how to harness AI not as a replacement for human tal
+ ent\, but as a powerful tool that multiplies your team's capabilities and 
+ impact. Drawing from real-world experience leading AI transformation initi
+ atives across healthcare\, insurance\, financial services\, and manufactur
+ ing\, Aaron will share actionable tips and proven techniques that you can 
+ implement immediately. Whether you're just beginning to explore AI applica
+ tions or actively managing transformation projects\, you'll walk away with
+  concrete strategies to integrate AI thoughtfully into your workflows whil
+ e keeping people at the center of your approach. Learn how organizations a
+ re achieving dramatic productivity gains and uncovering hidden opportuniti
+ es through strategic AI adoption—and how you can apply these same princi
+ ples in your own context. About the Presenter: Aaron Matthews\, MBA\, PMP\
+ , is a Fractional Executive (CTO/COO/Program Leader) and Founder of Value 
+ Alignment Consulting LLC\, based in West Des Moines\, Iowa. With over 21 y
+ ears of leadership experience spanning healthcare IT\, insurance technolog
+ y\, financial services\, SaaS\, and AI implementation\, Aaron helps organi
+ zations navigate digital transformation while keeping people—not just te
+ chnology—at the center of the strategy. Aaron currently leads complex pr
+ ojects including AI transformation initiatives at Hexion\, a 150-year-old 
+ chemical company undergoing major modernization backed by significant priv
+ ate equity investment. He manages the full portfolio of internal AI projec
+ ts\, bridging enterprise program management with emerging AI strategy at s
+ cale. Prior to his current work\, Aaron spent 17 years in healthcare IT\, 
+ including roles at Cerner Corporation and Munson Healthcare\, where he reb
+ uilt PMOs\, implemented governance frameworks\, and delivered measurable r
+ esults—from a 96% increase in developer throughput to discovering over $
+ 1.2M in operational savings. He also served as Technical Program Manager a
+ t Overjet.ai\, an AI-driven dental claims processing company\, giving him 
+ early\, hands-on experience with enterprise AI before the current wave. Aa
+ ron's leadership philosophy is rooted in servant leadership\, LEAN princip
+ les\, and a deep belief in the infinite potential of every person. His mis
+ sion: use technology as a force multiplier for human capability - not a re
+ placement for it.  
+DTEND:20260219T183000Z
+DTSTAMP:20261012T134428Z
+DTSTART:20260219T173000Z
+SEQUENCE:1
+SUMMARY:AI Tips & Tricks - Using AI as a Force Multiplier
+UID:88537ebb-bcea-4f8c-97c8-15392fc255e2
+X-ALT-DESC;FMTTYPE=text/html:<p class="font-claude-response-body break-word
+ s whitespace-normal leading-[1.7]"><strong>Join us for an engaging session
+  with Aaron Matthews as he shares practical strategies for leveraging AI t
+ o amplify human potential and drive meaningful results in your organizatio
+ n.</strong></p>\n\n<p class="font-claude-response-body break-words whitesp
+ ace-normal leading-[1.7]">In this interactive presentation\, you'll discov
+ er how to harness AI not as a replacement for human talent\, but as a powe
+ rful tool that multiplies your team's capabilities and impact. Drawing fro
+ m real-world experience leading AI transformation initiatives across healt
+ hcare\, insurance\, financial services\, and manufacturing\, Aaron will sh
+ are actionable tips and proven techniques that you can implement immediate
+ ly.</p>\n\n<p class="font-claude-response-body break-words whitespace-norm
+ al leading-[1.7]">Whether you're just beginning to explore AI applications
+  or actively managing transformation projects\, you'll walk away with conc
+ rete strategies to integrate AI thoughtfully into your workflows while kee
+ ping people at the center of your approach. Learn how organizations are ac
+ hieving dramatic productivity gains and uncovering hidden opportunities th
+ rough strategic AI adoption—and how you can apply these same principles 
+ in your own context.</p>\n\n<div>\n<p class="font-claude-response-body bre
+ ak-words whitespace-normal leading-[1.7]"><strong>About the Presenter:</st
+ rong></p>\n\n<p class="font-claude-response-body break-words whitespace-no
+ rmal leading-[1.7]">Aaron Matthews\, MBA\, PMP\, is a Fractional Executive
+  (CTO/COO/Program Leader) and Founder of Value Alignment Consulting LLC\, 
+ based in West Des Moines\, Iowa. With over 21 years of leadership experien
+ ce spanning healthcare IT\, insurance technology\, financial services\, Sa
+ aS\, and AI implementation\, Aaron helps organizations navigate digital tr
+ ansformation while keeping people—not just technology—at the center of
+  the strategy.</p>\n\n<p class="font-claude-response-body break-words whit
+ espace-normal leading-[1.7]">Aaron currently leads complex projects includ
+ ing AI transformation initiatives at Hexion\, a 150-year-old chemical comp
+ any undergoing major modernization backed by significant private equity in
+ vestment. He manages the full portfolio of internal AI projects\, bridging
+  enterprise program management with emerging AI strategy at scale.</p>\n\n
+ <p class="font-claude-response-body break-words whitespace-normal leading-
+ [1.7]">Prior to his current work\, Aaron spent 17 years in healthcare IT\,
+  including roles at Cerner Corporation and Munson Healthcare\, where he re
+ built PMOs\, implemented governance frameworks\, and delivered measurable 
+ results—from a 96% increase in developer throughput to discovering over 
+ $1.2M in operational savings. He also served as Technical Program Manager 
+ at Overjet.ai\, an AI-driven dental claims processing company\, giving him
+  early\, hands-on experience with enterprise AI before the current wave.</
+ p>\n\n<p class="font-claude-response-body break-words whitespace-normal le
+ ading-[1.7]">Aaron's leadership philosophy is rooted in servant leadership
+ \, LEAN principles\, and a deep belief in the infinite potential of every 
+ person. His mission: use technology as a force multiplier for human capabi
+ lity - not a replacement for it.</p>\n</div>\n
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION: AI as Your BA Partner: Plan Faster. Lead Smarter. Deliver Bett
+ er. AI can bring speed\, structure\, and fresh ideas\, but you bring the e
+ xperience\, judgment\, leadership\, and credibility that move a project fo
+ rward. This session puts the project manager firmly in control and shows h
+ ow AI can strengthen the work without replacing the person behind it. Atte
+ ndees will see practical ways to use AI for project plans\, roadmaps\, bud
+ gets\, risk matrices\, status updates\, stakeholder communication\, and de
+ cision support. The goal is simple: reduce busywork\, improve clarity\, an
+ d help project managers lead with greater confidence and deliver stronger 
+ results. Speaker Bio Angie Weller is a product\, business analysis\, and d
+ elivery leader with more than 15 years of experience turning complex busin
+ ess needs into actionable plans and measurable results. Her background inc
+ ludes Agile leadership\, project and product delivery\, stakeholder alignm
+ ent\, roadmaps\, budgeting\, risk management\, process improvement\, and l
+ arge-scale technology transformation. Angie is actively involved in Centra
+ l Iowa’s business analysis and project management communities and is pas
+ sionate about helping professionals use AI to work smarter while keeping h
+ uman judgment\, personality\, and leadership at the core.   
+DTEND:20260827T180000Z
+DTSTAMP:20261012T134428Z
+DTSTART:20260827T160000Z
+LOCATION:3001 Westown Parkway 3001 Westown Parkway West Des Moines\, IA Uni
+ ted States of America
+SEQUENCE:1
+SUMMARY:AI as Your BA Partner: Plan Faster. Lead Smarter. Deliver Better.
+UID:9879fbf8-5df5-4fcc-86bc-3d5b0d860eec
+X-ALT-DESC;FMTTYPE=text/html:<div><img height="640" src="https://clubrunner
+ .blob.core.windows.net/00000400579/Images/2026_07_27_14_48_391.png" width=
+ "432" /></div>\n\n<div><u><strong>AI as Your BA Partner: Plan Faster. Lead
+  Smarter. Deliver Better.</strong></u></div>\n\n<div>\n<p>AI can bring spe
+ ed\, structure\, and fresh ideas\, but you bring the experience\, judgment
+ \, leadership\, and credibility that move a project forward. This session 
+ puts the project manager firmly in control and shows how AI can strengthen
+  the work without replacing the person behind it.</p>\n\n<p>Attendees will
+  see practical ways to use AI for project plans\, roadmaps\, budgets\, ris
+ k matrices\, status updates\, stakeholder communication\, and decision sup
+ port. The goal is simple: reduce busywork\, improve clarity\, and help pro
+ ject managers lead with greater confidence and deliver stronger results.</
+ p>\n\n<p><strong>Speaker Bio</strong></p>\n\n<p>Angie Weller is a product\
+ , business analysis\, and delivery leader with more than 15 years of exper
+ ience turning complex business needs into actionable plans and measurable 
+ results. Her background includes Agile leadership\, project and product de
+ livery\, stakeholder alignment\, roadmaps\, budgeting\, risk management\, 
+ process improvement\, and large-scale technology transformation.</p>\n\n<p
+ >Angie is actively involved in Central Iowa’s business analysis and proj
+ ect management communities and is passionate about helping professionals u
+ se AI to work smarter while keeping human judgment\, personality\, and lea
+ dership at the core.&nbsp\;</p>\n</div>\n
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:🎃 Trick or treat\, Des Moines Analysts! Central Iowa IIBA 
+ and PMI Central Iowa will be at Trunk or Treat trunk handing out candy. 
+ 📅 Thursday\, October 22 | 5:00 to 6:00 p.m. 📍 Genesis Health Clu
+ b\, 4875 Mills Civic Pkwy\, West Des Moines Expect a live DJ\, mini-games\
+ , and treats from local trunk-decorating pros. It's a family-friendly nigh
+ t\, and no registration is needed. Just show up! Come find our trunk\, say
+  hello\, and meet fellow members of our Central Iowa business analysis com
+ munity. Costumes encouraged. Bring the family and a friend who might enjoy
+  meeting us. Event details: https://lnkd.in/gcAqJHA2 
+DTEND:20261023T010000Z
+DTSTAMP:20261012T134428Z
+DTSTART:20261022T220000Z
+LOCATION:4875 Mills Civic Parkway 4875 Mills Civic Parkway West Des Moines\
+ , IA United States of America
+SEQUENCE:1
+SUMMARY:IIBA Trunk or Treat
+UID:4015ea6b-10a3-436a-8d9f-5ebdc822aa32
+X-ALT-DESC;FMTTYPE=text/html:<div>🎃 Trick or treat\, Des Moines Analys
+ ts!<br />\n<br />\nCentral Iowa IIBA and PMI Central Iowa will be at Trunk
+  or Treat trunk handing out candy.<br />\n<br />\n📅 Thursday\, Octobe
+ r 22 | 5:00 to 6:00 p.m.<br />\n📍 Genesis Health Club\, 4875 Mills Ci
+ vic Pkwy\, West Des Moines<br />\n<br />\nExpect a live DJ\, mini-games\, 
+ and treats from local trunk-decorating pros. It's a family-friendly night\
+ , and no registration is needed. Just show up!<br />\n<br />\nCome find ou
+ r trunk\, say hello\, and meet fellow members of our Central Iowa business
+  analysis community. Costumes encouraged. Bring the family and a friend wh
+ o might enjoy meeting us.<br />\n<br />\nEvent details: <a aria-label="Ope
+ n https://lnkd.in/gcAqJHA2" href="https://www.linkedin.com/safety/go/?url=
+ https%3A%2F%2Flnkd%2Ein%2FgcAqJHA2&amp\;urlhash=xWTl&amp\;mt=p2cMwxl_V3KNC
+ KuIHaUKtyQeF3xVsX3f-uoQ6A_ml9UjBlR4OPghz-LkHNDIAURX36amqhuGGJwNbyK0wPwW1B9
+ ZmM9tXd97p9X2DQ_4xqlmVt9GQlK7Usj_&amp\;isSdui=true" target="_blank"><stron
+ g>https://lnkd.in/gcAqJHA2</strong></a></div>\n
+END:VEVENT
+END:VCALENDAR

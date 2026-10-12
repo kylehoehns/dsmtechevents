@@ -10,8 +10,9 @@ developer changing the site.
 (software, data, security, product, design, hardware and so on), open to
 anyone, in the Des Moines area or online and run by a local group. Local
 chapters of associations for people who work in tech count too: project
-management, business analysis, data management, security. No members-only
-or invite-only events.
+management, business analysis, data management, security. Paid or free is
+fine (the price is on the group's page); members-only or invite-only events
+are not.
 
 **How to ask**, whichever is easier:
 

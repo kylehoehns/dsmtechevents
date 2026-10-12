@@ -3,7 +3,7 @@
 // Times are local. The endpoint has no venue or description, so each event's
 // own page (/calendar?eventId=…) is read for its write-up and Location box.
 import { localToUtc } from '../../src/lib/time.mjs';
-import { toText } from './html.mjs';
+import { toText, richText } from './html.mjs';
 
 export default async function pmiChapter(group, { get }) {
   const origin = new URL(group.website).origin;
@@ -41,14 +41,8 @@ function readEventPage(html, url) {
   const box = /data-label="location"[^>]*>([\s\S]*?)<\/div>/.exec(html)?.[1];
   if (box == null) throw new Error(`no Location box on ${url}`);
 
-  const description = toText(body
-    .replace(/<img[^>]*>/gi, '')
-    .replace(/<br[^>]*>/gi, '<br>') // toText only breaks lines at a bare <br>; the editor adds styles
-    .replace(/<strong>([^<]*\S[^<]*)<\/strong>/gi, '**$1**')
-    .replace(/<hr\s*\/?>|<\/(p|div|h\d|li)>/gi, '$&\n\n'))
-    // "📅 Date: Tuesday, October 27, 2026" repeats the card's own date.
-    .split('\n').filter((line) => !/^\W*Date:/i.test(line)).join('\n')
-    .replace(/\n{3,}/g, '\n\n').trim();
+  // "📅 Date: Tuesday, October 27, 2026" repeats the card's own date.
+  const description = richText(body).split('\n').filter((line) => !/^\W*Date:/i.test(line)).join('\n').replace(/\n{3,}/g, '\n\n');
 
   const venue = toText(/<p class="h5 ">([\s\S]*?)<\/p>/.exec(box)?.[1] ?? '') || null;
   // "2816 Beaver Avenue<br>Des Moines, Iowa, 50310" → "2816 Beaver Avenue, Des Moines, IA 50310"

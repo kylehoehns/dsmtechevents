@@ -32,6 +32,7 @@ suggested isn't evidence people want it; what reopens one is listed below.
 | Per-event pages | The group's own page is the event page. | Not planned |
 | Accounts, sign-ups, notifications | No accounts, by design. | Not planned |
 | "Free" labels or "it's all free" | Can't be confirmed for every group. A hand-added event that really is free (Iowa Code Camp) can say so in its own description. | Not planned |
+| An "Association" or "Professional" label on member-run chapters (PMI, IIBA, ISSA) | Weighed when those chapters were added (2026-10-12). It hints at cost without saying it, and the price is on the group's page, which people read before paying. Same reasoning as "Free" labels. | People surprised by ticket pages |
 | Cleaning up or normalizing text scraped from groups | Means hard-coded per-source checks. Gross text stays gross; only tiny generic Markdown rules in `formatDescription`. | Not planned |
 | New groups (West DEV Moines, Salesforce, BSides…) | Owner's call for now. | The owner adding them |
 | Page and tab animations (view transitions) | Built and removed: cross-page ones were uneven, in-page ones swallowed quick clicks. | Not planned |

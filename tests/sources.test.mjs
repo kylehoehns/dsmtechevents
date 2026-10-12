@@ -5,6 +5,8 @@ import secdsm from '../scripts/sources/secdsm.mjs';
 import pmiChapter from '../scripts/sources/pmi-chapter.mjs';
 import taiTechbrew from '../scripts/sources/tai-techbrew.mjs';
 import iowansOfThings from '../scripts/sources/iowans-of-things.mjs';
+import iibaChapter from '../scripts/sources/iiba-chapter.mjs';
+import issaChapter from '../scripts/sources/issa-chapter.mjs';
 import { decode, toText, httpUrl, safeLinks, checkTimes } from '../scripts/sources/html.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
@@ -76,6 +78,103 @@ test('pmi-chapter allows an empty Location box', async () => {
 test('pmi-chapter fails loudly when the event page changes', async () => {
   await assert.rejects(pmiChapter(PMI, pmiSite(fixture('pmi-event.html').replace('editable-text-inner', 'rich-text'))), /no event text/);
   await assert.rejects(pmiChapter(PMI, pmiSite(fixture('pmi-event.html').replace('data-label="location"', 'data-label="where"'))), /no Location box/);
+});
+
+// The IIBA feed fixture holds five events: "Test" and the Annual General
+// Meeting (January, skipped), AI Tips (February, no location), AI as Your BA
+// Partner (August, with a location) and Trunk or Treat (October 22, upcoming).
+const IIBA = { id: 'iiba', website: 'https://centraliowa.iiba.org/' };
+const iibaSite = (pages = {}) => ({
+  now: Date.parse('2026-10-12T12:00:00Z'),
+  since: Date.parse('2026-01-01T00:00:00Z'),
+  get: async (url) => pages[url] ?? {
+    'https://centraliowa.iiba.org/calendar-feed': fixture('iiba-feed.ics'),
+    'https://centraliowa.iiba.org/Events': fixture('iiba-events.html'),
+    'https://centraliowa.iiba.org/Events/iiba-trunk-or-treat': fixture('iiba-event.html'),
+  }[url] ?? assert.fail(`unexpected fetch ${url}`),
+});
+
+test('iiba-chapter reads the feed, with link and venue for upcoming events from their pages', async () => {
+  const events = await iibaChapter(IIBA, iibaSite());
+  assert.deepEqual(events.map((e) => e.title), ['AI Tips & Tricks - Using AI as a Force Multiplier', 'AI as Your BA Partner: Plan Faster. Lead Smarter. Deliver Better.', 'IIBA Trunk or Treat']);
+  const [tips, partner, trunk] = events;
+  const { description, ...rest } = trunk;
+  assert.deepEqual(rest, {
+    id: 'iiba-4015ea6b-10a3-436a-8d9f-5ebdc822aa32', sourceId: '4015ea6b-10a3-436a-8d9f-5ebdc822aa32',
+    title: 'IIBA Trunk or Treat', start: '2026-10-22T22:00:00.000Z', end: '2026-10-23T01:00:00.000Z', allDay: false,
+    url: 'https://centraliowa.iiba.org/Events/iiba-trunk-or-treat',
+    venue: 'Genesis Health Clubs', address: '4875 Mills Civic Parkway, West Des Moines, IA',
+  });
+  // Past events have no link on the Events page: the street from the feed stands in for a venue.
+  assert.equal(partner.url, 'https://centraliowa.iiba.org/Events');
+  assert.deepEqual([partner.venue, partner.address], ['3001 Westown Parkway', 'West Des Moines, IA']);
+  assert.deepEqual([tips.venue, tips.address], [null, null]);
+});
+
+test('iiba-chapter drops the lines the card already shows from the write-up', async () => {
+  const [, partner, trunk] = await iibaChapter(IIBA, iibaSite());
+  assert.match(trunk.description, /^🎃 Trick or treat, Des Moines Analysts!\n\n/);
+  assert.doesNotMatch(trunk.description, /📅|📍/);
+  assert.match(partner.description, /^AI can bring speed/, 'the bold title at the top is dropped');
+  assert.match(partner.description, /\n\n\*\*Speaker Bio\*\*\n\n/);
+  assert.doesNotMatch(partner.description, /<|&nbsp/);
+});
+
+test('iiba-chapter fails loudly when the feed or pages change', async () => {
+  await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/calendar-feed': '<html>Just a moment...</html>' })), /did not return a calendar/);
+  await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/calendar-feed': 'BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n' })), /has no events/);
+  await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/Events': fixture('iiba-events.html').replaceAll('EAS-Name', 'EAS-Title') })), /no events listed/);
+  await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/Events/iiba-trunk-or-treat': fixture('iiba-event.html').replace('>Where<', '>Location<') })), /no Where box/);
+  const oddLocation = fixture('iiba-feed.ics').replace('3001 Westown Parkway 3001 Westown Parkway', '3001 Westown Parkway');
+  await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/calendar-feed': oddLocation })), /unexpected location/);
+});
+
+// The ISSA list fixture holds three posts: the September meeting, a "Coming
+// Soon" announcement with no date, and the April meeting (served here as the
+// September page with its date and place changed).
+const ISSA = { id: 'issa', website: 'https://issadesmoines.org/' };
+const issaPage = (url) => `https://issadesmoines.org/events/${url}/`;
+const issaApril = fixture('issa-event.html')
+  .replace('September 29, 2026 11:30 am', 'April 21, 2026 11:30 am')
+  .replace(/<p><strong>Principal[^<]*<\/strong><\/p>/, '<p><strong>Apex Systems</strong></p>');
+const issaSite = (pages = {}) => ({
+  now: Date.parse('2026-10-12T12:00:00Z'),
+  since: Date.parse('2026-01-01T00:00:00Z'),
+  get: async (url) => pages[url] ?? {
+    'https://issadesmoines.org/events/': fixture('issa-events.html'),
+    [issaPage('september-quarterly-issa-meeting')]: fixture('issa-event.html'),
+    [issaPage('coming-soon-information-about-a-fall-event')]: fixture('issa-event-coming-soon.html'),
+    [issaPage('april-issa-des-moines-chapter-meeting')]: issaApril,
+  }[url] ?? assert.fail(`unexpected fetch ${url}`),
+});
+
+test('issa-chapter reads each listed meeting page, skipping posts with no date yet', async () => {
+  const [sept, april, ...more] = await issaChapter(ISSA, issaSite());
+  assert.equal(more.length, 0);
+  const { description, ...rest } = sept;
+  assert.deepEqual(rest, {
+    id: 'issa-september-quarterly-issa-meeting', sourceId: 'september-quarterly-issa-meeting',
+    title: 'September Quarterly ISSA Meeting', start: '2026-09-29T16:30:00.000Z', end: '2026-09-29T18:00:00.000Z', allDay: false,
+    url: issaPage('september-quarterly-issa-meeting'),
+    venue: 'Principal Financial Group', address: '750 Park Street, Des Moines IA 50309',
+  });
+  assert.match(description, /^\*\*Presenting:\*\* Lucy Berry & Kaylee Fletcher \(DEFCON Talk\)/);
+  assert.match(description, /\n\nWhat:\s+Free lunch/);
+  assert.doesNotMatch(description, /Where:|-->|September 29/, 'no venue line repeated, nothing from the commented-out markup');
+  assert.deepEqual([april.venue, april.address], ['Apex Systems', null], 'a place with no street is a name alone');
+});
+
+test('issa-chapter skips meetings before the cutoff', async () => {
+  const events = await issaChapter(ISSA, { ...issaSite(), since: Date.parse('2026-06-01T00:00:00Z') });
+  assert.deepEqual(events.map((e) => e.sourceId), ['september-quarterly-issa-meeting']);
+});
+
+test('issa-chapter fails loudly when the pages change', async () => {
+  await assert.rejects(issaChapter(ISSA, issaSite({ 'https://issadesmoines.org/events/': '<html>redesigned</html>' })), /no events listed/);
+  const noHeading = fixture('issa-event.html').replace('<h2>September', '<h3>September').replace('am</h2>', 'am</h3>');
+  await assert.rejects(issaChapter(ISSA, issaSite({ [issaPage('september-quarterly-issa-meeting')]: noHeading })), /no date heading/);
+  const oddDate = fixture('issa-event.html').replace('September 29, 2026 11:30 am', '9/29/2026 11:30');
+  await assert.rejects(issaChapter(ISSA, issaSite({ [issaPage('september-quarterly-issa-meeting')]: oddDate })), /unreadable date/);
 });
 
 // The feed fixture holds four TechBrews (Sept–Dec 2026) and one CIO

@@ -66,6 +66,16 @@
   "description": "Pella Corporation has embraced the power of AI to transform how teams work. Their rollout of Microsoft 365 Copilot has been a game-changer, delivering both exceptional adoption and measurable business impact. Today, over 95% of licensed users actively engage with Copilot each month, and more than 75% return weekly. These results place Pella among the top 5–10% of companies leveraging Copilot, according to Microsoft benchmarks. Do you want to know how they did it? Come join us to find out how Pella starts with a people-first approach to AI based on the belief that AI should empower teams to"
  },
  {
+  "id": "issa-2026-holiday-event-in-partnership-with-devopsdsm-and-infragard-iowa",
+  "group": "issa",
+  "title": "2026 Holiday Event – In partnership with DevOpsDSM and InfraGard Iowa",
+  "start": "2026-01-30T00:00:00.000Z",
+  "end": "2026-01-30T01:30:00.000Z",
+  "venue": "Smash Park",
+  "url": "https://issadesmoines.org/events/2026-holiday-event-in-partnership-with-devopsdsm-and-infragard-iowa/",
+  "description": "Presenting: ISSA, DevOpsDSM and InfraGard Iowa A night full of fun and friends! We have reserved the upstairs meeting room for food, drinks and games. Games include axe throwing, shuffleboard, and many others! We are having an ugly sweater contest – who in our community has the best ugliest sweater?? No cost to attend – however we are supporting the Food Bank of Iowa, so please consider brining a non-perishable food item (or items) to help minimize food insecurity that happens right after the holidays and shelves are empty. We are grateful for our sponsors: Ahead, Optiv, Palmer Group, Sonrai"
+ },
+ {
   "id": "iadnug-313058429",
   "group": "iadnug",
   "title": "Hybrid .NET@Noon: Practical AI Tooling Tips For The Too Busy Developer",
@@ -130,6 +140,16 @@
   "going": 33,
   "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239035/",
   "description": "Multi-agent architectures are rapidly reshaping how agentic AI systems work. When data moves between agents, there is an implicit trust established. We’ll explore what that means, what trust actually looks like in multi-agent architectures, and how we can lean on decades of security research and best practices to mitigate potential issues that stem from that implicit trust. Join us for the next AI Group! 5:30 - 6:00 - Socializing/Networking 6:00 - Speaker begins"
+ },
+ {
+  "id": "iiba-88537ebb-bcea-4f8c-97c8-15392fc255e2",
+  "group": "iiba",
+  "title": "AI Tips & Tricks - Using AI as a Force Multiplier",
+  "start": "2026-02-19T17:30:00.000Z",
+  "end": "2026-02-19T18:30:00.000Z",
+  "venue": null,
+  "url": "https://centraliowa.iiba.org/Events",
+  "description": "Join us for an engaging session with Aaron Matthews as he shares practical strategies for leveraging AI to amplify human potential and drive meaningful results in your organization. In this interactive presentation, you'll discover how to harness AI not as a replacement for human talent, but as a powerful tool that multiplies your team's capabilities and impact. Drawing from real-world experience leading AI transformation initiatives across healthcare, insurance, financial services, and manufacturing, Aaron will share actionable tips and proven techniques that you can implement immediately."
  },
  {
   "id": "pyowa-313174348",
@@ -209,6 +229,16 @@
   "description": "Hi everyone, Sorry for the late notice. For this month we're going to be partnering with a talk at the virtual Microsoft reactor you can register for the reactor meetup page here https://www.meetup.com/microsoft-reactor-redmond/events/313286176 or the event itself here https://developer.microsoft.com/en-us/reactor/events/26826. If you have seen me give this talk before there will be some added demo content like RAG on your local machine and maybe even a MCP server? Still TBD on the MCP server calls, but check it out and we'll see you next month! What if you could build modern AI features"
  },
  {
+  "id": "issa-dmacc-issa-spring-it-career-panel",
+  "group": "issa",
+  "title": "DMACC ISSA Spring IT Career Panel",
+  "start": "2026-03-30T16:00:00.000Z",
+  "end": "2026-03-30T17:30:00.000Z",
+  "venue": "DMACC, Ankeny Campus Building 5 Room 1240",
+  "url": "https://issadesmoines.org/events/dmacc-issa-spring-it-career-panel/",
+  "description": "Presenting: Panel Chat with Lunch https://www.dmacc.edu/events-calendar/index.html#event-details/98ebf4c9-eadf-4621-9587-18bfa457c9d6 Come join ISSA at DMACC as we share IT hiring and career information with DMACC IT students! Curious minds want to know….what’s your biggest challenges and what do you look for in prospective employees? Pizza lunch is provided and the students are very appreciative of the opportunity to network with IT professionals! No registration required, just show up!"
+ },
+ {
   "id": "mobile-313728985",
   "group": "mobile",
   "title": "Mobile Engineering Meetup",
@@ -240,6 +270,16 @@
   "going": 21,
   "url": "https://www.meetup.com/des-moines-web-geeks/events/311473701/",
   "description": "The Power of Common Knowledge: Why Teams Break When Information Isn’t Shared We often assume that sharing information is enough to keep teams aligned. In reality, successful collaboration depends on something deeper: common knowledge. This happens when everyone knows something, and knows that everyone else knows it too. In this presentation, Mackenzie Ostrem will explore how a lack of shared understanding leads to misalignment, slow decisions, and broken trust in software teams. Drawing on ideas from cognitive scientist Steven Pinker, she will examine why coordination fails when information"
+ },
+ {
+  "id": "issa-april-issa-des-moines-chapter-meeting",
+  "group": "issa",
+  "title": "April ISSA Des Moines Chapter Meeting",
+  "start": "2026-04-21T16:30:00.000Z",
+  "end": "2026-04-21T18:00:00.000Z",
+  "venue": "Principal Financial Group",
+  "url": "https://issadesmoines.org/events/april-issa-des-moines-chapter-meeting/",
+  "description": "Presenting: Jacob Henry - What Does It Look Like to Rob a Bank Hey there! Don’t miss out on our in-person gathering this April. It’s a fantastic chance to connect, learn, and share with fellow ISSA enthusiasts. Whether you’re a newbie or a seasoned pro, there’s something for everyone. Jacob Henry is going to give a talk on his work as a Red Teamer. What does it actually look like to rob a bank, legally? In this talk, Jacob Henry, a penetration tester at Tenax Solutions, walks through a real physical penetration test from start to finish. He covers how entry is gained, what tools and"
  },
  {
   "id": "producttank-313733522",
@@ -284,6 +324,15 @@
   "going": 26,
   "url": "https://www.meetup.com/devopsdsm/events/314055212/",
   "description": "Join us on Wednesday, April 22nd from 6-7pm for our next DevOpsDSM meetup featuring Casey Howard from Torq, presenting “Serve, Protect, Automate: Building Better AI Agents with RoboCops Prime Directives.” This session will share practical, real-world insights into AI driven security automation agents and what they mean for the future of the SOC. Casey will explore how teams can use automation and AI to improve detection, response, and overall security outcomes in modern environments. If you are interested in DevOps, security, or the growing role of AI in operations, this session will offer"
+ },
+ {
+  "id": "iiba-ea545a86-8971-41a6-9def-569cd226e135",
+  "group": "iiba",
+  "title": "Intelligent Delivery: The Next Era of Strategy & Analysis with AI",
+  "start": "2026-04-24T12:30:00.000Z",
+  "end": "2026-04-24T21:30:00.000Z",
+  "venue": "205 South 64th Street",
+  "url": "https://centraliowa.iiba.org/Events"
  },
  {
   "id": "dsmdata-314214648",
@@ -451,6 +500,15 @@
   "description": "You did discovery. You validated the problem. You wrote beautiful user stories, hit the deadline, and shipped something you’re proud of. But users don’t care about what you shipped, they care about what it does for them. Real magic happens when a product reaches the right people, solves the right problems, and becomes part of their lives. The hard truth is that shipping a product and building something people will actually adopt are two very different problems. Both require the same rigor, curiosity, and user obsession, but most product teams are built to launch. This talk is about the gap"
  },
  {
+  "id": "iiba-e4b04f0f-e52e-4e1f-97da-d99c1b94326d",
+  "group": "iiba",
+  "title": "IIBA Central Iowa 20th Year Celebration",
+  "start": "2026-06-19T23:00:00.000Z",
+  "end": "2026-06-20T02:30:00.000Z",
+  "venue": "1 Line Drive",
+  "url": "https://centraliowa.iiba.org/Events"
+ },
+ {
   "id": "pyowa-315056917",
   "group": "pyowa",
   "title": "Tic-Tac-Toe Coding Competition",
@@ -605,6 +663,15 @@
   "description": "How do you turn noisy, inconsistent public health data into something genuinely informative? Aaron Hall with Source Allies walks us through the development of Sick Risk, a system that computes illness risk scores by zip code using CDC wastewater surveillance data. He will focus on extracting a stable, interpretable signal from messy real-world data, and the tradeoffs involved in doing so. Along the way, he will explore the Python-based, cloud-hosted architecture behind the application. Finally, he taks a look at how modern AI coding assistants accelerated development, without drifting into"
  },
  {
+  "id": "iiba-a7d77fec-a49d-4b20-b264-76e5956205e6",
+  "group": "iiba",
+  "title": "Exile Brewing Trivia Night with IIBA",
+  "start": "2026-07-30T23:00:00.000Z",
+  "end": "2026-07-31T01:00:00.000Z",
+  "venue": "1514 Walnut Street",
+  "url": "https://centraliowa.iiba.org/Events"
+ },
+ {
   "id": "webgeeks-312416822",
   "group": "webgeeks",
   "title": "Coding Dojo",
@@ -679,6 +746,16 @@
   "going": 17,
   "url": "https://www.meetup.com/devopsdsm/events/315859296/",
   "description": "Launching a SaaS product takes much more than writing great code. Before customers can sign up, there are business, financial, security, and infrastructure decisions that all have to happen in the right order. Miss a dependency, and you can lose days untangling problems that could have been avoided. Join us on Tuesday, August 26th, as Travis Smith presents \"The SaaS Startup Dependency Graph.\" Travis will walk through the real sequence of tasks involved in launching a SaaS business, from forming an LLC and obtaining an EIN to setting up banking, cloud identity, payment processing, and a secure"
+ },
+ {
+  "id": "iiba-9879fbf8-5df5-4fcc-86bc-3d5b0d860eec",
+  "group": "iiba",
+  "title": "AI as Your BA Partner: Plan Faster. Lead Smarter. Deliver Better.",
+  "start": "2026-08-27T16:00:00.000Z",
+  "end": "2026-08-27T18:00:00.000Z",
+  "venue": "3001 Westown Parkway",
+  "url": "https://centraliowa.iiba.org/Events",
+  "description": "AI can bring speed, structure, and fresh ideas, but you bring the experience, judgment, leadership, and credibility that move a project forward. This session puts the project manager firmly in control and shows how AI can strengthen the work without replacing the person behind it. Attendees will see practical ways to use AI for project plans, roadmaps, budgets, risk matrices, status updates, stakeholder communication, and decision support. The goal is simple: reduce busywork, improve clarity, and help project managers lead with greater confidence and deliver stronger results. Speaker Bio"
  },
  {
   "id": "iadnug-316281444",
@@ -788,6 +865,16 @@
   "going": 10,
   "url": "https://www.meetup.com/devopsdsm/events/316404457/",
   "description": "SaltStack: Configuration Management From Cloud Images to Developer Desktops Configuration management doesn’t stop at servers. On Wednesday, September 23rd, DevOpsDSM welcomes John Lengeling from Source Allies for a look at how SaltStack can provide a consistent approach to configuration across cloud infrastructure, servers, and developer workstations. John will explore SaltStack’s architecture and how it can be used to build Azure images and AWS AMIs, manage server configurations, and provision developer desktops. He’ll also discuss how Infrastructure as Code and configuration automation can"
+ },
+ {
+  "id": "issa-september-quarterly-issa-meeting",
+  "group": "issa",
+  "title": "September Quarterly ISSA Meeting",
+  "start": "2026-09-29T16:30:00.000Z",
+  "end": "2026-09-29T18:00:00.000Z",
+  "venue": "Principal Financial Group",
+  "url": "https://issadesmoines.org/events/september-quarterly-issa-meeting/",
+  "description": "Presenting: Lucy Berry & Kaylee Fletcher (DEFCON Talk) | Andrew Leef (Why the model you use, has little effect on the outcome - AI) What: Free lunch and networking with your peers! Why: If you’re interested in hearing more about AI, please come join us for AI topics….more to share soon! Sign up early! Don’t forget, by attending ISSA meetings you can earn free CEU credits! Also, parking is free if you register by September 23rd,"
  },
  {
   "id": "techbrew-techbrew-october-2026",
