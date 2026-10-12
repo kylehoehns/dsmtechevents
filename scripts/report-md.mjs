@@ -5,14 +5,14 @@
 
 export const num = (n) => n.toLocaleString('en-US');
 
-export const table = (head, rows) => [`| ${head.join(' | ')} |`, `|${head.map((_, i) => (i ? '---:' : '---')).join('|')}|`, ...rows.map((r) => `| ${r.join(' | ')} |`)].join('\n');
+// The first column and the bar columns (empty header) are left-aligned so
+// the bars all start at the same edge; the numbers are right-aligned.
+export const table = (head, rows) => [`| ${head.join(' | ')} |`, `|${head.map((h, i) => (i && h ? '---:' : '---')).join('|')}|`, ...rows.map((r) => `| ${r.join(' | ')} |`)].join('\n');
 
-// "████░░░░░░": n as a share of max, 10 blocks wide. Anything above 0 gets
-// at least one block, so a small number doesn't look like none.
-export const bar = (n, max, width = 10) => {
-  const full = n > 0 ? Math.max(1, Math.round((n / max) * width)) : 0;
-  return '█'.repeat(full) + '░'.repeat(width - full);
-};
+// "████": n as a share of max, out of 10 blocks. Anything above 0 gets at
+// least one block, so a small number doesn't look like none. No "░" padding:
+// GitHub's font draws it narrower than "█", so padded bars come out ragged.
+export const bar = (n, max, width = 10) => '█'.repeat(n > 0 ? Math.max(1, Math.round((n / max) * width)) : 0);
 
 // "▁▃█▅": one block per value, scaled to the biggest.
 export const spark = (values) => {

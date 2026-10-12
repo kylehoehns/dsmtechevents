@@ -6,9 +6,9 @@ import { bar, spark, trend } from '../scripts/report-md.mjs';
 const day = (key, visits, views) => ({ key, visits, views });
 
 test('text charts: bars, sparklines and week-over-week arrows', () => {
-  assert.equal(bar(3, 10), '███░░░░░░░');
-  assert.equal(bar(0, 0), '░░░░░░░░░░');
-  assert.equal(bar(1, 100), '█░░░░░░░░░');
+  assert.equal(bar(3, 10), '███');
+  assert.equal(bar(0, 0), '');
+  assert.equal(bar(1, 100), '█');
   assert.equal(spark([0, 7, 14]), '▁▅█');
   assert.equal(spark([0, 0]), '▁▁');
   assert.equal(trend(118, 100), '▲ 18%');
@@ -45,7 +45,7 @@ test('the click report names groups and events, totals the weeks and folds the l
   );
   assert.match(md, /\*\*4\*\* clicks in the last 7 days \(▲ 100%\), \*\*13\*\* in the last 30/);
   assert.match(md, /\| Pyowa \| 4 \| 10 \| ██████████ \|/);
-  assert.match(md, /\| No group \(conference \/ community event\) \| 0 \| 3 \| ███░░░░░░░ \|/);
+  assert.match(md, /\| No group \(conference \/ community event\) \| 0 \| 3 \| ███ \|/);
   assert.match(md, /<summary><b>Listings people clicked through to, last 30 days<\/b>: top is Python Office Hours, 6<\/summary>\n\n/);
   assert.match(md, /\| Python Office Hours \| 6 \|/);
   assert.match(md, /\| RSVP button \| 9 \| ██████████ \|/);
@@ -67,11 +67,11 @@ test('the traffic part folds the days, draws shares and calls blank referrers di
   });
   assert.match(md, /<summary>Visits per day \(UTC days\): busiest 2026-10-08, 30 visits<\/summary>/);
   assert.match(md, /\| 2026-10-08 \| 30 \| 60 \|\n\| 2026-10-07 \| 0 \| 0 \|\n\| 2026-10-06 \| 10 \| 20 \|/);
-  assert.match(md, /\| direct \| 30 \| ████████░░ 75% \|/);
-  assert.match(md, /\| www\.google\.com \| 10 \| ███░░░░░░░ 25% \|/);
-  assert.match(md, /\| mobile \| 30 \| ████████░░ 75% \|/);
+  assert.match(md, /\| direct \| 30 \| 75% \| ████████ \|/);
+  assert.match(md, /\| www\.google\.com \| 10 \| 25% \| ███ \|/);
+  assert.match(md, /\| mobile \| 30 \| 75% \| ████████ \|/);
   assert.match(md, /\| `\/` \| 1,070 \| ██████████ \| 40 \|/);
-  assert.match(md, /\| `\/groups\/` \| 535 \| █████░░░░░ \| 5 \|/);
+  assert.match(md, /\| `\/groups\/` \| 535 \| █████ \| 5 \|/);
 });
 
 test('weeks of traffic add up into one row per key, in the order asked for', () => {
