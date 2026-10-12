@@ -1,9 +1,11 @@
 // IIBA chapter sites (e.g. centraliowa.iiba.org) run on MemberNova, which
 // publishes every event, past and upcoming, as an iCal feed at /calendar-feed.
 // The feed has no event links and writes the location as "street street
-// City, IA Country", so each upcoming event is matched by title to its link on
-// the Events page, and its own page gives the venue name and address.
-// Past events (for Recently) keep the street from the feed.
+// City, IA Country". Each event's page is at /events/<slug>/, the slug made
+// from the title; a guess counts only if the page's title matches. A miss
+// falls back to the Events page (it lists the next six months), and the page
+// found gives the venue name and address. Otherwise the street from the feed
+// stands in.
 import { toText, richText } from './html.mjs';
 import { calendarEvents, times } from './ical.mjs';
 
@@ -17,21 +19,29 @@ export default async function iibaChapter(group, { get, now = Date.now(), since 
   if (!all.length) throw new Error('IIBA calendar feed has no events');
   const wanted = all.filter((e) => e.status !== 'CANCELLED' && (e.end ?? e.start).getTime() >= since && !SKIP.test(e.summary.trim()));
 
-  // The Events page lists the next six months: title → /Events/<slug>.
+  // Title → /Events/<slug> from the Events page, read only when a guess misses.
   let links = null;
-  if (wanted.some((e) => e.end.getTime() >= now)) {
-    const page = await get(`${origin}/Events`);
-    links = new Map([...page.matchAll(/class="EAS-Name">\s*<a href="[^"]*\/Events\/([^"/?#]+)">([^<]+)<\/a>/g)]
-      .map(([, slug, title]) => [toText(title), `${origin}/Events/${slug}`]));
-    if (!links.size) throw new Error(`no events listed on ${origin}/Events`);
-  }
+  const listed = async (title) => {
+    if (!links) {
+      const page = await get(`${origin}/Events`);
+      links = new Map([...page.matchAll(/class="EAS-Name">\s*<a href="[^"]*\/Events\/([^"/?#]+)">([^<]+)<\/a>/g)]
+        .map(([, slug, t]) => [toText(t), `${origin}/Events/${slug}`]));
+      if (!links.size) throw new Error(`no events listed on ${origin}/Events`);
+    }
+    return links.get(title) ?? null;
+  };
 
   const events = [];
   for (const e of wanted) {
     const title = e.summary.trim();
-    const url = links?.get(title) ?? null;
     const fromFeed = feedLocation(e.location);
-    const place = url ? readEventPage(await get(url), url, fromFeed) : fromFeed;
+    // "AI as Your BA Partner: Plan Faster. Lead Smarter." → ai-as-your-ba-partner-plan-faster.-lead-smarter.
+    const guess = `${origin}/events/${title.toLowerCase().replace(/[^a-z0-9. -]/g, '').trim().replace(/[ -]+/g, '-')}/`;
+    let url = null;
+    let html = await get(guess).catch(() => null);
+    if (html && toText(/<meta property="og:title" content="([^"]*)"/.exec(html)?.[1] ?? '') === title) url = guess;
+    else if (e.end.getTime() >= now && (url = await listed(title))) html = await get(url);
+    const place = url ? readEventPage(html, url, fromFeed) : fromFeed;
     events.push({
       id: `${group.id}-${e.uid}`,
       sourceId: e.uid,

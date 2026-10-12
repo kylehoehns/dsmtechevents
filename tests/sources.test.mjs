@@ -83,32 +83,60 @@ test('pmi-chapter fails loudly when the event page changes', async () => {
 // The IIBA feed fixture holds five events: "Test" and the Annual General
 // Meeting (January, skipped), AI Tips (February, no location), AI as Your BA
 // Partner (August, with a location) and Trunk or Treat (October 22, upcoming).
+// Event pages are served for Trunk or Treat and BA Partner (the latter made
+// from the Trunk or Treat page); any other URL is a 404.
 const IIBA = { id: 'iiba', website: 'https://centraliowa.iiba.org/' };
+const PARTNER = 'AI as Your BA Partner: Plan Faster. Lead Smarter. Deliver Better.';
+const iibaPage = (slug) => `https://centraliowa.iiba.org/events/${slug}/`;
+const partnerPage = fixture('iiba-event.html')
+  .replace('content="IIBA Trunk or Treat"', `content="${PARTNER}"`)
+  .replace('Genesis Health Clubs', 'QCi')
+  .replace('4875 Mills Civic Parkway', '3001 Westown Parkway');
 const iibaSite = (pages = {}) => ({
   now: Date.parse('2026-10-12T12:00:00Z'),
   since: Date.parse('2026-01-01T00:00:00Z'),
-  get: async (url) => pages[url] ?? {
-    'https://centraliowa.iiba.org/calendar-feed': fixture('iiba-feed.ics'),
-    'https://centraliowa.iiba.org/Events': fixture('iiba-events.html'),
-    'https://centraliowa.iiba.org/Events/iiba-trunk-or-treat': fixture('iiba-event.html'),
-  }[url] ?? assert.fail(`unexpected fetch ${url}`),
+  get: async (url) => {
+    const body = url in pages ? pages[url] : {
+      'https://centraliowa.iiba.org/calendar-feed': fixture('iiba-feed.ics'),
+      'https://centraliowa.iiba.org/Events': fixture('iiba-events.html'),
+      'https://centraliowa.iiba.org/Events/iiba-trunk-or-treat': fixture('iiba-event.html'),
+      [iibaPage('iiba-trunk-or-treat')]: fixture('iiba-event.html'),
+      [iibaPage('ai-as-your-ba-partner-plan-faster.-lead-smarter.-deliver-better.')]: partnerPage,
+    }[url];
+    if (body == null) throw new Error(`404 from ${url}`);
+    return body;
+  },
 });
 
-test('iiba-chapter reads the feed, with link and venue for upcoming events from their pages', async () => {
+test('iiba-chapter reads the feed, with link and venue from each event page', async () => {
   const events = await iibaChapter(IIBA, iibaSite());
-  assert.deepEqual(events.map((e) => e.title), ['AI Tips & Tricks - Using AI as a Force Multiplier', 'AI as Your BA Partner: Plan Faster. Lead Smarter. Deliver Better.', 'IIBA Trunk or Treat']);
+  assert.deepEqual(events.map((e) => e.title), ['AI Tips & Tricks - Using AI as a Force Multiplier', PARTNER, 'IIBA Trunk or Treat']);
   const [tips, partner, trunk] = events;
   const { description, ...rest } = trunk;
   assert.deepEqual(rest, {
     id: 'iiba-4015ea6b-10a3-436a-8d9f-5ebdc822aa32', sourceId: '4015ea6b-10a3-436a-8d9f-5ebdc822aa32',
     title: 'IIBA Trunk or Treat', start: '2026-10-22T22:00:00.000Z', end: '2026-10-23T01:00:00.000Z', allDay: false,
-    url: 'https://centraliowa.iiba.org/Events/iiba-trunk-or-treat',
+    url: iibaPage('iiba-trunk-or-treat'),
     venue: 'Genesis Health Clubs', address: '4875 Mills Civic Parkway, West Des Moines, IA',
   });
-  // Past events have no link on the Events page: the street from the feed stands in for a venue.
+  // The slug keeps the periods from the title.
+  assert.equal(partner.url, iibaPage('ai-as-your-ba-partner-plan-faster.-lead-smarter.-deliver-better.'));
+  assert.deepEqual([partner.venue, partner.address], ['QCi', '3001 Westown Parkway, West Des Moines, IA']);
+  // No page found for a past event: the Events page, and no venue (it has no location).
+  assert.equal(tips.url, 'https://centraliowa.iiba.org/Events');
+  assert.deepEqual([tips.venue, tips.address], [null, null]);
+});
+
+test('iiba-chapter falls back when a guessed page is missing or is a different event', async () => {
+  // A past event with no page keeps the street from the feed as its venue.
+  const [, partner, trunk] = await iibaChapter(IIBA, iibaSite({ [iibaPage('ai-as-your-ba-partner-plan-faster.-lead-smarter.-deliver-better.')]: null }));
   assert.equal(partner.url, 'https://centraliowa.iiba.org/Events');
   assert.deepEqual([partner.venue, partner.address], ['3001 Westown Parkway', 'West Des Moines, IA']);
-  assert.deepEqual([tips.venue, tips.address], [null, null]);
+  // An upcoming event whose guessed page has another title is found on the Events page instead.
+  const other = fixture('iiba-event.html').replace('content="IIBA Trunk or Treat"', 'content="Something Else"');
+  const [, , moved] = await iibaChapter(IIBA, iibaSite({ [iibaPage('iiba-trunk-or-treat')]: other }));
+  assert.equal(moved.url, 'https://centraliowa.iiba.org/Events/iiba-trunk-or-treat');
+  assert.equal(trunk.url, iibaPage('iiba-trunk-or-treat'));
 });
 
 test('iiba-chapter drops the lines the card already shows from the write-up', async () => {
@@ -123,8 +151,9 @@ test('iiba-chapter drops the lines the card already shows from the write-up', as
 test('iiba-chapter fails loudly when the feed or pages change', async () => {
   await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/calendar-feed': '<html>Just a moment...</html>' })), /did not return a calendar/);
   await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/calendar-feed': 'BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n' })), /has no events/);
-  await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/Events': fixture('iiba-events.html').replaceAll('EAS-Name', 'EAS-Title') })), /no events listed/);
-  await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/Events/iiba-trunk-or-treat': fixture('iiba-event.html').replace('>Where<', '>Location<') })), /no Where box/);
+  const noGuess = { [iibaPage('iiba-trunk-or-treat')]: null };
+  await assert.rejects(iibaChapter(IIBA, iibaSite({ ...noGuess, 'https://centraliowa.iiba.org/Events': fixture('iiba-events.html').replaceAll('EAS-Name', 'EAS-Title') })), /no events listed/);
+  await assert.rejects(iibaChapter(IIBA, iibaSite({ [iibaPage('iiba-trunk-or-treat')]: fixture('iiba-event.html').replace('>Where<', '>Location<') })), /no Where box/);
   const oddLocation = fixture('iiba-feed.ics').replace('3001 Westown Parkway 3001 Westown Parkway', '3001 Westown Parkway');
   await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/calendar-feed': oddLocation })), /unexpected location/);
 });

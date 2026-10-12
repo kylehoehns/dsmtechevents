@@ -148,7 +148,7 @@
   "start": "2026-02-19T17:30:00.000Z",
   "end": "2026-02-19T18:30:00.000Z",
   "venue": null,
-  "url": "https://centraliowa.iiba.org/Events",
+  "url": "https://centraliowa.iiba.org/events/ai-tips-tricks-using-ai-as-a-force-multiplier/",
   "description": "Join us for an engaging session with Aaron Matthews as he shares practical strategies for leveraging AI to amplify human potential and drive meaningful results in your organization. In this interactive presentation, you'll discover how to harness AI not as a replacement for human talent, but as a powerful tool that multiplies your team's capabilities and impact. Drawing from real-world experience leading AI transformation initiatives across healthcare, insurance, financial services, and manufacturing, Aaron will share actionable tips and proven techniques that you can implement immediately."
  },
  {
@@ -331,8 +331,8 @@
   "title": "Intelligent Delivery: The Next Era of Strategy & Analysis with AI",
   "start": "2026-04-24T12:30:00.000Z",
   "end": "2026-04-24T21:30:00.000Z",
-  "venue": "205 South 64th Street",
-  "url": "https://centraliowa.iiba.org/Events"
+  "venue": "Hilton Garden Inn",
+  "url": "https://centraliowa.iiba.org/events/intelligent-delivery-the-next-era-of-strategy-analysis-with-ai/"
  },
  {
   "id": "dsmdata-314214648",
@@ -505,8 +505,8 @@
   "title": "IIBA Central Iowa 20th Year Celebration",
   "start": "2026-06-19T23:00:00.000Z",
   "end": "2026-06-20T02:30:00.000Z",
-  "venue": "1 Line Drive",
-  "url": "https://centraliowa.iiba.org/Events"
+  "venue": "Principal Park",
+  "url": "https://centraliowa.iiba.org/events/iiba-central-iowa-20th-year-celebration/"
  },
  {
   "id": "pyowa-315056917",
@@ -668,8 +668,8 @@
   "title": "Exile Brewing Trivia Night with IIBA",
   "start": "2026-07-30T23:00:00.000Z",
   "end": "2026-07-31T01:00:00.000Z",
-  "venue": "1514 Walnut Street",
-  "url": "https://centraliowa.iiba.org/Events"
+  "venue": "Exile Brewing Company",
+  "url": "https://centraliowa.iiba.org/events/exile-brewing-trivia-night-with-iiba/"
  },
  {
   "id": "webgeeks-312416822",
@@ -753,8 +753,8 @@
   "title": "AI as Your BA Partner: Plan Faster. Lead Smarter. Deliver Better.",
   "start": "2026-08-27T16:00:00.000Z",
   "end": "2026-08-27T18:00:00.000Z",
-  "venue": "3001 Westown Parkway",
-  "url": "https://centraliowa.iiba.org/Events",
+  "venue": "QCi",
+  "url": "https://centraliowa.iiba.org/events/ai-as-your-ba-partner-plan-faster.-lead-smarter.-deliver-better./",
   "description": "AI can bring speed, structure, and fresh ideas, but you bring the experience, judgment, leadership, and credibility that move a project forward. This session puts the project manager firmly in control and shows how AI can strengthen the work without replacing the person behind it. Attendees will see practical ways to use AI for project plans, roadmaps, budgets, risk matrices, status updates, stakeholder communication, and decision support. The goal is simple: reduce busywork, improve clarity, and help project managers lead with greater confidence and deliver stronger results. Speaker Bio"
  },
  {
