@@ -41,7 +41,7 @@ body:
     attributes:
       label: Does it fit?
       options:
-        - label: It's open to the public. No members-only or invite-only events.
+        - label: It's open to the public, paid or free. No members-only or invite-only events.
           required: true
         - label: It's a community event focused on tech (software, data, security, product, design, hardware and so on), or a local chapter of an association for people who work in tech (project management, business analysis and the like).
           required: true
