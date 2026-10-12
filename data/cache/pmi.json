@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-11T22:58:26.552Z",
+  "fetchedAt": "2026-10-12T13:26:22.129Z",
   "logo": "https://pmi-centraliowa.org/static/img/logo-login.jpg",
   "events": [
     {
@@ -10,8 +10,9 @@
       "end": "2026-10-28T01:00:00.000Z",
       "allDay": false,
       "url": "https://pmi-centraliowa.org/calendar?eventId=47587",
-      "description": "",
-      "venue": null
+      "description": "Following our collaboration with IIBA for Professional Development Day, we are excited to continue connecting Central Iowa’s project and business analysis communities by welcoming Angie Weller as our featured speaker on Tuesday, October 27!\n\nAngie will present “AI as Your Partner: Plan Faster. Lead Smarter. Deliver Better.”, a practical session focused on how project professionals can use AI to strengthen their work without replacing the experience, judgment, and leadership they bring to the table.\n\nAttendees will explore practical ways to use AI for project plans, roadmaps, budgets, risk matrices, status updates, stakeholder communication, and decision support. The session will focus on reducing busywork, improving clarity, and helping project managers lead with greater confidence while delivering stronger results.\n\nWhether you are already using AI in your day-to-day work or are just beginning to explore its possibilities, this session will provide practical ideas you can apply to your projects.\n\n🎤 Featured Speaker: Angela Weller\n🤝 Connecting the PMI and IIBA professional communities\n\n**Speaker Bio**\n\nAngie Weller is a product, business analysis, and delivery leader with more than 15 years of experience turning complex business needs into actionable plans and measurable results. Her background includes Agile leadership, project and product delivery, stakeholder alignment, roadmaps, budgeting, risk management, process improvement, and large-scale technology transformation.\n\nAngie is actively involved in Central Iowa’s business analysis and project management communities and is passionate about helping professionals use AI to work smarter while keeping human judgment, personality, and leadership at the core.",
+      "venue": "Christopher's",
+      "address": "2816 Beaver Avenue, Des Moines, IA 50310"
     }
   ]
 }

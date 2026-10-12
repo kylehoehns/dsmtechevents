@@ -38,15 +38,44 @@ test('secdsm fails loudly when the page layout changes', async () => {
   await assert.rejects(secdsm({ id: 'secdsm' }, serve(noDates)), /no date could be read/);
 });
 
-test('pmi-chapter maps the JSON calendar to events in local time', async () => {
-  const json = JSON.stringify([{ id: 42, name: ' AI as Your Partner ', timeStartRaw: '2026-10-27 17:00:00.0', timeEndRaw: '2026-10-27 19:00:00.0' }]);
-  const [e] = await pmiChapter({ id: 'pmi', website: 'https://pmi-centraliowa.org/' }, serve(json));
-  assert.deepEqual(e, {
-    id: 'pmi-42', sourceId: '42', title: 'AI as Your Partner',
-    start: '2026-10-27T22:00:00.000Z', end: '2026-10-28T00:00:00.000Z', allDay: false,
-    url: 'https://pmi-centraliowa.org/calendar?eventId=42', description: '', venue: null,
+const PMI = { id: 'pmi', website: 'https://pmi-centraliowa.org/' };
+const pmiSite = (page = fixture('pmi-event.html')) => ({
+  get: async (url) => (url.includes('pmiAjaxGetEvent')
+    ? JSON.stringify([{ id: 47587, name: ' AI as Your Partner ', timeStartRaw: '2026-10-27 17:30:00.0', timeEndRaw: '2026-10-27 20:00:00.0' }])
+    : page),
+});
+
+test('pmi-chapter maps the JSON calendar to events in local time, with venue from the event page', async () => {
+  const [e] = await pmiChapter(PMI, pmiSite());
+  const { description, ...rest } = e;
+  assert.deepEqual(rest, {
+    id: 'pmi-47587', sourceId: '47587', title: 'AI as Your Partner',
+    start: '2026-10-27T22:30:00.000Z', end: '2026-10-28T01:00:00.000Z', allDay: false,
+    url: 'https://pmi-centraliowa.org/calendar?eventId=47587',
+    venue: "Christopher's", address: '2816 Beaver Avenue, Des Moines, IA 50310',
   });
-  await assert.rejects(pmiChapter({ id: 'pmi', website: 'https://pmi-centraliowa.org/' }, serve('{"error":1}')), /unexpected response/);
+  await assert.rejects(pmiChapter(PMI, serve('{"error":1}')), /unexpected response/);
+});
+
+test('pmi-chapter reads the full write-up, minus the date the card already shows', async () => {
+  const [{ description }] = await pmiChapter(PMI, pmiSite());
+  assert.match(description, /^Following our collaboration with IIBA/);
+  assert.match(description, /\n\n🎤 Featured Speaker: Angela Weller\n🤝 Connecting/);
+  assert.match(description, /\n\n\*\*Speaker Bio\*\*\n\nAngie Weller is a product/);
+  assert.match(description, /leadership at the core\.$/);
+  assert.doesNotMatch(description, /Date:|<|Register/);
+});
+
+test('pmi-chapter allows an empty Location box', async () => {
+  const empty = fixture('pmi-event.html').replace(/(data-label="location"[^>]*>)[\s\S]*?<\/div>/, '$1<p class="page-split-right-side-header h5 underlined bold bigger">Location</p></div>');
+  const [e] = await pmiChapter(PMI, pmiSite(empty));
+  assert.equal(e.venue, null);
+  assert.equal(e.address, null);
+});
+
+test('pmi-chapter fails loudly when the event page changes', async () => {
+  await assert.rejects(pmiChapter(PMI, pmiSite(fixture('pmi-event.html').replace('editable-text-inner', 'rich-text'))), /no event text/);
+  await assert.rejects(pmiChapter(PMI, pmiSite(fixture('pmi-event.html').replace('data-label="location"', 'data-label="where"'))), /no Location box/);
 });
 
 // The feed fixture holds four TechBrews (Sept–Dec 2026) and one CIO
