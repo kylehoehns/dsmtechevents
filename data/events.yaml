@@ -32,3 +32,13 @@
     Register (free) at https://www.tickettailor.com/events/iowacodecamp/2402912
   tags: [conference]
   headliner: true
+
+- title: GitHub Dev Days
+  url: https://luma.com/04xz1l03
+  start: 2026-10-20
+  time: "15:00"
+  endTime: "17:00"
+  venue: Lean Techniques
+  address: 9131 Northpark Dr, Johnston, IA 50131
+  description: |-
+    Free, hands-on GitHub Copilot workshop, part of GitHub's community-run Dev Days. The exercises use a lot of Copilot Free credits, so save some for it.
