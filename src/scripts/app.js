@@ -4,7 +4,7 @@
 // State lives in the URL (?view=calendar&group=cijug&day=2026-10-15, ?q=java)
 // so any view can be shared or bookmarked.
 import { fold, queryTerms, matchesAll, matchSpans, excerpt } from '../lib/search.mjs';
-import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, dayOf, recentSummary, plainText, isNew } from '../lib/format.mjs';
+import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, dayOf, recentSummary, plainText, isNew, sectionOf } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -83,6 +83,36 @@ function freshen(t) {
   return dropped;
 }
 freshen(now);
+
+// The build printed the list's headings (This week, Next week, ...) for the
+// day it ran. The refresh that rebuilds the site is scheduled just after
+// midnight on Mondays, but GitHub delays and sometimes drops scheduled runs,
+// so a page opened on a later day sorts its full rows into headings again.
+// Further out stays as built: its rows aren't full cards.
+function resection() {
+  if (listView.dataset.today === today) return;
+  const further = $('.far', listView)?.closest('[data-sec]');
+  const rows = $$('.shows > .show', listView);
+  for (const sec of $$('[data-sec]', listView)) if (sec !== further) sec.remove();
+  let ul = null;
+  let title = null;
+  for (const el of rows) {
+    const t = sectionOf(el.dataset.day, today);
+    if (t !== title) {
+      title = t;
+      const sec = document.createElement('section');
+      sec.className = 'sec';
+      sec.dataset.sec = '';
+      sec.innerHTML = '<div class="sec-head"><h2></h2><span class="count" data-count></span></div><ul class="shows"></ul>';
+      $('h2', sec).textContent = t;
+      listView.insertBefore(sec, further ?? $('#list-empty'));
+      ul = $('ul', sec);
+    }
+    ul.append(el);
+  }
+  listView.dataset.today = today;
+}
+resection();
 
 // Venue links open Google Maps; on iPhones and iPads, Apple Maps instead.
 if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes('Macintosh') && navigator.maxTouchPoints > 1)) {
