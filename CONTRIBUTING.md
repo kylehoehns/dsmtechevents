@@ -18,8 +18,11 @@ are not.
 
 - Email hello@dsmtechevents.com. The [For organizers page](https://dsmtechevents.com/organizers/)
   lists what to send and has a fill-in email.
-- Open an issue with the
-  [Add a group or event](https://github.com/kylehoehns/dsmtechevents/issues/new?template=add-listing.yml) form.
+- Open an issue. For a Luma event or a Meetup group, the
+  [Add a Luma event or Meetup group](https://github.com/kylehoehns/dsmtechevents/issues/new?template=1-add-from-link.yml)
+  form needs only the link, and a bot replies with a preview of the site
+  with it added. For anything else, use
+  [Add any other group or event](https://github.com/kylehoehns/dsmtechevents/issues/new?template=2-add-other.yml).
 
 **For a group on Meetup, the link is all we need.** The site reads every
 group's public Meetup calendar every few hours, so new events show up on
@@ -31,7 +34,7 @@ Luma link.
 People RSVP on your page, not ours. The site only links to it.
 
 Something wrong with a listing? Use the
-[listing form](https://github.com/kylehoehns/dsmtechevents/issues/new?template=fix-listing.yml), or fix it on
+[listing form](https://github.com/kylehoehns/dsmtechevents/issues/new?template=3-fix-listing.yml), or fix it on
 Meetup and it will update at the next refresh.
 
 ## Developers
@@ -118,7 +121,10 @@ For a Luma event or a Meetup group, one command does it all:
 `npm run add -- <link>` writes the entry, fetches its cache file, and checks
 that it isn't already listed, already over or outside Iowa. For a Meetup
 group, add `--short "Name"` to set the name on calendar pills, or check the
-guess it makes. Anything else is by hand:
+guess it makes. The "Add a Luma event or Meetup group" issue form runs the
+same script in `.github/workflows/add-listing.yml` and opens the PR itself;
+so does `gh workflow run add-listing.yml -f link=<link>`. Anything else is
+by hand:
 
 - A group: add an entry to `data/groups.yaml` (the comment at the top lists
   the fields).

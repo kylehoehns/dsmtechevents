@@ -7,7 +7,10 @@
 // Iowa, a private group), is left for a person, with the reason.
 //
 //   node scripts/add-listing.mjs <link> [--short "DSM AI"] [--issue 12] [--out listing.json]
+//   node scripts/add-listing.mjs --from-event "$GITHUB_EVENT_PATH" --out listing.json
 //
+// --from-event reads the link, short name and issue number from the issue
+// that triggered the workflow (the "Add from a link" form).
 // --out writes what happened as JSON (the PR title and body, the branch and
 // preview link, or the reason it stopped) for .github/workflows/add-listing.yml.
 // Exits 0 when the listing was added, 2 when it's left for a person, 1 on an
@@ -132,6 +135,17 @@ export function pullRequest({ title, entry, facts, warnings, preview, id, issue 
   return { title: `Add ${title}`, body };
 }
 
+// An issue form's answers by heading: GitHub writes each as "### Label",
+// a blank line, then the answer, or "_No response_" when left empty.
+export function issueAnswers(body = '') {
+  const answers = {};
+  for (const [, label, value] of String(body).matchAll(/^### (.+)\r?\n([\s\S]*?)(?=^### |(?![\s\S]))/gm)) {
+    const v = value.trim();
+    answers[label.trim()] = v === '_No response_' ? '' : v;
+  }
+  return answers;
+}
+
 async function get(url) {
   const res = await fetch(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(20_000) });
   if (!res.ok) throw new Error(`${res.status} from ${url}`);
@@ -197,11 +211,18 @@ export async function addListing(link, { short, issue, now = Date.now() } = {}) 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const args = process.argv.slice(2);
   const flag = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] : undefined);
-  const link = args.find((a, i) => !a.startsWith('--') && !args[i - 1]?.startsWith('--'));
   const out = flag('--out');
+  let link = args.find((a, i) => !a.startsWith('--') && !args[i - 1]?.startsWith('--'));
+  let short = flag('--short');
+  let issue = flag('--issue');
+  if (flag('--from-event')) {
+    const event = JSON.parse(fs.readFileSync(flag('--from-event'), 'utf8'));
+    const answers = issueAnswers(event.issue?.body);
+    [link, short, issue] = [answers.Link, answers['Short name'], event.issue?.number];
+  }
   let result, code;
   try {
-    result = await addListing(link, { short: flag('--short'), issue: flag('--issue') });
+    result = await addListing(link, { short, issue });
     code = 0;
     console.log(`\n${result.title}\nbranch: ${result.branch}\npreview: ${result.preview}`);
   } catch (err) {

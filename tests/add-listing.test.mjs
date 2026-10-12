@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { classify, alreadyListed, checkLumaEvent, checkMeetupGroup, defaultShort, uniqueId, insertGroup, appendEvent, pullRequest, LeaveIt } from '../scripts/add-listing.mjs';
+import { classify, alreadyListed, checkLumaEvent, checkMeetupGroup, defaultShort, uniqueId, insertGroup, appendEvent, pullRequest, issueAnswers, LeaveIt } from '../scripts/add-listing.mjs';
 
 test('only exact Luma event and Meetup group links are automatic', () => {
   assert.deepEqual(classify('https://luma.com/04xz1l03'), { kind: 'luma', slug: '04xz1l03' });
@@ -63,4 +63,11 @@ test('the PR closes its issue and lists what to check', () => {
   assert.match(pr.body, /Preview: https:\/\/p\.test\//);
   assert.match(pr.body, /Closes #12$/);
   assert.doesNotMatch(pullRequest({ title: 'X', entry: '', facts: [], warnings: [], preview: '', id: 'x' }).body, /Check before|Closes/);
+});
+
+test("an issue form's answers are read by heading, and a blank one is empty", () => {
+  const body = '### Link\n\nhttps://luma.com/04xz1l03\n\n### Short name\n\n_No response_\n\n### Does it fit?\n\n- [X] Public\n- [X] Tech';
+  assert.deepEqual(issueAnswers(body), { Link: 'https://luma.com/04xz1l03', 'Short name': '', 'Does it fit?': '- [X] Public\n- [X] Tech' });
+  assert.deepEqual(issueAnswers('### Link\r\n\r\nhttps://lu.ma/x\r\n'), { Link: 'https://lu.ma/x' });
+  assert.deepEqual(issueAnswers(undefined), {});
 });

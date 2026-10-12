@@ -1,4 +1,4 @@
-name: Bug or idea
+name: Report a bug or share an idea
 description: Something on the site is broken, or you have an idea to make it better.
 body:
   - type: textarea
