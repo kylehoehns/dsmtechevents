@@ -58,7 +58,7 @@ function daily(days) {
 export function renderTraffic({ days, pages, referrers, devices }) {
   const sum = (rows, k) => rows.reduce((n, r) => n + r[k], 0);
   const max = (rows, k) => Math.max(...rows.map((r) => r[k]));
-  const share = (rows) => { const t = sum(rows, 'visits') || 1; return rows.map((r) => [r.key || '(unknown)', num(r.visits), `${bar(r.visits, t)} ${Math.round((r.visits / t) * 100)}%`]); };
+  const share = (rows) => { const t = sum(rows, 'visits') || 1; return rows.map((r) => [r.key || '(unknown)', num(r.visits), `${Math.round((r.visits / t) * 100)}%`, bar(r.visits, t)]); };
   const busiest = days.length && days.reduce((a, b) => (b.visits > a.visits ? b : a));
   return [
     days.length
@@ -74,11 +74,11 @@ export function renderTraffic({ days, pages, referrers, devices }) {
     '',
     'Most links opened from Slack, Teams, iMessage or a bookmark carry no referrer, so they show as "direct".',
     '',
-    referrers.length ? table(['From', 'Visits', 'Share'], share(referrers).map(([k, v, p]) => [k === '(unknown)' ? 'direct' : k, v, p])) : '_None yet._',
+    referrers.length ? table(['From', 'Visits', 'Share', ''], share(referrers).map(([k, ...rest]) => [k === '(unknown)' ? 'direct' : k, ...rest])) : '_None yet._',
     '',
     '## Phone or computer, last 30 days',
     '',
-    devices.length ? table(['Device', 'Visits', 'Share'], share(devices)) : '_None yet._',
+    devices.length ? table(['Device', 'Visits', 'Share', ''], share(devices)) : '_None yet._',
     '',
   ].join('\n');
 }

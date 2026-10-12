@@ -64,7 +64,7 @@ time with `gh workflow run site-report.yml`. It needs a repository secret
 The report opens with a one-row summary (visits, page views and clicks out,
 each with ▲/▼ against the week before, and a small chart of visits per day).
 Run pages don't allow styles or images, so the charts are text: bars made of
-`█░` blocks and the `▁▃█` line. Long lists are folded and open on a click. The
+`█` blocks and the `▁▃█` line. Long lists are folded and open on a click. The
 helpers are in `scripts/report-md.mjs`.
 
 The same run ends with a **Lighthouse** table (`scripts/lighthouse-report.mjs`):
