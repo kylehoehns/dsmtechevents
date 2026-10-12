@@ -8,8 +8,10 @@ developer changing the site.
 
 **What fits:** public, community, tech. That means tech-focused events
 (software, data, security, product, design, hardware and so on), open to
-anyone, in the Des Moines area or online and run by a local group. No
-members-only or invite-only events.
+anyone, in the Des Moines area or online and run by a local group. Local
+chapters of associations for people who work in tech count too: project
+management, business analysis, data management, security. No members-only
+or invite-only events.
 
 **How to ask**, whichever is easier:
 
