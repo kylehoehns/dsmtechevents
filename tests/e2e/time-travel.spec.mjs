@@ -259,6 +259,24 @@ test.describe('a visit that spans the Coding Dojo (Web Geeks, Wed Oct 14, 5:30-7
   });
 });
 
+test('a build from last week, opened Monday: the list sorts into this week again', async ({ page }) => {
+  // The site was built Wednesday; the refresh due after midnight Sunday never
+  // ran (GitHub dropped it), so Monday's visitors get Wednesday's page.
+  await page.clock.setSystemTime(at('2026-10-19T14:00:00Z')); // Mon Oct 19, 9am
+  await page.goto('/');
+  const list = page.getByRole('region', { name: 'Upcoming events' });
+  await expect(list.getByRole('heading', { level: 2 })).toHaveText(['This week', 'Next week', 'November', 'Further out']);
+  const section = (name) => page.locator('[data-sec]', { has: page.getByRole('heading', { name, exact: true }) });
+  await expect(section('This week').locator('.show')).toHaveText([/Joint night - JVM vs\. CLR/, /Test Conf 2026/]);
+  await expect(section('This week').locator('[data-count]')).toHaveText('2 events');
+  await expect(section('Next week').locator('.show')).toHaveText([/Remote DevOps Chat/, /Fall Back Hack Night/]);
+  await expect(tag(page, 'Joint night')).toHaveText('Tomorrow');
+
+  // Filtering still works on the new sections.
+  await page.goto('/?group=cijug');
+  await expect(list.getByRole('heading', { level: 2 }).locator('visible=true')).toHaveText(['This week']);
+});
+
 test('midnight with the page hidden: one reload when it comes back, with the new day right', async ({ page }) => {
   await page.clock.setSystemTime(at('2026-10-15T04:00:00Z')); // Wed Oct 14, 11pm
   const loads = countLoads(page);

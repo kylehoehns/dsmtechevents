@@ -39,6 +39,17 @@ export const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) 
 export const dayName = (key) => fullDate(`${key}T17:00:00Z`); // "Thursday, October 22"
 // "October" or "October 2026" for a month key ("2026-10") or a day key.
 export const monthName = (key, withYear = false) => (withYear ? monthYear : monthLong).format(new Date(`${key.slice(0, 7)}-15T17:00:00Z`));
+// The home page list's heading for an event on day `key`, seen on day `today`.
+// Weeks end on Sunday. The build prints these; app.js sorts the rows again
+// when the page is opened on a later day than it was built.
+export function sectionOf(key, today) {
+  const dow = new Date(`${today}T12:00:00Z`).getUTCDay();
+  const thisWeekEnd = addDays(today, (7 - dow) % 7);
+  if (key <= thisWeekEnd) return 'This week';
+  if (key <= addDays(thisWeekEnd, 7)) return 'Next week';
+  if (key.slice(0, 7) === today.slice(0, 7)) return `Rest of ${monthName(key, false)}`;
+  return monthName(key, key.slice(0, 4) !== today.slice(0, 4));
+}
 export const plural = (n, word) => `${n} ${n === 1 ? word : `${word}s`}`;
 // The line under "Recently"; app.js redoes it when a group filter narrows the list.
 // "411 people went" matches the "18 went" on each row.

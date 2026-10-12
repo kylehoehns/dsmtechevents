@@ -5,29 +5,20 @@ import EventCard from '../components/EventCard.astro';
 import { loadData } from '../lib/data.mjs';
 import { splitEvents } from '../lib/pool.mjs';
 import { eventJsonLd, websiteJsonLd, toScript } from '../lib/jsonld.mjs';
-import { dayKey, lastDay, weekday, day, month, shortTime, addDays, daysBetween, monthName, plural, countdown, dayOf, dateRange, recentSummary } from '../lib/format.mjs';
+import { dayKey, lastDay, weekday, day, month, shortTime, daysBetween, sectionOf, plural, countdown, dayOf, dateRange, recentSummary } from '../lib/format.mjs';
 
 const { events, upcoming, past, endingSoon, groups, byId, updatedAt } = loadData();
 
 // Section labels are relative to the build, which runs at least once a day
-// (see refresh.yml); the browser re-labels Today/Tonight/Tomorrow itself.
+// (see refresh.yml); app.js sorts the rows again for a page opened on a later
+// day (data-today), since a scheduled refresh can run hours late.
 // Full rows through the end of next month, a compact set list after that.
 // Repeat dates and past events get their cards in the card pool (/cards/,
 // fetched by the calendar) instead: see lib/pool.mjs.
 const { today, listed, near, far } = splitEvents({ upcoming, past });
-const dow = new Date(`${today}T12:00:00Z`).getUTCDay();
-const thisWeekEnd = addDays(today, (7 - dow) % 7);
-const nextWeekEnd = addDays(thisWeekEnd, 7);
-
-function sectionOf(key: string) {
-  if (key <= thisWeekEnd) return 'This week';
-  if (key <= nextWeekEnd) return 'Next week';
-  if (key.slice(0, 7) === today.slice(0, 7)) return `Rest of ${monthName(key, false)}`;
-  return monthName(key, key.slice(0, 4) !== today.slice(0, 4));
-}
 const sections: { title: string; items: typeof near }[] = [];
 for (const e of near) {
-  const title = sectionOf(dayKey(e.start));
+  const title = sectionOf(dayKey(e.start), today);
   if (sections.at(-1)?.title !== title) sections.push({ title, items: [] });
   sections.at(-1)!.items.push(e);
 }
@@ -114,7 +105,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         <p class="filter-note" id="filter-note"></p>
         <button type="button" class="btn btn-solid btn-small" data-show-all>Show all groups</button>
       </div>
-      <section id="list-view" aria-label="Upcoming events">
+      <section id="list-view" aria-label="Upcoming events" data-today={today}>
         {sections.map((s) => (
           <section class="sec" data-sec>
             <div class="sec-head"><h2>{s.title}</h2><span class="count" data-count>{plural(s.items.length, 'event')}</span></div>

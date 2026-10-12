@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, dayOf, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary, isNew } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, dayOf, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary, isNew, sectionOf } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
@@ -252,4 +252,20 @@ test('isNew: put up in the last day', () => {
   assert.equal(isNew(added, Date.parse('2026-10-14T19:59:00Z')), true);
   assert.equal(isNew(added, Date.parse('2026-10-14T20:00:00Z')), false, 'a day later it is just another event');
   assert.equal(isNew(undefined), false, 'no record of when it went up');
+});
+
+test('sectionOf: weeks end on Sunday, then the rest of the month, then months', () => {
+  // Built on Sunday Oct 11: Monday is already next week.
+  assert.equal(sectionOf('2026-10-11', '2026-10-11'), 'This week');
+  assert.equal(sectionOf('2026-10-12', '2026-10-11'), 'Next week');
+  // The same Monday event, seen on Monday: this week. That is the rollover a
+  // late refresh missed, which is why app.js sorts again.
+  assert.equal(sectionOf('2026-10-12', '2026-10-12'), 'This week');
+  assert.equal(sectionOf('2026-10-18', '2026-10-12'), 'This week');
+  assert.equal(sectionOf('2026-10-19', '2026-10-12'), 'Next week');
+  assert.equal(sectionOf('2026-10-26', '2026-10-12'), 'Rest of October');
+  assert.equal(sectionOf('2026-11-03', '2026-10-12'), 'November');
+  // An event still on from an earlier day is this week.
+  assert.equal(sectionOf('2026-10-10', '2026-10-12'), 'This week');
+  assert.equal(sectionOf('2027-01-05', '2026-12-14'), 'January 2027');
 });
