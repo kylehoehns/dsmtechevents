@@ -56,6 +56,18 @@ test('a hand-added timed event without endTime fails loudly instead of ending as
   assert.equal(manualEvent({ title: 'Expo', start: '2026-11-07' }).allDay, true, 'an all-day event needs neither');
 });
 
+test('a luma: event takes its details from the fetched copy, and its own fields win', () => {
+  const details = { title: 'Dev Days | Des Moines, Iowa, USA', start: '2026-10-20T20:00:00.000Z', end: '2026-10-20T22:00:00.000Z', allDay: false, url: 'https://luma.com/abc123', venue: 'Lean Techniques Office', going: 14, description: 'Hands-on.' };
+  const e = manualEvent({ luma: 'https://lu.ma/abc123', title: 'Dev Days', hosts: ['cijug'] }, { abc123: details });
+  assert.deepEqual(
+    [e.id, e.title, e.start, e.venue, e.going, e.groupIds, e.multiDay, e.headliner, e.source],
+    ['luma-abc123', 'Dev Days', details.start, 'Lean Techniques Office', 14, ['cijug'], false, false, 'manual'],
+  );
+  assert.equal(manualEvent({ luma: 'https://luma.com/abc123' }, {}), null, 'not fetched yet: left out until the refresh reads it');
+  assert.throws(() => manualEvent({ luma: 'https://luma.com/abc123', start: '2026-10-20' }, { abc123: details }), /date and time from Luma/);
+  assert.throws(() => manualEvent({ luma: 'https://example.com/abc123' }), /not a Luma event link/);
+});
+
 test('a hand-added event running past midnight is one night, not two days', () => {
   assert.equal(manualEvent({ title: 'Hack night', start: '2026-10-16', end: '2026-10-17', time: '18:00', endTime: '02:00' }).multiDay, false);
   assert.equal(manualEvent({ title: 'Conf', start: '2026-10-15', end: '2026-10-16', time: '08:00', endTime: '17:00' }).multiDay, true);

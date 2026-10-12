@@ -4,6 +4,10 @@
 #   title (no year: the date shows it), url, start (YYYY-MM-DD), end (optional, multi-day), time + endTime ("HH:MM"; an endTime at or before 6am the next day keeps it one night)
 #   venue, address, description, tags, hosts (group ids), headliner (a pink row, and a poster up top when it is close)
 #   id (optional): keeps an event's id, and so its /tv/?event= link, after a title change
+#
+# An event on Luma needs only its link: `luma: https://luma.com/<slug>`. The refresh reads its title, time, place, photo
+# and write-up from Luma (into data/cache/luma.json). Add headliner, hosts or tags as above; a title, url, venue,
+# address or description on the entry replaces Luma's. Run `npm run fetch` and commit luma.json to see it before the next refresh.
 
 - title: Tech Fuse DSM
   id: manual-tech-fuse-dsm-2026-2026-10-15
@@ -32,3 +36,6 @@
     Register (free) at https://www.tickettailor.com/events/iowacodecamp/2402912
   tags: [conference]
   headliner: true
+
+- luma: https://luma.com/04xz1l03
+  title: GitHub Dev Days # Luma adds "| Des Moines, Iowa, USA"

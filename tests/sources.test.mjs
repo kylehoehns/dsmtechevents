@@ -7,6 +7,7 @@ import taiTechbrew from '../scripts/sources/tai-techbrew.mjs';
 import iowansOfThings from '../scripts/sources/iowans-of-things.mjs';
 import iibaChapter from '../scripts/sources/iiba-chapter.mjs';
 import issaChapter from '../scripts/sources/issa-chapter.mjs';
+import readLuma, { mirrorText } from '../scripts/sources/luma.mjs';
 import { decode, toText, httpUrl, safeLinks, checkTimes } from '../scripts/sources/html.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
@@ -351,4 +352,82 @@ test('safeLinks keeps only http(s) event links and photos', () => {
   assert.deepEqual(good, { id: 'b', url: 'https://example.com/e', image: 'https://example.com/p.jpg' });
   assert.ok(!('image' in noImage), 'no image key is added, so cache files stay byte-stable');
   assert.equal(safeLinks([{ id: 'd', url: 'javascript:x' }], { website: 'javascript:y' })[0].url, null);
+});
+
+const LUMA = 'https://luma.com/04xz1l03';
+const lumaApi = (edit = (j) => j) => ({
+  get: async (url) => {
+    assert.equal(url, 'https://api.lu.ma/url?url=04xz1l03');
+    return JSON.stringify(edit(JSON.parse(fixture('luma-event.json'))));
+  },
+});
+
+test('luma reads an event\'s time, place, photo, RSVPs and write-up', async () => {
+  const { description, ...rest } = await readLuma(LUMA, lumaApi());
+  assert.deepEqual(rest, {
+    title: 'Github Dev Days | Des Moines, Iowa, USA',
+    start: '2026-10-20T20:00:00.000Z', end: '2026-10-20T22:00:00.000Z', allDay: false,
+    url: LUMA,
+    venue: 'Lean Techniques Office', address: '9131 Northpark Dr, Johnston, IA 50131',
+    image: 'https://images.lumacdn.com/uploads/6c/d3c66d47-fef4-4f9d-b0b0-03ec162c8b3e.png',
+    going: 14,
+  });
+  assert.match(description, /^✨ Dev Days is a global/);
+  assert.match(description, /\n\nDisclaimer: this event utilizes AI credits\./, 'a quote is a paragraph');
+  assert.match(description, /\n\n## Code of Conduct\n\n/);
+  assert.match(description, /\*\*Event Code of Conduct\*\*: https:\/\/github\.com\/github\/dev-days\/blob\/main\/EVENT_CODE_OF_CONDUCT\.md$/, 'a bare link stays bare');
+});
+
+test('luma: an online event has no place, and hidden RSVPs stay hidden', async () => {
+  const online = await readLuma(LUMA, lumaApi((j) => ({ ...j, data: { ...j.data, event: { ...j.data.event, location_type: 'online', hide_rsvp: true } } })));
+  assert.equal(online.online, true);
+  assert.ok(!('venue' in online) && !('address' in online) && !('going' in online));
+});
+
+// Place shapes seen on real Luma events (Oct 2026).
+const lumaPlace = async (geo) => {
+  const e = await readLuma(LUMA, lumaApi((j) => {
+    j.data.event.geo_address_info = geo;
+    return j;
+  }));
+  return [e.venue, e.address];
+};
+
+test("luma: Google's place name is the venue, and the organizer's note only when it names one", async () => {
+  assert.deepEqual(await lumaPlace({
+    address: 'CrossRoads Shooting Sports', description: 'Parking is available and free.',
+    full_address: 'CrossRoads Shooting Sports, 5550 NW Johnston Dr, Johnston, IA 50131, USA',
+  }), ['CrossRoads Shooting Sports', '5550 NW Johnston Dr, Johnston, IA 50131'], 'a parking note is not a venue');
+  assert.deepEqual(await lumaPlace({
+    address: 'Sheslow Auditorium', description: '', full_address: 'Sheslow Auditorium, 2507 University Ave, Des Moines, IA 50311, USA',
+  }), ['Sheslow Auditorium', '2507 University Ave, Des Moines, IA 50311'], 'the name is said once, not again in the address');
+  assert.deepEqual(await lumaPlace({ address: '315 5th St', short_address: '315 5th St, West Des Moines', full_address: '315 5th St, West Des Moines, IA 50265, USA' }), [null, '315 5th St, West Des Moines, IA 50265']);
+  assert.deepEqual(await lumaPlace({ city_state: 'Des Moines, IA', mode: 'obfuscated' }), [null, 'Des Moines, IA'], 'address for guests only');
+  assert.deepEqual(await lumaPlace({ address: 'Microsoft Memphis Office', short_address: null, full_address: null }), ['Microsoft Memphis Office', null], 'typed in by hand');
+  assert.deepEqual(await lumaPlace({
+    address: 'Via Jacopo Durandi, 10', short_address: 'Via Jacopo Durandi, 10, Torino', description: 'Aula 10',
+    full_address: 'Via Jacopo Durandi, 10, 10144 Torino TO, Italy',
+  }), ['Aula 10', 'Via Jacopo Durandi, 10, 10144 Torino TO, Italy'], 'a street with no number first is still a street');
+});
+
+test('luma fails loudly when Luma changes its response', async () => {
+  await assert.rejects(readLuma(LUMA, serve('<html>Not found</html>')), /did not return JSON/);
+  await assert.rejects(readLuma(LUMA, lumaApi((j) => ({ ...j, kind: 'calendar' }))), /unexpected response/);
+  await assert.rejects(readLuma(LUMA, lumaApi((j) => {
+    delete j.data.event.start_at;
+    return j;
+  })), /unexpected response/);
+  await assert.rejects(readLuma('https://example.com/04xz1l03', lumaApi()), /not a Luma event link/);
+});
+
+test('luma descriptions keep lists, line breaks and links', () => {
+  const text = (t, marks) => ({ type: 'text', text: t, ...(marks && { marks }) });
+  const p = (...content) => ({ type: 'paragraph', content });
+  assert.equal(mirrorText({ content: [
+    p(text('Line one'), { type: 'hard_break' }, text('RSVP '), text('here', [{ type: 'link', attrs: { href: 'https://x.test/' } }])),
+    { type: 'bullet_list', content: [{ type: 'list_item', content: [p(text('Pizza'))] }, { type: 'list_item', content: [p(text('Talks'))] }] },
+    { type: 'ordered_list', content: [{ type: 'list_item', content: [p(text('Doors'))] }] },
+    p(text('bad', [{ type: 'link', attrs: { href: 'javascript:alert(1)' } }])),
+    { type: 'horizontal_rule' },
+  ] }), 'Line one\nRSVP [here](https://x.test/)\n\n- Pizza\n- Talks\n\n1. Doors\n\nbad');
 });

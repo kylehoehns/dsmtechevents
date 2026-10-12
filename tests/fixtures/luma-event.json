@@ -1,0 +1,97 @@
+{
+  "kind": "event",
+  "data": {
+    "event": {
+      "api_id": "evt-jRdJC993wqVbkHF",
+      "name": "Github Dev Days | Des Moines, Iowa, USA",
+      "start_at": "2026-10-20T20:00:00.000Z",
+      "end_at": "2026-10-20T22:00:00.000Z",
+      "timezone": "America/Chicago",
+      "url": "04xz1l03",
+      "location_type": "offline",
+      "cover_url": "https://images.lumacdn.com/uploads/6c/d3c66d47-fef4-4f9d-b0b0-03ec162c8b3e.png",
+      "hide_rsvp": false,
+      "geo_address_info": {
+        "address": "9131 Northpark Dr",
+        "city_state": "Johnston, IA",
+        "description": "Lean Techniques Office",
+        "full_address": "9131 Northpark Dr, Johnston, IA 50131, USA"
+      }
+    },
+    "guest_count": 14,
+    "description_mirror": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "text": "✨ Dev Days is a global, in-person community-led initiative taking place from September 1st - October 31st, 2026. The series brings together developers, enthusiasts, and local tech communities to explore the power of GitHub Copilot through practical, hands-on experiences.",
+              "type": "text"
+            }
+          ]
+        },
+        {
+          "type": "blockquote",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "Disclaimer: this event utilizes AI credits. While the workshops can be completed with Copilot Free, it will take up a large amount of those credits, so ensure you're preserving where makes sense knowing you'll be attending this event.",
+                  "type": "text"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 1
+          },
+          "content": [
+            {
+              "text": "Code of Conduct",
+              "type": "text"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "text": "👉 ",
+              "type": "text"
+            },
+            {
+              "text": "Event Code of Conduct",
+              "type": "text",
+              "marks": [
+                {
+                  "type": "bold"
+                }
+              ]
+            },
+            {
+              "text": ": ",
+              "type": "text"
+            },
+            {
+              "text": "https://github.com/github/dev-days/blob/main/EVENT_CODE_OF_CONDUCT.md",
+              "type": "text",
+              "marks": [
+                {
+                  "type": "link",
+                  "attrs": {
+                    "href": "https://github.com/github/dev-days/blob/main/EVENT_CODE_OF_CONDUCT.md"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

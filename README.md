@@ -85,7 +85,8 @@ Comfortable with GitHub? Open a pull request instead:
 - **A group:** add it to `data/groups.yaml` with its Meetup link (and website,
   if it has one). New events then show up on their own.
 - **A one-off event**, like a conference: add it to `data/events.yaml`.
-  `headliner: true` gives it a poster at the top of the page.
+  `headliner: true` gives it a poster at the top of the page. An event on
+  Luma needs only `luma:` and its link; the details come from Luma.
 
 [CONTRIBUTING.md](CONTRIBUTING.md) has the details, including groups that
 aren't on Meetup.

@@ -18,7 +18,8 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   const readYaml = (f) => YAML.parse(fs.readFileSync(path.join(dataDir, f), 'utf8')) ?? [];
   const groups = readYaml('groups.yaml').map((g) => readGroup(g, dataDir));
   const byId = Object.fromEntries(groups.map((g) => [g.id, g]));
-  const manual = readYaml('events.yaml').map(manualEvent);
+  const luma = readLumaCache(dataDir);
+  const manual = readYaml('events.yaml').map((e) => manualEvent(e, luma)).filter(Boolean);
 
   const events = mergeJoint([...groups.flatMap((g) => g._events), ...manual])
     .map(tidy)
@@ -103,9 +104,25 @@ function readGroup(g, dataDir) {
   };
 }
 
-// A hand-added event from events.yaml, in the cache's shape. The fetch uses
-// it too, to archive ended ones (scripts/archive.mjs).
-export function manualEvent(e) {
+// What the fetch read from Luma for each `luma:` event in events.yaml, by
+// slug (scripts/sources/luma.mjs).
+export function readLumaCache(dataDir) {
+  const file = path.join(dataDir, 'cache', 'luma.json');
+  return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
+}
+
+// "https://luma.com/04xz1l03" (or lu.ma) → "04xz1l03".
+export function lumaSlug(link) {
+  const slug = /^https:\/\/(?:www\.)?(?:luma\.com|lu\.ma)\/([\w-]+)\/?$/i.exec(String(link).trim())?.[1];
+  if (!slug) throw new Error(`events.yaml: luma: ${link} is not a Luma event link`);
+  return slug;
+}
+
+// A hand-added event from events.yaml, in the cache's shape, or null for a
+// `luma:` event the fetch hasn't read yet. The fetch uses it too, to archive
+// ended ones (scripts/archive.mjs).
+export function manualEvent(e, luma = {}) {
+  if (e.luma) return lumaEvent(e, luma[lumaSlug(e.luma)]);
   if ('featured' in e) throw new Error(`events.yaml: "${e.title}" uses featured:, which is now headliner:`);
   const startDate = String(e.start);
   const endDate = String(e.end ?? e.start);
@@ -125,6 +142,27 @@ export function manualEvent(e) {
     venue: e.venue ?? null,
     address: e.address ?? null,
     description: e.description ?? '',
+    tags: e.tags,
+    groupIds: e.hosts ?? [],
+    headliner: !!e.headliner,
+    source: 'manual',
+  };
+}
+
+// A `luma:` event: date, time, place, photo and write-up come from Luma.
+// Anything the entry sets itself (a shorter title, hosts, headliner) wins.
+function lumaEvent(e, details) {
+  if (e.start || e.time) throw new Error(`events.yaml: ${e.luma} gets its date and time from Luma; drop start and time`);
+  if (!details) {
+    console.warn(`events.yaml: nothing read from ${e.luma} yet; npm run fetch reads it`);
+    return null;
+  }
+  const own = Object.fromEntries(['title', 'url', 'venue', 'address', 'description'].filter((k) => e[k] != null).map((k) => [k, e[k]]));
+  return {
+    ...details,
+    ...own,
+    id: e.id ?? `luma-${lumaSlug(e.luma)}`,
+    multiDay: spansDays(details.start, details.end),
     tags: e.tags,
     groupIds: e.hosts ?? [],
     headliner: !!e.headliner,
