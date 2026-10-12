@@ -17,10 +17,21 @@ export default async function readLuma(link, { get }) {
   const ev = data?.event;
   if (res?.kind !== 'event' || !ev?.name || !ev.start_at || !ev.end_at) throw new Error(`unexpected response from Luma for ${slug}`);
 
+  // Luma's `address` is the place's name ("Sheslow Auditorium", or one typed
+  // in by hand with no full address), or the street itself when the place has
+  // no name ("9131 Northpark Dr", which also leads short_address). A name
+  // leads full_address too, so it's taken off there to say it once.
+  // `description` is the organizer's own note: a venue name ("Lean Techniques
+  // Office"), but also "Parking is available and free.", so it names the
+  // venue only when there's no name and it doesn't read as a sentence.
+  // An address shown to guests only leaves just the city.
   const place = ev.geo_address_info ?? {};
-  const address = place.full_address?.replace(/,\s*(USA|United States)$/, '') ?? place.city_state ?? null;
-  // Luma's place name is the street address itself when there's no venue name.
-  const venue = place.description && !address?.startsWith(place.description) ? place.description : null;
+  const full = place.full_address?.replace(/,\s*(USA|United States)$/, '');
+  const street = /^\d/.test(place.address ?? '') || place.short_address?.startsWith(place.address);
+  const named = place.address && !street ? place.address : null;
+  const address = (named && full?.startsWith(`${named}, `) ? full.slice(named.length + 2) : full) ?? place.city_state ?? null;
+  const note = place.description?.trim();
+  const venue = named ?? (note && note.length <= 60 && !/[.!?]$/.test(note) ? note : null);
   return {
     title: ev.name.trim(),
     start: new Date(ev.start_at).toISOString(),

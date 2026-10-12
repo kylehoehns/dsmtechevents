@@ -378,15 +378,36 @@ test('luma reads an event\'s time, place, photo, RSVPs and write-up', async () =
   assert.match(description, /\*\*Event Code of Conduct\*\*: https:\/\/github\.com\/github\/dev-days\/blob\/main\/EVENT_CODE_OF_CONDUCT\.md$/, 'a bare link stays bare');
 });
 
-test('luma: an online event has no place, hidden RSVPs stay hidden, a street-only place is not a venue', async () => {
+test('luma: an online event has no place, and hidden RSVPs stay hidden', async () => {
   const online = await readLuma(LUMA, lumaApi((j) => ({ ...j, data: { ...j.data, event: { ...j.data.event, location_type: 'online', hide_rsvp: true } } })));
   assert.equal(online.online, true);
   assert.ok(!('venue' in online) && !('address' in online) && !('going' in online));
-  const street = await readLuma(LUMA, lumaApi((j) => {
-    j.data.event.geo_address_info.description = '9131 Northpark Dr';
+});
+
+// Place shapes seen on real Luma events (Oct 2026).
+const lumaPlace = async (geo) => {
+  const e = await readLuma(LUMA, lumaApi((j) => {
+    j.data.event.geo_address_info = geo;
     return j;
   }));
-  assert.deepEqual([street.venue, street.address], [null, '9131 Northpark Dr, Johnston, IA 50131']);
+  return [e.venue, e.address];
+};
+
+test("luma: Google's place name is the venue, and the organizer's note only when it names one", async () => {
+  assert.deepEqual(await lumaPlace({
+    address: 'CrossRoads Shooting Sports', description: 'Parking is available and free.',
+    full_address: 'CrossRoads Shooting Sports, 5550 NW Johnston Dr, Johnston, IA 50131, USA',
+  }), ['CrossRoads Shooting Sports', '5550 NW Johnston Dr, Johnston, IA 50131'], 'a parking note is not a venue');
+  assert.deepEqual(await lumaPlace({
+    address: 'Sheslow Auditorium', description: '', full_address: 'Sheslow Auditorium, 2507 University Ave, Des Moines, IA 50311, USA',
+  }), ['Sheslow Auditorium', '2507 University Ave, Des Moines, IA 50311'], 'the name is said once, not again in the address');
+  assert.deepEqual(await lumaPlace({ address: '315 5th St', short_address: '315 5th St, West Des Moines', full_address: '315 5th St, West Des Moines, IA 50265, USA' }), [null, '315 5th St, West Des Moines, IA 50265']);
+  assert.deepEqual(await lumaPlace({ city_state: 'Des Moines, IA', mode: 'obfuscated' }), [null, 'Des Moines, IA'], 'address for guests only');
+  assert.deepEqual(await lumaPlace({ address: 'Microsoft Memphis Office', short_address: null, full_address: null }), ['Microsoft Memphis Office', null], 'typed in by hand');
+  assert.deepEqual(await lumaPlace({
+    address: 'Via Jacopo Durandi, 10', short_address: 'Via Jacopo Durandi, 10, Torino', description: 'Aula 10',
+    full_address: 'Via Jacopo Durandi, 10, 10144 Torino TO, Italy',
+  }), ['Aula 10', 'Via Jacopo Durandi, 10, 10144 Torino TO, Italy'], 'a street with no number first is still a street');
 });
 
 test('luma fails loudly when Luma changes its response', async () => {
