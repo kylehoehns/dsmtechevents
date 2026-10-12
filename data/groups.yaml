@@ -5,7 +5,8 @@
 #   short:    abbreviation shown on calendar pills
 #   meetup:   the group's Meetup page — its events are pulled in four times a day
 #   ical:     (optional) any other public .ics feed, for groups not on Meetup
-#             or to override the Meetup feed
+#             or to override the Meetup feed. A Luma calendar has one:
+#             https://api.lu.ma/ics/get?entity=calendar&id=cal-…
 #   source:   (optional) for groups with no feed: the name of a reader in
 #             scripts/sources/ that pulls events from their own website
 #   website:  for groups not on Meetup only: their own site, where their events

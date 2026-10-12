@@ -7,6 +7,7 @@ import taiTechbrew from '../scripts/sources/tai-techbrew.mjs';
 import iowansOfThings from '../scripts/sources/iowans-of-things.mjs';
 import iibaChapter from '../scripts/sources/iiba-chapter.mjs';
 import issaChapter from '../scripts/sources/issa-chapter.mjs';
+import readLuma, { mirrorText } from '../scripts/sources/luma.mjs';
 import { decode, toText, httpUrl, safeLinks, checkTimes } from '../scripts/sources/html.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
@@ -351,4 +352,61 @@ test('safeLinks keeps only http(s) event links and photos', () => {
   assert.deepEqual(good, { id: 'b', url: 'https://example.com/e', image: 'https://example.com/p.jpg' });
   assert.ok(!('image' in noImage), 'no image key is added, so cache files stay byte-stable');
   assert.equal(safeLinks([{ id: 'd', url: 'javascript:x' }], { website: 'javascript:y' })[0].url, null);
+});
+
+const LUMA = 'https://luma.com/04xz1l03';
+const lumaApi = (edit = (j) => j) => ({
+  get: async (url) => {
+    assert.equal(url, 'https://api.lu.ma/url?url=04xz1l03');
+    return JSON.stringify(edit(JSON.parse(fixture('luma-event.json'))));
+  },
+});
+
+test('luma reads an event\'s time, place, photo, RSVPs and write-up', async () => {
+  const { description, ...rest } = await readLuma(LUMA, lumaApi());
+  assert.deepEqual(rest, {
+    title: 'Github Dev Days | Des Moines, Iowa, USA',
+    start: '2026-10-20T20:00:00.000Z', end: '2026-10-20T22:00:00.000Z', allDay: false,
+    url: LUMA,
+    venue: 'Lean Techniques Office', address: '9131 Northpark Dr, Johnston, IA 50131',
+    image: 'https://images.lumacdn.com/uploads/6c/d3c66d47-fef4-4f9d-b0b0-03ec162c8b3e.png',
+    going: 14,
+  });
+  assert.match(description, /^✨ Dev Days is a global/);
+  assert.match(description, /\n\nDisclaimer: this event utilizes AI credits\./, 'a quote is a paragraph');
+  assert.match(description, /\n\n## Code of Conduct\n\n/);
+  assert.match(description, /\*\*Event Code of Conduct\*\*: https:\/\/github\.com\/github\/dev-days\/blob\/main\/EVENT_CODE_OF_CONDUCT\.md$/, 'a bare link stays bare');
+});
+
+test('luma: an online event has no place, hidden RSVPs stay hidden, a street-only place is not a venue', async () => {
+  const online = await readLuma(LUMA, lumaApi((j) => ({ ...j, data: { ...j.data, event: { ...j.data.event, location_type: 'online', hide_rsvp: true } } })));
+  assert.equal(online.online, true);
+  assert.ok(!('venue' in online) && !('address' in online) && !('going' in online));
+  const street = await readLuma(LUMA, lumaApi((j) => {
+    j.data.event.geo_address_info.description = '9131 Northpark Dr';
+    return j;
+  }));
+  assert.deepEqual([street.venue, street.address], [null, '9131 Northpark Dr, Johnston, IA 50131']);
+});
+
+test('luma fails loudly when Luma changes its response', async () => {
+  await assert.rejects(readLuma(LUMA, serve('<html>Not found</html>')), /did not return JSON/);
+  await assert.rejects(readLuma(LUMA, lumaApi((j) => ({ ...j, kind: 'calendar' }))), /unexpected response/);
+  await assert.rejects(readLuma(LUMA, lumaApi((j) => {
+    delete j.data.event.start_at;
+    return j;
+  })), /unexpected response/);
+  await assert.rejects(readLuma('https://example.com/04xz1l03', lumaApi()), /not a Luma event link/);
+});
+
+test('luma descriptions keep lists, line breaks and links', () => {
+  const text = (t, marks) => ({ type: 'text', text: t, ...(marks && { marks }) });
+  const p = (...content) => ({ type: 'paragraph', content });
+  assert.equal(mirrorText({ content: [
+    p(text('Line one'), { type: 'hard_break' }, text('RSVP '), text('here', [{ type: 'link', attrs: { href: 'https://x.test/' } }])),
+    { type: 'bullet_list', content: [{ type: 'list_item', content: [p(text('Pizza'))] }, { type: 'list_item', content: [p(text('Talks'))] }] },
+    { type: 'ordered_list', content: [{ type: 'list_item', content: [p(text('Doors'))] }] },
+    p(text('bad', [{ type: 'link', attrs: { href: 'javascript:alert(1)' } }])),
+    { type: 'horizontal_rule' },
+  ] }), 'Line one\nRSVP [here](https://x.test/)\n\n- Pizza\n- Talks\n\n1. Doors\n\nbad');
 });

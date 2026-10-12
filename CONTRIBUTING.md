@@ -24,8 +24,9 @@ are not.
 **For a group on Meetup, the link is all we need.** The site reads every
 group's public Meetup calendar every few hours, so new events show up on
 their own and fixes you make on Meetup carry over. Groups not on Meetup can
-send a website or public calendar (`.ics`) link. For a one-off event, send
-the date, time, venue and an RSVP link.
+send a website, a public calendar (`.ics`) link, or their Luma calendar. For
+a one-off event, send the date, time, venue and an RSVP link, or just its
+Luma link.
 
 People RSVP on your page, not ours. The site only links to it.
 
@@ -115,7 +116,13 @@ The one exception: when you add a new group, commit its new
 
 - A group: add an entry to `data/groups.yaml` (the comment at the top lists
   the fields).
-- A one-off event: add it to `data/events.yaml`.
+- A one-off event: add it to `data/events.yaml`. For one on Luma, `luma:`
+  and its link is the whole entry; run `npm run fetch` and commit
+  `data/cache/luma.json` (discard the other cache changes) so it shows up
+  before the next refresh.
+- A group that posts its events on a Luma calendar: its iCal feed is
+  `https://api.lu.ma/ics/get?entity=calendar&id=cal-…` (the id is in the
+  calendar page's source), so it goes under `ical:`.
 
 ### Adding a source reader
 

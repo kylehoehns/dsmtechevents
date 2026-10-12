@@ -10,6 +10,9 @@
 // Groups that aren't on Meetup and have no feed can name a reader in
 // scripts/sources/ with `source:` in groups.yaml (e.g. `source: secdsm`).
 //
+// Hand-added events in data/events.yaml that are just a `luma:` link get
+// their details from Luma, kept in data/cache/luma.json.
+//
 // Past events from the previous cache are carried forward for BACKFILL_DAYS,
 // so history keeps building even if Meetup stops showing an event.
 // If a group's feed fails, its previous cache file is left alone, so one bad
@@ -25,9 +28,10 @@ import taiTechbrew from './sources/tai-techbrew.mjs';
 import iowansOfThings from './sources/iowans-of-things.mjs';
 import iibaChapter from './sources/iiba-chapter.mjs';
 import issaChapter from './sources/issa-chapter.mjs';
+import readLuma from './sources/luma.mjs';
 import { parseFeed, parseEventsPage, enrich, cancelledIds, mergeCache, checkEmptyFeed } from './sources/meetup.mjs';
 import { updateArchive } from './archive.mjs';
-import { manualEvent } from '../src/lib/data.mjs';
+import { manualEvent, readLumaCache, lumaSlug } from '../src/lib/data.mjs';
 import { safeLinks, checkTimes } from './sources/html.mjs';
 import { sourceStatus } from './source-status.mjs';
 
@@ -60,6 +64,8 @@ for (const group of groups) {
   }
   await new Promise((r) => setTimeout(r, 500)); // be polite to Meetup
 }
+const eventsYaml = YAML.parse(await fs.readFile(path.join(root, 'data/events.yaml'), 'utf8')) ?? [];
+await fetchLuma(eventsYaml.filter((e) => e.luma));
 await fs.writeFile(path.join(root, 'fetch-report.json'), JSON.stringify(report, null, 2) + '\n');
 
 // The same facts, committed for the /status/ page (see source-status.mjs).
@@ -78,7 +84,8 @@ for (const f of await fs.readdir(archiveDir)) {
 }
 const caches = Object.fromEntries(await Promise.all(groups.map(async (g) => [g.id, await readCache(g.id)])));
 // Hand-added events (conferences) are archived too once they end.
-const manual = (YAML.parse(await fs.readFile(path.join(root, 'data/events.yaml'), 'utf8')) ?? []).map(manualEvent);
+const luma = readLumaCache(path.join(root, 'data'));
+const manual = eventsYaml.map((e) => manualEvent(e, luma)).filter(Boolean);
 for (const [year, list] of Object.entries(updateArchive(archive, caches, Date.now(), manual))) {
   await fs.writeFile(path.join(archiveDir, `${year}.json`), JSON.stringify(list, null, 1) + '\n');
   console.log(`archive ${year}: ${list.length} events`);
@@ -138,6 +145,37 @@ async function fetchFeed(group, now, cutoff, hadUpcoming) {
   // The feed's copy of an upcoming event wins over the page's. If the page
   // failed, mergeCache keeps the page details from the previous run.
   return { events: [...recent, ...upcoming], cancelled, logo, ...facts, pageFailed: Boolean(enrichError), enrichError };
+}
+
+// Each `luma:` event's details, by slug. Like a group, one that fails keeps
+// what it had and gets a source-broken issue. An event that's over is not
+// read again: nothing about it can change, and Luma may take the page down.
+// The file is rewritten only when something in it changed.
+async function fetchLuma(entries) {
+  const file = path.join(cacheDir, 'luma.json');
+  const before = await fs.readFile(file, 'utf8').catch(() => null);
+  const previous = JSON.parse(before ?? '{}');
+  const next = {};
+  for (const e of entries) {
+    const slug = lumaSlug(e.luma);
+    const id = `luma-${slug}`;
+    const had = previous[slug];
+    if (had && Date.parse(had.end) < Date.now()) {
+      next[slug] = had;
+      continue;
+    }
+    try {
+      [next[slug]] = safeLinks(checkTimes([await readLuma(e.luma, { get })]), {});
+      console.log(`✓ ${id}: ${next[slug].title}`);
+      report.ok.push(id);
+    } catch (err) {
+      if (had) next[slug] = had;
+      console.warn(`✗ ${id}: ${err.message}${had ? ' — keeping previous details' : ''}`);
+      report.problems.push({ id, name: e.title ?? had?.title ?? e.luma, kind: 'fetch', message: err.message });
+    }
+  }
+  const json = JSON.stringify(next, null, 2) + '\n';
+  if (json !== before && (before || entries.length)) await fs.writeFile(file, json);
 }
 
 async function readCache(id) {
