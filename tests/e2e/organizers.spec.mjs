@@ -5,7 +5,7 @@ const link = (page) => page.locator('#b-url');
 
 test("picking CIJUG's event gives its screen link and preview", async ({ page, baseURL }) => {
   await page.goto('/organizers/');
-  await page.getByLabel('Your event', { exact: true }).selectOption({ label: 'CIJUG + IADNUG: Joint night - JVM vs. CLR, Tue Oct 20' });
+  await page.getByLabel('Your event', { exact: true }).selectOption({ label: 'Tue Oct 20 · CIJUG + IADNUG: Joint night - JVM vs. CLR' });
   const url = `${baseURL}/tv/?event=cijug-joint`;
   await expect(link(page)).toHaveText(url);
   await expect(page.getByRole('link', { name: /Open preview/ })).toHaveAttribute('href', url);
@@ -17,12 +17,12 @@ test("picking CIJUG's event gives its screen link and preview", async ({ page, b
 test('a repeating series is one choice in the screen picker, its next date', async ({ page }) => {
   const options = (title) => page.locator('#b-event option', { hasText: title });
   await page.goto('/organizers/');
-  await expect(options('AI Study Group')).toHaveText(['DSM AI: AI Study Group, Thu Nov 12']);
-  await expect(options('Python Office Hours')).toHaveText(['Pyowa: Python Office Hours, Thu Oct 15']);
+  await expect(options('AI Study Group')).toHaveText(['Thu Nov 12 · DSM AI: AI Study Group']);
+  await expect(options('Python Office Hours')).toHaveText(['Thu Oct 15 · Pyowa: Python Office Hours']);
 
   await page.clock.setSystemTime(new Date('2026-10-16T14:00:00Z'));
   await page.reload();
-  await expect(options('Python Office Hours')).toHaveText(['Pyowa: Python Office Hours, Thu Nov 19']);
+  await expect(options('Python Office Hours')).toHaveText(['Thu Nov 19 · Pyowa: Python Office Hours']);
 });
 
 test('says how to fix a listing', async ({ page }) => {
@@ -36,9 +36,11 @@ test('says how to fix a listing', async ({ page }) => {
 test('copies the screen link and the badge snippets', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/organizers/');
-  await page.getByLabel('Your event', { exact: true }).selectOption({ label: 'CIJUG + IADNUG: Joint night - JVM vs. CLR, Tue Oct 20' });
+  await page.getByLabel('Your event', { exact: true }).selectOption({ label: 'Tue Oct 20 · CIJUG + IADNUG: Joint night - JVM vs. CLR' });
   await page.getByRole('button', { name: 'Copy link' }).click();
   await expect(page.locator('#b-copy')).toHaveText('Copied');
+  // The button's new text isn't announced while it has focus; the status line is.
+  await expect(page.getByRole('status').filter({ hasText: 'Copied' })).toHaveCount(1);
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(await link(page).textContent());
 
   await page.locator('.badge-kit').getByRole('button', { name: 'Copy' }).last().click();
