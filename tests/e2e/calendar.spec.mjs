@@ -107,7 +107,7 @@ test('arrow keys move between days and focus survives picking one', async ({ pag
   await expect(conf).toHaveAttribute('aria-pressed', 'true');
   await expect(conf).toBeFocused();
   await expect(dayPanel(page)).toContainText('Test Conf 2026');
-  await expect(page.getByRole('status')).toHaveText('Thursday, October 22: 1 event');
+  await expect(page.getByRole('status')).toHaveText('Thursday, October 22: 2 events');
 });
 
 test('the keyboard reaches the list before the mini calendar, which is one tab stop; arrow keys move between its days', async ({ page, isMobile }) => {

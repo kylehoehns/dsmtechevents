@@ -267,9 +267,9 @@ test('a build from last week, opened Monday: the list sorts into this week again
   const list = page.getByRole('region', { name: 'Upcoming events' });
   await expect(list.getByRole('heading', { level: 2 })).toHaveText(['This week', 'Next week', 'November', 'Further out']);
   const section = (name) => page.locator('[data-sec]', { has: page.getByRole('heading', { name, exact: true }) });
-  await expect(section('This week').locator('.show')).toHaveText([/Joint night - JVM vs\. CLR/, /Test Conf 2026/]);
-  await expect(section('This week').locator('[data-count]')).toHaveText('2 events');
-  await expect(section('Next week').locator('.show')).toHaveText([/Remote DevOps Chat/, /Hack Night Returns/, /Fall Back Hack Night/]);
+  await expect(section('This week').locator('.show')).toHaveText([/Joint night - JVM vs\. CLR/, /Test Conf 2026/, /Conf Afterparty/]);
+  await expect(section('This week').locator('[data-count]')).toHaveText('3 events');
+  await expect(section('Next week').locator('.show')).toHaveText([/Convention Center Tour/, /Remote DevOps Chat/, /Hack Night Returns/, /Fall Back Hack Night/]);
   await expect(tag(page, 'Joint night')).toHaveText('Tomorrow');
 
   // Filtering still works on the new sections.
