@@ -917,5 +917,16 @@
   "going": 26,
   "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/316515631/",
   "description": "Agentic AI is shifting how we work and redefining our roles. Agents are moving from answering questions to understanding, reasoning, and acting alongside people. As intelligence becomes abundant, the new leadership questions are: how can you uniquely and durably unlock value with AI, and build reliable agentic systems at scale? [Sagar Murthy](https://www.linkedin.com/in/sagar-murthy-13064a8/), AI GTM & Strategic Partnerships with AWS will unpack the state of agentic AI, the emerging patterns, and real production deployment outcomes. You will leave with a practical framework to take your"
+ },
+ {
+  "id": "webgeeks-312416826",
+  "group": "webgeeks",
+  "title": "Hacktoberfest",
+  "start": "2026-10-12T23:30:00.000Z",
+  "end": "2026-10-13T01:00:00.000Z",
+  "online": true,
+  "going": 15,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416826/",
+  "description": "Hacktoberfest 2026: DSM Web Geeks Hack Day Let’s get hacking! Join DSM Web Geeks on Monday, October 12th at 6:30 PM at Source Allies as we celebrate Hacktoberfest with an evening of open source, collaboration, and coding. Hacktoberfest is a celebration of open source that brings developers together to contribute, learn, and support the projects and communities that make so much of modern software possible. Whether you’ve contributed to dozens of open source projects or have never opened a pull request before, you’re welcome to join us. What’s Happening? We’ll kick things off with a quick"
  }
 ]
