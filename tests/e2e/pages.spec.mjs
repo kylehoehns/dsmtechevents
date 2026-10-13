@@ -32,7 +32,7 @@ test('status page lists every group, quiet ones included, with source and health
   await expect(row('AWS')).toContainText('Partial since Oct 12');
   await expect(row('Pyowa')).toContainText('Healthy');
   await expect(row('Pyowa')).toContainText('Meetup · changed Oct 14, 5:20a · 1 coming up');
-  await expect(page.getByText('most recently on Oct 14')).toBeVisible();
+  await expect(page.getByText('four times a day, at about 5:20a, 10:20a, 2:20p and 6:20p, most recently on Oct 14')).toBeVisible();
 });
 
 test('the status page keeps the main nav, with no tab marked current', async ({ page }) => {
@@ -53,7 +53,7 @@ test('a link to /groups/#id highlights that group', async ({ page }) => {
   const outline = (id) => page.locator(`article#${id}`).evaluate((el) => getComputedStyle(el).outlineStyle);
   expect(await outline('pyowa')).toBe('solid');
   expect(await outline('cijug')).toBe('none');
-  await page.locator('article#pyowa').getByRole('link', { name: 'Pyowa events' }).click();
+  await page.locator('article#pyowa').getByRole('link', { name: 'Events by Pyowa' }).click();
   await expect(page).toHaveURL(/\/\?group=pyowa$/);
 });
 
@@ -131,8 +131,8 @@ test('a group card catches up once its next event is over', async ({ page }) => 
   const card = page.locator('article#webgeeks');
   await expect(card.locator('.next:visible')).toContainText('Next: Wed Oct 14, Coding Dojo');
   await expect(card.locator('.last:visible')).toHaveText('Last event Oct 5 · 37 went');
-  // The name is the way to the group's whole list (coming up and past).
-  const see = card.getByRole('link', { name: 'Web Geeks events' });
+  // The Events button is the way to the group's whole list (coming up and past).
+  const see = card.getByRole('link', { name: 'Events by Web Geeks' });
   await expect(see).toHaveAttribute('href', '/?group=webgeeks');
 
   await page.clock.runFor('15:00'); // left open past 7:30p

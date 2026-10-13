@@ -255,7 +255,8 @@ function foldSeries(upcoming) {
   }
 }
 
-const seriesKey = (e) => `${e.groupIds.join('+')}|${e.title.trim().toLowerCase()}`;
+// Exported for the screen picker on /organizers/, which lists each series once.
+export const seriesKey = (e) => `${e.groupIds.join('+')}|${e.title.trim().toLowerCase()}`;
 const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 // What the Groups page needs: next and last event, how many are coming up,

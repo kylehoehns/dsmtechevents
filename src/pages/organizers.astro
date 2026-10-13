@@ -6,8 +6,8 @@
 // stored.
 import Layout from '../layouts/Layout.astro';
 import { site } from '../lib/site.mjs';
-import { loadData } from '../lib/data.mjs';
-import { weekday, month, day } from '../lib/format.mjs';
+import { loadData, seriesKey } from '../lib/data.mjs';
+import { weekday, month, day, refreshTimes } from '../lib/format.mjs';
 
 const { upcoming, updatedAt } = loadData();
 
@@ -20,10 +20,15 @@ const body = [
   'Anything else we should know:',
 ].join('\n\n');
 const mailto = `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+// The GitHub issue forms in .github/ISSUE_TEMPLATE/.
+const form = (file: string) => `${site.repo}/issues/new?template=${file}`;
 // Every upcoming event, by date. The browser drops any that have ended since the build.
+// A repeating series (same hosts and title) is one choice in the browser, its
+// next date; every date is in the page so the next can take over.
 const choices = upcoming.map((e) => ({
   id: e.id,
   end: e.end,
+  series: seriesKey(e),
   label: `${e.hostsLabel}: ${e.title}, ${weekday(e.start)} ${month(e.start)} ${day(e.start)}`,
 }));
 const firstUrl = choices[0] ? `${site.url}/tv/?event=${encodeURIComponent(choices[0].id)}` : '';
@@ -62,7 +67,8 @@ const snippets = [
         <li>For a group: its Meetup link. Not on Meetup? A website or public calendar link works too.</li>
         <li>For a one-off event: the date, time, venue, and a link where people can RSVP or learn more.</li>
       </ul>
-      <p>If your group is on Meetup, that's all. New events show up on their own.</p>
+      <p>If your group is on Meetup, that's all. New events show up on their own within a few hours.</p>
+      <p>On GitHub? The quickest way for a Meetup group or a Luma event is to <a href={form('1-add-from-link.yml')}>paste its link into this form</a>. A bot replies within minutes with a preview of the site with it added.</p>
     </section>
 
     <section class="email-box" aria-labelledby="email-h">
@@ -83,6 +89,12 @@ const snippets = [
       <p>The <a href="/status/">status page</a> shows where each group's events come from, when they last changed, and whether the latest check worked.</p>
     </section>
 
+    <section>
+      <h2>Something wrong?</h2>
+      <p>Most events come straight from your Meetup page or website. Fix the time, place or title there, and the site picks it up at its next check. It checks four times a day, at about {refreshTimes()}.</p>
+      <p>For anything else, like a wrong link or an event that shouldn't be listed, use the <a href={form('3-fix-listing.yml')}>Fix a listing form</a> on GitHub or email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+    </section>
+
     <section class="builder" aria-labelledby="screen-h">
       <h2 id="screen-h">Put your event on a screen</h2>
       <p>Show your event on the TV in your lobby: its date, time, place and talks with a QR code to RSVP, then your group's next meetup and what else is coming up.</p>
@@ -93,7 +105,7 @@ const snippets = [
             <p class="field">
               <label for="b-event">Your event</label>
               <select id="b-event">
-                {choices.map((c) => <option value={c.id} data-end={c.end}>{c.label}</option>)}
+                {choices.map((c) => <option value={c.id} data-end={c.end} data-series={c.series}>{c.label}</option>)}
               </select>
             </p>
             <div class="tv-link">
@@ -153,8 +165,13 @@ const snippets = [
   if (eventSel) {
     const urlEl = document.getElementById('b-url')!;
     const open = document.getElementById('b-open') as HTMLAnchorElement;
-    // The page was built ahead of time: drop events that have ended since.
-    for (const o of [...eventSel.options]) if (Date.parse(o.dataset.end!) <= Date.now()) o.remove();
+    // The page was built ahead of time: drop events that have ended since, then
+    // keep one date per series, its next.
+    const seen = new Set<string>();
+    for (const o of [...eventSel.options]) {
+      if (Date.parse(o.dataset.end!) <= Date.now() || seen.has(o.dataset.series!)) o.remove();
+      else seen.add(o.dataset.series!);
+    }
     const update = () => {
       const url = new URL(`/tv/?event=${encodeURIComponent(eventSel.value)}`, location.origin).href;
       urlEl.textContent = url;

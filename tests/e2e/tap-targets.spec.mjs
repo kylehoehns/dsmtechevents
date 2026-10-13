@@ -22,7 +22,7 @@ async function tapHeight(loc) {
 
 const targets = {
   '/': ['#list-view .more', '#list-view .rsvp', '#list-view .band a'],
-  '/groups/': ['.flyer h2 a', '.flyer .links a.btn-outline'],
+  '/groups/': ['.flyer .links a.btn-outline'],
   '/organizers/': ['#b-event', '[data-copy-from="add-email"]', '#b-copy', '.snippet [data-copy-from]'],
 };
 
