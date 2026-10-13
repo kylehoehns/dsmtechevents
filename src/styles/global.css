@@ -686,7 +686,7 @@ mark {
    motion keeps them; the JS animations (About, the day panel) check it
    themselves. */
 @media (prefers-reduced-motion: no-preference) {
-  .out-arrow { transition: transform 0.12s ease-out; }
+  .out-arrow { transition: transform 0.15s ease-out; }
   .btn[data-done] { animation: stamp 0.2s ease-out; }
   @keyframes stamp { from { transform: rotate(-3deg) scale(1.08); } }
   .search { transition: opacity 0.15s ease-out; }
@@ -724,5 +724,5 @@ mark {
   .day.has:hover { background: var(--paper-2); }
   .day.headliner:hover { background: var(--pink-fill); }
   .foot .big a:hover { background: var(--on-blue); color: var(--blue-fill); }
-  .btn:hover .out-arrow { transform: translate(1px, -1px); }
+  .btn:hover .out-arrow { transform: translate(0.15em, -0.15em); }
 }
