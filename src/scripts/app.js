@@ -822,7 +822,7 @@ async function toggleAbout(more) {
   };
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
     set(open);
-    if (open) revealAbout(desc, false);
+    if (open) scrollBy(0, aboutScroll(desc));
     return;
   }
 
@@ -837,14 +837,17 @@ async function toggleAbout(more) {
       if (fly || (big && !big.hasAttribute('height'))) { big.loading = 'eager'; await big.decode().catch(() => {}); }
       const from = fly && thumb.getBoundingClientRect();
       set(true);
-      // Measure where the photo lands before the panel starts growing: the
-      // grow animation begins with no padding or margin, which would aim the
-      // photo ~18px high and make it pop down at the end.
+      // Measure where the photo lands, and how far the page has to scroll,
+      // before the panel starts growing: the grow animation begins with no
+      // padding or margin, which would aim the photo ~18px high and make it
+      // pop down at the end. The page scrolls while the panel grows, so the
+      // photo aims for where its spot will be once both are done.
+      const by = aboutScroll(desc);
       const to = fly && big.getBoundingClientRect();
       const grow = slide(desc, true);
-      if (fly) await flyImage(big, from, to, { rotate: [rotation(thumb), 0], hide: [big] });
+      if (by) scrollAlong(desc.getAnimations()[0], by);
+      if (fly) await flyImage(big, from, { left: to.left, top: to.top - by, width: to.width, height: to.height }, { rotate: [rotation(thumb), 0], hide: [big] });
       await grow;
-      revealAbout(desc, true);
     } else {
       const from = fly && big.getBoundingClientRect();
       const to = fly && thumb.getBoundingClientRect(); // the thumbnail keeps its spot while hidden
@@ -858,15 +861,32 @@ async function toggleAbout(more) {
   }
 }
 
-// The open panel's photo comes first, and near the bottom of the screen (a
-// phone, mostly) it fills what's left, so the words just opened start below
-// it. Bring the photo up to the top with the words right under it; leave the
-// page alone when they're already showing.
-function revealAbout(desc, smooth) {
-  const photo = $('.desc-photo', desc);
-  const words = photo?.nextElementSibling;
-  if (!words || words.getBoundingClientRect().top < innerHeight - 48) return;
-  scrollBy({ top: photo.getBoundingClientRect().top - 12, behavior: smooth ? 'smooth' : 'auto' });
+// A panel opened low on the screen (a phone, mostly) runs off the bottom.
+// How far to scroll to show all of it, but never past its top, so a panel
+// taller than the screen starts at the top with its photo. The iOS install
+// hint covers the bottom of the screen while it shows, so it counts as off it.
+function aboutScroll(desc) {
+  const { top, bottom } = desc.getBoundingClientRect();
+  const hint = $('.install-hint');
+  const edge = (hint && !hint.hidden ? hint.getBoundingClientRect().top : innerHeight) - 12;
+  return Math.max(0, Math.min(bottom - edge, top - 12));
+}
+
+// Scroll the page `by` px in step with `anim`, frame for frame on its easing,
+// so the panel growing and the page moving read as one motion. The last
+// frame lands exactly, however the frames fell. It lets go as soon as the
+// page is somewhere it didn't put it: the reader is scrolling.
+function scrollAlong(anim, by) {
+  const start = scrollY;
+  let last = start;
+  const step = () => {
+    if (Math.abs(scrollY - last) > 1) return;
+    const p = anim.playState === 'running' ? anim.effect.getComputedTiming().progress : 1;
+    scrollTo(0, start + by * p);
+    last = scrollY;
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
 // Animate a panel's height, padding and margin between 0 and its natural size.
