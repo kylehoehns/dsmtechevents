@@ -1,8 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, dayOf, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary, isNew, sectionOf } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, dayOf, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary, isNew, sectionOf, refreshTimes } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
+import { readFileSync } from 'node:fs';
+import { site } from '../src/lib/site.mjs';
 
 test('dates are Des Moines dates, not UTC dates', () => {
   // 6:30pm Monday in Des Moines is already Tuesday in UTC.
@@ -268,4 +270,15 @@ test('sectionOf: weeks end on Sunday, then the rest of the month, then months', 
   // An event still on from an earlier day is this week.
   assert.equal(sectionOf('2026-10-10', '2026-10-12'), 'This week');
   assert.equal(sectionOf('2027-01-05', '2026-12-14'), 'January 2027');
+});
+
+test('refreshTimes: the refresh schedule in Des Moines time, which shifts with daylight saving', () => {
+  assert.equal(refreshTimes(Date.parse('2026-10-13T12:00:00Z')), '5:20a, 10:20a, 2:20p and 6:20p');
+  assert.equal(refreshTimes(Date.parse('2026-12-03T12:00:00Z')), '4:20a, 9:20a, 1:20p and 5:20p');
+});
+
+test('site.refreshUtc matches the schedule the refresh workflow runs on', () => {
+  const yml = readFileSync(new URL('../.github/workflows/refresh.yml', import.meta.url), 'utf8');
+  const [, min, hours] = /cron: '(\d+) ([\d,]+) \* \* \*'/.exec(yml);
+  assert.deepEqual(site.refreshUtc, hours.split(',').map((h) => `${h.padStart(2, '0')}:${min}`));
 });
