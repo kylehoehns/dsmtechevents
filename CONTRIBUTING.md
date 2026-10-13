@@ -114,12 +114,16 @@ The one exception: when you add a new group, commit its new
 
 ### Adding a group or event by PR
 
+For a Luma event or a Meetup group, one command does it all:
+`npm run add -- <link>` writes the entry, fetches its cache file, and checks
+that it isn't already listed, already over or outside Iowa. For a Meetup
+group, add `--short "Name"` to set the name on calendar pills, or check the
+guess it makes. Anything else is by hand:
+
 - A group: add an entry to `data/groups.yaml` (the comment at the top lists
   the fields).
-- A one-off event: add it to `data/events.yaml`. For one on Luma, `luma:`
-  and its link is the whole entry; run `npm run fetch` and commit
-  `data/cache/luma.json` (discard the other cache changes) so it shows up
-  before the next refresh.
+- A one-off event not on Luma: add it to `data/events.yaml` (the comment at
+  the top lists the fields).
 - A group that posts its events on a Luma calendar: its iCal feed is
   `https://api.lu.ma/ics/get?entity=calendar&id=cal-…` (the id is in the
   calendar page's source), so it goes under `ical:`.

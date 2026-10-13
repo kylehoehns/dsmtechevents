@@ -64,6 +64,11 @@ export function parseEventsPage(html, slug) {
   // quiet groups and to say "Back!" when one returns.
   const lastMet = [...events.values()].filter((e) => e.status === 'PAST').map((e) => e.start).sort().at(-1) ?? null;
   return {
+    // Who and where the group is, for scripts/add-listing.mjs. The fetch doesn't cache these.
+    name: group.name?.trim() || null,
+    city: group.city ?? null,
+    state: group.state ?? null,
+    isPrivate: group.isPrivate === true,
     logo: photo(group.keyGroupPhoto),
     members: group.stats?.memberCounts?.all ?? null,
     pastCount: (pastKey && group[pastKey]?.totalCount) ?? null,
