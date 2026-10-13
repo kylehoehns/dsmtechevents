@@ -172,6 +172,7 @@ export function eventMode(stage: HTMLElement, data: TvData, id: string, now = Da
       s.dataset.dwell = String(EVENT_DWELL);
       let over: boolean | null = null;
       let stamp: HTMLElement | null = null;
+      let labelKind = '';
       updates.push((t) => {
         const ended = Date.parse(e.end) <= t;
         if (ended !== over) {
@@ -184,7 +185,15 @@ export function eventMode(stage: HTMLElement, data: TvData, id: string, now = Da
           }
         }
         if (stamp) {
-          stamp.textContent = liveLabel(e, t);
+          const label = liveLabel(e, t);
+          // "Starts in 5 min" to "Happening now": stamp it again (tv-fx.css),
+          // but not for every minute of the countdown.
+          const was = labelKind;
+          labelKind = label.replace(/\d.*/, '');
+          if (was && labelKind !== was && label && stamp.closest('[data-fx]')) {
+            stamp.animate([{ scale: 1.5, opacity: 0 }, {}], { duration: 350, easing: 'cubic-bezier(0.3, 1.6, 0.5, 1)' });
+          }
+          stamp.textContent = label;
           stamp.hidden = !stamp.textContent;
         }
       });

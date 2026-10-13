@@ -60,3 +60,13 @@
 }
 .tv[data-fx=print] .slide.is-on::after { animation: fx-dry 2.6s ease-out 0.3s forwards; }
 @keyframes fx-dry { 0% { opacity: 0; } 15% { opacity: 0.45; } 100% { opacity: 0.1; } }
+
+/* The day's label (Tonight, Happening now) lands last, like a rubber stamp.
+   `scale`, not transform, so it keeps its tilt. tv-event.ts replays it when
+   event mode's label changes kind. */
+.tv[data-fx=print] .slide.is-on :is(.when-tag, .ev-stamp) { animation: fx-stamp 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) 0.9s backwards; }
+@keyframes fx-stamp { from { scale: 1.5; opacity: 0; } }
+
+/* event mode draws its QR codes after a script loads: fade them in, not pop */
+.tv[data-fx] .ev-slide .qr-code svg { animation: fx-fade 0.4s ease-out; }
+@keyframes fx-fade { from { opacity: 0; } }

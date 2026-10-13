@@ -35,9 +35,15 @@ export function copyButton(button: HTMLButtonElement, text: () => string, shown:
   let reset = 0;
   button.addEventListener('click', async () => {
     const copied = await copyText(text(), shown);
+    // Keep its width, so a shorter "Copied" doesn't pull the next button over.
+    button.style.minWidth = `${button.getBoundingClientRect().width}px`;
     button.textContent = copied ? 'Copied' : 'Selected';
+    // Stamp it (global.css), restarting on a second click.
+    delete button.dataset.done;
+    void button.offsetWidth;
+    button.dataset.done = '';
     announce(copied ? 'Copied' : 'Selected. Copy it with your keyboard.');
     clearTimeout(reset);
-    reset = window.setTimeout(() => { button.textContent = label; }, 2000);
+    reset = window.setTimeout(() => { button.textContent = label; button.style.minWidth = ''; delete button.dataset.done; }, 2000);
   });
 }

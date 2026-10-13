@@ -245,9 +245,10 @@ const eventData = {
   .ev-next-group .info h2 { font-size: 7.4vh; }
 
   .tv-progress { height: 6px; background: #2c2a33; margin-top: 1.4vh; }
-  .tv-progress span { display: block; height: 100%; width: 0; background: var(--pink); }
+  /* scaleX, not width: it runs on every slide, and width relays the page each frame */
+  .tv-progress span { display: block; height: 100%; background: var(--pink); transform: scaleX(0); transform-origin: left; }
   .tv-progress span.run { animation: tv-bar linear forwards; }
-  @keyframes tv-bar { to { width: 100%; } }
+  @keyframes tv-bar { to { transform: scaleX(1); } }
 
   /* A screen hung on its side. The landscape sizes are in vh, which a tall
      screen makes far too big for its width, so sizes here go by vw, and the
@@ -373,8 +374,7 @@ const eventData = {
   const fx = params.get('fx') !== 'off' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'print' : '';
   if (fx) {
     document.getElementById('tv')!.dataset.fx = fx;
-    document.querySelectorAll<HTMLElement>('.slide').forEach((s, n) => {
-      s.style.setProperty('--tilt', n % 2 ? '0.5deg' : '-0.6deg');
+    document.querySelectorAll<HTMLElement>('.slide').forEach((s) => {
       // --i staggers rows and lines within each group
       for (const group of s.querySelectorAll('ol, .info, .date-block, .overview-head')) {
         [...group.children].forEach((el, i) => (el as HTMLElement).style.setProperty('--i', String(i)));
