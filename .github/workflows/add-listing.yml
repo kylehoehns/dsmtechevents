@@ -2,8 +2,8 @@ name: add listing
 
 # Turns one link into a pull request with a preview, so adding a Luma event
 # or a Meetup group is: open an issue, look at the preview, merge.
-#   - an issue opened with the "Add from a link" form (it carries the
-#     from-link label), or that label added again to try once more
+#   - an issue opened with the "Add a Luma event or Meetup group" form, which
+#     gives it the from-link label, or that label added again to try once more
 #   - by hand: gh workflow run add-listing.yml -f link=<url> [-f short=<name>]
 # scripts/add-listing.mjs does the work; this file moves its result around.
 # A link it can't add gets the reason as a comment and a needs-hands label.
@@ -18,8 +18,10 @@ name: add listing
 # and doesn't bypass the ruleset.
 
 on:
+  # Only `labeled`: a new issue fires one for each label it's opened with,
+  # so the from-link one covers new issues and retries alike.
   issues:
-    types: [opened, labeled]
+    types: [labeled]
   workflow_dispatch:
     inputs:
       link:
@@ -32,18 +34,14 @@ on:
 permissions:
   contents: read
 
-# A new issue fires both `opened` and `labeled`; the later run replaces the
-# earlier, so each request gets one answer.
-concurrency:
-  group: add-listing-${{ github.event.issue.number || github.run_id }}
-  cancel-in-progress: true
-
 jobs:
   prepare:
-    if: >-
-      github.event_name == 'workflow_dispatch'
-      || (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'from-link'))
-      || (github.event.action == 'labeled' && github.event.label.name == 'from-link')
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'from-link'
+    # One run per issue at a time; a retry waits for the one before it. On
+    # the job, not the workflow, so the skipped runs for the issue's other
+    # labels never cancel the real one.
+    concurrency:
+      group: add-listing-${{ github.event.issue.number || github.run_id }}
     runs-on: ubuntu-24.04
     # The fetch caps each request at 20s; a run takes about a minute.
     timeout-minutes: 10
