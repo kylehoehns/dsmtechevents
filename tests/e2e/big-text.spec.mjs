@@ -91,3 +91,22 @@ test('form fields are big enough that iPhone Safari does not zoom in on them', a
     expect(small, path).toEqual([]);
   }
 });
+
+// The safety net for anything the checks above miss, like iOS sizing the
+// organizers' event picker to its longest option: even something far too
+// wide can't make the page scroll sideways. With only body clipping, the
+// overflow went up to the page as "hidden", which a script (and an iPhone
+// finger) could still scroll.
+test('nothing too wide can make a page scroll sideways', async ({ page }) => {
+  for (const path of new Set(VIEWS.map(([path]) => path))) {
+    await page.goto(path);
+    const scrollX = await page.evaluate(() => {
+      const wide = document.createElement('div');
+      wide.style.cssText = 'width: 3000px; height: 1px';
+      document.querySelector('main').append(wide);
+      window.scrollTo(500, 0);
+      return window.scrollX;
+    });
+    expect(scrollX, path).toBe(0);
+  }
+});
