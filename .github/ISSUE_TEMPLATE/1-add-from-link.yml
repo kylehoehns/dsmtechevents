@@ -1,0 +1,34 @@
+name: Add a Luma event or Meetup group
+description: The quick way. Paste the link and a bot replies within minutes with a preview of the site with it added.
+title: 'Add: '
+labels: [listing, from-link]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        DSM Tech Events lists public, community, tech events in and around Des Moines. We link to your page, and people sign up there.
+        Paste a **Luma event** link (luma.com/…) or a **Meetup group** link (meetup.com/…). Within a few minutes a bot replies here with a preview of the site with it added.
+        Not on Luma or Meetup? Use [Add any other group or event](https://github.com/kylehoehns/dsmtechevents/issues/new?template=2-add-other.yml) instead.
+  - type: input
+    id: link
+    attributes:
+      label: Link
+      placeholder: https://luma.com/abc123
+    validations:
+      required: true
+  - type: input
+    id: short
+    attributes:
+      label: Short name
+      description: For a Meetup group, the short name on the calendar, like "DSM AI" or "Pyowa". Leave blank and we'll guess.
+  - type: checkboxes
+    id: fits
+    attributes:
+      label: Does it fit?
+      options:
+        - label: It's open to the public, paid or free. No members-only or invite-only events.
+          required: true
+        - label: It's a community event focused on tech (software, data, security, product, design, hardware and so on), or a local chapter of an association for people who work in tech (project management, business analysis and the like).
+          required: true
+        - label: It's in the Des Moines area, or online and run by a local group.
+          required: true

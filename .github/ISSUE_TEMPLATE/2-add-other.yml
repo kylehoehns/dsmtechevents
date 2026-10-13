@@ -1,5 +1,5 @@
-name: Add a group or event
-description: Get a Des Moines tech meetup, user group, conference or one-off event listed.
+name: Add any other group or event
+description: Not on Luma or Meetup, like a conference site or a group's own website or calendar. Tell us the details and we'll add it.
 title: 'Add: '
 labels: [listing]
 body:
@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         DSM Tech Events lists public, community, tech events in and around Des Moines. We link to your page, and people sign up there.
-        If your group is on Meetup, its link is all we need: new events are pulled in automatically four times a day.
+        **On Meetup or Luma?** Use [Add a Luma event or Meetup group](https://github.com/kylehoehns/dsmtechevents/issues/new?template=1-add-from-link.yml) instead: it's quicker, and you get a preview within minutes.
   - type: input
     id: name
     attributes:
@@ -17,9 +17,9 @@ body:
   - type: input
     id: link
     attributes:
-      label: Meetup link, or website / public calendar link
-      description: For a group, its Meetup page if it has one. Otherwise its website or a public calendar (.ics) link.
-      placeholder: https://www.meetup.com/your-group/
+      label: Website or public calendar link
+      description: For a group, its website or a public calendar (.ics) link. For an event, its page.
+      placeholder: https://your-group.org/
     validations:
       required: true
   - type: textarea

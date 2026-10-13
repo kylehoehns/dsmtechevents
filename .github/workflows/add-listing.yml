@@ -1,0 +1,155 @@
+name: add listing
+
+# Turns one link into a pull request with a preview, so adding a Luma event
+# or a Meetup group is: open an issue, look at the preview, merge.
+#   - an issue opened with the "Add from a link" form (it carries the
+#     from-link label), or that label added again to try once more
+#   - by hand: gh workflow run add-listing.yml -f link=<url> [-f short=<name>]
+# scripts/add-listing.mjs does the work; this file moves its result around.
+# A link it can't add gets the reason as a comment and a needs-hands label.
+#
+# Two jobs, as in refresh.yml. `prepare` runs npm packages and reads a
+# stranger's link, with a read-only token and no secrets, and hands over only
+# a patch and a JSON result. `publish` runs nothing from npm and is the only
+# job that sees the GitHub App's token. The App opens the PR because a PR
+# opened with the workflow's own token wouldn't start CI, which main requires.
+# The App's ID and private key are the LISTING_APP_ID and LISTING_APP_KEY
+# secrets; it can write contents, pull requests and issues on this repo only,
+# and doesn't bypass the ruleset.
+
+on:
+  issues:
+    types: [opened, labeled]
+  workflow_dispatch:
+    inputs:
+      link:
+        description: Luma event or Meetup group link
+        required: true
+      short:
+        description: For a Meetup group, the short name on the calendar (optional)
+        required: false
+
+permissions:
+  contents: read
+
+# A new issue fires both `opened` and `labeled`; the later run replaces the
+# earlier, so each request gets one answer.
+concurrency:
+  group: add-listing-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'from-link'))
+      || (github.event.action == 'labeled' && github.event.label.name == 'from-link')
+    runs-on: ubuntu-24.04
+    # The fetch caps each request at 20s; a run takes about a minute.
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # The link reaches the script through the event file or an env var,
+      # never through ${{ }} in the script, so nothing in it can run as shell.
+      - name: add the listing
+        env:
+          LINK: ${{ inputs.link }}
+          SHORT: ${{ inputs.short }}
+          OUT: ${{ runner.temp }}/listing
+        run: |
+          mkdir -p "$OUT"
+          if [ "$GITHUB_EVENT_NAME" = issues ]; then
+            set -- --from-event "$GITHUB_EVENT_PATH"
+          else
+            set -- "$LINK"
+            if [ -n "$SHORT" ]; then set -- "$@" --short "$SHORT"; fi
+          fi
+          # Exit 2 (left for a person) and 1 (an error) both write the
+          # reason to listing.json, which publish posts on the issue.
+          node scripts/add-listing.mjs "$@" --out "$OUT/listing.json" || true
+          git add -A data
+          git diff --cached --binary > "$OUT/listing.patch"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: listing
+          path: ${{ runner.temp }}/listing/
+          if-no-files-found: error
+          retention-days: 3
+
+  publish:
+    needs: prepare
+    # Also after a failed prepare, to say so on the issue.
+    if: always() && needs.prepare.result != 'skipped' && needs.prepare.result != 'cancelled'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app
+        with:
+          app-id: ${{ secrets.LISTING_APP_ID }}
+          private-key: ${{ secrets.LISTING_APP_KEY }}
+          # Only what this job uses, even if the App is given more later.
+          permission-contents: write
+          permission-pull-requests: write
+          permission-issues: write
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        continue-on-error: true
+        with:
+          name: listing
+          path: ${{ runner.temp }}/listing
+      - name: open the pull request, or say why not
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+          ISSUE: ${{ github.event.issue.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          DIR: ${{ runner.temp }}/listing
+        run: |
+          # Reply on the issue (when there is one) and in the run's summary.
+          say() {
+            if [ -n "$ISSUE" ]; then gh issue comment "$ISSUE" --body "$1"; fi
+            printf '%s\n' "$1" >> "$GITHUB_STEP_SUMMARY"
+          }
+          if [ ! -f "$DIR/listing.json" ]; then
+            say "The bot hit an error before it could read the link: $RUN_URL"
+            exit 1
+          fi
+          if [ "$(jq -r .ok "$DIR/listing.json")" != true ]; then
+            if [ -n "$ISSUE" ]; then
+              gh label create needs-hands --color fbca04 --description "A listing request the bot couldn't add by itself" --force
+              gh issue edit "$ISSUE" --add-label needs-hands
+            fi
+            say "$(printf "Couldn't add this automatically: %s\n\nThe site's owner will take a look." "$(jq -r .reason "$DIR/listing.json")")"
+            exit 0
+          fi
+
+          branch=$(jq -r .branch "$DIR/listing.json")
+          title=$(jq -r .title "$DIR/listing.json")
+          preview=$(jq -r .preview "$DIR/listing.json")
+          jq -r .body "$DIR/listing.json" > "$DIR/body.md"
+
+          # Commit as the App's bot account, so the PR shows who made it.
+          bot_id=$(gh api "users/${APP_SLUG}%5Bbot%5D" --jq .id)
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${bot_id}+${APP_SLUG}[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git apply --index "$DIR/listing.patch"
+          git commit -m "$title" -m "Written by scripts/add-listing.mjs ($RUN_URL)."
+          # A second try for the same listing replaces the branch's commit.
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/$branch"
+
+          pr=$(gh pr list --head "$branch" --state open --json url --jq '.[0].url // empty')
+          if [ -z "$pr" ]; then
+            pr=$(gh pr create --head "$branch" --base main --title "$title" --body-file "$DIR/body.md")
+          fi
+          say "$(printf "Opened %s.\n\nPreview, ready in a couple of minutes: %s" "$pr" "$preview")"

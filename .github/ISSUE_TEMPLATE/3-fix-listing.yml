@@ -1,4 +1,4 @@
-name: Something's wrong with a listing
+name: Fix a listing
 description: An event or group on the site has the wrong time, place, link or name, or shouldn't be listed.
 title: 'Listing: '
 labels: [listing]
