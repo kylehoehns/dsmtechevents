@@ -59,6 +59,13 @@ test('"beginner" finds the events that say newcomers are welcome', () => {
   assert.ok(!finds('beginner', 'Hydra 1010 deep dive'));
 });
 
+test('"student" and "internship" find campus events and talks about getting hired', () => {
+  assert.ok(finds('students', 'Come join ISSA at DMACC as we share IT hiring and career information'));
+  assert.ok(finds('student', 'Panel on the current state of hiring in software development'));
+  assert.ok(finds('internship', 'IT hiring and career information'));
+  assert.ok(!finds('student', 'Carl began his career in IT as an infrastructure engineer'));
+});
+
 test('a synonym of a plural key word, and every word still has to match', () => {
   assert.ok(finds('llms', 'ChatGPT tips'));
   assert.ok(finds('ai python', 'Python and Copilot'));

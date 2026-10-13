@@ -11,6 +11,24 @@
   tags: [conference]
   headliner: true
 
+# At the conference's venue: the evening of its first day, right under its
+# row, and the Monday after, the first row of the next section. For
+# list.spec.mjs: each prints the address the row above can't be relied on for.
+- title: Conf Afterparty
+  url: https://example.com/afterparty
+  start: 2026-10-22
+  time: "18:00"
+  endTime: "20:00"
+  venue: Convention Center
+  address: 833 5th Ave, Des Moines, IA 50309
+- title: Convention Center Tour
+  url: https://example.com/tour
+  start: 2026-10-26
+  time: "12:00"
+  endTime: "13:00"
+  venue: Convention Center
+  address: 833 5th Ave, Des Moines, IA 50309
+
 # Evenings on the two daylight-saving Sundays, for time-travel.spec.mjs:
 # clocks fall back at 2am on Nov 1 2026 and spring forward on Mar 14 2027.
 - title: Fall Back Hack Night

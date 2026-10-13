@@ -195,6 +195,18 @@ test('a venue in the row above drops its street address', async ({ page }) => {
   await expect(row(page, 'Hack Night Returns').getByText('4501 NW Urbandale Dr, Urbandale')).toBeVisible();
 });
 
+test('the row above only counts when it shows its venue, in the same section', async ({ page, isMobile }) => {
+  await page.goto('/');
+  const addr = '833 5th Ave';
+  // Right under the conference. Desktop prints the conference's venue on the
+  // poster, not its row, so the afterparty keeps the address; on a phone the
+  // conference row shows it, so the afterparty drops it.
+  if (isMobile) await expect(row(page, 'Conf Afterparty').getByText(addr)).toBeHidden();
+  else await expect(row(page, 'Conf Afterparty').getByText(addr)).toBeVisible();
+  // Same venue as the row above, but a section heading sits between them.
+  await expect(row(page, 'Convention Center Tour').getByText(addr)).toBeVisible();
+});
+
 test('venue links open Google Maps', async ({ page }) => {
   await page.goto('/');
   const map = row(page, 'Coding Dojo').getByRole('link', { name: /Source Allies.*opens map in new tab/ });

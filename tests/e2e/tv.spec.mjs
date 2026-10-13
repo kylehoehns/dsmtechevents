@@ -53,13 +53,15 @@ test('drops events once they have ended', async ({ page }) => {
   await expect(page.locator('.overview')).toContainText('Python Office Hours');
 });
 
-// The overview fits 7 rows; the fixture has fewer upcoming, so the test
-// shrinks the limit to 3 rather than adding events.
+// The overview fits 7 rows. The test sets the limit itself: every event
+// fits, then only 3, so the counts don't hang on how many the fixture has.
 test('the overview says how many more are on the posters, and fills in as events end', async ({ page }) => {
   await page.goto('/tv/?fx=off');
   const more = page.locator('.overview .tv-more');
-  await expect(more).toBeHidden();
   const total = await page.locator('.overview li').count();
+  await more.evaluate((el, n) => (el.dataset.rows = String(n)), total);
+  await page.keyboard.press('ArrowRight');
+  await expect(more).toBeHidden();
   await more.evaluate((el) => (el.dataset.rows = '3'));
   await page.keyboard.press('ArrowRight'); // the next slide change re-checks
   await expect(page.locator('.overview li:visible')).toHaveCount(3);

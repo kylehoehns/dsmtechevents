@@ -235,19 +235,26 @@ function renderList() {
 
 // Don't print what the row above just said: the date for a second event on
 // the same day, the street address for a second event at the same venue. Only
-// the row above: an address shown weeks earlier is off screen by now.
+// the row above, in the same section: an address shown weeks earlier, or above
+// a section heading, is off screen by now. A posted conference's row on a wide
+// screen leaves its venue to the poster beside it (global.css), so the row
+// under it has nothing to lean on.
+const wide = matchMedia('(min-width: 1060px)');
 function squashRepeats() {
   let prevDay = null;
   let prevVenue = null;
+  let section = null;
   for (const el of $$('.show', listView)) {
     if (el.hidden || el.closest('[hidden]')) continue;
+    if (el.parentElement !== section) { section = el.parentElement; prevVenue = null; }
     el.classList.toggle('same-day', el.dataset.day === prevDay && el.previousElementSibling != null);
     prevDay = el.dataset.day;
     const v = el.dataset.venue;
     el.classList.toggle('addr-seen', !!v && v === prevVenue);
-    prevVenue = v || null;
+    prevVenue = el.classList.contains('posted') && wide.matches ? null : v || null;
   }
 }
+wide.addEventListener('change', squashRepeats);
 
 // ---- what matched ----
 // While a search is on, each result marks what matched in the text it shows:
@@ -813,7 +820,11 @@ async function toggleAbout(more) {
     desc.hidden = !isOpen;
     card.classList.toggle('open', isOpen);
   };
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return set(open);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    set(open);
+    if (open) revealAbout(desc, false);
+    return;
+  }
 
   const thumb = $('.photo img', card);
   const big = $('.desc-photo', card);
@@ -833,6 +844,7 @@ async function toggleAbout(more) {
       const grow = slide(desc, true);
       if (fly) await flyImage(big, from, to, { rotate: [rotation(thumb), 0], hide: [big] });
       await grow;
+      revealAbout(desc, true);
     } else {
       const from = fly && big.getBoundingClientRect();
       const to = fly && thumb.getBoundingClientRect(); // the thumbnail keeps its spot while hidden
@@ -844,6 +856,17 @@ async function toggleAbout(more) {
   } finally {
     delete card.dataset.animating;
   }
+}
+
+// The open panel's photo comes first, and near the bottom of the screen (a
+// phone, mostly) it fills what's left, so the words just opened start below
+// it. Bring the photo up to the top with the words right under it; leave the
+// page alone when they're already showing.
+function revealAbout(desc, smooth) {
+  const photo = $('.desc-photo', desc);
+  const words = photo?.nextElementSibling;
+  if (!words || words.getBoundingClientRect().top < innerHeight - 48) return;
+  scrollBy({ top: photo.getBoundingClientRect().top - 12, behavior: smooth ? 'smooth' : 'auto' });
 }
 
 // Animate a panel's height, padding and margin between 0 and its natural size.

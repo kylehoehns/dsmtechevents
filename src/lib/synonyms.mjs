@@ -33,4 +33,9 @@ export const SYNONYMS = {
   // a phrase only has to start a word, so it would find "new tools").
   beginner: ['all levels', 'all experience levels', 'all skill levels', 'newbie', 'newcomer', 'first time', 'have never', 'no experience', 'getting started', 'introduction', 'introductory', 'intro to', '101'],
   newcomer: ['all levels', 'all experience levels', 'all skill levels', 'newbie', 'beginner', 'first time', 'have never', 'no experience', 'getting started', 'introduction', 'introductory', 'intro to', '101'],
+  // Where a student would look: a campus, or a talk about getting hired.
+  // ("career" alone is no good: speakers' bios say "began his career"; nor
+  // "intern", which starts "internal".)
+  student: ['college', 'university', 'campus', 'dmacc', 'drake', 'grand view', 'iowa state', 'career fair', 'career panel', 'career information', 'job fair', 'hiring'],
+  internship: ['interns', 'career fair', 'career panel', 'career information', 'job fair', 'hiring'],
 };

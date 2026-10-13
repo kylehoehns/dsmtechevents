@@ -164,7 +164,7 @@ test('no match shows a friendly note that clears the search', async ({ page }) =
   await expect(box(page)).toBeFocused();
   await expect(box(page)).toHaveValue('');
   await expect(event(page, 'Coding Dojo')).toBeVisible();
-  await expect(page.getByRole('status')).toHaveText('Showing 10 events');
+  await expect(page.getByRole('status')).toHaveText('Showing 12 events');
 });
 
 test('an archived event is found by words in its description, with the excerpt to show why', async ({ page }) => {
