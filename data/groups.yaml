@@ -85,7 +85,7 @@
   meetup: https://www.meetup.com/dsmsql/
 
 - id: secdsm
-  name: SecDSM
+  name: SecDSM Information Security Meetup
   short: SecDSM
   source: secdsm
   website: https://secdsm.org/
@@ -98,21 +98,21 @@
   website: https://iowansofthings.com/
 
 - id: pmi
-  name: PMI Central Iowa Chapter
+  name: Project Management Institute Central Iowa Chapter
   short: PMI
   source: pmi-chapter
   website: https://pmi-centraliowa.org/
   logo: https://pmi-centraliowa.org/static/img/logo-login.jpg
 
 - id: iiba
-  name: IIBA Central Iowa Chapter
+  name: International Institute of Business Analysis Central Iowa Chapter
   short: IIBA
   source: iiba-chapter
   website: https://centraliowa.iiba.org/
   logo: https://clubrunner.blob.core.windows.net/00000400579/Favicon/macIcon.png
 
 - id: issa
-  name: ISSA Des Moines Chapter
+  name: Information Systems Security Association Des Moines Chapter
   short: ISSA
   source: issa-chapter
   website: https://issadesmoines.org/
