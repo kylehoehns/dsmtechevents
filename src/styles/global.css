@@ -255,7 +255,8 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
   .headliners .poster .when { font-size: var(--fs-ui); white-space: nowrap; }
   .headliners .poster .go { order: 0; flex: none; white-space: nowrap; }
   .headliners .poster .stamp-days { margin: 0 4px 0 auto; }
-  .headliners .poster .tape { left: auto; right: 24%; margin-left: 0; } /* clear of the button */
+  /* at the far right, over the stamp: the button sits wherever the title ends */
+  .headliners .poster .tape { left: auto; right: 8px; margin-left: 0; }
 }
 /* the poster's button is outlined in the poster's own text color */
 .poster { --btn-line: currentColor; --btn-hover-bg: var(--on-pink); --btn-hover-fg: var(--pink-fill); }
@@ -276,26 +277,27 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 }
 
 /* ---------- page layout: main column + side rail on desktop ---------- */
-/* Source order is the phone order: headliners, (mini calendar, desktop only),
-   main (the group filter bar on top), day panel, recent. Desktop places the rail pieces in column 2,
+/* Source order is the phone order: headliners, main (the group filter bar on
+   top), then the desktop-only mini calendar, day panel, recent. The mini
+   calendar comes after main so the keyboard reaches This week before it. Desktop places the rail pieces in column 2,
    one row each, with the day panel on top. The last row is 1fr so a tall main
    column doesn't spread the rail. */
 .layout { display: flex; flex-direction: column; margin-top: 22px; }
 .layout > .main { min-width: 0; }
 .lead, .side { display: contents; }
 .lead > .headliners { margin-bottom: 12px; }
-.lead > .minical { display: none; }
+.layout > .minical { display: none; }
 @media (min-width: 1060px) {
   .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; grid-template-rows: repeat(5, auto) 1fr; gap: 0 40px; align-items: start; }
   .layout > .main { grid-column: 1; grid-row: 1 / -1; }
-  .lead > *, .side > * { grid-column: 2; }
+  .lead > *, .layout > .minical, .side > * { grid-column: 2; }
   /* the 22px gap between rail pieces is each one's top margin; whichever
      piece shows first gets none */
   .side > .day-panel { grid-row: 1; margin-top: 0; }
   .lead > .headliners { grid-row: 2; margin-top: 0; }
-  .lead > .minical { grid-row: 3; margin-top: 22px; display: block; }
+  .layout > .minical { grid-row: 3; margin-top: 22px; display: block; }
   .side > .recent { grid-row: 5; margin-top: 22px; }
-  .layout:not(:has(#headliners:not([hidden]))) .lead > .minical { margin-top: 0; }
+  .layout:not(:has(#headliners:not([hidden]))) > .minical { margin-top: 0; }
 }
 
 /* Calendar view. Layout.astro sets data-view before first paint on
@@ -489,8 +491,9 @@ mark {
 
 /* ---------- mini month (desktop rail) ---------- */
 .minical { border: 2px solid var(--line); padding: 10px 10px 8px; }
-.minical h2 { font: 900 var(--fs-title)/0.9 var(--display); text-transform: uppercase; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
-.minical h2 a { font: 600 var(--fs-label)/1 var(--mono); text-transform: none; }
+.minical .mini-head { margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.minical h2 { font: 900 var(--fs-title)/0.9 var(--display); text-transform: uppercase; margin: 0; }
+.minical .mini-head a { font: 600 var(--fs-label)/1 var(--mono); }
 .mini-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; text-align: center; }
 .mini-grid .weekday { font: 700 var(--fs-micro)/1 var(--mono); color: var(--ink-soft); padding: 2px 0 4px; }
 .mini-grid button, .mini-grid span.blank { aspect-ratio: 1; display: grid; place-items: center; font: 800 var(--fs-ui)/1 var(--display); background: none; border: 0; padding: 0; position: relative; }
@@ -590,7 +593,6 @@ mark {
 /* no logo of their own: a monogram in our type, so the card still has its tile */
 .flyer .logo-mono { display: grid; place-items: center; background: var(--pink-fill); color: var(--on-pink); border-color: var(--pink-fill); font: 900 26px/1 var(--display); letter-spacing: -0.01em; }
 .flyer h2 { margin: 0; font: 900 var(--fs-title-l)/0.9 var(--display); text-transform: uppercase; overflow-wrap: anywhere; }
-.flyer h2 a { text-decoration: none; }
 .flyer .full { margin: 0; font-size: var(--fs-label); line-height: 1.35; }
 .flyer .facts { grid-column: -2 / -1; margin: 3px 0 0; font: var(--fs-label)/1.3 var(--mono); color: var(--ink-soft); }
 .flyer .next { margin: 10px 0 0; padding-top: 8px; border-top: 1.5px dashed var(--line); font-size: var(--fs-meta); }
@@ -666,12 +668,11 @@ mark {
    tall without looking any bigger. A see-through ::after box, centered on the
    control, takes the tap; the layout doesn't move. (min() keeps a control
    that is already taller at its own size.) The group name on a card grows
-   up, away from the title link just below it; a Groups card's name grows
-   both ways (nothing else on the card is a link near it). The organizers' event picker
+   up, away from the title link just below it. The organizers' event picker
    is a real form field, so it simply gets taller. */
 @media (pointer: coarse) {
-  :is(.btn, .more, .band a, .flyer h2 a) { position: relative; }
-  :is(.btn, .more, .flyer h2 a)::after { content: ""; position: absolute; left: 0; right: 0; top: min(0px, calc(50% - 22px)); bottom: min(0px, calc(50% - 22px)); }
+  :is(.btn, .more, .band a) { position: relative; }
+  :is(.btn, .more)::after { content: ""; position: absolute; left: 0; right: 0; top: min(0px, calc(50% - 22px)); bottom: min(0px, calc(50% - 22px)); }
   .band a::after { content: ""; position: absolute; left: 0; right: 0; top: min(0px, calc(100% - 41px)); bottom: -3px; }
   .builder select { min-height: 44px; }
 }
@@ -699,7 +700,7 @@ mark {
   .btn-solid:hover { background: var(--btn-hover-bg, var(--blue-fill)); color: var(--btn-hover-fg, var(--on-blue)); border-color: var(--btn-hover-bg, var(--blue-fill)); }
   .btn-outline:hover { background: var(--btn-hover-bg, var(--pink-fill)); color: var(--btn-hover-fg, var(--on-pink)); border-color: var(--btn-hover-bg, var(--pink-fill)); }
   .cal-nav .btn[aria-disabled="true"]:hover { background: var(--paper); color: var(--ink-soft); border-color: var(--line); }
-  :is(.band a, .flyer h2 a):hover { color: var(--blue-t); text-decoration: underline; text-decoration-thickness: 2px; }
+  .band a:hover { color: var(--blue-t); text-decoration: underline; text-decoration-thickness: 2px; }
   .title a:hover { text-decoration: underline; text-underline-offset: 3px; }
   .meta a.map:hover .venue { text-decoration-style: solid; }
   .setlist a:hover .row-title { text-decoration: underline; }

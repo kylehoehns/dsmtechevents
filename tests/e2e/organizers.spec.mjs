@@ -11,6 +11,28 @@ test("picking CIJUG's event gives its screen link and preview", async ({ page, b
   await expect(page.getByRole('link', { name: /Open preview/ })).toHaveAttribute('href', url);
 });
 
+// Two repeating series in the fixtures: DSM AI's study group (3 dates) and
+// Pyowa's office hours (2). Each is one choice, its next date, from the data
+// alone; when that date ends, the next one takes its place.
+test('a repeating series is one choice in the screen picker, its next date', async ({ page }) => {
+  const options = (title) => page.locator('#b-event option', { hasText: title });
+  await page.goto('/organizers/');
+  await expect(options('AI Study Group')).toHaveText(['DSM AI: AI Study Group, Thu Nov 12']);
+  await expect(options('Python Office Hours')).toHaveText(['Pyowa: Python Office Hours, Thu Oct 15']);
+
+  await page.clock.setSystemTime(new Date('2026-10-16T14:00:00Z'));
+  await page.reload();
+  await expect(options('Python Office Hours')).toHaveText(['Pyowa: Python Office Hours, Thu Nov 19']);
+});
+
+test('says how to fix a listing and when a change shows up', async ({ page }) => {
+  await page.goto('/organizers/');
+  const fix = page.locator('section', { has: page.getByRole('heading', { name: 'Something wrong?' }) });
+  await expect(fix).toContainText('four times a day, at about 5:20a, 10:20a, 2:20p and 6:20p');
+  await expect(fix.getByRole('link', { name: 'Fix a listing form' })).toHaveAttribute('href', 'https://github.com/kylehoehns/dsmtechevents/issues/new?template=3-fix-listing.yml');
+  await expect(page.getByRole('link', { name: 'paste its link into this form' })).toHaveAttribute('href', 'https://github.com/kylehoehns/dsmtechevents/issues/new?template=1-add-from-link.yml');
+});
+
 test('copies the screen link and the badge snippets', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/organizers/');

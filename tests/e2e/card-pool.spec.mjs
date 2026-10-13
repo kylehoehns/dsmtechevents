@@ -34,7 +34,8 @@ test('the day panel says it is loading while the pool is on its way', async ({ p
 plain('if the pool can\'t load, the day panel still names the event and links to it', async ({ page }) => {
   await page.route('**/cards/', (route) => route.fulfill({ status: 503, body: 'offline' }));
   await page.goto('/?view=calendar&day=2026-10-05');
-  const link = dayPanel(page).getByRole('link', { name: 'Hiring in the Age of AI (opens in new tab)' });
+  const link = dayPanel(page).getByRole('link', { name: 'Hiring in the Age of AI', exact: true });
   await plainExpect(link).toHaveAttribute('href', 'https://www.meetup.com/des-moines-web-geeks/events/1/');
+  await plainExpect(link).toHaveAccessibleDescription('Opens in new tab');
   await plainExpect(dayPanel(page)).not.toContainText('Loading events…');
 });

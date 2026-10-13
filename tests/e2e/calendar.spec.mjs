@@ -110,20 +110,26 @@ test('arrow keys move between days and focus survives picking one', async ({ pag
   await expect(page.getByRole('status')).toHaveText('Thursday, October 22: 1 event');
 });
 
-test('the mini calendar is one tab stop; arrow keys move between its days', async ({ page, isMobile }) => {
+test('the keyboard reaches the list before the mini calendar, which is one tab stop; arrow keys move between its days', async ({ page, isMobile }) => {
   test.skip(isMobile, 'the mini calendar is desktop only');
   await page.goto('/');
   const mini = page.getByRole('group', { name: 'October 2026' });
-  // Tab from the top of the page to the first link in the event list.
+  const at = (sel) => page.evaluate((s) => !!document.activeElement?.closest(s), sel);
+  // Tab from the top of the page to the first link in the event list. The
+  // mini calendar is drawn beside the list, but comes after it.
   let presses = 0;
-  let minicalStops = 0;
-  while (presses < 80 && !(await page.evaluate(() => !!document.activeElement?.closest('#list-view')))) {
+  while (presses < 80 && !(await at('#list-view'))) {
     await page.keyboard.press('Tab');
     presses++;
-    if (await page.evaluate(() => !!document.activeElement?.closest('.mini-grid'))) minicalStops++;
+    expect(await at('#minical'), 'the mini calendar comes before the list').toBe(false);
   }
-  expect(minicalStops).toBe(1);
-  expect(presses).toBeLessThanOrEqual(15);
+  expect(presses).toBeLessThanOrEqual(12);
+  // From its "Full calendar" link: one stop in the grid, then out of it.
+  await page.getByRole('link', { name: 'Full calendar' }).focus();
+  await page.keyboard.press('Tab');
+  expect(await at('.mini-grid')).toBe(true);
+  await page.keyboard.press('Tab');
+  expect(await at('.mini-grid')).toBe(false);
 
   const today = mini.getByRole('button', { name: /^Wednesday, October 14,/ });
   await today.focus();

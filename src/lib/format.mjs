@@ -136,6 +136,14 @@ export function shortTime(iso) {
   return timeFmt.format(new Date(iso)).replace(':00', '').replace(/\s?AM$/, 'a').replace(/\s?PM$/, 'p');
 }
 
+// When the refresh runs (site.refreshUtc), in Des Moines time on the given
+// day: "5:20a, 10:20a, 2:20p and 6:20p" in summer, an hour earlier in winter.
+export function refreshTimes(now = Date.now()) {
+  const date = new Date(now).toISOString().slice(0, 10);
+  const times = site.refreshUtc.map((t) => shortTime(`${date}T${t}:00Z`));
+  return `${times.slice(0, -1).join(', ')} and ${times.at(-1)}`;
+}
+
 // "Oct 15–16", or "Oct 30–Nov 2" across a month. Ends on lastDay(), so an
 // event ending at midnight doesn't gain a day.
 export function dateRange(start, end) {

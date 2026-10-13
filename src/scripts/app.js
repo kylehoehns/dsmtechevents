@@ -467,7 +467,7 @@ function renderDayPanel() {
       // linked to the event's page, still says what was on.
       const href = e.url ?? groups[e.groups[0]]?.url;
       ul.insertAdjacentHTML('beforeend', `<li class="show"><div class="body"><h3 class="title">${href
-        ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(e.title)}<span class="sr-only"> (opens in new tab)</span></a>`
+        ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener" aria-describedby="new-tab">${escapeHtml(e.title)}</a>`
         : escapeHtml(e.title)}</h3></div></li>`);
       continue;
     }
@@ -522,7 +522,7 @@ function renderMinical() {
     // One tab stop (today); arrow keys move between days, as in the big calendar.
     return `<button type="button" class="${cls}" data-goto="${key}" tabindex="${key === today ? 0 : -1}" aria-label="${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}">${Number(key.slice(8))}</button>`;
   });
-  minical.innerHTML = `<h2>${monthName(ym)} <a href="?view=calendar" data-nav="calendar">Full calendar</a></h2>
+  minical.innerHTML = `<div class="mini-head"><h2>${monthName(ym)}</h2><a href="?view=calendar" data-nav="calendar">Full calendar</a></div>
     <div class="mini-grid" role="group" aria-label="${monthName(ym, true)}">${WEEKDAYS.map((d) => `<span class="weekday" aria-hidden="true">${d[0]}</span>`).join('')}${cells.join('')}</div>`;
 }
 
@@ -738,6 +738,14 @@ function gridKeys(root, attr) {
 }
 gridKeys(calView, 'data-day');
 gridKeys(minical, 'data-goto');
+
+// The phone's poster strip scrolls sideways with no scrollbar. Tabbing to a
+// poster's button brings its whole poster into view; the browser alone stops
+// once any of the button shows, leaving it and its focus ring cut off.
+$('#headliners')?.addEventListener('focusin', (ev) => {
+  const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  ev.target.closest('.poster')?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'nearest', inline: 'nearest' });
+});
 
 // Back/Forward: the URL changed under us, so read it again. The status line
 // says what is showing now, the same as a click would.
