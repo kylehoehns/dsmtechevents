@@ -15,3 +15,12 @@ test('a conference row is boxed on paper, and the tape stays on screen', async (
   await expect(page.locator('.sheet .tape').first()).toBeHidden();
   await expect(page.locator('.tear-note')).toBeVisible();
 });
+
+// A sheet on a corkboard goes stale; it says, big, the last day it lists
+// everything. The fixtures all fit, so that's the end of the four weeks from
+// the build (Wed Oct 14): Tue Nov 10.
+test('the flyer says how long it is good for', async ({ page }) => {
+  await page.goto('/print/');
+  await expect(page.locator('.sheet-foot .through')).toHaveText('Good through Tue Nov 10');
+  await expect(page.locator('.kicker')).toHaveText('Des Moines tech meetups'); // the date is said once, in the footer
+});

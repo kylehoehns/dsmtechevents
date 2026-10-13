@@ -29,7 +29,8 @@ const choices = upcoming.map((e) => ({
   id: e.id,
   end: e.end,
   series: seriesKey(e),
-  label: `${e.hostsLabel}: ${e.title}, ${weekday(e.start)} ${month(e.start)} ${day(e.start)}`,
+  // Date first: the list is by date, and a title can end in anything ("+ 1 more").
+  label: `${weekday(e.start)} ${month(e.start)} ${day(e.start)} · ${e.hostsLabel}: ${e.title}`,
 }));
 const firstUrl = choices[0] ? `${site.url}/tv/?event=${encodeURIComponent(choices[0].id)}` : '';
 
@@ -109,8 +110,8 @@ const snippets = [
               </select>
             </p>
             <div class="tv-link">
-              <p class="tv-link-label" id="b-url-label">Your screen's link</p>
-              <pre><code id="b-url" aria-labelledby="b-url-label">{firstUrl}</code></pre>
+              <p class="tv-link-label">Your screen's link</p>
+              <pre><code id="b-url">{firstUrl}</code></pre>
               <div class="tv-link-actions">
                 <button type="button" class="btn btn-solid" id="b-copy">Copy link</button>
                 <a class="btn btn-outline" id="b-open" href={firstUrl} target="_blank" rel="noopener">Open preview<span class="sr-only"> (opens in new tab)</span></a>
