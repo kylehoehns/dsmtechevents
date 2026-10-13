@@ -78,3 +78,16 @@ test.describe('320px wide with wider text spacing', () => {
     });
   }
 });
+
+// iPhone Safari zooms in on any form field with text under 16px when it's
+// tapped, and stays zoomed, so the page then pans sideways. The organizers'
+// event picker was 15px. Every field on every page is 16px or more.
+test('form fields are big enough that iPhone Safari does not zoom in on them', async ({ page }) => {
+  for (const path of new Set(VIEWS.map(([path]) => path))) {
+    await page.goto(path);
+    const small = await page.evaluate(() => [...document.querySelectorAll('input, select, textarea')]
+      .filter((el) => parseFloat(getComputedStyle(el).fontSize) < 16)
+      .map((el) => `#${el.id} ${getComputedStyle(el).fontSize}`));
+    expect(small, path).toEqual([]);
+  }
+});
