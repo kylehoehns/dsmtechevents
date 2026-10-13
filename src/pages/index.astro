@@ -67,6 +67,9 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
   <script type="application/ld+json" set:html={toScript(structured)} />
   <h1 class="sr-only">Upcoming tech events in Des Moines</h1>
   <p class="sr-only" role="status" id="status"></p>
+  {/* What an event title link says after its name (aria-describedby), so the
+      heading it sits in is just the title. */}
+  <span id="new-tab" hidden>Opens in new tab</span>
   <div class="layout">
     {/* Headliners come first in the page so phones read and tab them in the
         order they show. On desktop the grid puts them in the side rail (see
@@ -84,16 +87,12 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
                 {/* On the day itself the hand-lettered note gives way to a pasted-up strip (app.js re-checks both). */}
                 <span class:list={['stamp-days', 'countdown', { 'day-of': dayOf(stamp) }]} data-start={e.start} data-end={e.end} data-days={e.multiDay && !e.allDay ? '' : undefined}>{stamp}</span>
                 <p class="where">{e.venue}{e.address && <><br />{e.address}</>}</p>
-                <a class="go btn btn-outline" href={e.url} target="_blank" rel="noopener" data-click="poster">RSVP & info<span class="sr-only">: {e.title} (opens in new tab)</span> <OutArrow /></a>
+                <a class="go btn btn-outline" href={e.url} target="_blank" rel="noopener" data-click="poster" aria-label={`RSVP & info: ${e.title} (opens in new tab)`}>RSVP & info <OutArrow /></a>
               </div>
             </article>
           ); })}
         </section>
       )}
-
-      {/* desktop only; phones hide it */}
-      <section class="minical" id="minical" aria-label="This month"></section>
-
     </div>
 
     <div class="main">
@@ -144,6 +143,11 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
 
       <section id="calendar-view" aria-label="Calendar" hidden></section>
     </div>
+
+    {/* Desktop only; phones hide it. After the list in the page, so the
+        keyboard and screen readers reach This week first; the grid still
+        draws it in the rail under the posters. */}
+    <section class="minical" id="minical" aria-label="This month"></section>
 
     <aside class="side" aria-label="Day details and recent events">
       <section class="day-panel" id="day-panel" hidden></section>
