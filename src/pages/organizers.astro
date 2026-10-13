@@ -7,7 +7,7 @@
 import Layout from '../layouts/Layout.astro';
 import { site } from '../lib/site.mjs';
 import { loadData, seriesKey } from '../lib/data.mjs';
-import { weekday, month, day, refreshTimes } from '../lib/format.mjs';
+import { weekday, month, day } from '../lib/format.mjs';
 
 const { upcoming, updatedAt } = loadData();
 
@@ -91,7 +91,7 @@ const snippets = [
 
     <section>
       <h2>Something wrong?</h2>
-      <p>Most events come straight from your Meetup page or website. Fix the time, place or title there, and the site picks it up at its next check. It checks four times a day, at about {refreshTimes()}.</p>
+      <p>Most events come straight from your Meetup page or website. Fix the time, place or title there, and the site picks it up at its next check.</p>
       <p>For anything else, like a wrong link or an event that shouldn't be listed, use the <a href={form('3-fix-listing.yml')}>Fix a listing form</a> on GitHub or email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
     </section>
 

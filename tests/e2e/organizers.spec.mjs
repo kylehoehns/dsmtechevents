@@ -25,10 +25,10 @@ test('a repeating series is one choice in the screen picker, its next date', asy
   await expect(options('Python Office Hours')).toHaveText(['Pyowa: Python Office Hours, Thu Nov 19']);
 });
 
-test('says how to fix a listing and when a change shows up', async ({ page }) => {
+test('says how to fix a listing', async ({ page }) => {
   await page.goto('/organizers/');
   const fix = page.locator('section', { has: page.getByRole('heading', { name: 'Something wrong?' }) });
-  await expect(fix).toContainText('four times a day, at about 5:20a, 10:20a, 2:20p and 6:20p');
+  await expect(fix).toContainText('picks it up at its next check');
   await expect(fix.getByRole('link', { name: 'Fix a listing form' })).toHaveAttribute('href', 'https://github.com/kylehoehns/dsmtechevents/issues/new?template=3-fix-listing.yml');
   await expect(page.getByRole('link', { name: 'paste its link into this form' })).toHaveAttribute('href', 'https://github.com/kylehoehns/dsmtechevents/issues/new?template=1-add-from-link.yml');
 });
