@@ -3,7 +3,7 @@ import { test, expect } from './fixtures.mjs';
 
 const list = (page) => page.getByRole('region', { name: 'Upcoming events' });
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-// An event's title in the list (its accessible name adds "(opens in new tab)").
+// An event's title in the list.
 const event = (page, title) => list(page).getByRole('heading', { name: new RegExp(`^${escape(title)}`) });
 // A group's name on an event row is the way into its filter (search covers the rest).
 const groupLink = (page, eventText, name) => list(page).getByRole('listitem').filter({ hasText: eventText }).getByRole('link', { name, exact: true });
