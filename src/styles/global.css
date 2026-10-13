@@ -405,7 +405,7 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
   .show.has-photo .body { grid-column: 2; grid-row: 1; }
   .show.has-photo .photo { display: block; grid-column: 3; grid-row: 1 / span 2; width: 160px; align-self: start; }
   .show.has-photo .photo .ink { width: 160px; transform: rotate(-1deg); }
-  .show.has-photo:nth-child(even) .photo .ink { transform: rotate(0.8deg); }
+  .show.has-photo:nth-child(even of .has-photo) .photo .ink { transform: rotate(0.8deg); }
   .band a, .band span.band-name { font-size: var(--fs-title-l); }
   .acts, .desc { grid-column: 2 / -1; }
   .show.has-photo .acts { grid-column: 2; }
