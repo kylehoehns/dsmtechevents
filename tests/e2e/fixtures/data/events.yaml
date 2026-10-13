@@ -27,3 +27,13 @@
   endTime: "20:00"
   venue: Gravitate
   address: 1250 SE Gateway Dr, Grimes, IA 50111
+
+# Back at Source Allies two weeks after the Wednesday and Thursday events
+# there, with other venues in between, for list.spec.mjs: its address prints again.
+- title: Hack Night Returns
+  url: https://example.com/hack-night
+  start: 2026-10-29
+  time: "18:00"
+  endTime: "20:00"
+  venue: Source Allies
+  address: 4501 NW Urbandale Dr, Urbandale, IA 50322

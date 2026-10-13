@@ -48,6 +48,17 @@ test('a synonym finds what the word itself would not', () => {
   assert.ok(finds('data', 'Power BI dashboards'));
 });
 
+// Phrases from real listings (PyOWA, ISSA, CIJUG).
+test('"beginner" finds the events that say newcomers are welcome', () => {
+  assert.ok(finds('beginner', 'approachable for all experience levels'));
+  assert.ok(finds('beginners', 'Whether you’re a newbie or a seasoned pro'));
+  assert.ok(finds('newcomer', 'if you have never been to one of our events'));
+  assert.ok(finds('beginner', 'Kubernetes 101'));
+  assert.ok(finds('beginner', 'An introduction to Rust'));
+  assert.ok(!finds('beginner', 'New tools in Java 25'));
+  assert.ok(!finds('beginner', 'Hydra 1010 deep dive'));
+});
+
 test('a synonym of a plural key word, and every word still has to match', () => {
   assert.ok(finds('llms', 'ChatGPT tips'));
   assert.ok(finds('ai python', 'Python and Copilot'));

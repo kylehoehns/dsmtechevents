@@ -234,17 +234,18 @@ function renderList() {
 }
 
 // Don't print what the row above just said: the date for a second event on
-// the same day, the street address for a venue already shown.
+// the same day, the street address for a second event at the same venue. Only
+// the row above: an address shown weeks earlier is off screen by now.
 function squashRepeats() {
-  const seenVenues = new Set();
   let prevDay = null;
+  let prevVenue = null;
   for (const el of $$('.show', listView)) {
     if (el.hidden || el.closest('[hidden]')) continue;
     el.classList.toggle('same-day', el.dataset.day === prevDay && el.previousElementSibling != null);
     prevDay = el.dataset.day;
     const v = el.dataset.venue;
-    el.classList.toggle('addr-seen', !!v && seenVenues.has(v));
-    if (v) seenVenues.add(v);
+    el.classList.toggle('addr-seen', !!v && v === prevVenue);
+    prevVenue = v || null;
   }
 }
 

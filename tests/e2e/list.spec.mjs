@@ -184,12 +184,15 @@ test('overnight between conference days, the poster stamp agrees with the row', 
   await expect(tag).toBeHidden();
 });
 
-test('a venue already listed above drops its street address', async ({ page }) => {
+test('a venue in the row above drops its street address', async ({ page }) => {
   await page.goto('/');
-  // Both are at Source Allies; only the first row prints the address.
+  // Both are at Source Allies, back to back; only the first row prints the address.
   await expect(row(page, 'Coding Dojo').getByText('4501 NW Urbandale Dr, Urbandale')).toBeVisible();
   await expect(row(page, 'Python Office Hours').getByText('4501 NW Urbandale Dr, Urbandale')).toBeHidden();
   await expect(row(page, 'Python Office Hours').getByRole('link', { name: /Source Allies/ })).toBeVisible();
+  // Back there two weeks later, with other venues in between: the address
+  // above is long off screen, so it prints again.
+  await expect(row(page, 'Hack Night Returns').getByText('4501 NW Urbandale Dr, Urbandale')).toBeVisible();
 });
 
 test('venue links open Google Maps', async ({ page }) => {
