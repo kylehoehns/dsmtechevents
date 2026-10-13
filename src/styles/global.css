@@ -679,10 +679,25 @@ mark {
 
 /* the copy of a photo that flies between the thumbnail and About (app.js) */
 .about-ghost { position: fixed; z-index: 60; margin: 0; transform-origin: 0 0; pointer-events: none; object-fit: contain; border: 1.5px solid var(--line); background: var(--paper); }
+/* Small motion: the copy stamp, the arrow nudge, the search box and Recent
+   rows fading in, the linked group card drawing its outline. Fade-ins use
+   @starting-style, so only things that start hidden fade (nothing on load);
+   older browsers just show them. Tilts are print, not motion, so reduced
+   motion keeps them; the JS animations (About, the day panel) check it
+   themselves. */
+@media (prefers-reduced-motion: no-preference) {
+  .out-arrow { transition: transform 0.15s ease-out; }
+  .btn[data-done] { animation: stamp 0.2s ease-out; }
+  @keyframes stamp { from { transform: rotate(-3deg) scale(1.08); } }
+  .search { transition: opacity 0.15s ease-out; }
+  @starting-style { .search { opacity: 0; } }
+  .recent .setlist.open li.extra { transition: opacity 0.2s ease-out; }
+  @starting-style { .recent .setlist.open li.extra { opacity: 0; } }
+  .flyer:target { animation: pin 0.3s ease-out; }
+  @keyframes pin { from { outline-color: transparent; outline-offset: 14px; } }
+}
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transform: none !important; scroll-behavior: auto !important; }
-  .misprint::before { transform: translate(3px, 2px) !important; }
-  .logo .misprint::before { transform: translate(5px, 4px) !important; }
+  * { scroll-behavior: auto !important; }
 }
 
 /* Windows High Contrast drops backgrounds, which is all that marks today and
@@ -709,4 +724,5 @@ mark {
   .day.has:hover { background: var(--paper-2); }
   .day.headliner:hover { background: var(--pink-fill); }
   .foot .big a:hover { background: var(--on-blue); color: var(--blue-fill); }
+  .btn:hover .out-arrow { transform: translate(0.15em, -0.15em); }
 }
