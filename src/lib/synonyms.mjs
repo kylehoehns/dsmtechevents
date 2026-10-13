@@ -29,4 +29,8 @@ export const SYNONYMS = {
   mobile: ['ios', 'android', 'swift', 'kotlin', 'flutter', 'react native'],
   hardware: ['firmware', 'embedded', 'arduino', 'raspberry pi', 'maker'],
   iot: ['firmware', 'embedded', 'arduino', 'raspberry pi', 'maker'],
+  // What a group writes to say "come even if you're new" ("new to" is no good:
+  // a phrase only has to start a word, so it would find "new tools").
+  beginner: ['all levels', 'all experience levels', 'all skill levels', 'newbie', 'newcomer', 'first time', 'have never', 'no experience', 'getting started', 'introduction', 'introductory', 'intro to', '101'],
+  newcomer: ['all levels', 'all experience levels', 'all skill levels', 'newbie', 'beginner', 'first time', 'have never', 'no experience', 'getting started', 'introduction', 'introductory', 'intro to', '101'],
 };

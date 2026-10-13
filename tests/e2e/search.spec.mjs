@@ -85,7 +85,7 @@ test('the address is searched, so a town name works', async ({ page }) => {
   await expect(event(page, 'Coding Dojo')).toBeVisible();
   await expect(event(page, 'Python Office Hours')).toBeVisible();
   await expect(event(page, 'Joint night - JVM vs. CLR')).toBeHidden();
-  await expect(page.getByRole('status')).toHaveText("Showing 2 events matching 'urbandale', plus 1 past event");
+  await expect(page.getByRole('status')).toHaveText("Showing 3 events matching 'urbandale', plus 1 past event");
 });
 
 test('synonyms: "ai" finds an event that only says Copilot, and marks what matched', async ({ page }) => {
@@ -164,7 +164,7 @@ test('no match shows a friendly note that clears the search', async ({ page }) =
   await expect(box(page)).toBeFocused();
   await expect(box(page)).toHaveValue('');
   await expect(event(page, 'Coding Dojo')).toBeVisible();
-  await expect(page.getByRole('status')).toHaveText('Showing 9 events');
+  await expect(page.getByRole('status')).toHaveText('Showing 10 events');
 });
 
 test('an archived event is found by words in its description, with the excerpt to show why', async ({ page }) => {

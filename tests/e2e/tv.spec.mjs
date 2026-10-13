@@ -53,6 +53,25 @@ test('drops events once they have ended', async ({ page }) => {
   await expect(page.locator('.overview')).toContainText('Python Office Hours');
 });
 
+// The overview fits 7 rows; the fixture has fewer upcoming, so the test
+// shrinks the limit to 3 rather than adding events.
+test('the overview says how many more are on the posters, and fills in as events end', async ({ page }) => {
+  await page.goto('/tv/?fx=off');
+  const more = page.locator('.overview .tv-more');
+  await expect(more).toBeHidden();
+  const total = await page.locator('.overview li').count();
+  await more.evaluate((el) => (el.dataset.rows = '3'));
+  await page.keyboard.press('ArrowRight'); // the next slide change re-checks
+  await expect(page.locator('.overview li:visible')).toHaveCount(3);
+  await expect(more).toHaveText(`+ ${total - 3} more on the next slides`);
+
+  // Coding Dojo ends at 7:30pm: the next event moves up, one fewer is left over.
+  await page.clock.fastForward('12:00:00');
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('.overview li:visible')).toHaveCount(3);
+  await expect(more).toHaveText(`+ ${total - 4} more on the next slides`);
+});
+
 test('asks the browser to keep the screen awake, and again when the tab comes back', async ({ page }) => {
   await page.addInitScript(() => {
     window.__locks = 0;

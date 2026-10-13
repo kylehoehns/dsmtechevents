@@ -36,7 +36,7 @@
 
 - id: devopsdsm
   name: DevOpsDSM
-  short: DevOps
+  short: DevOpsDSM
   meetup: https://www.meetup.com/devopsdsm/
 
 - id: aws
