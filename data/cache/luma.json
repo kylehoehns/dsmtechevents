@@ -10,5 +10,17 @@
     "image": "https://images.lumacdn.com/uploads/6c/d3c66d47-fef4-4f9d-b0b0-03ec162c8b3e.png",
     "going": 14,
     "description": "✨ Dev Days is a global, in-person community-led initiative taking place from September 1st - October 31st, 2026. The series brings together developers, enthusiasts, and local tech communities to explore the power of GitHub Copilot through practical, hands-on experiences.\n\nOpen to all developers, each session runs for approximately 2-3 hours and focuses on real-world workflows, hands-on activities, and workshops centered on GitHub Copilot in the Copilot app and the CLI.\n\nDisclaimer: this event utilizes AI credits. While the workshops can be completed with Copilot Free, it will take up a large amount of those credits, so ensure you're preserving where makes sense knowing you'll be attending this event.\n\n## Code of Conduct\n\nWe are committed to providing a welcoming and inclusive environment for all participants. Please review the event Code of Conduct before attending.\n\n👉 **Event Code of Conduct**: https://github.com/github/dev-days/blob/main/EVENT_CODE_OF_CONDUCT.md"
+  },
+  "741cvyke": {
+    "title": "Databricks CampusConnect: Iowa State University",
+    "start": "2026-12-05T14:30:00.000Z",
+    "end": "2026-12-06T01:00:00.000Z",
+    "allDay": false,
+    "url": "https://luma.com/741cvyke",
+    "venue": "Iowa State University",
+    "address": "Ames, IA 50011",
+    "image": "https://images.lumacdn.com/gallery-images/uz/49704622-9e5f-46ed-ad62-46dc3ed83c20",
+    "going": 52,
+    "description": "Join Databricks and Corteva on October 10, 2026 for hands-on learning data and AI skills, followed by an afternoon hackathon where you work on real-world challenges faced by Corteva engineers day-to-day.\n\nDatabricks and Corteva engineers will guide you through an intro session covering:\n\n- An overview of the Databricks platform, including how Corteva uses it day-to-day\n- AI/BI Dashboards, Genie, Unity Catalog, and Lakehouse architecture\n- Hands-on demos and exercises\n\nFood will be provided.\n\n**Who should attend?**\n\nThis event is open to current Iowa State University students. Content is especially relevant for students studying computer science, engineering, information science, statistics, or data science, but all majors are welcome.\n\nAdvance registration is required, please **use your university email**.\n\n**Why attend?**\n\n- Build confidence working with Databricks\n- Learn practical, in-demand data and AI skills\n- Connect with Databricks and Corteva engineers and leaders\n- Compete for exclusive swag\n\n**What to bring?**\n\n- Your laptop (required)\n\n**Speakers**"
   }
 }
