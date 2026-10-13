@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 import { meetupSlug, meetupUrl, meetupPhoto } from './meetup.mjs';
+import { lumaPhoto } from './luma.mjs';
 import { dayKey, spansDays, weekday, fmt } from './format.mjs';
 import { localToUtc } from './time.mjs';
 
@@ -219,10 +220,11 @@ const photoId = (url) => /_(\d+)\.\w+$/.exec(url ?? '')?.[1] ?? url;
 // The photo, host label and venue every card needs.
 function describe(e, byId) {
   const logos = e.groupIds.map((id) => photoId(byId[id]?.logo)).filter(Boolean);
-  // { small, large } or null. Meetup photos get their small webp copies; any
-  // other image is used as-is for both.
+  // { small, large } or null. Meetup and Luma photos get small webp copies
+  // (Luma's through our own /img/luma/, see luma.mjs); any other image is
+  // used as-is for both.
   const url = e.image && !logos.includes(photoId(e.image)) ? e.image : null;
-  e.photo = url && (meetupPhoto(url) ?? { small: url, large: url });
+  e.photo = url && (meetupPhoto(url) ?? lumaPhoto(url) ?? { small: url, large: url });
   // Who's putting it on, as plain text: "CIJUG + Pyowa", or for an event
   // with no group, "Conference" / "Community event". Every list uses this.
   e.hostsLabel = e.groupIds.map((id) => byId[id]?.short).filter(Boolean).join(' + ')
