@@ -32,7 +32,7 @@ test('status page lists every group, quiet ones included, with source and health
   await expect(row('AWS')).toContainText('Partial since Oct 12');
   await expect(row('Pyowa')).toContainText('Healthy');
   await expect(row('Pyowa')).toContainText('Meetup · changed Oct 14, 5:20a · 1 coming up');
-  await expect(page.getByText('four times a day, at about 5:20a, 10:20a, 2:20p and 6:20p, most recently on Oct 14')).toBeVisible();
+  await expect(page.getByText('most recently on Oct 14')).toBeVisible();
 });
 
 test('the status page keeps the main nav, with no tab marked current', async ({ page }) => {

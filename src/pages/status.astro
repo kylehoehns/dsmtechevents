@@ -9,7 +9,7 @@
 // are listed here too, since every other page hides them.
 import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
-import { month, day, shortTime, refreshTimes } from '../lib/format.mjs';
+import { month, day, shortTime } from '../lib/format.mjs';
 import { site } from '../lib/site.mjs';
 
 const { allGroups, updatedAt, checkedOn } = loadData();
@@ -30,7 +30,7 @@ const health = (h: any) => !h ? ['unknown', 'Not checked yet']
   <div class="status-page">
     <p class="lede">
       Where each group's events come from, and whether the site could read them.
-      Every group is checked four times a day, at about {refreshTimes()}{checkedOn && `, most recently on ${onDay(checkedOn)}`}.
+      Every group is checked automatically{checkedOn && `, most recently on ${onDay(checkedOn)}`}.
     </p>
 
     {/* A list, not a table: five columns don't fit a phone, and each line reads on its own. */}
