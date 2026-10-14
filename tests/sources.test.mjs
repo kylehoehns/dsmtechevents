@@ -292,8 +292,14 @@ test('html helpers decode entities and strip tags', () => {
   assert.equal(toText('<p>Hi<br/>there  <b>you</b></p>'), 'Hi\nthere you');
 });
 
+// The Iowans of Things homepage, and each event's own page (a bare one
+// unless given).
+const iotSite = (home = fixture('iowans-of-things.html'), pages = {}) => ({
+  get: async (url) => (url === 'https://iowansofthings.com/' ? home : pages[url] ?? '<div class="post-content"></div>'),
+});
+
 test('iowans-of-things reads the Upcoming Events section of the homepage', async () => {
-  const events = await iowansOfThings({ id: 'iot', website: 'https://iowansofthings.com/' }, serve(fixture('iowans-of-things.html')));
+  const events = await iowansOfThings({ id: 'iot', website: 'https://iowansofthings.com/' }, iotSite());
   assert.deepEqual(events.map((e) => e.id), ['iot-ff-october-2026', 'iot-hh-november-2026'], 'past events are left out');
   const [ff, hh] = events;
   assert.equal(ff.title, 'Firmware Fellowship - October 2026');
@@ -309,10 +315,21 @@ test('iowans-of-things reads the Upcoming Events section of the homepage', async
   // No " - " in the place: the address starts at the street number.
   assert.equal(hh.venue, 'Maple Studios');
   assert.equal(hh.address, '1207 Maple Street, West Des Moines, IA');
+  assert.equal(hh.description, 'Bring a board.', "not the homepage's \"Learn more and register…\" link after it");
+});
+
+test("iowans-of-things brings over the bulleted sections of the event's own page", async () => {
+  const pages = { 'https://iowansofthings.com/hh-november-2026': fixture('iowans-of-things-event.html') };
+  const [, hh] = await iowansOfThings({ id: 'iot', website: 'https://iowansofthings.com/' }, iotSite(undefined, pages));
+  assert.equal(hh.description, [
+    'Bring a board.',
+    '## Event Highlights\n• **Technical Talk:** Embedded in Motion\n• **Networking:** Mingle with like-minded individuals',
+    '## Event Agenda\n• 6:30 - Arrive, park, grab refreshments\n• 7:00 - Tech Talk & Open Discussion',
+  ].join('\n\n'), 'not the RSVP form, sponsor logos, parking notes or the page footer');
 });
 
 test('iowans-of-things never ends an event before it starts', async () => {
-  const read = (time) => iowansOfThings({ id: 'iot' }, serve(fixture('iowans-of-things.html').replace(/7:00 PM\s*-\s*8:00 PM/, time)));
+  const read = (time) => iowansOfThings({ id: 'iot' }, iotSite(fixture('iowans-of-things.html').replace(/7:00 PM\s*-\s*8:00 PM/, time)));
   const [late] = await read('7:00 PM - 12:00 AM');
   assert.equal(late.end, '2026-10-09T05:00:00.000Z', 'midnight is the next day');
   const [open] = await read('7:00 PM');
@@ -329,7 +346,9 @@ test('checkTimes stops any source from writing an event that ends before it star
 test('iowans-of-things fails loudly when the homepage changes', async () => {
   await assert.rejects(iowansOfThings({ id: 'iot' }, serve('<html>new site</html>')), /no Upcoming Events section/);
   const noDates = fixture('iowans-of-things.html').replace(/<strong>\s*Date:/g, '<strong>When:');
-  await assert.rejects(iowansOfThings({ id: 'iot' }, serve(noDates)), /none had a link and date/);
+  await assert.rejects(iowansOfThings({ id: 'iot' }, iotSite(noDates)), /none had a link and date/);
+  const newEventPage = { get: async (url) => (url === 'https://iowansofthings.com/' ? fixture('iowans-of-things.html') : '<html>new site</html>') };
+  await assert.rejects(iowansOfThings({ id: 'iot' }, newEventPage), /no post content on https:\/\/iowansofthings.com\/ff-october-2026/);
   const empty = '<section id="upcoming-events"></section><section id="past-events"></section>';
   assert.deepEqual(await iowansOfThings({ id: 'iot' }, serve(empty)), [], 'nothing scheduled is not an error');
 });
