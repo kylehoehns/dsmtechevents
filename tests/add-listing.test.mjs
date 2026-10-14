@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { classify, alreadyListed, checkLumaEvent, checkMeetupGroup, defaultShort, uniqueId, insertGroup, appendEvent, pullRequest, issueAnswers, LeaveIt } from '../scripts/add-listing.mjs';
+import { tame, classify, alreadyListed, checkLumaEvent, checkMeetupGroup, defaultShort, uniqueId, insertGroup, appendEvent, pullRequest, issueAnswers, LeaveIt } from '../scripts/add-listing.mjs';
 
 test('only exact Luma event and Meetup group links are automatic', () => {
   assert.deepEqual(classify('https://luma.com/04xz1l03'), { kind: 'luma', slug: '04xz1l03' });
@@ -63,6 +63,14 @@ test('the PR closes its issue and lists what to check', () => {
   assert.match(pr.body, /Preview: https:\/\/p\.test\//);
   assert.match(pr.body, /Closes #12$/);
   assert.doesNotMatch(pullRequest({ title: 'X', entry: '', facts: [], warnings: [], preview: '', id: 'x' }).body, /Check before|Closes/);
+});
+
+test("a page's words can't mention anyone, close an issue or break the formatting", () => {
+  assert.equal(tame('Hi @kylehoehns, Fixes #3 `x`\nnext'), 'Hi @\u200bkylehoehns, Fixes #\u200b3  x next');
+  const pr = pullRequest({ title: 'Fixes #3', entry: '- name: "@team"\n', facts: ['Where: Room #2'], warnings: [], preview: '', id: 'x', issue: '12' });
+  assert.equal(pr.title, 'Add Fixes #\u200b3');
+  assert.doesNotMatch(pr.body, /#3|@team|#2/);
+  assert.match(pr.body, /Closes #12$/);
 });
 
 test("an issue form's answers are read by heading, and a blank one is empty", () => {

@@ -51,17 +51,21 @@ export async function readCapped(request, max) {
 // cookie. Only the widths the site asks for, and only image paths on Luma's
 // host, so this can't be used to fetch anything else.
 const LUMA_TTL = 30 * 24 * 60 * 60; // an event's cover rarely changes; a new one gets a new file name
+// Raster types only: an SVG can carry script. These responses skip
+// public/_headers, so they set their own hardening.
+const IMAGE_TYPES = new Set(['image/webp', 'image/png', 'image/jpeg', 'image/gif', 'image/avif']);
+const IMAGE_HEADERS = { 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; sandbox" };
 async function lumaImage(path) {
   const [, width, rest] = /^\/img\/luma\/(\d+)\/(.+)$/.exec(path) ?? [];
-  if (!LUMA_WIDTHS.includes(width) || !LUMA_PATH.test(rest ?? '')) return new Response(null, { status: 404 });
+  if (!LUMA_WIDTHS.includes(width) || !LUMA_PATH.test(rest ?? '')) return new Response(null, { status: 404, headers: IMAGE_HEADERS });
   const res = await fetch(`${LUMA_HOST}/cdn-cgi/image/format=webp,fit=scale-down,quality=75,width=${width}/${rest}`, {
     // Luma sends PNG unless asked for webp, which every current browser shows.
     headers: { Accept: 'image/webp' },
     cf: { cacheEverything: true, cacheTtl: LUMA_TTL },
   });
-  const type = res.headers.get('Content-Type') ?? '';
-  if (!res.ok || !type.startsWith('image/')) return new Response(null, { status: res.status === 404 ? 404 : 502 });
-  return new Response(res.body, { headers: { 'Content-Type': type, 'Cache-Control': `public, max-age=${LUMA_TTL}` } });
+  const type = (res.headers.get('Content-Type') ?? '').split(';')[0].trim().toLowerCase();
+  if (!res.ok || !IMAGE_TYPES.has(type)) return new Response(null, { status: res.status === 404 ? 404 : 502, headers: IMAGE_HEADERS });
+  return new Response(res.body, { headers: { ...IMAGE_HEADERS, 'Content-Type': type, 'Cache-Control': `public, max-age=${LUMA_TTL}` } });
 }
 
 export default {
