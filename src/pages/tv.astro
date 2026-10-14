@@ -326,6 +326,7 @@ const eventData = {
 <script>
   import { fmt, whenLabel, countdown } from '../lib/format.mjs';
   import { eventMode } from '../scripts/tv-event';
+  import { inkLayer } from '../scripts/tv-ink';
 
   const SLIDE_MS = 12_000;
   const RELOAD_MS = 60 * 60 * 1000;
@@ -388,9 +389,20 @@ const eventData = {
     });
   }
   let leaving = 0;
-  // How each slide comes in (tv-fx.css), taking turns; a headliner always floods.
-  const PULLS = ['wipe', 'dots', 'flood', 'peel'];
+  // How each slide comes in (tv-fx.css), taking turns. A headliner always
+  // gets the ink (the WebGL pour, tv-ink.ts), or the flood without WebGL.
+  const ink = fx ? inkLayer(document.querySelector<HTMLElement>('.tv-stage')!) : null;
+  const PULLS = ['wipe', 'dots', 'paste', 'tear', 'flood', 'slam', 'peel', 'feed', 'ribbon', ...(ink ? ['ink'] : [])];
   let pulls = 0;
+
+  // Ink pours from the slide's big date, or the overview's top corner.
+  function pour(slide: HTMLElement) {
+    const tv = document.getElementById('tv')!;
+    const num = slide.querySelector('.date-block .num')?.getBoundingClientRect();
+    const stage = tv.querySelector('.tv-stage')!.getBoundingClientRect();
+    const origin = num ? { x: num.left + num.width / 2, y: num.top + num.height / 2 } : { x: stage.left, y: stage.top };
+    ink!(origin, getComputedStyle(tv).getPropertyValue('--pink'));
+  }
 
   let slides: HTMLElement[] = [];
   let index = 0;
@@ -408,7 +420,8 @@ const eventData = {
       const tv = document.getElementById('tv')!;
       document.querySelectorAll('.was-on').forEach((s) => s.classList.remove('was-on'));
       if (prev?.isConnected) prev.classList.add('was-on');
-      tv.dataset.pull = slides[index].matches('.headliner') ? 'flood' : PULLS[pulls++ % PULLS.length];
+      tv.dataset.pull = slides[index].matches('.headliner') ? (ink ? 'ink' : 'flood') : PULLS[pulls++ % PULLS.length];
+      if (tv.dataset.pull === 'ink') pour(slides[index]);
       clearTimeout(leaving);
       leaving = window.setTimeout(() => { prev?.classList.remove('was-on'); delete tv.dataset.pull; }, 1600);
     }

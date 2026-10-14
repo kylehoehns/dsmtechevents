@@ -95,7 +95,7 @@ test('slides are screen-printed in, and still step through', async ({ page }) =>
   await expect(page.locator('.slide.was-on')).toHaveCount(0);
 });
 
-test('slides take turns at how they come in, and a headliner always floods in', async ({ page }) => {
+test('slides take turns at how they come in, and a headliner always gets the ink (or the flood)', async ({ page }) => {
   await page.goto('/tv/');
   const seen = [];
   const count = await page.locator('.slide').count();
@@ -103,8 +103,9 @@ test('slides take turns at how they come in, and a headliner always floods in', 
     await page.keyboard.press('ArrowRight');
     seen.push(await page.evaluate(() => [document.querySelector('.slide.is-on').matches('.headliner'), document.getElementById('tv').dataset.pull]));
   }
-  expect(seen.filter(([headliner]) => headliner).map(([, pull]) => pull)).toEqual(expect.arrayContaining(['flood']));
-  expect(seen.filter(([headliner]) => headliner).every(([, pull]) => pull === 'flood')).toBe(true);
+  const headliners = seen.filter(([headliner]) => headliner).map(([, pull]) => pull);
+  expect(headliners.length).toBeGreaterThan(0);
+  expect(headliners.every((pull) => pull === 'ink' || pull === 'flood')).toBe(true);
   expect(new Set(seen.filter(([headliner]) => !headliner).map(([, pull]) => pull)).size).toBeGreaterThan(1);
   await page.clock.runFor(2000);
   await expect(page.locator('.tv')).not.toHaveAttribute('data-pull');

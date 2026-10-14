@@ -58,6 +58,68 @@
 }
 @keyframes fx-peel { to { transform: translate(8vw, -125%) rotate(-8deg); } }
 
+/* Paste-up: the new sheet is slapped on crooked over the old one, like a
+   flyer on a pole, and smoothed straight. */
+.tv[data-pull=paste] .slide.is-on { animation: fx-paste 0.85s cubic-bezier(0.2, 0.8, 0.3, 1); }
+@keyframes fx-paste {
+  from { transform: translate(55vw, 12vh) rotate(10deg); box-shadow: 0 5vh 10vh rgb(0 0 0 / 0.6); }
+  60% { transform: translate(0, 0) rotate(-1.6deg); box-shadow: 0 1.5vh 3vh rgb(0 0 0 / 0.45); }
+  to { transform: none; box-shadow: none; }
+}
+
+/* Tear-off: the old sheet is ripped away along a ragged edge, left to right. */
+.tv[data-pull=tear] .slide.was-on {
+  z-index: 3;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100' preserveAspectRatio='none'%3E%3Cpolygon points='120,0 120,100 20.3,100 18.6,97.5 19.6,95 18.5,92.5 18.2,90 19.4,87.5 20.4,85 20.2,82.5 23.7,80 17,77.5 19.4,75 19,72.5 20.4,70 17.5,67.5 19.1,65 19.8,62.5 20.3,60 19.4,57.5 20.6,55 20.2,52.5 21.2,50 19.3,47.5 18.8,45 20.8,42.5 18.5,40 20.8,37.5 21.2,35 20.6,32.5 20.3,30 21.1,27.5 19.9,25 18.6,22.5 20.5,20 21,17.5 19.6,15 18.5,12.5 16.3,10 19.3,7.5 19.7,5 18.7,2.5 20,0'/%3E%3C/svg%3E") no-repeat; -webkit-mask-size: 220vw 100%;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100' preserveAspectRatio='none'%3E%3Cpolygon points='120,0 120,100 20.3,100 18.6,97.5 19.6,95 18.5,92.5 18.2,90 19.4,87.5 20.4,85 20.2,82.5 23.7,80 17,77.5 19.4,75 19,72.5 20.4,70 17.5,67.5 19.1,65 19.8,62.5 20.3,60 19.4,57.5 20.6,55 20.2,52.5 21.2,50 19.3,47.5 18.8,45 20.8,42.5 18.5,40 20.8,37.5 21.2,35 20.6,32.5 20.3,30 21.1,27.5 19.9,25 18.6,22.5 20.5,20 21,17.5 19.6,15 18.5,12.5 16.3,10 19.3,7.5 19.7,5 18.7,2.5 20,0'/%3E%3C/svg%3E") no-repeat; mask-size: 220vw 100%;
+  animation: fx-tear 0.9s cubic-bezier(0.5, 0, 0.4, 1) forwards;
+}
+@keyframes fx-tear { from { -webkit-mask-position: -42vw 0; mask-position: -42vw 0; } to { -webkit-mask-position: 70vw 0; mask-position: 70vw 0; } }
+
+/* Slam: letterpress. The new sheet comes down hard, a size too big, and the
+   press shudders. */
+.tv[data-pull=slam] .slide.is-on { animation: fx-slam 0.6s cubic-bezier(0.5, 0, 0.5, 1); }
+@keyframes fx-slam {
+  from { scale: 1.25; opacity: 0; }
+  45% { scale: 0.98; opacity: 1; translate: 0 0; }
+  60% { scale: 1; translate: 0.6vw 0.4vh; }
+  75% { translate: -0.4vw -0.2vh; }
+  90% { translate: 0.15vw 0; }
+  to { scale: 1; translate: 0 0; }
+}
+
+/* Feed: the next sheet rolls up off the press and pushes the old one out the top. */
+.tv[data-pull=feed] .slide.is-on { animation: fx-feed-in 0.9s cubic-bezier(0.65, 0, 0.35, 1); }
+.tv[data-pull=feed] .slide.was-on { animation: fx-feed-out 0.9s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+@keyframes fx-feed-in { from { transform: translateY(105%); } }
+@keyframes fx-feed-out { to { transform: translateY(-105%); } }
+
+/* Ribbon: the new sheet comes through in eight strips, each a beat behind
+   the one above, alternating sides like a feeder. */
+@property --p { syntax: "<number>"; inherits: false; initial-value: 1; }
+.tv[data-pull=ribbon] .slide.is-on {
+  --ribbon:
+    linear-gradient(90deg, #000 clamp(0%, calc((var(--p) - 0.00) * 172%), 100%), transparent 0) 0 calc(0 * 100% / 7) / 100% 12.6% no-repeat,
+    linear-gradient(270deg, #000 clamp(0%, calc((var(--p) - 0.06) * 172%), 100%), transparent 0) 0 calc(1 * 100% / 7) / 100% 12.6% no-repeat,
+    linear-gradient(90deg, #000 clamp(0%, calc((var(--p) - 0.12) * 172%), 100%), transparent 0) 0 calc(2 * 100% / 7) / 100% 12.6% no-repeat,
+    linear-gradient(270deg, #000 clamp(0%, calc((var(--p) - 0.18) * 172%), 100%), transparent 0) 0 calc(3 * 100% / 7) / 100% 12.6% no-repeat,
+    linear-gradient(90deg, #000 clamp(0%, calc((var(--p) - 0.24) * 172%), 100%), transparent 0) 0 calc(4 * 100% / 7) / 100% 12.6% no-repeat,
+    linear-gradient(270deg, #000 clamp(0%, calc((var(--p) - 0.30) * 172%), 100%), transparent 0) 0 calc(5 * 100% / 7) / 100% 12.6% no-repeat,
+    linear-gradient(90deg, #000 clamp(0%, calc((var(--p) - 0.36) * 172%), 100%), transparent 0) 0 calc(6 * 100% / 7) / 100% 12.6% no-repeat,
+    linear-gradient(270deg, #000 clamp(0%, calc((var(--p) - 0.42) * 172%), 100%), transparent 0) 0 calc(7 * 100% / 7) / 100% 12.6% no-repeat;
+  -webkit-mask: var(--ribbon); mask: var(--ribbon);
+  animation: fx-ribbon 1s linear;
+}
+@keyframes fx-ribbon { from { --p: 0; } to { --p: 1; } }
+
+/* Ink: WebGL ink pours across from the big date and soaks away
+   (src/scripts/tv-ink.ts draws it on a canvas over the stage). The new sheet
+   waits under the ink. Without WebGL this kind is never picked. */
+.tv[data-pull=ink] .slide.is-on { animation: fx-ink-wait 1.1s; }
+@keyframes fx-ink-wait { 0%, 44.9% { opacity: 0; } 45% { opacity: 1; } }
+.tv-ink { position: absolute; inset: 0 calc(-4vw - 8px); z-index: 4; width: calc(100% + 8vw + 16px); height: 100%; pointer-events: none; }
+@media (orientation: portrait) { .tv-ink { inset: 0 calc(-5vw - 8px); width: calc(100% + 10vw + 16px); } }
+
 /* the squeegee blade rides the edge of the wipe */
 .tv[data-pull=wipe] .slide.is-on::before {
   content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none;
