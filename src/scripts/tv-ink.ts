@@ -1,17 +1,29 @@
-// The /tv/ ink transition (tv-fx.css, data-pull=ink): ink pours across the
-// stage from a point, with a ragged, fibrous edge that breaks into halftone
-// dots, covers the old sheet while the new one goes up under it, then soaks
-// away in blotches. Drawn by one fragment shader on a canvas over the stage.
+// The /tv/ ink transition (tv-fx.css, data-pull=ink): a wave of ink rolls
+// out from the slide's big date, its ragged, fibrous edges breaking into
+// halftone dots. The new sheet shows behind the wave and the old one ahead
+// of it, so the screen is never solid ink. One fragment shader on a canvas
+// over the stage draws the wave; the new sheet is revealed by a clip-path
+// circle that stays inside the wave, where the ink hides its smooth edge.
 // inkLayer() returns null where WebGL isn't available, and the slideshow
 // then never picks this kind.
+
+const DURATION = 1000;
+// The roughness can push the wave's edges this far (in screen heights) either
+// way of a true circle; the band is wide enough that the new sheet's circle,
+// drawn SLACK inside the front, always sits under ink.
+const ROUGH = 0.3;
+const SLACK = 0.17;
+const BAND = 0.4;
 
 const VERT = `attribute vec2 a; void main() { gl_Position = vec4(a, 0.0, 1.0); }`;
 
 const FRAG = `
+#define ROUGH ${ROUGH.toFixed(2)}
+#define BAND ${BAND.toFixed(2)}
 precision highp float; // mediump is 16-bit on Apple GPUs: too coarse for the noise
 uniform vec2 res;     // canvas size, px
 uniform vec2 origin;  // where the ink starts, 0-1 from the top left
-uniform float p;      // 0-1 through the transition
+uniform float reach;  // how far the wave's front has rolled, in screen heights
 uniform vec3 ink;
 uniform float seed;
 uniform float dpr;
@@ -38,22 +50,15 @@ void main() {
   vec2 uv = vec2(gl_FragCoord.x / res.y, 1.0 - gl_FragCoord.y / res.y);
   vec2 o = origin * vec2(aspect, 1.0);
   // distance from the pour, roughened by blots and paper fibres
-  float f = length(uv - o) + (fbm(uv * 3.0) - 0.5) * 0.55 + (fbm(uv * vec2(46.0, 7.0)) - 0.5) * 0.09;
-  float c = smoothstep(0.0, 0.42, p);
-  float reach = mix(-0.15, aspect + 0.9, c * c * (3.0 - 2.0 * c));
-  float amt = (reach - f) / 0.14;
-  // soaking away: blotches dry from the thinnest ink first
-  float u = smoothstep(0.45, 1.0, p);
-  float g = fbm(uv * 2.6 + 11.0) + (fbm(uv * vec2(38.0, 6.0)) - 0.5) * 0.08;
-  amt = min(amt, (g - mix(-0.25, 1.15, u)) / 0.1);
-  // the edge breaks into a halftone screen
+  float f = length(uv - o) + (fbm(uv * 3.0) - 0.5) * ROUGH + (fbm(uv * vec2(46.0, 7.0)) - 0.5) * 0.09;
+  // ink between the front (crisp) and the back (thinning into dots)
+  float amt = min((reach - f) / 0.04, (f - (reach - BAND)) / 0.12);
   vec2 cell = fract(gl_FragCoord.xy / (9.0 * dpr)) - 0.5;
   float a = clamp(amt, 0.0, 1.0);
   float on = a >= 1.0 ? 1.0 : step(length(cell), a * 0.72);
   gl_FragColor = vec4(ink * on, on);
 }`;
 
-const DURATION = 1100;
 
 const hex = (css: string) => {
   const m = css.trim().match(/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
@@ -86,9 +91,13 @@ export function inkLayer(stage: HTMLElement) {
   stage.append(canvas);
 
   let frame = 0;
-  // origin: the point to pour from, in viewport px; color: a CSS hex color
-  return function play(origin: { x: number; y: number }, color: string) {
+  let clipped: HTMLElement | null = null;
+  // Roll the wave across `slide` (the one coming in) from `origin`, a point
+  // in viewport px, in `color`, a CSS hex color.
+  return function play(slide: HTMLElement, origin: { x: number; y: number }, color: string) {
     cancelAnimationFrame(frame);
+    if (clipped) clipped.style.clipPath = ''; // a quick key press cut the last wave short
+    clipped = slide;
     const dpr = Math.min(devicePixelRatio || 1, 2);
     const box = canvas.getBoundingClientRect();
     canvas.width = Math.round(box.width * dpr);
@@ -99,14 +108,25 @@ export function inkLayer(stage: HTMLElement) {
     gl.uniform3fv(at('ink'), hex(color));
     gl.uniform1f(at('seed'), Math.random() * 100);
     gl.uniform1f(at('dpr'), dpr);
+    // far enough that the wave's back has cleared the farthest corner
+    const far = Math.max(...[[box.left, box.top], [box.right, box.top], [box.left, box.bottom], [box.right, box.bottom]]
+      .map(([x, y]) => Math.hypot(x - origin.x, y - origin.y))) / box.height;
+    const end = far + BAND + ROUGH;
+    const sheet = slide.getBoundingClientRect();
+    const cx = origin.x - sheet.left;
+    const cy = origin.y - sheet.top;
     const start = performance.now();
     const draw = (now: number) => {
-      const p = Math.min((now - start) / DURATION, 1);
-      gl.uniform1f(at('p'), p);
+      const p = Math.min(Math.max((now - start) / DURATION, 0), 1);
+      const e = p < 0.5 ? 4 * p * p * p : 1 - (-2 * p + 2) ** 3 / 2;
+      const reach = -0.05 + (end + 0.05) * e;
+      gl.uniform1f(at('reach'), reach);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      slide.style.clipPath = `circle(${Math.max(reach - SLACK, 0) * box.height}px at ${cx}px ${cy}px)`;
       if (p < 1) frame = requestAnimationFrame(draw);
-      else gl.clear(gl.COLOR_BUFFER_BIT);
+      else { gl.clear(gl.COLOR_BUFFER_BIT); slide.style.clipPath = ''; }
     };
+    slide.style.clipPath = 'circle(0 at 0 0)';
     frame = requestAnimationFrame(draw);
   };
 }

@@ -401,7 +401,7 @@ const eventData = {
     const num = slide.querySelector('.date-block .num')?.getBoundingClientRect();
     const stage = tv.querySelector('.tv-stage')!.getBoundingClientRect();
     const origin = num ? { x: num.left + num.width / 2, y: num.top + num.height / 2 } : { x: stage.left, y: stage.top };
-    ink!(origin, getComputedStyle(tv).getPropertyValue('--pink'));
+    ink!(slide, origin, getComputedStyle(tv).getPropertyValue('--pink'));
   }
 
   let slides: HTMLElement[] = [];
