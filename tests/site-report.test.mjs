@@ -32,27 +32,25 @@ test('the headline totals the week, compares it with the one before and draws th
   assert.match(md, /\*\*1,500\*\* visits in the last 30/);
 });
 
-test('the click report names groups and events, totals the weeks and folds the long lists', () => {
+test('the click report lists groups A to Z with no bars or top lists, and totals real clicks', () => {
   const md = renderReport(
     {
       week: [{ key: 'pyowa', clicks: 4 }],
-      prevWeek: [{ key: 'pyowa', clicks: 2 }],
-      month: [{ key: 'pyowa', clicks: 10 }, { key: '', clicks: 3 }],
+      month: [{ key: 'pyowa', clicks: 10 }, { key: '', clicks: 3 }, { key: 'cijug', clicks: 12 }],
       kinds: [{ key: 'rsvp', clicks: 9 }, { key: 'map', clicks: 4 }],
-      events: [{ key: 'pyowa-1', clicks: 6 }],
+      totals: { week: 4, prevWeek: 2, month: 20 }, // less than the groups' 25: joint meetups count once
     },
-    { groupNames: { pyowa: 'Pyowa' }, eventTitles: { 'pyowa-1': 'Python Office Hours' } },
+    { groupNames: { pyowa: 'Pyowa', cijug: 'CIJUG' } },
   );
-  assert.match(md, /\*\*4\*\* clicks in the last 7 days \(▲ 100%\), \*\*13\*\* in the last 30/);
-  assert.match(md, /\| Pyowa \| 4 \| 10 \| ██████████ \|/);
-  assert.match(md, /\| No group \(conference \/ community event\) \| 0 \| 3 \| ███ \|/);
-  assert.match(md, /<summary><b>Listings people clicked through to, last 30 days<\/b>: top is Python Office Hours, 6<\/summary>\n\n/);
-  assert.match(md, /\| Python Office Hours \| 6 \|/);
+  assert.match(md, /\*\*4\*\* clicks in the last 7 days \(▲ 100%\), \*\*20\*\* in the last 30/);
+  // The report is public: A to Z, not by clicks, and no bars to compare.
+  assert.match(md, /\| CIJUG \| 0 \| 12 \|\n\| Pyowa \| 4 \| 10 \|\n\| No group \(conference \/ community event\) \| 0 \| 3 \|/);
+  assert.doesNotMatch(md, /Listings people clicked through to/);
   assert.match(md, /\| RSVP button \| 9 \| ██████████ \|/);
 });
 
 test('an empty month still makes a readable report', () => {
-  const md = renderReport({ week: [], month: [], kinds: [], events: [] });
+  const md = renderReport({ week: [], month: [], kinds: [], totals: { week: 0, prevWeek: 0, month: 0 } });
   assert.match(md, /\*\*0\*\* clicks in the last 7 days,/);
   assert.match(md, /No clicks yet/);
   assert.match(renderTraffic({ days: [], pages: [], referrers: [], devices: [] }), /No visits yet/);

@@ -90,9 +90,11 @@ export default {
       if (!click) return new Response(null, { status: 400 });
       // Analytics Engine: blobs are the dimensions, the index is what we
       // usually filter by (the group). One data point per host group, so a
-      // joint meetup counts for each of them.
-      for (const group of click.groups.length ? click.groups : ['']) {
-        env.CLICKS?.writeDataPoint({ blobs: [click.kind, group, click.event], indexes: [group || 'none'] });
+      // joint meetup counts for each of them; double1 is that point's share
+      // of the one click (1/hosts), so totals add up to real clicks.
+      const hosts = click.groups.length ? click.groups : [''];
+      for (const group of hosts) {
+        env.CLICKS?.writeDataPoint({ blobs: [click.kind, group, click.event], doubles: [1 / hosts.length], indexes: [group || 'none'] });
       }
       return new Response(null, { status: 204 });
     }

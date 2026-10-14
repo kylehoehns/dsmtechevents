@@ -23,7 +23,12 @@ the groups from the nearest `data-groups`, and the event from the nearest
 | `blob1`   | kind (below)                                                  |
 | `blob2`   | group id (`pyowa`), empty for a conference with no group      |
 | `blob3`   | event id (`pyowa-316749553`), empty for group links           |
+| `double1` | this point's share of the click: 1 ÷ the number of host groups |
 | `index1`  | group id, or `none`                                           |
+
+Per-group counts sum the points; totals sum `double1`, so a joint meetup's
+click is one click, not one per host. (Points from before 2026-10-15 have no
+`double1` and count whole.)
 
 Kinds: `rsvp` (the card's button), `title` (the card's title), `map` (the
 venue), `poster` (a headliner's Tickets & info), `later` (a "Further out"
@@ -57,7 +62,9 @@ Every Monday, `.github/workflows/site-report.yml` runs
 (**Actions → site report → the latest run**): visits and page views with the
 week-on-week change, visits per day, top pages, where visits come from and
 phone vs computer (Cloudflare Web Analytics), then the outbound clicks above
-(per group for 7 and 30 days, the listings people clicked through to, which links get used). Run it any
+(per group for 7 and 30 days, which links get used). The run page is public,
+because the repo is, so groups are listed A to Z with no bars and no list of
+the most-clicked listings: the report never ranks one group against another. Run it any
 time with `gh workflow run site-report.yml`. It needs a repository secret
 `CF_ANALYTICS_TOKEN`: a Cloudflare API token with **Account Analytics: Read**.
 

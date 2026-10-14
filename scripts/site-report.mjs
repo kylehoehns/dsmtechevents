@@ -83,27 +83,29 @@ export function renderTraffic({ days, pages, referrers, devices }) {
   ].join('\n');
 }
 
-// Pure: query results in, Markdown out. rows are { key, clicks } with clicks a number.
-export function renderReport({ week, prevWeek = [], month, kinds, events }, { groupNames = {}, eventTitles = {} } = {}) {
-  const total = (rows) => rows.reduce((n, r) => n + r.clicks, 0);
+// Pure: query results in, Markdown out. rows are { key, clicks } with clicks
+// a number; totals are each window's real clicks ({ week, prevWeek, month }).
+// The report is public (anyone can open a run on a public repo), so groups
+// are listed A to Z with no bars and no per-listing top list: nothing here
+// ranks one group against another.
+export function renderReport({ week, month, kinds, totals }, { groupNames = {} } = {}) {
   const max = (rows) => Math.max(...rows.map((r) => r.clicks));
   const groupName = (id) => (id ? groupNames[id] ?? id : 'No group (conference / community event)');
   const weekBy = Object.fromEntries(week.map((r) => [r.key, r.clicks]));
+  // A to Z by name; events with no group last.
+  const groups = [...month].sort((x, y) => (!x.key) - (!y.key) || groupName(x.key).localeCompare(groupName(y.key)));
   const top = (rows, name) => `${name(rows[0].key)}, ${num(rows[0].clicks)}`;
+  const change = trend(totals.week, totals.prevWeek);
   const lines = [
     '## Outbound clicks',
     '',
-    `**${num(total(week))}** clicks in the last 7 days${trend(total(week), total(prevWeek)) && ` (${trend(total(week), total(prevWeek))})`}, **${num(total(month))}** in the last 30.`,
-    'Each click on a joint meetup counts once for every host.',
+    `**${num(totals.week)}** clicks in the last 7 days${change && ` (${change})`}, **${num(totals.month)}** in the last 30.`,
     '',
-    '### By group',
+    '### By group, A to Z',
     '',
-    month.length ? table(['Group', 'Last 7 days', 'Last 30 days', ''], month.map((r) => [groupName(r.key), num(weekBy[r.key] ?? 0), num(r.clicks), bar(r.clicks, max(month))])) : '_No clicks yet._',
+    'A joint meetup counts for each of its hosts, so these add up to more than the total.',
     '',
-    events.length
-      ? fold(`<b>Listings people clicked through to, last 30 days</b>: top is ${top(events, (k) => eventTitles[k] ?? k)}`,
-        table(['Meetup or conference', 'Clicks'], events.map((r) => [eventTitles[r.key] ?? r.key, num(r.clicks)])))
-      : '_No clicks on listings yet._',
+    groups.length ? table(['Group', 'Last 7 days', 'Last 30 days'], groups.map((r) => [groupName(r.key), num(weekBy[r.key] ?? 0), num(r.clicks)])) : '_No clicks yet._',
     '',
     kinds.length
       ? fold(`<b>Which links get used, last 30 days</b>: top is ${top(kinds, (k) => KIND_NAMES[k] ?? k)}`,
@@ -176,18 +178,10 @@ async function trafficOnce(token, dim, from, to, limit = 10, order = 'sum_visits
   return json.data.viewer.accounts[0].rumPageloadEventsAdaptiveGroups.map((r) => ({ key: r.dimensions[dim], visits: r.sum.visits, views: r.count }));
 }
 
-// Group names and event titles, so the report says "Pyowa" and the talk's
-// title instead of ids: the site's own data (cache plus hand-added events),
-// then the archive for anything older.
-function names(root) {
-  const { groups, events } = loadData({ dataDir: path.join(root, 'data') });
-  const eventTitles = {};
-  const archive = path.join(root, 'data/archive');
-  for (const f of fs.readdirSync(archive).filter((f) => f.endsWith('.json'))) {
-    for (const e of JSON.parse(fs.readFileSync(path.join(archive, f), 'utf8'))) eventTitles[e.id] = e.title;
-  }
-  for (const e of events) eventTitles[e.id] = e.title;
-  return { groupNames: Object.fromEntries(groups.map((g) => [g.id, g.short])), eventTitles };
+// Group names, so the report says "Pyowa" instead of an id.
+function groupNames(root) {
+  const { groups } = loadData({ dataDir: path.join(root, 'data') });
+  return { groupNames: Object.fromEntries(groups.map((g) => [g.id, g.short])) };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
@@ -198,13 +192,20 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   }
   // Launch-day test clicks are tagged smoke-test; leave them out.
   const since = (days) => `FROM ${DATASET} WHERE timestamp > NOW() - INTERVAL '${days}' DAY AND blob3 != 'smoke-test'`;
-  const [week, prevWeek, month, kinds, events] = await Promise.all([
-    query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${since(7)} GROUP BY key ORDER BY clicks DESC`, token),
-    query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${since(14)} AND timestamp <= NOW() - INTERVAL '7' DAY GROUP BY key ORDER BY clicks DESC`, token),
-    query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${since(30)} GROUP BY key ORDER BY clicks DESC`, token),
-    query(`SELECT blob1 AS key, SUM(_sample_interval) AS clicks ${since(30)} GROUP BY key ORDER BY clicks DESC`, token),
-    query(`SELECT blob3 AS key, SUM(_sample_interval) AS clicks ${since(30)} AND blob3 != '' GROUP BY key ORDER BY clicks DESC LIMIT 10`, token),
+  // A joint meetup's click is one point per host group (worker/index.js),
+  // each weighted 1/hosts in double1, so per-group counts use the points and
+  // totals use the weights. Points from before the weights count whole.
+  const ONE = `SUM(_sample_interval * IF(double1 > 0, double1, 1))`;
+  const prev = `${since(14)} AND timestamp <= NOW() - INTERVAL '7' DAY`;
+  const [week, month, kinds, [tw], [tp], [tm]] = await Promise.all([
+    query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${since(7)} GROUP BY key`, token),
+    query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${since(30)} GROUP BY key`, token),
+    query(`SELECT blob1 AS key, ${ONE} AS clicks ${since(30)} GROUP BY key ORDER BY clicks DESC`, token),
+    query(`SELECT 'all' AS key, ${ONE} AS clicks ${since(7)}`, token),
+    query(`SELECT 'all' AS key, ${ONE} AS clicks ${prev}`, token),
+    query(`SELECT 'all' AS key, ${ONE} AS clicks ${since(30)}`, token),
   ]);
+  const totals = { week: Math.round(tw?.clicks ?? 0), prevWeek: Math.round(tp?.clicks ?? 0), month: Math.round(tm?.clicks ?? 0) };
   const now = new Date();
   const ago = (days) => new Date(now - days * 86_400_000);
   const [tWeek, tPrev, tMonth, tDays, tPages, tRefs, tDevices] = await Promise.all([
@@ -218,10 +219,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   ]);
   // Visits from our own pages (moving between pages) aren't "where from".
   const referrers = tRefs.filter((r) => r.key !== 'dsmtechevents.com' && r.visits > 0);
-  const total = (rows) => rows.reduce((n, r) => n + r.clicks, 0);
-  const report = renderHeadline({ week: tWeek, prevWeek: tPrev, month: tMonth, days: tDays, clicks: total(week), prevClicks: total(prevWeek) })
+  const report = renderHeadline({ week: tWeek, prevWeek: tPrev, month: tMonth, days: tDays, clicks: totals.week, prevClicks: totals.prevWeek })
     + '\n' + renderTraffic({ days: tDays, pages: tPages, referrers, devices: tDevices })
-    + '\n' + renderReport({ week, prevWeek, month, kinds, events }, names(path.resolve(import.meta.dirname, '..')));
+    + '\n' + renderReport({ week, month, kinds: kinds.map((r) => ({ ...r, clicks: Math.round(r.clicks) })), totals }, groupNames(path.resolve(import.meta.dirname, '..')));
   if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, report);
   console.log(report);
 }
