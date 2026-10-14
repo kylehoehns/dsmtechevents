@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-14T19:28:00.924Z",
+  "fetchedAt": "2026-10-14T20:22:12.418Z",
   "logo": null,
   "events": [
     {
@@ -24,8 +24,8 @@
       "allDay": false,
       "url": "https://iowansofthings.com/hh-november-2026",
       "description": "Join us for the final Hardware Hangout of the 2026 season! This networking event brings together embedded developers, electronics engineers, hobbyists, and industry supporters for technical discussions and community building. The topic for November is embedded in motion. How embedded systems are being used in, on, and around vehicles of all kinds. From cars and trucks to tractors, construction equipment, and everything in between, embedded systems are powering the vehicles we rely on every day.\n\nShare your stories, tips, and questions with the group! Have an idea for what Iowans of Things could do next year? We’d love to hear it! We’re always looking for new ways to connect, learn, and strengthen Iowa’s embedded technology community.\n\nLearn more and register…",
-      "venue": "Maple Studios, 1207 Maple Street, West Des Moines, IA",
-      "address": null,
+      "venue": "Maple Studios",
+      "address": "1207 Maple Street, West Des Moines, IA",
       "image": "https://iowansofthings.com/assets/images/banner_hardware_hangout_2026_11.png",
       "added": "2026-10-14T19:28:00.924Z"
     }
