@@ -159,3 +159,21 @@ test('a click or F toggles full screen', async ({ page }) => {
   await page.keyboard.press('f');
   await expect.poll(full).toBe(false);
 });
+
+// Titles clip their overflow (line clamp, ellipsis), so the line has to be
+// tall enough for g, j, p, q, y to hang below the baseline.
+test("clipped titles leave room for letters that hang below the line", async ({ page }) => {
+  await page.goto('/tv/?fx=off');
+  await page.evaluate(() => document.fonts.ready);
+  const short = await page.evaluate(() => {
+    const c = document.createElement('canvas').getContext('2d');
+    return ['.poster-slide h2', '.overview .row-title'].filter((sel) => {
+      const cs = getComputedStyle(document.querySelector(sel));
+      c.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const m = c.measureText('gjpqy');
+      const room = (parseFloat(cs.lineHeight) - m.fontBoundingBoxAscent + m.fontBoundingBoxDescent) / 2;
+      return room < m.actualBoundingBoxDescent;
+    });
+  });
+  expect(short).toEqual([]);
+});
