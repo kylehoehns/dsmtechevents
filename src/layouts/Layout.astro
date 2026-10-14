@@ -192,14 +192,34 @@ const speculation = toScript({
       showTheme();
 
       // Count outbound clicks (docs/ANALYTICS.md): which kind of link, which
-      // group(s), which event. Nothing about the visitor. sendBeacon survives
-      // the page being left, and a failure never gets in the way of the link.
+      // group(s), which event, and which part of the site. Nothing about the
+      // visitor. sendBeacon survives the page being left, and a failure never
+      // gets in the way of the link. window.dsmBeacon is for app.js's own
+      // signals (a search that found nothing).
+      const beacon = (body: Record<string, unknown>) => {
+        if (!import.meta.env.PROD) return;
+        try { navigator.sendBeacon('/api/click', JSON.stringify(body)); } catch {}
+      };
+      (window as any).dsmBeacon = beacon;
+      // Where on the site: a filtered list first (search or one group), then
+      // the section the link sits in.
+      const whereFrom = (a: Element) => {
+        const params = new URLSearchParams(location.search);
+        if (a.closest('#day-panel, #calendar-view')) return 'calendar';
+        if (params.get('q')) return 'search';
+        if (params.get('group')) return 'group-filter';
+        if (a.closest('#headliners')) return 'headliners';
+        if (a.closest('#recent')) return 'recent';
+        if (location.pathname.startsWith('/groups')) return 'groups-page';
+        const heading = a.closest('[data-sec]')?.querySelector('h2')?.textContent?.trim();
+        if (heading) return { 'This week': 'this-week', 'Next week': 'next-week', 'Further out': 'further' }[heading] ?? 'later';
+        return 'other';
+      };
       document.addEventListener('click', (ev) => {
         const a = (ev.target as Element).closest<HTMLElement>('[data-click]');
-        if (!a || !import.meta.env.PROD) return;
+        if (!a) return;
         const host = a.closest<HTMLElement>('[data-groups]');
-        const body = { kind: a.dataset.click, groups: host?.dataset.groups?.split(' ').filter(Boolean) ?? [], event: a.closest<HTMLElement>('[data-id]')?.dataset.id ?? '' };
-        try { navigator.sendBeacon('/api/click', JSON.stringify(body)); } catch {}
+        beacon({ kind: a.dataset.click, groups: host?.dataset.groups?.split(' ').filter(Boolean) ?? [], event: a.closest<HTMLElement>('[data-id]')?.dataset.id ?? '', from: whereFrom(a) });
       });
 
       // After the page has loaded: the worker's install downloads the whole site,
@@ -219,7 +239,7 @@ const speculation = toScript({
       const installBtn = document.getElementById('install-app') as HTMLButtonElement;
       let installOffer: any = null;
       window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installOffer = e; installBtn.hidden = false; });
-      window.addEventListener('appinstalled', () => { installBtn.hidden = true; installOffer = null; });
+      window.addEventListener('appinstalled', () => { installBtn.hidden = true; installOffer = null; beacon({ kind: 'install' }); });
       installBtn.addEventListener('click', async () => {
         if (!installOffer) return;
         installOffer.prompt();
@@ -238,6 +258,9 @@ const speculation = toScript({
       const iosSafari = /iPhone|iPad|iPod/.test(ua) && /Version\/[\d.]+.*Safari\//.test(ua)
         && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|YaBrowser|DuckDuckGo|GSA\/|FBAN|FBAV|FB_IAB|Instagram|LinkedInApp|Twitter|Snapchat|Pinterest|Line\//.test(ua);
       const standalone = matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
+      // An installed app being opened: a page load in the app that didn't
+      // come from another of its own pages. Counts openings, not people.
+      if (standalone && !document.referrer.startsWith(location.origin)) beacon({ kind: 'app-open' });
       if (iosSafari && !standalone && store.get('install-hint') !== 'dismissed') {
         // One visit per browser session; sessionStorage can throw (private mode, blocked storage).
         let visits = Number(store.get('visits')) || 0;

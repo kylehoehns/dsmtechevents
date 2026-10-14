@@ -1,27 +1,53 @@
 // The only server-side code: counts outbound clicks (RSVP, details, maps) so
-// organizers can see how many people the site sends their way, and passes Luma
-// event photos through from our own domain (see src/lib/luma.mjs). Everything
-// else is static files, served by Cloudflare before this runs (wrangler.jsonc
-// routes only /api/* and /img/luma/* here).
+// organizers can see how many people the site sends their way, plus a few
+// site signals (searches that found nothing, app installs and opens, link
+// previews; docs/ANALYTICS.md), and passes Luma event photos through from
+// our own domain (see src/lib/luma.mjs). Everything else is static files,
+// served by Cloudflare before this runs (wrangler.jsonc routes only /api/*,
+// /img/luma/* and the share image here).
 //
-// Privacy: a click is stored as what kind of link, which group, which event.
-// No IP address, cookie, user agent or anything else about the visitor.
+// Privacy: a click is stored as what kind of link, which group, which event,
+// and which part of the page. No IP address, cookie, user agent or anything
+// else about the visitor.
 import { LUMA_HOST, LUMA_WIDTHS, LUMA_PATH } from '../src/lib/luma.mjs';
 
-const KINDS = new Set(['rsvp', 'title', 'map', 'poster', 'later', 'past', 'meetup', 'website']);
+// Outbound links, then the page's own signals: a search that found nothing,
+// an app install, an installed app being opened.
+const LINK_KINDS = ['rsvp', 'title', 'map', 'poster', 'later', 'past', 'meetup', 'website'];
+const KINDS = new Set([...LINK_KINDS, 'search-miss', 'install', 'app-open']);
+// Which part of the site a link was clicked in (Layout.astro works it out).
+const FROMS = new Set(['this-week', 'next-week', 'later', 'further', 'headliners', 'recent', 'calendar', 'search', 'group-filter', 'groups-page', 'other']);
 const ID = /^[a-z0-9-]{1,120}$/i;
+// A search term as app.js sends it: lowercased, letters, digits and a few
+// marks (c#, .net, node.js), so an email address or anything odd is refused.
+const TERM = /^[a-z0-9 .#+-]{2,30}$/;
 const MAX_BODY = 1024; // a real beacon is about 80 bytes
 
-// The beacon body is {kind, groups, event}. Anything unexpected is dropped
-// rather than stored; a joint meetup has up to a few host groups.
+// The beacon body is {kind, groups, event, from, term}. Anything unexpected
+// is dropped rather than stored; a joint meetup has up to a few host groups.
 export function parseClick(text) {
   let body;
   try { body = JSON.parse(text); } catch { return null; }
   if (!body || !KINDS.has(body.kind)) return null;
   const groups = (Array.isArray(body.groups) ? body.groups : []).filter((g) => typeof g === 'string' && ID.test(g)).slice(0, 4);
   const event = typeof body.event === 'string' && ID.test(body.event) ? body.event : '';
-  return { kind: body.kind, groups, event };
+  const from = FROMS.has(body.from) ? body.from : '';
+  const term = body.kind === 'search-miss' && typeof body.term === 'string' && TERM.test(body.term) ? body.term : '';
+  if (body.kind === 'search-miss' && !term) return null;
+  return { kind: body.kind, groups, event, from, term };
 }
+
+// The share image is fetched by the apps that draw a link preview, never by
+// a person's browser looking at the page. Which app, by its preview bot's
+// user agent (only the name is kept): iMessage sends Facebook's and X's bot
+// names together, from a Mac browser string.
+const PREVIEWERS = [
+  ['imessage', /facebookexternalhit.*Twitterbot|Twitterbot.*facebookexternalhit/i],
+  ['slack', /Slackbot/i], ['teams', /SkypeUriPreview|MicrosoftPreview/i], ['discord', /Discordbot/i],
+  ['linkedin', /LinkedInBot/i], ['facebook', /facebookexternalhit|Facebot/i], ['x', /Twitterbot/i],
+  ['whatsapp', /WhatsApp/i], ['telegram', /TelegramBot/i],
+];
+export const previewer = (ua = '') => PREVIEWERS.find(([, re]) => re.test(ua))?.[0] ?? null;
 
 // The body as text, or null as soon as it passes `max` bytes (the rest is
 // never read).
@@ -94,9 +120,19 @@ export default {
       // of the one click (1/hosts), so totals add up to real clicks.
       const hosts = click.groups.length ? click.groups : [''];
       for (const group of hosts) {
-        env.CLICKS?.writeDataPoint({ blobs: [click.kind, group, click.event], doubles: [1 / hosts.length], indexes: [group || 'none'] });
+        env.CLICKS?.writeDataPoint({ blobs: [click.kind, group, click.event, click.from, click.term], doubles: [1 / hosts.length], indexes: [group || 'none'] });
       }
       return new Response(null, { status: 204 });
+    }
+    if (url.pathname === '/og-image-dark.png') {
+      const app = previewer(request.headers.get('User-Agent') ?? '');
+      if (app && request.method === 'GET') {
+        const ip = request.headers.get('CF-Connecting-IP') ?? '';
+        if (!env.CLICK_LIMIT || (await env.CLICK_LIMIT.limit({ key: ip })).success) {
+          env.CLICKS?.writeDataPoint({ blobs: ['preview', '', '', app, ''], doubles: [1], indexes: ['none'] });
+        }
+      }
+      return env.ASSETS.fetch(request);
     }
     if (url.pathname.startsWith('/img/luma/')) {
       if (request.method !== 'GET' && request.method !== 'HEAD') return new Response(null, { status: 405 });

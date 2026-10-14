@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mergeRows, renderHeadline, renderReport, renderTraffic } from '../scripts/site-report.mjs';
+import { mergeRows, renderHeadline, renderReport, renderSignals, renderTraffic } from '../scripts/site-report.mjs';
 import { bar, spark, trend } from '../scripts/report-md.mjs';
 
 const day = (key, visits, views) => ({ key, visits, views });
@@ -77,4 +77,21 @@ test('weeks of traffic add up into one row per key, in the order asked for', () 
   assert.deepEqual(mergeRows(rows, 'sum_visits_DESC').map((r) => [r.key, r.visits, r.views]), [['direct', 500, 900], ['linkedin', 40, 900], ['google', 10, 12]]);
   assert.deepEqual(mergeRows(rows, 'count_DESC').map((r) => r.key).slice(0, 2).sort(), ['direct', 'linkedin']);
   assert.deepEqual(mergeRows([day('2026-10-07', 1, 1), day('2026-10-09', 1, 1), day('2026-10-08', 1, 1)], 'date_DESC').map((r) => r.key), ['2026-10-09', '2026-10-08', '2026-10-07']);
+});
+
+test('the site signals: where people click, searches that found nothing, the app, link previews', () => {
+  const md = renderSignals({
+    where: [{ key: 'this-week', clicks: 20 }, { key: 'search', clicks: 5 }],
+    misses: [{ key: 'rust', clicks: 4 }],
+    installs: 2, opens: 9,
+    previews: [{ key: 'slack', clicks: 6 }, { key: 'imessage', clicks: 3 }],
+  });
+  assert.match(md, /\| This week \| 20 \| ██████████ \|/);
+  assert.match(md, /\| Search results \| 5 \|/);
+  assert.match(md, /\| `rust` \| 4 \|/);
+  assert.match(md, /\*\*Installed app:\*\* 2 installed, 9 times opened\./);
+  assert.match(md, /\| Slack \| 6 \|/);
+  assert.match(md, /\| iMessage \| 3 \|/);
+  const empty = renderSignals({ where: [], misses: [], installs: 0, opens: 0, previews: [] });
+  assert.match(empty, /_None\._/);
 });
