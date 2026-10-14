@@ -23,6 +23,8 @@ the groups from the nearest `data-groups`, and the event from the nearest
 | `blob1`   | kind (below)                                                  |
 | `blob2`   | group id (`pyowa`), empty for a conference with no group      |
 | `blob3`   | event id (`pyowa-316749553`), empty for group links           |
+| `blob4`   | where: the part of the site for a click (below), the app for a preview |
+| `blob5`   | the term, for a search that found nothing; empty otherwise   |
 | `double1` | this point's share of the click: 1 ÷ the number of host groups |
 | `index1`  | group id, or `none`                                           |
 
@@ -34,6 +36,34 @@ Kinds: `rsvp` (the card's button), `title` (the card's title), `map` (the
 venue), `poster` (a headliner's Tickets & info), `later` (a "Further out"
 row), `past` (a "Recently" row), `meetup` and `website` (the Groups page).
 A new kind has to be added to `KINDS` in the Worker too, or it is rejected.
+
+Where (`blob4`), worked out in the listener: `search` or `group-filter` when
+the list is filtered, otherwise `calendar`, `headliners`, `recent`,
+`groups-page`, or the list section the link sits in (`this-week`,
+`next-week`, `further`, `later` for the month sections), else `other`. The
+Worker keeps only those values.
+
+### The site's own signals
+
+The same dataset holds a few non-click points, kept out of the click counts:
+
+- `search-miss`: a search on the home page that found nothing at all, coming
+  up or past, sent by `app.js` two seconds after the typing settles, once
+  per term per page. Only the term, lowercased, and only if it's 2 to 30
+  letters, digits, spaces or `.#+-` (the Worker checks again), so a pasted
+  sentence or an email address is never sent. Searches that find something
+  aren't recorded. The report lists terms seen 3 or more times in 30 days,
+  so one person's one-off never shows. This is the evidence decision 0006
+  asks for before topic tags come back.
+- `install` (the browser's `appinstalled`) and `app-open` (a page load in the
+  installed app that didn't come from one of its own pages): openings, not
+  people.
+- `preview`: written by the Worker, not the page. Apps that draw a link
+  preview (Slack, iMessage, Teams, LinkedIn…) fetch `/og-image-dark.png`; a
+  person's browser looking at the page never does. The Worker runs first on
+  that path (`wrangler.jsonc`), keeps just the app's name from its bot's user
+  agent (`previewer()`), and serves the image as before. Apps cache
+  previews, so this counts fewer than the real shares; search engines aren't counted.
 
 Nothing else is stored: no IP address, user agent, referrer or cookie.
 

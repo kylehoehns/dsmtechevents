@@ -229,9 +229,22 @@ function renderList() {
       ? `Check <a href="${escapeHtml(g.url)}" target="_blank" rel="noopener">their page<span class="sr-only"> (opens in new tab)</span></a> for what's next.`
       : 'Check their page for what\'s next.'}`;
   }
+  // A search that finds nothing at all, coming up or past, once the
+  // typing has settled (docs/ANALYTICS.md). Only the words themselves, and
+  // only ones that look like a topic, never a whole sentence or an address.
+  clearTimeout(missTimer);
+  if (!total && state.q && poolReady && !pastShown) missTimer = setTimeout(() => searchMiss(state.q), 2000);
   squashRepeats();
   highlight();
   return total;
+}
+let missTimer = 0;
+const missed = new Set();
+function searchMiss(q) {
+  const term = q.toLowerCase().replace(/\s+/g, ' ').trim();
+  if (q !== state.q || missed.has(term) || !/^[a-z0-9 .#+-]{2,30}$/.test(term)) return;
+  missed.add(term);
+  window.dsmBeacon?.({ kind: 'search-miss', term });
 }
 
 // Don't print what the row above just said: the date for a second event on

@@ -1,26 +1,53 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import worker, { parseClick, readCapped } from '../worker/index.js';
+import worker, { parseClick, previewer, readCapped } from '../worker/index.js';
 
-test('parseClick keeps only a known kind and safe ids', () => {
-  assert.deepEqual(parseClick('{"kind":"rsvp","groups":["pyowa"],"event":"pyowa-316749553"}'), { kind: 'rsvp', groups: ['pyowa'], event: 'pyowa-316749553' });
+test('parseClick keeps only a known kind, safe ids and a known part of the site', () => {
+  assert.deepEqual(parseClick('{"kind":"rsvp","groups":["pyowa"],"event":"pyowa-316749553","from":"this-week"}'), { kind: 'rsvp', groups: ['pyowa'], event: 'pyowa-316749553', from: 'this-week', term: '' });
   assert.equal(parseClick('{"kind":"track-everything"}'), null);
   assert.equal(parseClick('not json'), null);
-  assert.deepEqual(parseClick('{"kind":"map","groups":["<script>",7,"cijug"],"event":"x y"}'), { kind: 'map', groups: ['cijug'], event: '' }, 'odd ids are dropped, not stored');
-  assert.deepEqual(parseClick('{"kind":"poster","groups":"pyowa"}'), { kind: 'poster', groups: [], event: '' });
+  assert.deepEqual(parseClick('{"kind":"map","groups":["<script>",7,"cijug"],"event":"x y","from":"/secret?page"}'), { kind: 'map', groups: ['cijug'], event: '', from: '', term: '' }, 'odd values are dropped, not stored');
+  assert.deepEqual(parseClick('{"kind":"poster","groups":"pyowa"}'), { kind: 'poster', groups: [], event: '', from: '', term: '' });
+  assert.equal(parseClick('{"kind":"preview"}'), null, 'only the Worker itself writes previews');
+});
+
+test('a search miss keeps only a short, plain term; nothing else carries one', () => {
+  assert.deepEqual(parseClick('{"kind":"search-miss","term":"rust"}'), { kind: 'search-miss', groups: [], event: '', from: '', term: 'rust' });
+  assert.equal(parseClick('{"kind":"search-miss","term":"me@example.com"}'), null, 'an address is refused outright');
+  assert.equal(parseClick('{"kind":"search-miss","term":"a"}'), null);
+  assert.equal(parseClick('{"kind":"search-miss","term":"a very long sentence someone pasted in"}'), null);
+  assert.equal(parseClick('{"kind":"rsvp","term":"rust"}').term, '');
+  assert.deepEqual(parseClick('{"kind":"app-open"}'), { kind: 'app-open', groups: [], event: '', from: '', term: '' });
+});
+
+test('link previews are told apart by the app that drew them; browsers are not previews', () => {
+  assert.equal(previewer('Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)'), 'slack');
+  assert.equal(previewer('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.4 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.4 facebookexternalhit/1.1 Facebot Twitterbot/1.0'), 'imessage');
+  assert.equal(previewer('LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)'), 'linkedin');
+  assert.equal(previewer('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'), null);
+  assert.equal(previewer('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'), null, 'search engines are not previews');
+});
+
+test('the share image is served as ever, and a preview bot fetching it is counted', async () => {
+  const points = [];
+  const env = { CLICKS: { writeDataPoint: (p) => points.push(p) }, ASSETS: { fetch: async () => new Response('png') } };
+  const get = (ua) => worker.fetch(new Request('https://dsmtechevents.com/og-image-dark.png?v=5', { headers: { 'User-Agent': ua } }), env);
+  assert.equal(await (await get('Slackbot-LinkExpanding 1.0')).text(), 'png');
+  assert.equal(await (await get('Mozilla/5.0 (iPhone) Safari/604.1')).text(), 'png');
+  assert.deepEqual(points, [{ blobs: ['preview', '', '', 'slack', ''], doubles: [1], indexes: ['none'] }]);
 });
 
 test('the Worker records a click per host group and serves everything else from assets', async () => {
   const points = [];
   const env = { CLICKS: { writeDataPoint: (p) => points.push(p) }, ASSETS: { fetch: async () => new Response('static') } };
   const post = (body, headers = { Origin: 'https://dsmtechevents.com' }) => new Request('https://dsmtechevents.com/api/click', { method: 'POST', body, headers });
-  assert.equal((await worker.fetch(post('{"kind":"rsvp","groups":["cijug","pyowa"],"event":"cijug-1"}'), env)).status, 204);
+  assert.equal((await worker.fetch(post('{"kind":"rsvp","groups":["cijug","pyowa"],"event":"cijug-1","from":"search"}'), env)).status, 204);
   assert.equal((await worker.fetch(post('{"kind":"poster","groups":[],"event":"manual-devcon-2026-10-15"}'), env)).status, 204);
   // A joint meetup: a point per host, each half of the one click.
   assert.deepEqual(points, [
-    { blobs: ['rsvp', 'cijug', 'cijug-1'], doubles: [0.5], indexes: ['cijug'] },
-    { blobs: ['rsvp', 'pyowa', 'cijug-1'], doubles: [0.5], indexes: ['pyowa'] },
-    { blobs: ['poster', '', 'manual-devcon-2026-10-15'], doubles: [1], indexes: ['none'] },
+    { blobs: ['rsvp', 'cijug', 'cijug-1', 'search', ''], doubles: [0.5], indexes: ['cijug'] },
+    { blobs: ['rsvp', 'pyowa', 'cijug-1', 'search', ''], doubles: [0.5], indexes: ['pyowa'] },
+    { blobs: ['poster', '', 'manual-devcon-2026-10-15', '', ''], doubles: [1], indexes: ['none'] },
   ]);
   assert.equal((await worker.fetch(new Request('https://dsmtechevents.com/api/click'), env)).status, 405);
   assert.equal((await worker.fetch(post('{}'), env)).status, 400);
