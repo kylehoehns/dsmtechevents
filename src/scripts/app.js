@@ -177,7 +177,8 @@ function haystack(id) {
     searchIndex = new Map();
     const index = (el, sel) => {
       const names = hostsOf(el).flatMap((g) => groups[g] ? [groups[g].short, groups[g].name] : []);
-      const text = $$(sel, el).map((t) => t.textContent);
+      // An About's words as shown: not its links' hidden "(opens in new tab)".
+      const text = $$(sel, el).map((t) => (t.matches('.desc') ? plainAbout(t) : t.textContent));
       searchIndex.set(el.dataset.id, fold([...names, ...text].join(' ')));
     };
     for (const card of cards.values()) index(card, '.band, .series, .title, .venue, .addr, .tag-online, .desc');

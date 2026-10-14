@@ -53,6 +53,15 @@ test('the About text is searched', async ({ page }) => {
   await expect(event(page, 'Python Office Hours')).toBeHidden();
 });
 
+test('a link\'s hidden "(opens in new tab)" isn\'t searched', async ({ page }) => {
+  await page.goto('/');
+  await search(page, 'front desk');
+  await expect(event(page, 'Convention Center Tour')).toBeVisible();
+  await box(page).fill('tab');
+  await expect(event(page, 'Convention Center Tour')).toBeHidden();
+  await expect(page.getByRole('status')).toContainText('Nothing matches');
+});
+
 test('words match from their start: "ai" finds AI, not "said"', async ({ page }) => {
   await page.goto('/');
   await search(page, 'ai');

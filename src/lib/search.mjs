@@ -1,15 +1,18 @@
 // The home page search's matching rules (app.js), here so they can be tested.
 // Every word typed must be found in what a card says:
-// - A short word (under 4 characters) or one with ".", "#" or "+" must start
-//   a word: "ai" finds "AI" but not "said", ".net" finds ".NET" but not
+// - A short word (under 4 characters) or one with ".", "#" or "+" must be a
+//   whole word (or its plural): "ai" finds "AI" but not "said" or "air",
+//   "go" finds "Go" but not "good", ".net" finds ".NET" and "ASP.NET" but not
 //   "networking", "net" finds ".NET".
 // - A longer plain word may sit inside a word ("telemetry" finds
-//   "OpenTelemetry"), and a trailing "s" is dropped ("agents" finds "agent").
-// - A word in SYNONYMS (synonyms.mjs) also matches its synonyms, by the same
-//   rules, except that a short one must be a whole word (or plural), so "ml"
-//   from "ai" doesn't find "MLH" any more than "html". A synonym of several
-//   words ("machine learning", "ci/cd") matches them in a row, with any
-//   spaces or punctuation between.
+//   "OpenTelemetry"), and a trailing "s" is dropped from a word of 5 or more
+//   letters ("agents" finds "agent"; "news" doesn't find "renewal").
+// - A word in SYNONYMS (synonyms.mjs) also matches its synonyms, which must
+//   start a word, as written: "logging" doesn't find "blogging", "interns"
+//   doesn't find "internal", "cyber" finds "cybersecurity". A short one must
+//   be a whole word (or plural), so "ml" from "ai" doesn't find "MLH" any
+//   more than "html". A synonym of several words ("machine learning",
+//   "ci/cd") matches them in a row, with any spaces or punctuation between.
 import { SYNONYMS } from './synonyms.mjs';
 
 export const fold = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/['’]/g, '').toLowerCase();
@@ -22,9 +25,11 @@ function pattern(text, synonym = false) {
   const ws = queryWords(text);
   if (ws.length > 1) return `(?<![\\p{L}\\p{N}])${ws.map(esc).join('[^\\p{L}\\p{N}]+')}`;
   const [w] = ws;
-  if (loose(w)) return `${esc(w.replace(/s$/, ''))}s?`; // "s?" only so a highlight covers the plural
-  const start = `(?<![\\p{L}\\p{N}${/[.#+]/.test(w) ? '.#+' : ''}])${esc(w)}`;
-  return synonym ? `${start}s?(?![\\p{L}\\p{N}])` : start;
+  if (loose(w) && synonym) return `(?<![\\p{L}\\p{N}])${esc(w)}`;
+  if (loose(w)) return `${esc(w.length >= 5 ? w.replace(/s$/, '') : w)}s?`; // "s?" only so a highlight covers the plural
+  // ".net" starts at its dot, whatever is before it ("ASP.NET").
+  const before = /^[.#+]/.test(w) ? '' : `(?<![\\p{L}\\p{N}${/[.#+]/.test(w) ? '.#+' : ''}])`;
+  return `${before}${esc(w)}s?(?![\\p{L}\\p{N}])`;
 }
 
 // The query as terms, each of which must match: { test(hay), re }, where re
