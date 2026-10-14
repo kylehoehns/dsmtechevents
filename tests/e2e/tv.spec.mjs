@@ -177,3 +177,36 @@ test("clipped titles leave room for letters that hang below the line", async ({ 
   });
   expect(short).toEqual([]);
 });
+
+test("the hourly reload waits while the site can't be reached, and the slides keep going", async ({ page }) => {
+  await page.goto('/tv/?fx=off');
+  await page.evaluate(() => { window.__before = true; });
+  // The check before reloading fails, as it would with the Wi-Fi down. (Faked in the
+  // page: a blocked request would log a console error, which fails every test.)
+  await page.evaluate(() => {
+    const real = window.fetch;
+    window.fetch = (url, opts) => (opts?.method === 'HEAD' ? Promise.reject(new TypeError('Failed to fetch')) : real(url, opts));
+  });
+  await page.clock.fastForward('01:01:00');
+  // Step to the last slide (left from the overview wraps round): its timer is the one that reloads.
+  for (let i = 0; i < 20 && !(await current(page).evaluate((s) => s.matches('.overview'))); i++) await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowLeft');
+  await page.clock.runFor(13_000);
+  await expect(current(page).getByRole('heading', { name: 'Coming up' })).toBeVisible();
+  expect(await page.evaluate(() => window.__before ?? false)).toBe(true);
+});
+
+test('the clock keeps time, its colon blinking and each new minute stamped in', async ({ page }) => {
+  await page.goto('/tv/');
+  const clock = page.locator('#tv-clock');
+  await expect(clock).toHaveText('Wed, Oct 14, 9:00 AM');
+  await expect(clock.locator('.colon')).toHaveCSS('animation-name', 'fx-blink');
+  await page.clock.runFor(61_000);
+  await expect(clock).toHaveText('Wed, Oct 14, 9:01 AM');
+});
+
+test('the year-so-far slide stays off while the year has too little to show', async ({ page }) => {
+  await page.goto('/tv/');
+  await expect(current(page).getByRole('heading', { name: 'Coming up' })).toBeVisible();
+  await expect(page.locator('.year-slide')).toHaveCount(0); // the fixture archive has 2 events this year
+});

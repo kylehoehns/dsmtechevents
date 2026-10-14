@@ -179,3 +179,11 @@
   animation: fx-halo 2.4s ease-in-out infinite alternate;
 }
 @keyframes fx-halo { from { scale: 0.8; opacity: 0.3; } to { scale: 1.1; opacity: 0.75; } }
+
+/* the clock's colon blinks: a second on, a second dim */
+.tv[data-fx] .tv-clock .colon { animation: fx-blink 2s steps(1) infinite; }
+@keyframes fx-blink { 50% { opacity: 0.2; } }
+
+/* the year's bars grow up from the baseline, one after another */
+.tv[data-fx=print] .slide.is-on .year-chart .bar { transform-origin: bottom; animation: fx-grow 0.7s cubic-bezier(0.3, 1.3, 0.5, 1) calc(0.3s + var(--i, 0) * 0.06s) backwards; }
+@keyframes fx-grow { from { transform: scaleY(0); } }
