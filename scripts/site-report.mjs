@@ -195,7 +195,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   // A joint meetup's click is one point per host group (worker/index.js),
   // each weighted 1/hosts in double1, so per-group counts use the points and
   // totals use the weights. Points from before the weights count whole.
-  const ONE = `SUM(_sample_interval * IF(double1 > 0, double1, 1))`;
+  const ONE = `SUM(_sample_interval * IF(double1 > 0, double1, 1.0))`;
   const prev = `${since(14)} AND timestamp <= NOW() - INTERVAL '7' DAY`;
   const [week, month, kinds, [tw], [tp], [tm]] = await Promise.all([
     query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${since(7)} GROUP BY key`, token),
