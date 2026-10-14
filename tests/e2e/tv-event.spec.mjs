@@ -38,6 +38,7 @@ test("CIJUG's event counts down, says Happening now, then thanks everyone", asyn
   await expect(stamp).toHaveText('Starts in 25 min');
   await page.clock.fastForward('00:30:00'); // 5:35pm
   await expect(stamp).toHaveText('Happening now');
+  await expect(page.locator('.ev-event .tv-side .qr span')).toHaveText('Scan for details'); // nothing left to RSVP to
   await page.clock.fastForward('02:00:00'); // 7:35pm, over
   const slide = page.locator('.ev-event');
   await expect(slide.getByRole('heading', { name: 'Thanks for coming' })).toBeVisible();

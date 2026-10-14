@@ -107,7 +107,7 @@ const eventData = {
               {qr && (
                 <div class="qr">
                   <div class="qr-code" set:html={qr} />
-                  <span>{e.url.includes('meetup.com') ? 'Scan to RSVP' : 'Scan for details'}</span>
+                  <span class="scan" data-label={e.url.includes('meetup.com') ? 'Scan to RSVP' : 'Scan for details'}>{e.url.includes('meetup.com') ? 'Scan to RSVP' : 'Scan for details'}</span>
                 </div>
               )}
             </div>
@@ -361,6 +361,9 @@ const eventData = {
       tag.textContent = label;
       tag.hidden = !label;
       s.classList.toggle('is-live', label === 'Happening now');
+      // Once it's on, there's nothing left to RSVP to: the code is for details.
+      const scan = s.querySelector<HTMLElement>('.scan');
+      if (scan) scan.textContent = label === 'Happening now' ? 'Scan for details' : scan.dataset.label!;
     }
     mode?.update(now);
     const empty = document.querySelector<HTMLElement>('.overview .tv-empty');

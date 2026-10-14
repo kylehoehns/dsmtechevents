@@ -116,10 +116,13 @@ test('an event on now is marked live, on its row and its poster', async ({ page 
   const row = page.locator('.overview li', { hasText: 'Coding Dojo' });
   const poster = page.locator('.poster-slide', { hasText: 'Coding Dojo' });
   await expect(row).not.toHaveClass(/is-live/);
+  await expect(poster.locator('.qr span')).toHaveText('Scan to RSVP');
   await page.clock.fastForward('09:00:00'); // 6pm, Coding Dojo is on
   await page.keyboard.press('ArrowRight');
   await expect(row).toHaveClass(/is-live/);
   await expect(poster).toHaveClass(/is-live/);
+  // nothing left to RSVP to once it's on
+  await expect(poster.locator('.qr span')).toHaveText('Scan for details');
 });
 
 test('?fx=off, or reduced motion, keeps the plain swap', async ({ page }) => {

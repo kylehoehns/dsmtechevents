@@ -196,7 +196,11 @@ export function eventMode(stage: HTMLElement, data: TvData, id: string, now = Da
           stamp.textContent = label;
           stamp.hidden = !stamp.textContent;
         }
-        s.classList.toggle('is-live', !!stamp && stamp.textContent === 'Happening now');
+        const live = !!stamp && stamp.textContent === 'Happening now';
+        s.classList.toggle('is-live', live);
+        // Once it's on, there's nothing left to RSVP to: the code is for details.
+        const scan = s.querySelector('.tv-side .qr span');
+        if (scan) scan.textContent = live ? 'Scan for details' : rsvpLabel(e);
       });
     } else {
       let key: string | null = null;
