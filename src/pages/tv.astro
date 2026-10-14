@@ -16,11 +16,12 @@ import QRCode from 'qrcode';
 import Layout from '../layouts/Layout.astro';
 import '../styles/tv-fx.css';
 import { loadData } from '../lib/data.mjs';
-import { weekday, day, month, shortRange, shortTime, dateRange, lastDay, lineup, DAY } from '../lib/format.mjs';
+import { weekday, day, month, shortRange, shortTime, dateRange, lastDay, lineup, DAY, plural } from '../lib/format.mjs';
+import { yearSoFar } from '../lib/year-so-far.mjs';
 import { toScript } from '../lib/jsonld.mjs';
 import { site } from '../lib/site.mjs';
 
-const { upcoming, events: all, allGroups } = loadData();
+const { upcoming, events: all, allGroups, archive } = loadData();
 const DAYS = 21;
 const SHOWN = 10;
 const ROWS = 7; // what fits on the overview at 1080p; the rest are on "+ N more"
@@ -28,6 +29,9 @@ const horizon = Date.now() + DAYS * 86_400_000;
 const soon = upcoming.filter((e) => !e.repeat && Date.parse(e.start) < horizon);
 // Always show something, even in a quiet stretch.
 const events = (soon.length >= 3 ? soon : upcoming.filter((e) => !e.repeat)).slice(0, SHOWN);
+
+// The year so far (src/lib/year-so-far.mjs): null early in the year.
+const yearNow = yearSoFar(archive, upcoming);
 
 // On the overview slide: one code to the whole site.
 const siteQr = await QRCode.toString(site.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#1d1b2b', light: '#0000' } });
@@ -114,6 +118,27 @@ const eventData = {
           )}
         </section>
       ))}
+      {yearNow && (
+        <section class="slide year-slide">
+          <div class="year-head">
+            <h2 class="misprint" data-t={`${yearNow.year} so far`}>{yearNow.year} so far</h2>
+            <p class="year-stats">
+              <span><b>{yearNow.events}</b> events</span>
+              <span><b>{yearNow.groups}</b> groups</span>
+              {yearNow.ahead > 0 && <span><b>{yearNow.ahead}</b> more on the calendar</span>}
+            </p>
+          </div>
+          <ol class="year-chart" aria-label={`Events each month in ${yearNow.year}`}>
+            {yearNow.months.map((m) => m.n === null ? <li class="future" aria-hidden="true"><span class="mo">{m.label}</span></li> : (
+              <li class:list={{ partial: m.partial }} style={`--h: ${m.n / Math.max(1, yearNow.busiest)}`} aria-label={`${m.label}: ${plural(m.n, 'event')}${m.partial ? ' so far' : ''}`}>
+                <b>{m.n}</b>
+                <span class="bar"></span>
+                <span class="mo">{m.label}{m.partial && <small> so far</small>}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
     </main>
 
     <div class="tv-progress"><span id="tv-bar"></span></div>
@@ -142,6 +167,7 @@ const eventData = {
   .tv-logo { font: 900 5vh/0.9 var(--display); text-transform: uppercase; color: var(--blue); }
   .tv-site { font: 700 2.2vh/1 var(--mono); color: var(--soft); }
   .tv-clock { margin-left: auto; font: 700 3vh/1 var(--mono); }
+  .tv-clock .min { display: inline-block; } /* so the new minute can be stamped in */
 
   .tv-stage { position: relative; min-height: 0; }
   .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease; display: flex; }
@@ -167,6 +193,22 @@ const eventData = {
   .overview .when-tag { display: inline-block; margin: 0 1vw 0 0; font: 400 2.6vh/1 var(--marker); background: var(--pink); color: #1d1b2b; padding: 0.5vh 0.6vw 0.2vh; transform: rotate(-3deg); }
   /* On now: a dot in the stamp, in the stamp's ink (tv-fx.css makes it pulse) */
   .is-live :is(.when-tag, .ev-stamp)::before { content: ""; display: inline-block; width: 0.5em; height: 0.5em; margin-right: 0.35em; border-radius: 50%; background: currentColor; vertical-align: 0.08em; }
+
+  /* The year so far: three numbers, then a bar per month. */
+  .year-slide { flex-direction: column; gap: 4vh; padding: 3vh 0 1vh; }
+  .year-head { display: flex; align-items: baseline; justify-content: space-between; gap: 3vw; flex-wrap: wrap; }
+  .year-head h2 { margin: 0; font: 900 9vh/0.85 var(--display); text-transform: uppercase; }
+  .year-stats { display: flex; gap: 3vw; margin: 0; font: 600 3vh/1 var(--mono); color: var(--soft); }
+  .year-stats b { font: 900 7vh/1 var(--display); color: var(--blue); margin-right: 0.6vw; vertical-align: -0.6vh; }
+  .year-chart { flex: 1; min-height: 0; list-style: none; margin: 0; padding: 0; display: flex; align-items: stretch; gap: 1.2vw; }
+  .year-chart li { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 1vh; }
+  .year-chart b { font: 700 3vh/1 var(--mono); color: var(--ink); }
+  .year-chart .bar { width: 100%; height: calc(var(--h) * (100% - 9vh)); min-height: 4px; background: var(--pink); border-radius: 4px 4px 0 0; }
+  /* this month isn't over: an outline, not a solid bar */
+  .year-chart .partial .bar { background: none; border: 3px dashed var(--pink); border-bottom: 0; }
+  .year-chart .mo { font: 900 3.2vh/1 var(--display); text-transform: uppercase; color: var(--soft); white-space: nowrap; }
+  .year-chart .mo small { font: 600 1.8vh/1 var(--mono); text-transform: none; }
+  .year-chart .future .mo { opacity: 0.35; } /* the rest of the year, still to come */
 
   .poster-slide { align-items: center; gap: 4vw; padding: 3vh 0; }
   .poster-slide.headliner { background: var(--pink); color: #1d1b2b; margin: 2vh calc(-4vw - 8px); padding: 3vh calc(4vw + 8px); }
@@ -299,6 +341,14 @@ const eventData = {
     .qr-code svg { width: 30vw; height: 30vw; }
     .qr span { font-size: 3.6vw; }
 
+    .year-head h2 { font-size: 10vw; }
+    .year-stats { flex-wrap: wrap; row-gap: 1.5vh; font-size: 3.4vw; }
+    .year-stats b { font-size: 8vw; }
+    .year-chart { gap: 1.5vw; }
+    .year-chart b { font-size: 3vw; }
+    .year-chart .mo { font-size: 3vw; }
+    .year-chart .mo small { display: none; } /* no room; the dashed bar says it */
+
     /* event mode stacks the same way */
     .ev-slide, .ev-poster { flex-direction: column; align-items: stretch; justify-content: center; gap: 3vh; }
     .ev-slide .qr { align-self: center; }
@@ -377,7 +427,26 @@ const eventData = {
       more.textContent = `+ ${rows.length - fit} more on the next slides`;
       more.hidden = rows.length <= fit;
     }
-    clock.textContent = clockFmt.format(new Date());
+    tick();
+  }
+
+  // The clock: the colon blinks (tv-fx.css), and each new minute is stamped
+  // in like the day's label. Rebuilt only when the minute changes.
+  let shown = '';
+  function tick() {
+    const parts = clockFmt.formatToParts(new Date());
+    const text = parts.map((x) => x.value).join('');
+    if (text === shown) return;
+    const first = !shown;
+    shown = text;
+    clock.replaceChildren(...parts.map((x) => {
+      if (x.type !== 'minute' && x.value !== ':') return x.value;
+      const span = document.createElement('span');
+      span.className = x.type === 'minute' ? 'min' : 'colon';
+      span.textContent = x.value;
+      return span;
+    }));
+    if (fx && !first) clock.querySelector('.min')?.animate([{ scale: 1.6, opacity: 0 }, {}], { duration: 350, easing: 'cubic-bezier(0.3, 1.6, 0.5, 1)' });
   }
 
   // Screen-print transitions, unless motion is reduced or ?fx=off.
@@ -441,8 +510,19 @@ const eventData = {
 
   function next() {
     // Reload between slides once an hour, to pick up new events. reload()
-    // keeps the address, so event mode's ?event=… comes back as is.
-    if (Date.now() - loadedAt > RELOAD_MS && index === slides.length - 1) return location.reload();
+    // keeps the address, so event mode's ?event=… comes back as is. Only
+    // when the site answers: a reload with the Wi-Fi down and no saved copy
+    // would leave the browser's offline page up, with nothing to bring the
+    // screen back. Otherwise keep going and try again next time round.
+    if (Date.now() - loadedAt > RELOAD_MS && index === slides.length - 1) {
+      fetch(location.href, { method: 'HEAD', cache: 'no-store', signal: AbortSignal.timeout(5000) })
+        .then((r) => (r.ok ? location.reload() : advance()), advance);
+      return;
+    }
+    advance();
+  }
+
+  function advance() {
     // refresh() may remove ended slides, so step from where the current one
     // ends up rather than by position (which would skip a slide).
     const current = slides[index];
@@ -466,7 +546,8 @@ const eventData = {
   }
   document.addEventListener('click', fullScreen);
   // The clock, and event mode's countdown, tick between slide changes too.
-  setInterval(() => { clock.textContent = clockFmt.format(new Date()); mode?.update(Date.now()); }, 15_000);
+  setInterval(tick, 1000);
+  setInterval(() => mode?.update(Date.now()), 15_000);
   show(0);
 
   // Keep the screen from dimming or sleeping while the page is up (a laptop
