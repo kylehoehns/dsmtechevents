@@ -37,5 +37,29 @@
   tags: [conference]
   headliner: true
 
+- title: Women in Tech Happy Hour
+  url: https://www.linkedin.com/company/ia-women-in-tech/
+  start: 2026-11-18
+  time: "15:00"
+  endTime: "17:00"
+  venue: Source Allies
+  address: 4501 NW Urbandale Dr, Urbandale, IA 50322
+  description: |-
+    An afternoon of connection, conversation, and community, from IA Women in Tech.
+
+    Whether you're building something at a startup, part of a large technology team, early in your career, or have been in the industry for years, there's a place for you at this table.
+
+    This is a chance to step away from the day-to-day, meet other women working across Iowa's technology community, hear real stories and experiences, and leave with a few new connections in your corner.
+
+    **What's planned**
+    3:00 Welcome and networking
+    3:30 Panel discussion
+    4:00 Fireside chat
+    4:30 Networking
+
+    The event is free and open to the public. If you're a woman working in technology, IT, engineering, data, cybersecurity, product, innovation, or a related field, come join. And if someone in your network comes to mind, send this their way.
+
+    [Register on their form](https://docs.google.com/forms/d/e/1FAIpQLSeqhVPt6C4GjvZiuuVvXwWrewDtqFWy6ym8tczvto6VWG-Lnw/viewform).
+
 - luma: https://luma.com/04xz1l03
   title: GitHub Dev Days # Luma adds "| Des Moines, Iowa, USA"
