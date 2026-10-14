@@ -1,6 +1,10 @@
 // Iowans of Things (iowansofthings.com) isn't on Meetup. Its homepage has an
 // "Upcoming Events" section with one `archive-item` per event, each with
-// "Date:", "Time:" and "Place:" lines followed by a short write-up.
+// "Date:", "Time:" and "Place:" lines followed by a short write-up. The rest
+// of the write-up is on the event's own page, after the summary: <h3>
+// sections, the useful ones bulleted lists (Event Highlights, Who Should
+// Come?, Event Agenda). Those come over too; the others are their RSVP form,
+// sponsor logos and parking notes.
 import { localToUtc } from '../../src/lib/time.mjs';
 import { addDays } from '../../src/lib/format.mjs';
 import { decode, toText } from './html.mjs';
@@ -28,6 +32,22 @@ const field = (html, name) => {
   return m ? toText(m[1]) : null;
 };
 
+// The bulleted sections of an event's own page, as description text:
+// "## Event Agenda\n• 4:30 - Arrive, park, grab refreshments\n• …".
+function sections(page, url) {
+  const at = page.indexOf('class="post-content');
+  if (at < 0) throw new Error(`no post content on ${url}`);
+  const body = page.slice(at).split('</article>')[0];
+  const more = body.indexOf('<!--more-->');
+  if (more < 0) return [];
+  return [...body.slice(more).matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>([\s\S]*?)(?=<h3|$)/g)].flatMap(([, heading, part]) => {
+    const items = [...part.matchAll(/<li>([\s\S]*?)<\/li>/g)]
+      .map((m) => toText(m[1].replace(/<strong>([^<]*\S[^<]*)<\/strong>/gi, '**$1**')))
+      .filter(Boolean);
+    return items.length ? [`## ${toText(heading)}\n${items.map((i) => `• ${i}`).join('\n')}`] : [];
+  });
+}
+
 export default async function iowansOfThings(group, { get }) {
   const base = group.website ?? 'https://iowansofthings.com/';
   const html = await get(base);
@@ -35,12 +55,15 @@ export default async function iowansOfThings(group, { get }) {
   const start = html.indexOf('id="upcoming-events"');
   const end = html.indexOf('id="past-events"');
   if (start < 0 || end < start) throw new Error('no Upcoming Events section on iowansofthings.com');
-  const items = html.slice(start, end).split('class="archive-item"').slice(1);
+  // Each item ends at its </article>: after it, the homepage adds a "Learn
+  // more and register…" link to the event's page.
+  const items = html.slice(start, end).split('class="archive-item"').slice(1).map((item) => item.split('</article>')[0]);
 
-  const events = items.flatMap((item) => {
+  const events = (await Promise.all(items.map(async (item) => {
     const link = /<h4>\s*<a href="([^"]+)">([\s\S]*?)<\/a>/.exec(item);
     const date = isoDate(field(item, 'Date') ?? '');
     if (!link || !date) return [];
+    const url = new URL(link[1], base).href;
     const [from, to] = (field(item, 'Time') ?? '').split(/\s*[-–]\s*/);
     const startTime = hhmm(from);
     const endTime = hhmm(to);
@@ -74,13 +97,13 @@ export default async function iowansOfThings(group, { get }) {
       start: startAt,
       end: endAt,
       allDay: !startTime,
-      url: new URL(link[1], base).href,
-      description: paragraphs.join('\n\n').slice(0, 2000),
+      url,
+      description: [...paragraphs, ...sections(await get(url), url)].join('\n\n').slice(0, 2000),
       venue: venue?.trim() || null,
       address: address?.trim() || null,
       ...(banner && { image: new URL(banner, base).href }),
     }];
-  });
+  }))).flat();
   // An empty section is fine (nothing scheduled); items that all fail to
   // parse mean the markup changed.
   if (items.length && !events.length) throw new Error(`${items.length} upcoming items on iowansofthings.com but none had a link and date`);
