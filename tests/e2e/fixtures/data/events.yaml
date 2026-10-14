@@ -28,6 +28,9 @@
   endTime: "13:00"
   venue: Convention Center
   address: 833 5th Ave, Des Moines, IA 50309
+  # A link in its About, for search.spec.mjs: the link's hidden "(opens in
+  # new tab)" isn't searched.
+  description: Meet at the front desk. Parking map at https://example.com/parking
 
 # Evenings on the two daylight-saving Sundays, for time-travel.spec.mjs:
 # clocks fall back at 2am on Nov 1 2026 and spring forward on Mar 14 2027.

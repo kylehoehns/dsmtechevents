@@ -33,6 +33,12 @@ const UA = 'dsmtechevents/1.0 (+https://dsmtechevents.com; community event calen
 // A request this script won't do on its own; `message` says why, for the issue.
 export class LeaveIt extends Error {}
 
+// Text from a stranger's page (a title, name or address), made inert before
+// it goes in an issue comment, the PR or the commit message: no backticks or
+// line breaks to break out of the formatting around it, and an invisible space
+// after each @ and #, so "@someone" pings nobody and "Fixes #3" closes nothing.
+export const tame = (s) => String(s).replace(/[`\r\n]+/g, ' ').replace(/[@#]/g, '$&\u200b');
+
 // Which kind of link this is. Only exact Luma event and Meetup group links
 // (or one of the group's event links) get through.
 export function classify(link) {
@@ -53,15 +59,15 @@ export function alreadyListed({ kind, slug }, groups, events) {
 
 // Reasons a Luma event can't go in, and things the reviewer should check.
 export function checkLumaEvent(e, now) {
-  if (Date.parse(e.end) < now) throw new LeaveIt(`"${e.title}" is already over.`);
-  if (!e.online && !/\b(IA|Iowa)\b/.test(e.address ?? '')) throw new LeaveIt(`"${e.title}" isn't in Iowa (Luma says ${e.address ?? 'no address'}).`);
+  if (Date.parse(e.end) < now) throw new LeaveIt(`"${tame(e.title)}" is already over.`);
+  if (!e.online && !/\b(IA|Iowa)\b/.test(e.address ?? '')) throw new LeaveIt(`"${tame(e.title)}" isn't in Iowa (Luma says ${tame(e.address ?? 'no address')}).`);
   return e.online ? ['It is online: check it is run by a local group.'] : [];
 }
 
 export function checkMeetupGroup(g, slug) {
   if (!g.name) throw new LeaveIt(`Couldn't read the group's name from meetup.com/${slug}.`);
-  if (g.isPrivate) throw new LeaveIt(`${g.name} is a private Meetup group.`);
-  if (g.state !== 'IA') throw new LeaveIt(`${g.name} isn't in Iowa (Meetup says ${[g.city, g.state].filter(Boolean).join(', ') || 'nowhere'}).`);
+  if (g.isPrivate) throw new LeaveIt(`${tame(g.name)} is a private Meetup group.`);
+  if (g.state !== 'IA') throw new LeaveIt(`${tame(g.name)} isn't in Iowa (Meetup says ${tame([g.city, g.state].filter(Boolean).join(', ') || 'nowhere')}).`);
   return [];
 }
 
@@ -102,17 +108,21 @@ const when = (e) => `${fmt({ weekday: 'short', month: 'short', day: 'numeric', h
 export const previewUrl = (branch, page = '/') => `https://${branch}-dsmtechevents.kyhoehns.workers.dev${page}`;
 
 // The PR, in the owner's template (Summary, Evidence, Undo and Impact).
-export function pullRequest({ title, entry, facts, warnings, preview, id, issue }) {
+// `title`, `entry` and `facts` carry the page's own words, so they're tamed
+// here (warnings are tamed where they're written); the closing "Closes #12"
+// is ours and isn't.
+export function pullRequest({ title: raw, entry, facts, warnings, preview, id, issue }) {
+  const title = tame(raw);
   const body = [
     '## Summary',
     '',
     `Adds **${title}**${issue ? `, as asked in #${issue}` : ''}. \`scripts/add-listing.mjs\` wrote this entry from the link:`,
     '',
     '```yaml',
-    entry.trimEnd(),
+    ...entry.trimEnd().split('\n').map(tame),
     '```',
     '',
-    ...facts.map((f) => `- ${f}`),
+    ...facts.map((f) => `- ${tame(f)}`),
     ...(warnings.length ? ['', '**Check before merging:**', '', ...warnings.map((w) => `- ${w}`)] : []),
     '',
     '## Evidence',
@@ -178,7 +188,7 @@ export async function addListing(link, { short, issue, now = Date.now() } = {}) 
       `Where: ${e.online ? 'Online' : [e.venue, shortAddress(e.address)].filter(Boolean).join(', ') || 'not given'}`,
       ...(e.going != null ? [`Going so far: ${e.going}`] : []),
     ];
-    if (/\s[|·–—-]\s/.test(e.title)) warnings.push(`Luma's title is "${e.title}". If part of it repeats the date or place, add a shorter \`title:\` to the entry.`);
+    if (/\s[|·–—-]\s/.test(e.title)) warnings.push(`Luma's title is "${tame(e.title)}". If part of it repeats the date or place, add a shorter \`title:\` to the entry.`);
     page = `/?view=calendar&day=${dayKey(e.start)}`;
     write = () => fs.writeFileSync(file('events.yaml'), appendEvent(eventsText, entry));
   } else {
@@ -189,7 +199,7 @@ export async function addListing(link, { short, issue, now = Date.now() } = {}) 
     title = g.name;
     entry = YAML.stringify([{ id, name: g.name, short: pill, meetup: meetupUrl(target.slug) }]);
     facts = [`Where: ${g.city}, ${g.state}`, ...(g.members != null ? [`Members: ${g.members}`] : [])];
-    if (!short?.trim()) warnings.push(`The short name on calendar pills is a guess: "${pill}". Change \`short:\` if the group goes by something else.`);
+    if (!short?.trim()) warnings.push(`The short name on calendar pills is a guess: "${tame(pill)}". Change \`short:\` if the group goes by something else.`);
     page = `/?group=${id}`;
     write = () => fs.writeFileSync(file('groups.yaml'), insertGroup(groupsText, entry));
   }
@@ -203,7 +213,8 @@ export async function addListing(link, { short, issue, now = Date.now() } = {}) 
     fs.writeFileSync(file('events.yaml'), eventsText);
     throw new Error(`the fetch couldn't read ${id}`, { cause: err });
   }
-  const branch = `add-${id}`;
+  // A prefix no person uses for a branch, since the workflow force-pushes it.
+  const branch = `bot-add-${id}`;
   const preview = previewUrl(branch, page);
   return { ok: true, id, kind: target.kind, branch, preview, ...pullRequest({ title, entry, facts, warnings, preview, id, issue }) };
 }

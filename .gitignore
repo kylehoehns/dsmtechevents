@@ -10,3 +10,6 @@ playwright-report/
 lighthouse.json
 prev/
 .claude/worktrees/
+
+# Playwright MCP browser snapshots
+.playwright-mcp/

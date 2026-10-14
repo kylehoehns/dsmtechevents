@@ -140,10 +140,28 @@ jobs:
           bot_id=$(gh api "users/${APP_SLUG}%5Bbot%5D" --jq .id)
           git config user.name "${APP_SLUG}[bot]"
           git config user.email "${bot_id}+${APP_SLUG}[bot]@users.noreply.github.com"
+          # The patch came from the job that ran npm and read a stranger's
+          # page: take it only if it touches nothing but listing data, so a
+          # bad package or parser can't slip code onto a branch Cloudflare builds.
+          if git apply --numstat "$DIR/listing.patch" | cut -f3- \
+            | grep -Ev '^data/(groups\.yaml|events\.yaml|cache/[a-z0-9-]+\.json)$'; then
+            say "The bot's change touched files outside the listing data, so it stopped: $RUN_URL"
+            exit 1
+          fi
+          # A second try for the same listing replaces the branch's commit,
+          # but only a branch this bot made: never a person's.
+          if [[ ! "$branch" =~ ^bot-add-[a-z0-9-]+$ ]]; then
+            say "The bot made an unexpected branch name, so it stopped: $RUN_URL"
+            exit 1
+          fi
+          if gh api "repos/${GITHUB_REPOSITORY}/branches/${branch}" --silent 2>/dev/null \
+            && [ "$(gh api "repos/${GITHUB_REPOSITORY}/branches/${branch}" --jq .commit.author.login)" != "${APP_SLUG}[bot]" ]; then
+            say "Branch $branch already exists with someone else's work on it, so the bot left it alone: $RUN_URL"
+            exit 1
+          fi
           git switch -c "$branch"
           git apply --index "$DIR/listing.patch"
           git commit -m "$title" -m "Written by scripts/add-listing.mjs ($RUN_URL)."
-          # A second try for the same listing replaces the branch's commit.
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/$branch"
 
           pr=$(gh pr list --head "$branch" --state open --json url --jq '.[0].url // empty')

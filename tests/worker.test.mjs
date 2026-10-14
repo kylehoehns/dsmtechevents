@@ -69,6 +69,7 @@ test('the Worker passes a Luma photo through resized and without its cookie', as
     asked.push(u);
     if (u.includes('missing')) return new Response('nope', { status: 404 });
     if (u.includes('page')) return new Response('<html>', { headers: { 'Content-Type': 'text/html' } });
+    if (u.includes('vector')) return new Response('<svg>', { headers: { 'Content-Type': 'image/svg+xml' } });
     return new Response('webp', { headers: { 'Content-Type': 'image/webp', 'Set-Cookie': '__cf_bm=x' } });
   });
   const get = (path, method = 'GET') => worker.fetch(new Request(`https://dsmtechevents.com${path}`, { method }), {});
@@ -77,12 +78,15 @@ test('the Worker passes a Luma photo through resized and without its cookie', as
   assert.equal(await res.text(), 'webp');
   assert.equal(res.headers.get('Content-Type'), 'image/webp');
   assert.equal(res.headers.get('Set-Cookie'), null, "Luma's cookie stays behind");
+  assert.equal(res.headers.get('X-Content-Type-Options'), 'nosniff');
+  assert.match(res.headers.get('Content-Security-Policy'), /sandbox/);
   assert.equal(asked[0], 'https://images.lumacdn.com/cdn-cgi/image/format=webp,fit=scale-down,quality=75,width=600/uploads/6c/abc.png');
 
   assert.equal((await get('/img/luma/9999/uploads/6c/abc.png')).status, 404, 'only the widths the site uses');
   assert.equal((await get('/img/luma/600/uploads/6c/notes.txt')).status, 404, 'only image files');
   assert.equal((await get('/img/luma/600/uploads/missing.png')).status, 404);
   assert.equal((await get('/img/luma/600/uploads/page.png')).status, 502, 'not an image: not passed on');
+  assert.equal((await get('/img/luma/600/uploads/vector.png')).status, 502, 'an SVG can carry script: not passed on');
   assert.equal((await get('/img/luma/600/uploads/6c/abc.png', 'POST')).status, 405);
-  assert.equal(asked.length, 3, 'refused paths never reach Luma');
+  assert.equal(asked.length, 4, 'refused paths never reach Luma');
 });

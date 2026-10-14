@@ -22,6 +22,9 @@ export const SYNONYMS = {
   javascript: ['js'],
   ts: ['typescript'],
   typescript: ['ts'],
+  dotnet: ['.net'],
+  'c#': ['.net', 'csharp'],
+  csharp: ['c#', '.net'],
   data: ['analytics', 'data science', 'bi', 'power bi', 'sql', 'database', 'data engineering'],
   career: ['hiring', 'interview', 'jobs', 'skills', 'mentoring', 'resume'],
   leadership: ['cio', 'cto', 'executive', 'strategy', 'management'],
@@ -37,5 +40,7 @@ export const SYNONYMS = {
   // ("career" alone is no good: speakers' bios say "began his career"; nor
   // "intern", which starts "internal".)
   student: ['college', 'university', 'campus', 'dmacc', 'drake', 'grand view', 'iowa state', 'career fair', 'career panel', 'career information', 'job fair', 'hiring'],
+  // A conference's name typed as one word.
+  techfuse: ['tech fuse'],
   internship: ['interns', 'career fair', 'career panel', 'career information', 'job fair', 'hiring'],
 };

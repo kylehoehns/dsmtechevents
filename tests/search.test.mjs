@@ -92,7 +92,34 @@ test('short synonyms keep to whole words', () => {
   assert.ok(finds('ai', 'GPTs we built'));
 });
 
-test('a highlight covers just what matched', () => {
+test('short words are whole words, and a plural "s" comes off longer words only', () => {
+  assert.ok(finds('go', 'Go 1.25 generics') && finds('go', 'Intro to Go'));
+  assert.ok(!finds('go', 'Good food and Google'));
+  assert.ok(!finds('ai', 'Fresh air at Water Works'));
+  assert.ok(finds('ai', 'AIs that write tests'));
+  assert.ok(finds('.net', 'ASP.NET Core minimal APIs'));
+  assert.ok(!finds('news', 'Membership renewal'));
+  assert.ok(finds('news', 'News from the board'));
+});
+
+test('a longer synonym starts a word and keeps its "s"', () => {
+  assert.ok(!finds('internship', 'Internal developer platforms'));
+  assert.ok(finds('internship', 'Meet our interns'));
+  assert.ok(!finds('observability', 'Blogging for developers'));
+  assert.ok(finds('observability', 'Structured logging'));
+  assert.ok(!finds('hardware', 'Q&A with a filmmaker'));
+  assert.ok(finds('security', 'Cybersecurity awareness month'));
+});
+
+test('.NET, C# and Tech Fuse by the other names people type', () => {
+  assert.ok(finds('dotnet', 'Iowa .NET User Group'));
+  assert.ok(finds('c#', 'Iowa .NET User Group'));
+  assert.ok(finds('csharp', 'Records in C#'));
+  assert.ok(finds('techfuse', 'Tech Fuse DSM'));
+});
+
+test('a highlight covers just what matched'
+, () => {
   assert.deepEqual(marked('ai', 'AI Study Group'), ['AI']);
   assert.deepEqual(marked('ai', 'Pairing with Copilot and an LLM'), ['Copilot', 'LLM']);
   assert.deepEqual(marked('telemetry', 'Tracing with OpenTelemetry'), ['Telemetry']);
