@@ -16,10 +16,11 @@ test('the Worker records a click per host group and serves everything else from 
   const post = (body, headers = { Origin: 'https://dsmtechevents.com' }) => new Request('https://dsmtechevents.com/api/click', { method: 'POST', body, headers });
   assert.equal((await worker.fetch(post('{"kind":"rsvp","groups":["cijug","pyowa"],"event":"cijug-1"}'), env)).status, 204);
   assert.equal((await worker.fetch(post('{"kind":"poster","groups":[],"event":"manual-devcon-2026-10-15"}'), env)).status, 204);
+  // A joint meetup: a point per host, each half of the one click.
   assert.deepEqual(points, [
-    { blobs: ['rsvp', 'cijug', 'cijug-1'], indexes: ['cijug'] },
-    { blobs: ['rsvp', 'pyowa', 'cijug-1'], indexes: ['pyowa'] },
-    { blobs: ['poster', '', 'manual-devcon-2026-10-15'], indexes: ['none'] },
+    { blobs: ['rsvp', 'cijug', 'cijug-1'], doubles: [0.5], indexes: ['cijug'] },
+    { blobs: ['rsvp', 'pyowa', 'cijug-1'], doubles: [0.5], indexes: ['pyowa'] },
+    { blobs: ['poster', '', 'manual-devcon-2026-10-15'], doubles: [1], indexes: ['none'] },
   ]);
   assert.equal((await worker.fetch(new Request('https://dsmtechevents.com/api/click'), env)).status, 405);
   assert.equal((await worker.fetch(post('{}'), env)).status, 400);
