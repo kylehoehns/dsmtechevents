@@ -95,6 +95,32 @@ test('slides are screen-printed in, and still step through', async ({ page }) =>
   await expect(page.locator('.slide.was-on')).toHaveCount(0);
 });
 
+test('slides take turns at how they come in, and a headliner always floods in', async ({ page }) => {
+  await page.goto('/tv/');
+  const seen = [];
+  const count = await page.locator('.slide').count();
+  for (let i = 0; i < count; i++) {
+    await page.keyboard.press('ArrowRight');
+    seen.push(await page.evaluate(() => [document.querySelector('.slide.is-on').matches('.headliner'), document.getElementById('tv').dataset.pull]));
+  }
+  expect(seen.filter(([headliner]) => headliner).map(([, pull]) => pull)).toEqual(expect.arrayContaining(['flood']));
+  expect(seen.filter(([headliner]) => headliner).every(([, pull]) => pull === 'flood')).toBe(true);
+  expect(new Set(seen.filter(([headliner]) => !headliner).map(([, pull]) => pull)).size).toBeGreaterThan(1);
+  await page.clock.runFor(2000);
+  await expect(page.locator('.tv')).not.toHaveAttribute('data-pull');
+});
+
+test('an event on now is marked live, on its row and its poster', async ({ page }) => {
+  await page.goto('/tv/');
+  const row = page.locator('.overview li', { hasText: 'Coding Dojo' });
+  const poster = page.locator('.poster-slide', { hasText: 'Coding Dojo' });
+  await expect(row).not.toHaveClass(/is-live/);
+  await page.clock.fastForward('09:00:00'); // 6pm, Coding Dojo is on
+  await page.keyboard.press('ArrowRight');
+  await expect(row).toHaveClass(/is-live/);
+  await expect(poster).toHaveClass(/is-live/);
+});
+
 test('?fx=off, or reduced motion, keeps the plain swap', async ({ page }) => {
   await page.goto('/tv/?fx=off');
   await expect(page.locator('.tv')).not.toHaveAttribute('data-fx');

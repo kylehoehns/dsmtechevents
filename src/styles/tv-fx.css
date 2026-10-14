@@ -1,34 +1,70 @@
 /* Screen-print motion for /tv/. tv.astro sets data-fx="print" on .tv (not
    under prefers-reduced-motion or ?fx=off), marks the
-   showing slide .is-on and the one leaving .was-on for a beat. Every effect is
-   an entrance plus a quiet idle; text is still from ~1.5s on. Motion is
-   transform, opacity and clip-path, plus a one-off color/text-shadow on the
-   print plates. --i is each row's or line's position, for staggers. */
+   showing slide .is-on and the one leaving .was-on for a beat, and names the
+   change on .tv as data-pull (wipe, dots, flood, peel) for that beat. Every
+   effect is an entrance plus a quiet idle; text is still from ~1.5s on.
+   Motion is transform, opacity, clip-path and mask, plus a one-off
+   color/text-shadow on the print plates. --i is each row's or line's
+   position, for staggers. */
 
 .tv[data-fx] .slide { transition: none; }
 .tv[data-fx] .slide.is-on { z-index: 2; }
 .tv[data-fx] .slide.was-on { opacity: 1; z-index: 1; }
 
 /* ------------------------------------------------------------------ print
-   Screen print: a squeegee pulls the new sheet across the old one. The pink
-   plate lands first, way off register; then the ink comes down and snaps
-   into register. Halftone dots flash and dry. Idle: the plate creeps. */
+   Screen print: the new sheet comes down one of four ways, taking turns. The
+   pink plate lands first, way off register; then the ink comes down and
+   snaps into register. Halftone dots flash and dry. Idle: the plate creeps. */
 .tv[data-fx=print] .slide { --plate: var(--pink); --off: 0.4; }
 /* these clip their overflow (ellipsis, line clamp), so the plate starts closer */
 .tv[data-fx=print] :is(h2, li > span) { --off: 0.15; }
 .tv[data-fx=print] .slide.headliner { --plate: #0a6cc0; }
-.tv[data-fx=print] .slide.is-on { animation: fx-pull-in 0.7s cubic-bezier(0.6, 0, 0.3, 1); }
-.tv[data-fx=print] .slide.was-on { animation: fx-pull-out 0.7s cubic-bezier(0.6, 0, 0.3, 1) forwards; }
+/* Each sheet is opaque and as wide as a headliner's pink one (which bleeds
+   past the screen's side margins), so whatever shape the new one comes in,
+   no part of the old one shows past or through it. */
+.tv[data-fx=print] .slide:not(.headliner) { background: var(--bg); margin-inline: calc(-4vw - 8px); padding-inline: calc(4vw + 8px); }
+@media (orientation: portrait) { .tv[data-fx=print] .slide:not(.headliner) { margin-inline: calc(-5vw - 8px); padding-inline: calc(5vw + 8px); } }
+/* The others leave the old sheet up until the new one covers it. */
+.tv[data-pull] .slide.was-on { animation: fx-hold 0.9s forwards; }
+@keyframes fx-hold { 0%, 99% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Wipe: a squeegee pulls the new sheet across the old one. */
+.tv[data-pull=wipe] .slide.is-on { animation: fx-pull-in 0.7s cubic-bezier(0.6, 0, 0.3, 1); }
+.tv[data-pull=wipe] .slide.was-on { animation: fx-pull-out 0.7s cubic-bezier(0.6, 0, 0.3, 1) forwards; }
 @keyframes fx-pull-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes fx-pull-out { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 0 0 100%); } }
 
+/* Dots: the new sheet prints through a halftone screen whose dots swell
+   until they touch. Px, not vh: @property's initial value can't use them. */
+@property --dot { syntax: "<length>"; inherits: false; initial-value: 24px; }
+.tv[data-pull=dots] .slide.is-on {
+  -webkit-mask: radial-gradient(circle, #000 var(--dot), transparent calc(var(--dot) + 1px)) 50% 50% / 32px 32px;
+  mask: radial-gradient(circle, #000 var(--dot), transparent calc(var(--dot) + 1px)) 50% 50% / 32px 32px;
+  animation: fx-dots 0.9s cubic-bezier(0.5, 0, 0.6, 1);
+}
+@keyframes fx-dots { from { --dot: 0px; } to { --dot: 24px; } }
+
+/* Flood: ink spreads out from the big date. Every headliner comes in this way. */
+.tv[data-fx=print] .slide { --from: 13% 55%; }
+.tv[data-fx=print] .overview { --from: 6% 8%; }
+.tv[data-pull=flood] .slide.is-on { animation: fx-flood 0.9s cubic-bezier(0.7, 0, 0.3, 1); }
+@keyframes fx-flood { from { clip-path: circle(0 at var(--from)); } to { clip-path: circle(150% at var(--from)); } }
+@media (orientation: portrait) { .tv[data-fx=print] .slide { --from: 30% 22%; } }
+
+/* Peel: the printed sheet is lifted off the bed, showing the next one under it. */
+.tv[data-pull=peel] .slide.was-on {
+  z-index: 3; transform-origin: 0 0; box-shadow: 0 3vh 6vh rgb(0 0 0 / 0.55);
+  animation: fx-peel 0.9s cubic-bezier(0.55, 0, 0.75, 0.3) forwards;
+}
+@keyframes fx-peel { to { transform: translate(8vw, -125%) rotate(-8deg); } }
+
 /* the squeegee blade rides the edge of the wipe */
-.tv[data-fx=print] .slide.is-on::before {
+.tv[data-pull=wipe] .slide.is-on::before {
   content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none;
   background: linear-gradient(90deg, transparent calc(100% - 1.8vw), var(--plate) calc(100% - 1.8vw) calc(100% - 0.7vw), #f3ede1 calc(100% - 0.7vw));
   animation: fx-blade 0.7s cubic-bezier(0.6, 0, 0.3, 1) both;
 }
-@keyframes fx-blade { from { transform: translateX(-100%); } 92% { opacity: 1; } to { transform: translateX(0); opacity: 0; } }
+@keyframes fx-blade { from { transform: translateX(-100%); } to { transform: translateX(2vw); } } /* runs off the edge rather than parking there */
 
 /* two plates on plain text: plate color as a text-shadow, ink color after */
 .tv[data-fx=print] .slide.is-on :is(h2, .hosts, .time, .where, .going, .dow, .mon, li > span, .qr span, .ev-kicker) {
@@ -70,3 +106,15 @@
 /* event mode draws its QR codes after a script loads: fade them in, not pop */
 .tv[data-fx] .ev-slide .qr-code svg { animation: fx-fade 0.4s ease-out; }
 @keyframes fx-fade { from { opacity: 0; } }
+
+/* On now: the stamp's dot pulses, and ink glows behind the big date. */
+.tv[data-fx] .is-live :is(.when-tag, .ev-stamp)::before { animation: fx-live 1.6s ease-in-out infinite; }
+@keyframes fx-live { 50% { opacity: 0.15; } }
+.tv[data-fx=print] .is-live .date-block { position: relative; }
+.tv[data-fx=print] .is-live .date-block::before {
+  content: ""; position: absolute; left: 50%; top: 45%; z-index: -1; pointer-events: none;
+  width: 46vh; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%;
+  background: radial-gradient(circle, var(--plate) 0, transparent 68%);
+  animation: fx-halo 2.4s ease-in-out infinite alternate;
+}
+@keyframes fx-halo { from { scale: 0.8; opacity: 0.3; } to { scale: 1.1; opacity: 0.75; } }
