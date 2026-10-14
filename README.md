@@ -39,7 +39,7 @@ the group's own page.
 | **Calendar** | A month grid with a day panel, fully keyboard-navigable. |
 | **Groups** | Every group with its next meetup, members and a link to its own page. |
 | **Headliners** | Conferences get a taped-up poster with a countdown. |
-| **Lobby TV** (`/tv/`) | A self-running slideshow for a screen at a coworking space or venue, with QR codes. Arrow keys step through it, space pauses. |
+| **Lobby TV** (`/tv/`) | A self-running slideshow for a screen at a coworking space or venue, with QR codes. Arrow keys step through it, space pauses, a click or F goes full screen. For a screen nobody tends, run Chrome in kiosk mode (`--kiosk <link>`) so a reload never brings the browser back. |
 | **Event screen** (`/tv/?event=…`) | One event on a venue's lobby TV: a countdown, the talk lineup, the group's next meetup and what else is coming up. Linked from the organizers page. |
 | **Print flyer** (`/print/`) | One Letter page with tear-off tabs, for a real corkboard. |
 | **For organizers** (`/organizers/`) | Getting listed, the event screen link, and a badge for a group's site. |

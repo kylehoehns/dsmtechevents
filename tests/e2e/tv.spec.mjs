@@ -120,3 +120,12 @@ test.describe('on a portrait screen', () => {
     }
   });
 });
+
+test('a click or F toggles full screen', async ({ page }) => {
+  await page.goto('/tv/');
+  const full = () => page.evaluate(() => !!document.fullscreenElement);
+  await page.mouse.click(200, 200);
+  await expect.poll(full).toBe(true);
+  await page.keyboard.press('f');
+  await expect.poll(full).toBe(false);
+});

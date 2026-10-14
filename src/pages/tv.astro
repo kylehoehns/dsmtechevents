@@ -428,7 +428,16 @@ const eventData = {
     if (e.key === 'ArrowRight') show(index + 1);
     else if (e.key === 'ArrowLeft') show(index - 1);
     else if (e.key === ' ') { paused = !paused; show(index); e.preventDefault(); }
+    else if (e.key === 'f') fullScreen();
   });
+  // Browsers only allow full screen after a click or key press, so the page
+  // can't take it on load; and the hourly reload drops it again. A screen
+  // nobody tends should run in kiosk mode instead (see README).
+  function fullScreen() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.().catch(() => {});
+  }
+  document.addEventListener('click', fullScreen);
   // The clock, and event mode's countdown, tick between slide changes too.
   setInterval(() => { clock.textContent = clockFmt.format(new Date()); mode?.update(Date.now()); }, 15_000);
   show(0);
