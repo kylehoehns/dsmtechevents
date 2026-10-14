@@ -45,9 +45,11 @@ export default async function iowansOfThings(group, { get }) {
     const startTime = hhmm(from);
     const endTime = hhmm(to);
 
-    // "Area515, Des Moines Maker Space - 108 Jefferson Avenue, Des Moines, IA 50314"
+    // "Area515, Des Moines Maker Space - 108 Jefferson Avenue, Des Moines, IA 50314",
+    // or without the dash, "Maple Studios, 1207 Maple Street, West Des Moines, IA":
+    // then the address starts at the street number.
     const place = field(item, 'Place') ?? '';
-    const [venue, address] = place.split(/\s+[-–]\s+/);
+    const [venue, address] = /\s[-–]\s/.test(place) ? place.split(/\s+[-–]\s+/) : (/^(.+?),\s*(\d.*)$/.exec(place)?.slice(1) ?? [place]);
 
     // The write-up: the plain paragraphs after Place, minus images and the
     // "Registration below." pointer to a form further down their page.
