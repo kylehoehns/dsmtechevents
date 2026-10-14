@@ -134,6 +134,9 @@ const eventData = {
     animation: tv-drift 600s ease-in-out infinite alternate; /* nudges everything a few px against burn-in */
   }
   @keyframes tv-drift { from { translate: -6px -4px; } to { translate: 6px 4px; } }
+  /* Paper grain of its own: the page's grain is off in dark mode, and the
+     TV is the dark flyer whatever the device's setting. */
+  .tv::after { content: ""; position: absolute; inset: 0; z-index: 10; pointer-events: none; background-image: var(--grain); opacity: 0.16; mix-blend-mode: screen; }
   .tv .misprint::before { color: var(--misprint); mix-blend-mode: normal; }
   .tv-top { display: flex; align-items: baseline; gap: 2vw; border-bottom: 3px solid #5d5966; padding-bottom: 1.2vh; }
   .tv-logo { font: 900 5vh/0.9 var(--display); text-transform: uppercase; color: var(--blue); }
@@ -162,6 +165,8 @@ const eventData = {
   .overview .row-time { font: 600 2.6vh/1 var(--mono); color: var(--soft); }
   /* Happening now / Tonight / Today on a row, hand-stamped like the home list's */
   .overview .when-tag { display: inline-block; margin: 0 1vw 0 0; font: 400 2.6vh/1 var(--marker); background: var(--pink); color: #1d1b2b; padding: 0.5vh 0.6vw 0.2vh; transform: rotate(-3deg); }
+  /* On now: a dot in the stamp, in the stamp's ink (tv-fx.css makes it pulse) */
+  .is-live :is(.when-tag, .ev-stamp)::before { content: ""; display: inline-block; width: 0.5em; height: 0.5em; margin-right: 0.35em; border-radius: 50%; background: currentColor; vertical-align: 0.08em; }
 
   .poster-slide { align-items: center; gap: 4vw; padding: 3vh 0; }
   .poster-slide.headliner { background: var(--pink); color: #1d1b2b; margin: 2vh calc(-4vw - 8px); padding: 3vh calc(4vw + 8px); }
@@ -321,6 +326,7 @@ const eventData = {
 <script>
   import { fmt, whenLabel, countdown } from '../lib/format.mjs';
   import { eventMode } from '../scripts/tv-event';
+  import { inkLayer } from '../scripts/tv-ink';
 
   const SLIDE_MS = 12_000;
   const RELOAD_MS = 60 * 60 * 1000;
@@ -354,6 +360,7 @@ const eventData = {
       const label = (s.matches('.poster-slide.headliner') ? countdown : whenLabel)(s.dataset.start!, s.dataset.end!, now, { multiDay: 'days' in s.dataset });
       tag.textContent = label;
       tag.hidden = !label;
+      s.classList.toggle('is-live', label === 'Happening now');
     }
     mode?.update(now);
     const empty = document.querySelector<HTMLElement>('.overview .tv-empty');
@@ -382,6 +389,20 @@ const eventData = {
     });
   }
   let leaving = 0;
+  // How each slide comes in (tv-fx.css), taking turns. A headliner always
+  // gets the ink (the WebGL pour, tv-ink.ts), or the flood without WebGL.
+  const ink = fx ? inkLayer(document.querySelector<HTMLElement>('.tv-stage')!) : null;
+  const PULLS = ['wipe', 'dots', 'paste', 'tear', 'flood', 'slam', 'peel', 'feed', 'ribbon', ...(ink ? ['ink'] : [])];
+  let pulls = 0;
+
+  // Ink pours from the slide's big date, or the overview's top corner.
+  function pour(slide: HTMLElement) {
+    const tv = document.getElementById('tv')!;
+    const num = slide.querySelector('.date-block .num')?.getBoundingClientRect();
+    const stage = tv.querySelector('.tv-stage')!.getBoundingClientRect();
+    const origin = num ? { x: num.left + num.width / 2, y: num.top + num.height / 2 } : { x: stage.left, y: stage.top };
+    ink!(slide, origin, getComputedStyle(tv).getPropertyValue('--pink'));
+  }
 
   let slides: HTMLElement[] = [];
   let index = 0;
@@ -395,11 +416,14 @@ const eventData = {
     if (!slides.length) return;
     index = (i + slides.length) % slides.length;
     // The slide going out stays up for a beat so the next one can cover it.
-    if (fx && prev && prev !== slides[index]) {
+    if (fx && prev !== slides[index]) {
+      const tv = document.getElementById('tv')!;
       document.querySelectorAll('.was-on').forEach((s) => s.classList.remove('was-on'));
-      if (prev.isConnected) prev.classList.add('was-on');
+      if (prev?.isConnected) prev.classList.add('was-on');
+      tv.dataset.pull = slides[index].matches('.headliner') ? (ink ? 'ink' : 'flood') : PULLS[pulls++ % PULLS.length];
+      if (tv.dataset.pull === 'ink') pour(slides[index]);
       clearTimeout(leaving);
-      leaving = window.setTimeout(() => prev.classList.remove('was-on'), 1600);
+      leaving = window.setTimeout(() => { prev?.classList.remove('was-on'); delete tv.dataset.pull; }, 1600);
     }
     slides.forEach((s, n) => s.classList.toggle('is-on', n === index));
     // Restart the progress bar. Event mode's event slide stays up longer.

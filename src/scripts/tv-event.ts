@@ -196,6 +196,7 @@ export function eventMode(stage: HTMLElement, data: TvData, id: string, now = Da
           stamp.textContent = label;
           stamp.hidden = !stamp.textContent;
         }
+        s.classList.toggle('is-live', !!stamp && stamp.textContent === 'Happening now');
       });
     } else {
       let key: string | null = null;
