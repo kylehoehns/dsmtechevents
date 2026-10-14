@@ -306,6 +306,9 @@ test('iowans-of-things reads the Upcoming Events section of the homepage', async
   assert.equal(ff.description, 'A technical discussion series on embedded firmware. Don’t be afraid to join us!\n\nThis month: an open-source project review.');
   assert.equal(hh.start, '2026-11-13T00:30:00.000Z', '6:30pm CST');
   assert.ok(!('image' in hh));
+  // No " - " in the place: the address starts at the street number.
+  assert.equal(hh.venue, 'Maple Studios');
+  assert.equal(hh.address, '1207 Maple Street, West Des Moines, IA');
 });
 
 test('iowans-of-things never ends an event before it starts', async () => {
