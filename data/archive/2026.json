@@ -867,6 +867,16 @@
   "description": "SaltStack: Configuration Management From Cloud Images to Developer Desktops Configuration management doesn’t stop at servers. On Wednesday, September 23rd, DevOpsDSM welcomes John Lengeling from Source Allies for a look at how SaltStack can provide a consistent approach to configuration across cloud infrastructure, servers, and developer workstations. John will explore SaltStack’s architecture and how it can be used to build Azure images and AWS AMIs, manage server configurations, and provision developer desktops. He’ll also discuss how Infrastructure as Code and configuration automation can"
  },
  {
+  "id": "dsmhack-1992100761002",
+  "group": "dsmhack",
+  "title": "Hack Away Hunger: Food Insecurity Challenge",
+  "start": "2026-09-24T23:00:00.000Z",
+  "end": "2026-09-25T04:59:00.000Z",
+  "venue": null,
+  "url": "https://www.eventbrite.com/e/hack-away-hunger-food-insecurity-challenge-tickets-1992100761002",
+  "description": "Presented by Corteva Agriscience, a charity hackathon focused on overcoming issues impacting food insecurity in our community. #TechforGood"
+ },
+ {
   "id": "issa-september-quarterly-issa-meeting",
   "group": "issa",
   "title": "September Quarterly ISSA Meeting",
@@ -939,5 +949,16 @@
   "going": 22,
   "url": "https://www.meetup.com/producttank-des-moines-ames/events/316553691/",
   "description": "We are thrilled to welcome Joel Tosi — co-author of Signals & Levers (ITRevolution, September 2026), Coaching for Learning, and Create Your Dojo — who helps organizations evolve through learning by blending systems thinking, agile, lean, and DevOps practices. He joins ProductTank Des Moines ahead of his Tech Fuse Des Moines keynote. Special thanks to F&G for sponsoring the venue and for having a senior leader kick off and welcome the group. Overview: Software delivery is influenced by a myriad of factors - internal ability to execute, customer demands, and an every shifting market for"
+ },
+ {
+  "id": "dsmdata-316389479",
+  "group": "dsmdata",
+  "title": "ISU Business Analytics Symposium",
+  "start": "2026-10-15T14:00:00.000Z",
+  "end": "2026-10-15T21:00:00.000Z",
+  "venue": "Community Choice Credit Union Convention Center",
+  "going": 6,
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/316389479/",
+  "description": "This event is hosted by Iowa State University and is not affiliated with the Des Moines Data & Analytics Community group. This event does includes a cost. You must register with ISU to attend. [ISU Event Details](https://www.ivybusiness.iastate.edu/business-analytics-symposium/) This year’s event will focus on leading change with business analytics. Through real-world case studies and practitioner insights, speakers will share how organizations move from insight to action, from analysis to implementation, and from data-informed thinking to measurable business results."
  }
 ]
