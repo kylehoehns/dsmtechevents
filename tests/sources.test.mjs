@@ -7,6 +7,7 @@ import taiTechbrew from '../scripts/sources/tai-techbrew.mjs';
 import iowansOfThings from '../scripts/sources/iowans-of-things.mjs';
 import iibaChapter from '../scripts/sources/iiba-chapter.mjs';
 import issaChapter from '../scripts/sources/issa-chapter.mjs';
+import eventbrite from '../scripts/sources/eventbrite.mjs';
 import readLuma, { mirrorText } from '../scripts/sources/luma.mjs';
 import { decode, toText, httpUrl, safeLinks, checkTimes } from '../scripts/sources/html.mjs';
 
@@ -205,6 +206,30 @@ test('issa-chapter fails loudly when the pages change', async () => {
   await assert.rejects(issaChapter(ISSA, issaSite({ [issaPage('september-quarterly-issa-meeting')]: noHeading })), /no date heading/);
   const oddDate = fixture('issa-event.html').replace('September 29, 2026 11:30 am', '9/29/2026 11:30');
   await assert.rejects(issaChapter(ISSA, issaSite({ [issaPage('september-quarterly-issa-meeting')]: oddDate })), /unreadable date/);
+});
+
+const DSMHACK = { id: 'dsmhack', website: 'https://www.eventbrite.com/cc/des-moines-charity-hackathons-4819767/' };
+
+test('eventbrite reads the collection page\'s event list, with venue and address', async () => {
+  const [hunger, hackathon, jam, ...more] = await eventbrite(DSMHACK, serve(fixture('eventbrite-collection.html')));
+  assert.equal(more.length, 0);
+  const { image, ...rest } = hackathon;
+  assert.deepEqual(rest, {
+    id: 'dsmhack-1982547093726', sourceId: '1982547093726',
+    title: '12th Annual Des Moines Charity Hackathon', start: '2026-05-14T22:30:00.000Z', end: '2026-05-17T00:30:00.000Z', allDay: false,
+    url: 'https://www.eventbrite.com/e/12th-annual-des-moines-charity-hackathon-tickets-1982547093726',
+    description: 'Nonprofits and volunteers come together to build practical tech solutions that strengthen our community in just 48 hours.',
+    venue: 'West48', address: '1601 48th St, West Des Moines, IA 50266',
+  });
+  assert.match(image, /^https:\/\/img\.evbuc\.com\//);
+  assert.deepEqual([hunger.venue, hunger.address], [null, '7200 Northwest 62nd Avenue, Johnston, IA 50131'], 'a place named by its street has no separate name');
+  assert.equal(jam.title, 'Design Jam 2026');
+});
+
+test('eventbrite fails loudly when the page changes', async () => {
+  await assert.rejects(eventbrite(DSMHACK, serve('<html>redesigned</html>')), /no event list/);
+  const noDate = fixture('eventbrite-collection.html').replace(/"startDate":"[^"]*",/, '');
+  await assert.rejects(eventbrite(DSMHACK, serve(noDate)), /unreadable event/);
 });
 
 // The feed fixture holds four TechBrews (Sept–Dec 2026) and one CIO

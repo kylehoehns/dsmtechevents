@@ -32,6 +32,7 @@ import taiTechbrew from './sources/tai-techbrew.mjs';
 import iowansOfThings from './sources/iowans-of-things.mjs';
 import iibaChapter from './sources/iiba-chapter.mjs';
 import issaChapter from './sources/issa-chapter.mjs';
+import eventbrite from './sources/eventbrite.mjs';
 import readLuma from './sources/luma.mjs';
 import { parseFeed, parseEventsPage, enrich, cancelledIds, mergeCache, checkEmptyFeed } from './sources/meetup.mjs';
 import { updateArchive } from './archive.mjs';
@@ -39,7 +40,7 @@ import { manualEvent, readLumaCache, lumaSlug } from '../src/lib/data.mjs';
 import { safeLinks, checkTimes } from './sources/html.mjs';
 import { sourceStatus } from './source-status.mjs';
 
-const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew, 'iowans-of-things': iowansOfThings, 'iiba-chapter': iibaChapter, 'issa-chapter': issaChapter };
+const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew, 'iowans-of-things': iowansOfThings, 'iiba-chapter': iibaChapter, 'issa-chapter': issaChapter, eventbrite };
 
 const root = path.resolve(import.meta.dirname, '..');
 const cacheDir = path.join(root, 'data/cache');
