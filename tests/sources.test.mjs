@@ -208,7 +208,7 @@ test('issa-chapter fails loudly when the pages change', async () => {
   await assert.rejects(issaChapter(ISSA, issaSite({ [issaPage('september-quarterly-issa-meeting')]: oddDate })), /unreadable date/);
 });
 
-const DSMHACK = { id: 'dsmhack', website: 'https://www.eventbrite.com/cc/des-moines-charity-hackathons-4819767/' };
+const DSMHACK = { id: 'dsmhack', eventbrite: 'https://www.eventbrite.com/cc/des-moines-charity-hackathons-4819767/' };
 
 test('eventbrite reads the collection page\'s event list, with venue and address', async () => {
   const [hunger, hackathon, jam, ...more] = await eventbrite(DSMHACK, serve(fixture('eventbrite-collection.html')));

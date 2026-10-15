@@ -1,19 +1,20 @@
 // An Eventbrite collection page (eventbrite.com/cc/…) carries its events as a
 // schema.org ItemList of Events in JSON-LD: name, url, startDate/endDate with
 // their UTC offset, a one-line summary, a photo and the Place. The collection
-// is curated by the organizer, so it lists only what they add to it.
+// is curated by the organizer, so it lists only what they add to it. It is
+// the group's `eventbrite:`; their `website:` stays their own site.
 import { decode } from './html.mjs';
 
 export default async function eventbrite(group, { get }) {
-  const html = await get(group.website);
+  const html = await get(group.eventbrite);
   const list = [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
     .map((m) => JSON.parse(m[1]))
     .find((d) => d['@type'] === 'ItemList');
-  if (!list) throw new Error(`no event list on ${group.website}`);
+  if (!list) throw new Error(`no event list on ${group.eventbrite}`);
 
   return list.itemListElement.map(({ item: e }) => {
     const sourceId = /-(\d+)\/?$/.exec(e.url ?? '')?.[1];
-    if (e['@type'] !== 'Event' || !sourceId || !e.name || !e.startDate) throw new Error(`unreadable event in ${group.website}`);
+    if (e['@type'] !== 'Event' || !sourceId || !e.name || !e.startDate) throw new Error(`unreadable event in ${group.eventbrite}`);
     const online = e.eventAttendanceMode === 'https://schema.org/OnlineEventAttendanceMode';
     return {
       id: `${group.id}-${sourceId}`,

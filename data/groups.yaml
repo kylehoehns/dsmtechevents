@@ -9,9 +9,11 @@
 #             https://api.lu.ma/ics/get?entity=calendar&id=cal-…
 #   source:   (optional) for groups with no feed: the name of a reader in
 #             scripts/sources/ that pulls events from their own website
-#   website:  for groups not on Meetup only: their own site, where their events
-#             are read from and where their link goes. A Meetup group gets one
+#   website:  for groups not on Meetup only: their own site, where their link
+#             goes and, unless an eventbrite: is given, where events are read. A Meetup group gets one
 #             link, its Meetup page, so there's one address to keep current.
+#   eventbrite: (optional) an Eventbrite collection (/cc/…) the eventbrite
+#             reader pulls events from, for groups that post there
 #   logo:     (optional) image URL, for groups whose logo isn't read from Meetup
 
 - id: cijug
@@ -129,7 +131,8 @@
 - id: dsmhack
   name: Des Moines Charity Hackathons
   short: dsmHack
-  # dsmHack's Eventbrite collection (see scripts/sources/eventbrite.mjs).
+  # Events from its Eventbrite collection (see scripts/sources/eventbrite.mjs).
   source: eventbrite
-  website: https://www.eventbrite.com/cc/des-moines-charity-hackathons-4819767/
+  eventbrite: https://www.eventbrite.com/cc/des-moines-charity-hackathons-4819767/
+  website: https://dsmhack.org/
   logo: https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F25160565%2F161540665187%2F2%2Foriginal.png?h=200&w=200&auto=format%2Ccompress&q=75&sharp=10&s=cfddf772f877ed8b87c743bc93a388f5
