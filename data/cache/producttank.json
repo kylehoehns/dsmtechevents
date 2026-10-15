@@ -1,7 +1,7 @@
 {
-  "fetchedAt": "2026-10-15T15:06:38.504Z",
+  "fetchedAt": "2026-10-15T19:13:46.787Z",
   "logo": "https://secure.meetupstatic.com/photos/event/7/b/c/a/600_535291690.jpeg",
-  "members": 846,
+  "members": 847,
   "pastCount": 52,
   "lastMet": "2026-10-14T21:30:00.000Z",
   "events": [
@@ -53,6 +53,23 @@
       "image": "https://secure.meetupstatic.com/photos/event/a/8/a/f/600_536143183.jpeg",
       "going": 22,
       "added": "2026-09-14T14:18:32.000Z"
+    },
+    {
+      "id": "producttank-316999014",
+      "sourceId": "316999014",
+      "title": "November Meeting TBD",
+      "start": "2026-11-17T22:30:00.000Z",
+      "end": "2026-11-18T00:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/producttank-des-moines-ames/events/316999014/",
+      "description": "We're still planning our November ProductTank Des Moines/Ames meeting. Have something you'd like to talk about, or are interested in hosting? Let us know.",
+      "venue": null,
+      "address": null,
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/7/b/c/a/600_535291690.jpeg",
+      "going": 1,
+      "added": "2026-10-15T19:13:46.787Z"
     }
   ]
 }
