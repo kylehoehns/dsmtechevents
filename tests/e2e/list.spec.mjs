@@ -140,14 +140,14 @@ for (const colorScheme of ['light', 'dark']) {
   });
 }
 
-test('while its poster is up, a conference row is a pink outline, and the venue is said once', async ({ page, isMobile }) => {
+test('while its poster is up, a conference row is a pink outline that keeps its venue and address', async ({ page }) => {
   await page.goto('/');
   const conf = row(page, 'Test Conf 2026');
   await expect(conf).toHaveClass(/\bposted\b/);
   await expect(conf).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-  // Desktop prints the venue on the poster beside the list; phones hide it there, so the row keeps it.
-  if (isMobile) await expect(conf.getByRole('link', { name: /Convention Center/ })).toBeVisible();
-  else await expect(conf.getByRole('link', { name: /Convention Center/ })).toBeHidden();
+  // The poster prints the venue too, but the row keeps it: the list reads on its own.
+  await expect(conf.getByRole('link', { name: /Convention Center/ })).toBeVisible();
+  await expect(conf.locator('.addr')).toBeVisible();
 
   // The row keeps its own tag beside the poster's stamp: a tag missing from one row of a day reads as a different day.
   await page.clock.setFixedTime(new Date('2026-10-22T15:00:00Z'));
@@ -195,14 +195,11 @@ test('a venue in the row above drops its street address', async ({ page }) => {
   await expect(row(page, 'Hack Night Returns').getByText('4501 NW Urbandale Dr, Urbandale')).toBeVisible();
 });
 
-test('the row above only counts when it shows its venue, in the same section', async ({ page, isMobile }) => {
+test('the row above only counts in the same section', async ({ page }) => {
   await page.goto('/');
   const addr = '833 5th Ave';
-  // Right under the conference. Desktop prints the conference's venue on the
-  // poster, not its row, so the afterparty keeps the address; on a phone the
-  // conference row shows it, so the afterparty drops it.
-  if (isMobile) await expect(row(page, 'Conf Afterparty').getByText(addr)).toBeHidden();
-  else await expect(row(page, 'Conf Afterparty').getByText(addr)).toBeVisible();
+  // Right under the conference row, which shows the address, so the afterparty drops it.
+  await expect(row(page, 'Conf Afterparty').getByText(addr)).toBeHidden();
   // Same venue as the row above, but a section heading sits between them.
   await expect(row(page, 'Convention Center Tour').getByText(addr)).toBeVisible();
 });

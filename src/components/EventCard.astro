@@ -75,12 +75,11 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
     <p class="meta">
       <span class="sr-only">{weekday(e.start)} {month(e.start)} {day(e.start)}, </span>
       <span class="time" data-full={e.multiDay ? shortRange(e, { full: true }) : undefined}>{shortRange(e)}</span>
-      {/* No-break spaces keep "·" with the time and "@" with the venue on a narrow card.
-          .at: a posted conference's row hides it where the poster prints the venue (desktop). */}
+      {/* No-break spaces keep "·" with the time and "@" with the venue on a narrow card. */}
       {e.online
         ? <>{'\u00a0· '}<span class="tag-online">Online</span></>
         : e.venue
-          ? <span class="at">{'\u00a0· @\u00a0'}<a class="map" href={mapUrl} data-q={mapQuery} data-click="map" target="_blank" rel="noopener"><span class="venue">{e.venue}</span>{e.address && <span class="addr">, {e.address}</span>}<span class="sr-only"> (opens map in new tab)</span></a></span>
+          ? <>{'\u00a0· @\u00a0'}<a class="map" href={mapUrl} data-q={mapQuery} data-click="map" target="_blank" rel="noopener"><span class="venue">{e.venue}</span>{e.address && <span class="addr">, {e.address}</span>}<span class="sr-only"> (opens map in new tab)</span></a></>
           : '\u00a0· @\u00a0Venue TBA'}
       {e.hybrid && <> · <span class="tag-online">+ online</span></>}
     </p>
