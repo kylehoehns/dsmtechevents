@@ -157,6 +157,11 @@
 }
 .tv[data-fx=print] .slide.is-on::after { animation: fx-dry 2.6s ease-out 0.3s forwards; }
 @keyframes fx-dry { 0% { opacity: 0; } 15% { opacity: 0.45; } 100% { opacity: 0.1; } }
+/* On the pink sheet the dots are ink, the dark sheets' inverse. Dark on
+   pink shows less than pink on dark, so they dry to a stronger hint. */
+.tv[data-fx=print] .slide.headliner::after { background-image: radial-gradient(circle, #1d1b2b 1.3px, transparent 2px); }
+.tv[data-fx=print] .slide.headliner.is-on::after { animation-name: fx-dry-ink; }
+@keyframes fx-dry-ink { 0% { opacity: 0; } 15% { opacity: 0.6; } 100% { opacity: 0.25; } }
 
 /* The day's label (Tonight, Happening now) lands last, like a rubber stamp.
    `scale`, not transform, so it keeps its tilt. tv-event.ts replays it when
