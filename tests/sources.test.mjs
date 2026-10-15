@@ -7,6 +7,7 @@ import taiTechbrew from '../scripts/sources/tai-techbrew.mjs';
 import iowansOfThings from '../scripts/sources/iowans-of-things.mjs';
 import iibaChapter from '../scripts/sources/iiba-chapter.mjs';
 import issaChapter from '../scripts/sources/issa-chapter.mjs';
+import eventbrite from '../scripts/sources/eventbrite.mjs';
 import readLuma, { mirrorText } from '../scripts/sources/luma.mjs';
 import { decode, toText, httpUrl, safeLinks, checkTimes } from '../scripts/sources/html.mjs';
 
@@ -205,6 +206,41 @@ test('issa-chapter fails loudly when the pages change', async () => {
   await assert.rejects(issaChapter(ISSA, issaSite({ [issaPage('september-quarterly-issa-meeting')]: noHeading })), /no date heading/);
   const oddDate = fixture('issa-event.html').replace('September 29, 2026 11:30 am', '9/29/2026 11:30');
   await assert.rejects(issaChapter(ISSA, issaSite({ [issaPage('september-quarterly-issa-meeting')]: oddDate })), /unreadable date/);
+});
+
+const DSMHACK = { id: 'dsmhack', eventbrite: 'https://www.eventbrite.com/o/dsmhackorg-9037669922' };
+const ebPage = (edit = (events) => events) => {
+  const html = fixture('eventbrite-organizer.html');
+  const [, json] = /<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/.exec(html);
+  const data = JSON.parse(json);
+  data.props.pageProps.upcomingEvents = edit(data.props.pageProps.upcomingEvents);
+  return serve(html.replace(json, JSON.stringify(data)));
+};
+
+test('eventbrite reads every upcoming event on the organizer page, in local time', async () => {
+  const [hackathon, hunger, info, ...more] = await eventbrite(DSMHACK, ebPage());
+  assert.equal(more.length, 0, 'a cancelled event is left out');
+  const { image, ...rest } = hackathon;
+  assert.deepEqual(rest, {
+    id: 'dsmhack-2001000000001', sourceId: '2001000000001',
+    title: '13th Annual Des Moines Charity Hackathon', start: '2027-05-13T22:30:00.000Z', end: '2027-05-16T00:30:00.000Z', allDay: false,
+    url: 'https://www.eventbrite.com/e/13th-annual-des-moines-charity-hackathon-tickets-2001000000001',
+    description: 'Nonprofits and volunteers come together to build practical tech solutions that strengthen our community in just 48 hours.',
+    venue: 'West48', address: '1601 48th St, West Des Moines, IA 50266',
+  });
+  assert.match(image, /^https:\/\/img\.evbuc\.com\//);
+  assert.deepEqual([hunger.venue, hunger.address], [null, '7200 Northwest 62nd Avenue, Johnston, IA 50131'], 'a venue named by its street has no separate name');
+  assert.deepEqual([info.venue, info.address, info.online], ['Online', null, true]);
+});
+
+test('eventbrite allows an organizer with nothing scheduled', async () => {
+  assert.deepEqual(await eventbrite(DSMHACK, ebPage(() => [])), []);
+});
+
+test('eventbrite fails loudly when the page changes', async () => {
+  await assert.rejects(eventbrite(DSMHACK, serve('<html>redesigned</html>')), /no event list/);
+  await assert.rejects(eventbrite(DSMHACK, ebPage(([e]) => [{ ...e, start_date: undefined }])), /unreadable event/);
+  await assert.rejects(eventbrite(DSMHACK, ebPage(([e]) => [{ ...e, timezone: 'America/New_York' }])), /America\/New_York/);
 });
 
 // The feed fixture holds four TechBrews (Sept–Dec 2026) and one CIO
