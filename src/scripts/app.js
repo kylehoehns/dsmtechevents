@@ -250,10 +250,7 @@ function searchMiss(q) {
 // Don't print what the row above just said: the date for a second event on
 // the same day, the street address for a second event at the same venue. Only
 // the row above, in the same section: an address shown weeks earlier, or above
-// a section heading, is off screen by now. A posted conference's row on a wide
-// screen leaves its venue to the poster beside it (global.css), so the row
-// under it has nothing to lean on.
-const wide = matchMedia('(min-width: 1060px)');
+// a section heading, is off screen by now.
 function squashRepeats() {
   let prevDay = null;
   let prevVenue = null;
@@ -265,10 +262,9 @@ function squashRepeats() {
     prevDay = el.dataset.day;
     const v = el.dataset.venue;
     el.classList.toggle('addr-seen', !!v && v === prevVenue);
-    prevVenue = el.classList.contains('posted') && wide.matches ? null : v || null;
+    prevVenue = v || null;
   }
 }
-wide.addEventListener('change', squashRepeats);
 
 // ---- what matched ----
 // While a search is on, each result marks what matched in the text it shows:
