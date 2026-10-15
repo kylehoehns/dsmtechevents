@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-10-10T02:26:21.274Z",
+  "fetchedAt": "2026-10-15T01:33:03.891Z",
   "logo": "https://secure.meetupstatic.com/photos/event/7/8/6/c/600_460890828.jpeg",
   "members": 887,
   "pastCount": 77,
   "lastMet": "2026-09-16T22:30:00.000Z",
   "events": [
-    {
-      "id": "cijug-315286709",
-      "sourceId": "315286709",
-      "allDay": false,
-      "title": "From Sidebar to Sub-Agents: A Live, Hands-On Guide to Building with AI Agents",
-      "start": "2026-07-16T22:30:00.000Z",
-      "end": "2026-07-17T00:00:00.000Z",
-      "description": "AI-assisted development has come a long way from simple autocomplete, but most developers are only scratching the surface of what's possible today. Join us as Kyle Hoehns demonstrates how modern AI development tools have evolved from helpful coding assistants into capable agents that can help build complete features with minimal human intervention. Drawing from more than a year of daily use on real client projects, Kyle will share his insights into how these tools fit into modern software development workflows.\n\nThis session is completely hands-on. Starting with an empty project, Kyle will build a real REST API feature live using tools such as Claude Code and GitHub Copilot. Along the way, you'll see how AI agents can assist with implementation, testing, iteration, and feature development while still keeping developers in control of the process.\n\n**Speaker Bio:**\nKyle Hoehns\nSoftware Engineer and Teammate Pipeline Architect at Source Allies\nKyle is a seasoned software engineer with more than a decade of experience developing and implementing complex software solutions. With a strong background in backend technologies, including Java and Go, he has delivered scalable and efficient systems across multiple industries. Kyle is passionate about solving problems, improving developer experiences, and believes in not taking himself too seriously.\n\n**Event Details:**\n*Date:* Thursday, July 16th, 2026\n*Time:* 5:30 PM to 7:00 PM\n*Location:* Source Allies\nFood and drinks will be provided.",
-      "url": "https://www.meetup.com/central-iowa-java-users-group/events/315286709/",
-      "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr, Urbandale",
-      "online": false,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/e/6/1/4/600_534778900.jpeg",
-      "going": 20
-    },
     {
       "id": "cijug-315859295",
       "sourceId": "315859295",
