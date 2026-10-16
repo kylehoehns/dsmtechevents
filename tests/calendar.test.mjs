@@ -7,7 +7,7 @@ const ev = (start, end, groups = ['cijug']) => ({ start, end, groups });
 const events = [
   ev('2026-08-20T23:00:00Z', '2026-08-21T01:00:00Z'), // the oldest on file
   ev('2026-10-08T23:00:00Z', '2026-10-09T01:00:00Z', ['pyowa']),
-  ev('2026-10-20T23:00:00Z', '2026-10-21T01:00:00Z'), // 6pm Tue Oct 20 in Des Moines
+  ev('2026-10-21T00:30:00Z', '2026-10-21T02:00:00Z'), // 7:30pm Tue Oct 20 in Des Moines, Oct 21 in UTC
   ev('2026-10-22T13:00:00Z', '2026-10-23T22:00:00Z', []), // a two-day conference
   ev('2026-12-31T23:00:00Z', '2027-01-01T03:00:00Z', ['pyowa']), // New Year's Eve, into the night
 ];
@@ -22,7 +22,7 @@ test('the grid is whole weeks from Sunday, with the days around the month', () =
 });
 
 test('a day lists its events by Des Moines date, a conference on each of its days, by group', () => {
-  assert.equal(cal.on('2026-10-20').length, 1, 'evening UTC next day is still the 20th here');
+  assert.equal(cal.on('2026-10-20').length, 1, 'already the 21st in UTC, still the 20th here');
   assert.equal(cal.on('2026-10-21').length, 0);
   assert.equal(cal.on('2026-10-23').length, 1, 'day two of the conference');
   assert.equal(cal.on('2026-12-31').length, 1);
