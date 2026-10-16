@@ -16,12 +16,10 @@ const lead = hosts[0];
 const isMeetup = e.url?.includes('meetup.com');
 const cta = isMeetup ? 'RSVP on Meetup' : 'RSVP & info';
 const descId = `about-${e.id.replace(/[^a-z0-9-]/gi, '')}`;
-// Meetup photos come as small webp copies (see meetupPhoto). Most are 16:9 at
-// 600x338; width/height hold that shape until the image arrives. Photos from
-// anywhere else come in any shape (Iowans of Things posts a 1400x400 banner),
-// so they get no size and take their own shape once loaded.
+// Meetup photos come as small webp copies with a known size (see meetupPhoto),
+// which holds their shape until the image arrives; others take their own.
 const photo = e.photo;
-const size = photo?.large.includes('meetupstatic.com') ? { width: 600, height: 338 } : {};
+const size = photo?.width ? { width: photo.width, height: photo.height } : {};
 const thumbSrcset = photo && photo.small !== photo.large ? `${photo.small} 180w, ${photo.large} 600w` : undefined;
 // "Tomorrow" / "Tonight" as of the build, so the tag is in the page from the
 // start and nothing moves when app.js re-checks it against the real date.

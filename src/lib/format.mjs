@@ -146,13 +146,16 @@ export function dateRange(start, end) {
 // "Thu–Fri Oct 15–16".
 export const dayRange = (start, end) => `${weekday(start)}–${weekday(`${lastDay(start, end)}T17:00:00Z`)} ${dateRange(start, end)}`;
 
-// "5:30p–7p", "All day", and for an event over several days
+// "5:30p–7p", or "All day": the hours alone, where a date column says the day.
+export const hours = (e) => (e.allDay ? 'All day' : `${shortTime(e.start)}–${shortTime(e.end)}`);
+
+// The same, and for an event over several days
 // "through Fri Oct 16 · 8a–5p". Cards and TV slides print the start date big
 // beside this line, so it only adds the last day (say it once). Where nothing
 // shows the start (the calendar's day panel hides it), { full: true } gives
 // the whole range: "Thu–Fri Oct 15–16 · 8a–5p".
 export function shortRange(e, { full = false } = {}) {
-  const t = e.allDay ? 'All day' : `${shortTime(e.start)}–${shortTime(e.end)}`;
+  const t = hours(e);
   if (!e.multiDay) return t;
   const last = `${lastDay(e.start, e.end)}T17:00:00Z`;
   if (!full) return `through ${weekday(last)} ${month(last)} ${day(last)} · ${t}`;

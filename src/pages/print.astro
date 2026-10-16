@@ -5,7 +5,7 @@
 import QRCode from 'qrcode';
 import Layout from '../layouts/Layout.astro';
 import { loadData } from '../lib/data.mjs';
-import { weekday, day, month, shortTime, dateRange, dayKey, addDays } from '../lib/format.mjs';
+import { weekday, day, month, hours, dateRange, dayKey, addDays } from '../lib/format.mjs';
 import { site } from '../lib/site.mjs';
 
 const { upcoming } = loadData();
@@ -23,8 +23,6 @@ const through = addDays(dayKey(next ? next.start : horizon), -1);
 const throughIso = `${through}T17:00:00Z`;
 // The label before the title: the hosts, plus "conference" for headliners.
 const label = (e: any) => (e.groupIds.length && e.headliner ? `${e.hostsLabel} · conference` : e.hostsLabel);
-// The date column carries the dates, so this is only the hours.
-const hours = (e: any) => (e.allDay ? 'All day' : `${shortTime(e.start)}–${shortTime(e.end)}`);
 const dates = (e: any) => (e.multiDay ? dateRange(e.start, e.end) : `${month(e.start)} ${day(e.start)}`);
 const where = (e: any) => (e.online ? 'Online' : e.venue ?? 'Venue TBA');
 const qr = await QRCode.toString(site.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#000000', light: '#0000' } });

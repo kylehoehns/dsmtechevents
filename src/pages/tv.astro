@@ -16,7 +16,8 @@ import QRCode from 'qrcode';
 import Layout from '../layouts/Layout.astro';
 import '../styles/tv-fx.css';
 import { loadData } from '../lib/data.mjs';
-import { weekday, day, month, shortRange, shortTime, dateRange, lastDay, lineup, DAY, plural } from '../lib/format.mjs';
+import { weekday, day, month, shortRange, hours, dateRange, lastDay, lineup, DAY, plural } from '../lib/format.mjs';
+import { QR_OPTIONS, scanLabel } from '../lib/tv-poster.mjs';
 import { yearSoFar } from '../lib/year-so-far.mjs';
 import { toScript } from '../lib/jsonld.mjs';
 import { site } from '../lib/site.mjs';
@@ -34,14 +35,14 @@ const events = (soon.length >= 3 ? soon : upcoming.filter((e) => !e.repeat)).sli
 const yearNow = yearSoFar(archive, upcoming);
 
 // On the overview slide: one code to the whole site.
-const siteQr = await QRCode.toString(site.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#1d1b2b', light: '#0000' } });
+const siteQr = await QRCode.toString(site.url, QR_OPTIONS);
 
 const whereOf = (e: { online?: boolean; venue?: string; address?: string }) => (e.online ? 'Online' : [e.venue, e.address].filter(Boolean).join(' · ') || 'Venue TBA');
 const slides = await Promise.all(events.map(async (e) => ({
   e,
   hosts: e.hostsLabel,
   where: whereOf(e),
-  qr: e.url ? await QRCode.toString(e.url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#1d1b2b', light: '#0000' } }) : null,
+  qr: e.url ? await QRCode.toString(e.url, QR_OPTIONS) : null,
 })));
 
 // Event mode's data: every upcoming event, plus any that ended in the last
@@ -52,7 +53,8 @@ const eventData = {
   groups: Object.fromEntries(allGroups.map((g) => [g.id, g.short])),
   events: all.filter((e) => Date.parse(e.end) > Date.now() - DAY).map((e) => ({
     id: e.id, title: e.title, start: e.start, end: e.end, allDay: !!e.allDay, multiDay: !!e.multiDay, repeat: !!e.repeat,
-    hosts: e.hostsLabel, groups: e.groupIds, where: whereOf(e), url: e.url ?? null, photo: e.photo?.large ?? null,
+    hosts: e.hostsLabel, groups: e.groupIds, where: whereOf(e), url: e.url ?? null,
+    photo: e.photo ? { src: e.photo.large, width: e.photo.width, height: e.photo.height } : null,
     talks: lineup(e.description),
   })),
 };
@@ -83,7 +85,7 @@ const eventData = {
                 : <><b>{weekday(e.start)}</b> {month(e.start)} {day(e.start)}</>}</span>
               <span class="row-group">{hosts}</span>
               <span class="row-title"><span class="when-tag" hidden></span>{e.title}</span>
-              <span class="row-time">{e.allDay ? 'All day' : `${shortTime(e.start)}–${shortTime(e.end)}`}</span>
+              <span class="row-time">{hours(e)}</span>
             </li>
           ))}
         </ol>
@@ -107,11 +109,11 @@ const eventData = {
           </div>
           {(e.photo || qr) && (
             <div class="tv-side">
-              {e.photo && <img class="tv-photo" src={e.photo.large} {...(e.photo.large.includes('meetupstatic.com') ? { width: 600, height: 338 } : {})} alt="" />}
+              {e.photo && <img class="tv-photo" src={e.photo.large} width={e.photo.width} height={e.photo.height} alt="" />}
               {qr && (
                 <div class="qr">
                   <div class="qr-code" set:html={qr} />
-                  <span class="scan" data-label={e.url.includes('meetup.com') ? 'Scan to RSVP' : 'Scan for details'}>{e.url.includes('meetup.com') ? 'Scan to RSVP' : 'Scan for details'}</span>
+                  <span class="scan" data-url={e.url}>{scanLabel(e.url)}</span>
                 </div>
               )}
             </div>
@@ -380,6 +382,7 @@ const eventData = {
   import { fmt, whenLabel, countdown } from '../lib/format.mjs';
   import { eventMode } from '../scripts/tv-event';
   import { inkLayer } from '../scripts/tv-ink';
+  import { setLive } from '../lib/tv-poster.mjs';
 
   const SLIDE_MS = 12_000;
   const RELOAD_MS = 60 * 60 * 1000;
@@ -413,10 +416,7 @@ const eventData = {
       const label = (s.matches('.poster-slide.headliner') ? countdown : whenLabel)(s.dataset.start!, s.dataset.end!, now, { multiDay: 'days' in s.dataset });
       tag.textContent = label;
       tag.hidden = !label;
-      s.classList.toggle('is-live', label === 'Happening now');
-      // Once it's on, there's nothing left to RSVP to: the code is for details.
-      const scan = s.querySelector<HTMLElement>('.scan');
-      if (scan) scan.textContent = label === 'Happening now' ? 'Scan for details' : scan.dataset.label!;
+      setLive(s, label === 'Happening now');
     }
     mode?.update(now);
     const empty = document.querySelector<HTMLElement>('.overview .tv-empty');

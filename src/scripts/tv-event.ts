@@ -11,10 +11,12 @@
 // slide points out, to the group's own page (QR to RSVP) or to the site. It
 // takes no sign-ups, stores nothing, and the page stays noindex.
 import { weekday, day, month, shortRange, liveLabel } from '../lib/format.mjs';
+import { QR_OPTIONS, scanLabel, setLive } from '../lib/tv-poster.mjs';
 
 export type TvEvent = {
   id: string; title: string; start: string; end: string; allDay: boolean; multiDay: boolean; repeat: boolean;
-  hosts: string; groups: string[]; where: string; url: string | null; photo: string | null;
+  hosts: string; groups: string[]; where: string; url: string | null;
+  photo: { src: string; width?: number; height?: number } | null;
   talks: { time: string; title: string; speaker: string }[];
 };
 export type TvData = { site: string; events: TvEvent[]; groups: Record<string, string> };
@@ -42,13 +44,20 @@ function qr(text: string, label: string, cls = '') {
   const code = el('div', 'qr-code');
   box.append(code, el('span', '', label));
   (qrLib ??= import('qrcode').then((m) => m.default ?? m))
-    .then((lib) => lib.toString(text, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#1d1b2b', light: '#0000' } }))
+    .then((lib) => lib.toString(text, QR_OPTIONS))
     // The SVG is the library's own drawing of the code: paths only, no text from the URL.
     .then((svg: string) => { code.innerHTML = svg; })
     .catch(() => box.remove());
   return box;
 }
-const rsvpLabel = (e: TvEvent) => (e.url?.includes('meetup.com') ? 'Scan to RSVP' : 'Scan for details');
+// An event's own code, whose label setLive switches once the event is on.
+function eventQr(url: string) {
+  const box = qr(url, scanLabel(url));
+  const label = box.querySelector('span')!;
+  label.className = 'scan';
+  label.dataset.url = url;
+  return box;
+}
 
 function dateBlock(e: TvEvent) {
   const b = el('div', 'date-block');
@@ -85,13 +94,13 @@ function eventPoster(e: TvEvent) {
   const side = el('div', 'tv-side');
   if (e.photo) {
     const img = el('img', 'tv-photo');
-    img.src = e.photo;
+    img.src = e.photo.src;
     img.alt = '';
-    // Meetup's copies are 600x338 (see EventCard.astro); hold that shape while it loads.
-    if (e.photo.includes('meetupstatic.com')) Object.assign(img, { width: 600, height: 338 });
+    // A Meetup photo's size holds its shape while it loads (see meetupPhoto).
+    if (e.photo.width && e.photo.height) Object.assign(img, { width: e.photo.width, height: e.photo.height });
     side.append(img);
   }
-  if (e.url) side.append(qr(e.url, rsvpLabel(e)));
+  if (e.url) side.append(eventQr(e.url));
   return { nodes: [date, info, side], stamp };
 }
 
@@ -140,7 +149,7 @@ function nextGroup(e: TvEvent, data: TvData, group: string, now: number) {
   stagger(info);
   const row = el('div', 'ev-poster');
   row.append(dateBlock(next), info);
-  if (next.url) row.append(qr(next.url, rsvpLabel(next)));
+  if (next.url) row.append(eventQr(next.url));
   head.append(row);
   return { key: next.id, nodes: [head] };
 }
@@ -196,11 +205,7 @@ export function eventMode(stage: HTMLElement, data: TvData, id: string, now = Da
           stamp.textContent = label;
           stamp.hidden = !stamp.textContent;
         }
-        const live = !!stamp && stamp.textContent === 'Happening now';
-        s.classList.toggle('is-live', live);
-        // Once it's on, there's nothing left to RSVP to: the code is for details.
-        const scan = s.querySelector('.tv-side .qr span');
-        if (scan) scan.textContent = live ? 'Scan for details' : rsvpLabel(e);
+        setLive(s, !!stamp && stamp.textContent === 'Happening now');
       });
     } else {
       let key: string | null = null;
