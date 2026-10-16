@@ -28,6 +28,8 @@ test('a photo is shown only when it is not just the group logo', () => {
   assert.deepEqual(find('Joint Night: JVM vs CLR').photo, {
     small: 'https://secure.meetupstatic.com/photos/event/a/b/global_888.webp',
     large: 'https://secure.meetupstatic.com/photos/event/a/b/600_888.webp',
+    width: 600,
+    height: 338,
   }, 'Meetup photos get their small webp copies');
 });
 

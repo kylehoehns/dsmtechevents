@@ -20,6 +20,8 @@ test('meetupPhoto picks the small and medium webp versions', () => {
   assert.deepEqual(meetupPhoto('https://secure.meetupstatic.com/photos/event/a/b/600_12345.jpeg'), {
     small: 'https://secure.meetupstatic.com/photos/event/a/b/global_12345.webp',
     large: 'https://secure.meetupstatic.com/photos/event/a/b/600_12345.webp',
+    width: 600,
+    height: 338,
   });
   assert.equal(meetupPhoto('https://example.com/flyer.png'), null);
   assert.equal(meetupPhoto(null), null);
