@@ -951,6 +951,16 @@
   "description": "We are thrilled to welcome Joel Tosi — co-author of Signals & Levers (ITRevolution, September 2026), Coaching for Learning, and Create Your Dojo — who helps organizations evolve through learning by blending systems thinking, agile, lean, and DevOps practices. He joins ProductTank Des Moines ahead of his Tech Fuse Des Moines keynote. Special thanks to F&G for sponsoring the venue and for having a senior leader kick off and welcome the group. Overview: Software delivery is influenced by a myriad of factors - internal ability to execute, customer demands, and an every shifting market for"
  },
  {
+  "id": "manual-tech-fuse-dsm-2026-2026-10-15",
+  "title": "Tech Fuse DSM",
+  "start": "2026-10-15T13:00:00.000Z",
+  "end": "2026-10-16T22:00:00.000Z",
+  "venue": "Community Choice Credit Union Convention Center",
+  "url": "https://techfusedsm.com/",
+  "headliner": true,
+  "description": "Two-day Des Moines tech conference. Rooted in tech, fueled by community."
+ },
+ {
   "id": "dsmdata-316389479",
   "group": "dsmdata",
   "title": "ISU Business Analytics Symposium",
