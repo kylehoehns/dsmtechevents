@@ -10,9 +10,10 @@
 // two days get a row too, with data-after, so one that ends while a search or
 // a group's view is open moves to Past instead of vanishing.
 import EventCard from '../components/EventCard.astro';
+import EventRow from '../components/EventRow.astro';
 import { loadData } from '../lib/data.mjs';
 import { splitEvents, pastEvents } from '../lib/pool.mjs';
-import { dayKey, month, day } from '../lib/format.mjs';
+import { dayKey } from '../lib/format.mjs';
 
 const data = loadData();
 const { pooled, today } = splitEvents(data);
@@ -23,18 +24,5 @@ const year = (e: { start: string }) => (dayKey(e.start).slice(0, 4) === today.sl
 <html lang="en">
 <head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Card pool</title></head>
 <body><ul>{pooled.map((e) => <EventCard event={e} byId={data.byId} />)}</ul>
-<ol id="past">{pastRows.map((e) => (
-  <li data-groups={e.groupIds.join(' ')} data-id={e.id} data-after={data.endingSoon.includes(e) ? e.end : undefined}>
-    <span class="row-date">{month(e.start)} {day(e.start)}{year(e)}</span>
-    <a href={e.url ?? data.byId[e.groupIds[0]]?.meetupUrl} target="_blank" rel="noopener" data-click="past">
-      <span class="row-group">{e.hostsLabel}</span>
-      <span class="row-title">{e.title}</span>
-      <span class="row-where">{e.online ? 'Online' : e.venue ? `@ ${e.venue}` : ''}</span>
-      <span class="sr-only"> (opens in new tab)</span>
-    </a>
-    <span class="row-going">{e.going ? <><b>{e.going}</b> went</> : ''}</span>
-    {/* An archived event has no card to search, so its short description rides along, hidden. */}
-    {e.archived && e.description && <span class="desc" hidden>{e.description}</span>}
-  </li>
-))}</ol></body>
+<ol id="past">{pastRows.map((e) => <EventRow event={e} kind="past" byId={data.byId} year={year(e)} data-after={data.endingSoon.includes(e) ? e.end : undefined} />)}</ol></body>
 </html>
