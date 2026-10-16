@@ -15,11 +15,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import YAML from 'yaml';
+import { UA } from './refresh.mjs';
 
 const LABEL = 'broken-link';
 const TITLE = 'Broken links on the site';
-// Same as scripts/fetch-events.mjs, so site owners see one polite visitor.
-const UA = 'dsmtechevents/1.0 (+https://dsmtechevents.com; community event calendar, fetched four times a day)';
 const TIMEOUT = 20_000;
 
 // Every link to check, once each, with where it came from. Pure.

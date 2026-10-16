@@ -145,7 +145,7 @@ pulls events from its website:
 2. Throw when the page doesn't look as expected. That keeps the last good
    events and opens a `source-broken` issue, instead of the group quietly
    going empty.
-3. Register it in `SOURCES` in `scripts/fetch-events.mjs`, and set
+3. Register it in `SOURCES` in `scripts/refresh.mjs`, and set
    `source: <name>` on the group in `data/groups.yaml`.
 4. Save a trimmed copy of the page in `tests/fixtures/` and add a test in
    `tests/sources.test.mjs`: one that reads the fixture, and one that proves

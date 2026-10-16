@@ -1,5 +1,5 @@
 // Reading Meetup data, with no network calls, so tests can feed it saved pages.
-// fetch-events.mjs does the fetching and hands the text to these.
+// scripts/refresh.mjs does the fetching and hands the text to these.
 import { meetupUrl } from '../../src/lib/meetup.mjs';
 import { calendarEvents, isUpcoming, times, created, eventUrl } from './ical.mjs';
 
@@ -82,7 +82,7 @@ export function parseEventsPage(html, slug) {
 // The feed stays the source for an upcoming event's title, time and link; the
 // page only adds these. An event the page says is cancelled is dropped even if
 // the feed still lists it.
-const FROM_PAGE = ['venue', 'address', 'online', 'hybrid', 'image', 'going', 'description'];
+export const FROM_PAGE = ['venue', 'address', 'online', 'hybrid', 'image', 'going', 'description'];
 export function enrich(upcoming, details, group, { now, cutoff }) {
   for (let i = upcoming.length - 1; i >= 0; i--) {
     const page = details.events.get(upcoming[i].sourceId);
@@ -100,7 +100,7 @@ export function enrich(upcoming, details, group, { now, cutoff }) {
   return recent;
 }
 
-// Ids of the events the page says are cancelled, so mergeCache can drop a
+// Ids of the events the page says are cancelled, so mergeCache (refresh.mjs) can drop a
 // cached copy that ended before the next run noticed the cancellation.
 export function cancelledIds(details, group) {
   return [...details.events].filter(([, e]) => e.status === 'CANCELLED').map(([id]) => `${group.id}-${id}`);
@@ -117,54 +117,6 @@ export function checkEmptyFeed(upcoming, details, { now, hadUpcoming }) {
   const onPage = [...details.events.values()].filter((e) => e.status !== 'CANCELLED' && Date.parse(e.end) >= now).length;
   if (onPage) throw new Error(`feed lists no upcoming events, but the events page lists ${onPage}`);
 }
-
-// Merge a fresh fetch into the previous cache file: past events from the cache
-// are kept for the backfill window, the fresh copy of an event wins, and
-// `fetchedAt` only moves when something actually changed (so an unchanged
-// run leaves the file alone and the refresh workflow has nothing to commit).
-// `fresh.pageFailed`: the Meetup events page couldn't be read this run, so the
-// feed-only copies lack what the page adds; those fields come from the
-// previous copy of the same event instead of vanishing until the next run.
-// `fresh.cancelled`: ids the page says are cancelled, never carried forward.
-export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(now).toISOString() }) {
-  const cancelled = new Set(fresh.cancelled);
-  const carried = previous.events.filter((e) => Date.parse(e.end) < now && Date.parse(e.end) >= cutoff && !cancelled.has(e.id));
-  const before = new Map(previous.events.map((e) => [e.id, e]));
-  const freshEvents = fresh.pageFailed
-    ? fresh.events.map((e) => ({ ...e, ...pick(before.get(e.id), FROM_PAGE) }))
-    : fresh.events;
-  const byId = new Map();
-  for (const e of [...carried, ...freshEvents]) byId.set(e.id, { ...byId.get(e.id), ...e });
-  const { fetchedAt: lastFetched, enriched, ...previousResult } = previous;
-  // `added`: when an upcoming event first showed up, for its "New" tag
-  // (isNew in format.mjs). Set once and then kept, so files stay the same
-  // run to run. An event this run is the first to see is new as of now; we
-  // go by when we saw it rather than the feed's created time, since an
-  // event drafted weeks ago and announced today is news today. An event we
-  // have no record of appearing (a group's first fetch, or a cache from
-  // before this was kept) takes the feed's created time, or goes without:
-  // better no tag than a new group's whole calendar tagged New.
-  const events = [...byId.values()].map(({ status, created, ...e }) => {
-    const appeared = lastFetched && !before.has(e.id) && Date.parse(e.end) >= now;
-    const added = before.get(e.id)?.added ?? (appeared ? fetchedAt : created);
-    return added ? { ...e, added } : e;
-  }).sort((a, b) => a.start.localeCompare(b.start));
-
-  // Group facts from Meetup: kept from the last run if this one missed them,
-  // and left out when unknown so files without them don't change.
-  const facts = {};
-  for (const k of ['members', 'pastCount', 'lastMet']) {
-    const v = fresh[k] ?? previous[k];
-    if (v != null) facts[k] = v;
-  }
-  const result = { logo: fresh.logo ?? previous.logo ?? null, ...facts, events };
-  // `enriched` was written by older versions; ignoring it (above) means
-  // dropping it rewrites each file once without moving fetchedAt.
-  const unchanged = lastFetched && JSON.stringify(previousResult) === JSON.stringify(result);
-  return { fetchedAt: unchanged ? lastFetched : fetchedAt, ...result };
-}
-
-const pick = (obj, keys) => Object.fromEntries(keys.filter((k) => obj?.[k] !== undefined).map((k) => [k, obj[k]]));
 
 export function formatAddress(venue) {
   if (!venue?.address) return venue?.city || null;
