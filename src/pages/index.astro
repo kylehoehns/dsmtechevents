@@ -54,6 +54,8 @@ const recentRows = [...endingSoon, ...past].sort((a, b) => b.start.localeCompare
 const calendarData = {
   events: events.map((e) => ({
     id: e.id, title: e.title, url: e.url, start: e.start, end: e.end, groups: e.groupIds, headliner: e.headliner, allDay: e.allDay,
+    // The calendar pill: its hosts, or for an event with no group, its own name ("Tech Fuse DSM").
+    label: e.groupIds.length ? e.hostsLabel : e.title.replace(/\s+20\d\d$/, ''),
   })),
   groups: Object.fromEntries(groups.map((g) => [g.id, { name: g.name, short: g.short, url: g.meetupUrl ?? g.website ?? null }])),
 };

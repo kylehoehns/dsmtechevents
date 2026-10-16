@@ -3,6 +3,7 @@
 // its other cards from. index.astro and cards.astro both split this way, so
 // between them every event has exactly one card.
 import { dayKey } from './format.mjs';
+import { archivedEvents, hostsLabel } from './joint.mjs';
 
 /** @param {{ upcoming: any[], past: any[] }} data */
 export function splitEvents({ upcoming, past }, now = Date.now()) {
@@ -23,20 +24,13 @@ export function splitEvents({ upcoming, past }, now = Date.now()) {
 // (about 90 days) plus older ones from the archive (data/archive/), which keeps
 // every ended event. The card pool prints them as one-line rows, so a search
 // can show a "Past" section without the home page carrying them.
-// Archive records are slim (one host each, no address or About text). A
-// joint meetup is one record per host, so those fold together like mergeJoint.
+// Archive records are slim (one host each, no address or About text), and a
+// joint meetup has one record per host, folded together like the cache's.
 /** @param {{ past: any[], archive?: any[], byId: Record<string, any> }} data */
 export function pastEvents({ past, archive = [], byId }) {
-  const key = (e) => `${e.start}|${e.title.toLowerCase().replace(/\W+/g, '')}`;
-  const seen = new Set(past.flatMap((e) => [e.id, key(e)]));
-  const older = new Map();
-  for (const r of archive) {
-    if (seen.has(r.id) || seen.has(key(r))) continue;
-    const had = older.get(key(r));
-    if (had) { if (r.group && !had.groupIds.includes(r.group)) had.groupIds.push(r.group); continue; }
-    older.set(key(r), { id: r.id, title: r.title, start: r.start, end: r.end, venue: r.venue ?? null, online: !!r.online, going: r.going, url: r.url ?? null, groupIds: r.group ? [r.group] : [], headliner: !!r.headliner, description: r.description ?? '', archived: true });
-  }
-  // A hand-added event with no host reads like its card did (data.mjs describe).
-  for (const e of older.values()) e.hostsLabel = e.groupIds.map((id) => byId[id]?.short).filter(Boolean).join(' + ') || (e.headliner ? 'Conference' : 'Community event');
-  return [...past, ...older.values()].sort((a, b) => b.start.localeCompare(a.start));
+  const seen = new Set(past.flatMap((e) => e.ids ?? [e.id]));
+  const older = archivedEvents(archive)
+    .filter((r) => !r.ids.some((id) => seen.has(id)))
+    .map((r) => ({ id: r.id, title: r.title, start: r.start, end: r.end, venue: r.venue ?? null, online: !!r.online, going: r.going, url: r.url ?? null, groupIds: r.groupIds, headliner: !!r.headliner, description: r.description ?? '', archived: true, hostsLabel: hostsLabel(r, byId) }));
+  return [...past, ...older].sort((a, b) => b.start.localeCompare(a.start));
 }

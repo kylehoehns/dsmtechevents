@@ -3,16 +3,17 @@
 // this year, how many groups ran them, how many more are already on the
 // calendar this year, and a count per month through this one (which isn't
 // over; later months are null, so the chart keeps all twelve slots and its
-// bars the same width all year). No RSVP counts: only Meetup and Luma report them. null early in the
+// bars the same width all year). A joint meetup counts once. No RSVP counts: only Meetup and Luma report them. null early in the
 // year, while there's too little to show.
 import { dayKey, month } from './format.mjs';
+import { archivedEvents } from './joint.mjs';
 
 const ENOUGH = 10;
 
 export function yearSoFar(archive, upcoming, now = Date.now()) {
   const today = dayKey(now);
   const year = today.slice(0, 4);
-  const ended = archive.filter((r) => dayKey(r.start).startsWith(year));
+  const ended = archivedEvents(archive).filter((r) => dayKey(r.start).startsWith(year));
   if (ended.length < ENOUGH) return null;
   const current = Number(today.slice(5, 7));
   const months = Array.from({ length: 12 }, (_, i) => {
@@ -23,7 +24,7 @@ export function yearSoFar(archive, upcoming, now = Date.now()) {
   return {
     year,
     events: ended.length,
-    groups: new Set(ended.map((r) => r.group)).size,
+    groups: new Set(ended.flatMap((r) => r.groupIds)).size,
     ahead: upcoming.filter((e) => !e.repeat && dayKey(e.start).startsWith(year)).length,
     months,
     busiest: Math.max(...months.map((m) => m.n ?? 0)),

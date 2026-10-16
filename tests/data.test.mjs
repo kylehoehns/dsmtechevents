@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { mkdtempSync, cpSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { loadData, shortAddress, sameNight, manualEvent } from '../src/lib/data.mjs';
+import { loadData, shortAddress, manualEvent } from '../src/lib/data.mjs';
+import { sameNight } from '../src/lib/joint.mjs';
 
 const dataDir = fileURLToPath(new URL('./fixtures/data', import.meta.url));
 const now = Date.parse('2026-10-07T17:00:00Z');
