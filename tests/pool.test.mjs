@@ -28,3 +28,16 @@ test('an archived hand-added event with no host reads as a conference or communi
   const list = pastEvents({ past: [], archive, byId });
   assert.deepEqual(list.map((e) => [e.hostsLabel, e.groupIds]), [['Community event', []], ['Conference', []]]);
 });
+
+test('a joint night titled differently by each host is one row, from the archive or the cache', () => {
+  const archive = [
+    rec('c-1', 'cijug', 'Joint night - JVM vs. CLR', '2026-04-15T22:30:00Z'),
+    rec('i-1', 'iadnug', 'JVM vs CLR, with CIJUG', '2026-04-15T22:30:00Z'),
+    rec('c-2', 'cijug', 'Records', '2026-10-01T22:30:00Z'),
+    rec('i-2', 'iadnug', 'Records, with CIJUG', '2026-10-01T22:30:00Z'),
+  ];
+  // The cache's copy of the second night, folded at build time, lists both ids.
+  const past = [{ id: 'c-2', ids: ['c-2', 'i-2'], title: 'Records', start: '2026-10-01T22:30:00Z', groupIds: ['cijug', 'iadnug'], hostsLabel: 'CIJUG + IADNUG' }];
+  const list = pastEvents({ past, archive, byId });
+  assert.deepEqual(list.map((e) => [e.id, e.hostsLabel]), [['c-2', 'CIJUG + IADNUG'], ['c-1', 'CIJUG + IADNUG']]);
+});

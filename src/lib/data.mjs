@@ -6,6 +6,7 @@ import { meetupSlug, meetupUrl, meetupPhoto } from './meetup.mjs';
 import { lumaPhoto } from './luma.mjs';
 import { dayKey, spansDays, weekday, fmt } from './format.mjs';
 import { localToUtc } from './time.mjs';
+import { foldJoint, hostsLabel, placeKey } from './joint.mjs';
 
 // The site rebuilds at least once a day (refresh.yml), so a page can be up to
 // a day old. Pages print what they'll need when events ending this soon end.
@@ -22,7 +23,7 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   const luma = readLumaCache(dataDir);
   const manual = readYaml('events.yaml').map((e) => manualEvent(e, luma)).filter(Boolean);
 
-  const events = mergeJoint([...groups.flatMap((g) => g._events), ...manual])
+  const events = foldJoint([...groups.flatMap((g) => g._events), ...manual])
     .map(tidy)
     .sort((a, b) => a.start.localeCompare(b.start));
   // "Upcoming" is as of the build. The browser re-checks, since the page can be up to a day old.
@@ -171,38 +172,6 @@ function lumaEvent(e, details) {
   };
 }
 
-// Joint meetups show up on several groups' feeds. Merge ones that share a
-// start time and title, and list every host.
-function mergeJoint(all) {
-  const merged = new Map();
-  for (const e of all) {
-    const key = `${e.start}|${e.title.toLowerCase().replace(/\W+/g, '')}`;
-    const existing = merged.get(key);
-    if (existing) fold(existing, e);
-    else merged.set(key, { ...e });
-  }
-  // Co-hosts sometimes title the same night differently ("Joint night - JVM vs.
-  // CLR" vs "JVM vs CLR, with CIJUG"). Fold those too: same start, same place,
-  // no host in common, and titles that are mostly the same words.
-  const list = [...merged.values()];
-  for (let i = 0; i < list.length; i++) {
-    for (let j = i + 1; j < list.length; j++) {
-      const [a, b] = [list[i], list[j]];
-      if (!a || !b || !sameNight(a, b)) continue;
-      fold(a, b);
-      list[j] = null;
-    }
-  }
-  return [...new Map(list.filter(Boolean).map((e) => [e.id, e])).values()];
-}
-
-// One co-host's copy of a joint event into another's. It's new when the
-// first co-host posted it.
-function fold(into, e) {
-  into.groupIds = [...new Set([...into.groupIds, ...e.groupIds])];
-  if (e.added && !(into.added <= e.added)) into.added = e.added;
-}
-
 function tidy(e) {
   return {
     ...e,
@@ -225,10 +194,7 @@ function describe(e, byId) {
   // used as-is for both.
   const url = e.image && !logos.includes(photoId(e.image)) ? e.image : null;
   e.photo = url && (meetupPhoto(url) ?? lumaPhoto(url) ?? { small: url, large: url });
-  // Who's putting it on, as plain text: "CIJUG + Pyowa", or for an event
-  // with no group, "Conference" / "Community event". Every list uses this.
-  e.hostsLabel = e.groupIds.map((id) => byId[id]?.short).filter(Boolean).join(' + ')
-    || (e.headliner || e.tags.includes('conference') ? 'Conference' : 'Community event');
+  e.hostsLabel = hostsLabel(e, byId);
   // Same street address = same venue, even when it's spelled two ways
   // ("Community Choice Convention Center" vs "...Credit Union Convention Center").
   e.venueKey = placeKey(e) || null;
@@ -308,20 +274,4 @@ export function shortAddress(a) {
 
 function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
-
-// Where an event is, for spotting the same night listed twice: the street
-// number and name ("801 Grand"), else the venue name, or "online".
-const placeKey = (e) => (e.online ? 'online' : (/^\s*(\d+\s+\S+(?:\s+\S+)?)/.exec(e.address ?? '')?.[1] ?? e.venue ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim());
-const STOP = new Set(['the', 'and', 'with', 'for', 'night', 'meetup', 'joint', 'des', 'moines']);
-const titleWords = (t) => new Set(t.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && !STOP.has(w)));
-
-// Two listings of one joint meetup? Exported for tests.
-export function sameNight(a, b) {
-  if (a.start !== b.start || a.groupIds.some((g) => b.groupIds.includes(g))) return false;
-  const place = placeKey(a);
-  if (!place || place !== placeKey(b)) return false;
-  const [x, y] = [titleWords(a.title), titleWords(b.title)];
-  const shared = [...x].filter((w) => y.has(w)).length;
-  return shared > 0 && shared / Math.min(x.size, y.size) >= 0.6;
 }

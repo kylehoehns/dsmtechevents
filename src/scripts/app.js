@@ -388,7 +388,6 @@ const addMonths = (ym, n) => { const d = new Date(`${ym}-01T00:00:00Z`); d.setUT
 const eventsOn = (key) => events
   .filter((e) => dayKey(e.start) <= key && key <= lastDay(e.start, e.end) && matches(e.groups))
   .sort((a, b) => a.start.localeCompare(b.start));
-const label = (e) => e.groups.length ? e.groups.map((id) => groups[id]?.short).join(' + ') : e.title.replace(/\s+20\d\d$/, '');
 
 function monthCells(ym) {
   const first = `${ym}-01`;
@@ -413,8 +412,8 @@ function dayCell(key) {
   const pills = list.slice(0, 3).map((e) => {
     const ended = Date.parse(e.end) < now ? ' ended' : '';
     return e.headliner
-      ? `<span class="pill headliner${ended}" title="${escapeHtml(e.title)}">${escapeHtml(label(e))}</span>`
-      : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : shortTime(e.start)}</i> ${escapeHtml(label(e))}</span>`;
+      ? `<span class="pill headliner${ended}" title="${escapeHtml(e.title)}">${escapeHtml(e.label)}</span>`
+      : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : shortTime(e.start)}</i> ${escapeHtml(e.label)}</span>`;
   }).join('') + (list.length > 3 ? `<span class="more-n">+${list.length - 3} more</span>` : '');
   const dots = list.filter((e) => !e.headliner).map(() => '<i class="dot"></i>').join('');
   const name = `${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}`;
