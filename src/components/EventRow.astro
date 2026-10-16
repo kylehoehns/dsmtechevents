@@ -1,0 +1,41 @@
+---
+// One line of a set list: date, hosts, title, where, and how many are going
+// (or went). The home page's Further out list (kind "later") and Recent
+// events, and a search's Past rows from the card pool ("past"), all print
+// this. app.js searches and highlights a row by its .row-group, .row-title
+// and .row-where, and a hidden .desc on an archived event, so keep those
+// class names in step with it.
+//
+// Other attributes (data-after, hidden, class) go on the <li>.
+import { month, day, shortTime } from '../lib/format.mjs';
+
+interface Props {
+  event: any;
+  kind: 'later' | 'past';
+  byId: Record<string, any>;
+  /** ", 2025" on a row from another year */
+  year?: string;
+  [attr: string]: any;
+}
+const { event: e, kind, byId, year = '', ...attrs } = Astro.props;
+const later = kind === 'later';
+// A hand-added event may have no link of its own: its group's page, then.
+const href = e.url ?? byId[e.groupIds[0]]?.meetupUrl;
+// Coming up: the time and place (TBA until it's known). Over: the place, if any.
+const where = later
+  ? `${e.allDay ? 'All day' : shortTime(e.start)} · ${e.online ? 'Online' : `@ ${e.venue ?? 'Venue TBA'}`}`
+  : e.online ? 'Online' : e.venue ? `@ ${e.venue}` : '';
+---
+<li data-groups={e.groupIds.join(' ')} data-id={e.id} {...attrs}>
+  <span class="row-date">{month(e.start)} {day(e.start)}{year}</span>
+  <a href={href} target="_blank" rel="noopener" data-click={kind}>
+    <span class="row-group">{e.hostsLabel}{later && e.back && <> <span class="back-tag">Back!</span></>}</span>
+    {later && e.series && <span class="row-series">{e.series.rule} · {e.series.count} dates</span>}
+    <span class="row-title">{e.title}</span>
+    <span class="row-where">{where}</span>
+    <span class="sr-only"> (opens in new tab)</span>
+  </a>
+  <span class="row-going">{e.going ? <><b>{e.going}</b> {later ? 'going' : 'went'}</> : ''}</span>
+  {/* An archived event has no card to search, so its short description rides along, hidden. */}
+  {e.archived && e.description && <span class="desc" hidden>{e.description}</span>}
+</li>

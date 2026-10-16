@@ -2,10 +2,11 @@
 import OutArrow from '../components/OutArrow.astro';
 import Layout from '../layouts/Layout.astro';
 import EventCard from '../components/EventCard.astro';
+import EventRow from '../components/EventRow.astro';
 import { loadData } from '../lib/data.mjs';
 import { splitEvents } from '../lib/pool.mjs';
 import { eventJsonLd, websiteJsonLd, toScript } from '../lib/jsonld.mjs';
-import { dayKey, lastDay, weekday, day, month, shortTime, daysBetween, sectionOf, plural, countdown, dayOf, dateRange, recentSummary } from '../lib/format.mjs';
+import { dayKey, lastDay, weekday, day, month, daysBetween, sectionOf, plural, countdown, dayOf, dateRange, recentSummary } from '../lib/format.mjs';
 
 const { events, upcoming, past, endingSoon, groups, byId, updatedAt } = loadData();
 
@@ -117,19 +118,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
           <section class="sec" data-sec>
             <div class="sec-head"><h2>Further out</h2><span class="count" data-count>{far.length} on the books</span></div>
             <ol class="setlist far">
-              {far.map((e) => (
-                <li data-groups={e.groupIds.join(' ')} data-end={e.end} data-id={e.id}>
-                  <span class="row-date">{month(e.start)} {day(e.start)}</span>
-                  <a href={e.url} target="_blank" rel="noopener" data-click="later">
-                    <span class="row-group">{e.hostsLabel}{e.back && <> <span class="back-tag">Back!</span></>}</span>
-                    {e.series &&<span class="row-series">{e.series.rule} · {e.series.count} dates</span>}
-                    <span class="row-title">{e.title}</span>
-                    <span class="row-where">{e.allDay ? 'All day' : shortTime(e.start)} · {e.online ? 'Online' : `@ ${e.venue ?? 'Venue TBA'}`}</span>
-                    <span class="sr-only"> (opens in new tab)</span>
-                  </a>
-                  <span class="row-going">{e.going ? <><b>{e.going}</b> going</> : ''}</span>
-                </li>
-              ))}
+              {far.map((e) => <EventRow event={e} kind="later" byId={byId} data-end={e.end} />)}
             </ol>
           </section>
         )}
@@ -159,16 +148,8 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         <p class="sub" id="recent-sub">{recentSummary(past.length, past.reduce((n, e) => n + (e.going ?? 0), 0))}</p>
         <ol class="setlist" id="recent-list" data-shown={PAST_SHOWN}>
           {recentRows.map((e) => (
-            <li class:list={{ extra: past.indexOf(e) >= PAST_SHOWN }} data-groups={e.groupIds.join(' ')} data-id={e.id} data-going={e.going ?? 0} data-after={endingSoon.includes(e) ? e.end : undefined} hidden={endingSoon.includes(e)}>
-              <span class="row-date">{month(e.start)} {day(e.start)}</span>
-              <a href={e.url} target="_blank" rel="noopener" data-click="past">
-                <span class="row-group">{e.hostsLabel}</span>
-                <span class="row-title">{e.title}</span>
-                <span class="row-where">{e.online ? 'Online' : e.venue ? `@ ${e.venue}` : ''}</span>
-                <span class="sr-only"> (opens in new tab)</span>
-              </a>
-              <span class="row-going">{e.going ? <><b>{e.going}</b> went</> : ''}</span>
-            </li>
+            <EventRow event={e} kind="past" byId={byId} class:list={{ extra: past.indexOf(e) >= PAST_SHOWN }} data-going={e.going ?? 0}
+              data-after={endingSoon.includes(e) ? e.end : undefined} hidden={endingSoon.includes(e)} />
           ))}
         </ol>
         {recentRows.length > PAST_SHOWN && <button type="button" class="all btn btn-outline" id="recent-all" aria-expanded="false">+ All {past.length}</button>}
