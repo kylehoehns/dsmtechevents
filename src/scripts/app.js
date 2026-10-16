@@ -4,7 +4,8 @@
 // State lives in the URL (?view=calendar&group=cijug&day=2026-10-15, ?q=java)
 // so any view can be shared or bookmarked.
 import { fold, queryTerms, matchesAll, matchSpans, excerpt } from '../lib/search.mjs';
-import { dayKey, lastDay, isDayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, dayOf, recentSummary, plainText, isNew, sectionOf } from '../lib/format.mjs';
+import { calendar, readState, stateQuery, addMonths } from '../lib/calendar.mjs';
+import { dayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, dayOf, recentSummary, plainText, isNew, sectionOf } from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -119,27 +120,13 @@ if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.userAgent.include
   for (const a of $$('a.map[data-q]')) a.href = `https://maps.apple.com/?q=${encodeURIComponent(a.dataset.q)}`;
 }
 
-// The months the data covers: the cache keeps about 90 days of past events
-// (plus the archive), so earlier months would look quiet when they're just
-// not on file. Paging and ?day= stay inside these, and this month always counts.
-const firstMonth = events.reduce((m, e) => { const k = dayKey(e.start).slice(0, 7); return k < m ? k : m; }, today.slice(0, 7));
-const lastMonth = events.reduce((m, e) => { const k = lastDay(e.start, e.end).slice(0, 7); return k > m ? k : m; }, today.slice(0, 7));
-const inRange = (key) => key.slice(0, 7) >= firstMonth && key.slice(0, 7) <= lastMonth;
+// The calendar's months, grids and days (src/lib/calendar.mjs).
+const cal = calendar(events, today);
+const eventsOn = (key) => cal.on(key, state.group);
 
 // ---- state ----
 const state = {};
-function readUrl() {
-  const params = new URLSearchParams(location.search);
-  state.view = params.get('view') === 'calendar' ? 'calendar' : 'list';
-  // Ignore unknown groups (and inherited names like ?group=constructor) and
-  // dates that don't exist, rather than rendering an empty or broken page.
-  state.group = Object.hasOwn(groups, params.get('group') ?? '') ? params.get('group') : '';
-  state.day = isDayKey(params.get('day')) && inRange(params.get('day')) ? params.get('day') : null;
-  state.month = (state.day ?? today).slice(0, 7);
-  // A search looks through every group, and shows its results in the list.
-  state.q = (params.get('q') ?? '').trim().slice(0, 100);
-  if (state.q) { state.group = ''; state.view = 'list'; }
-}
+const readUrl = () => Object.assign(state, readState(location.search, { groups, inRange: cal.inRange, today }));
 readUrl();
 
 // Tell screen readers what a click changed. Never called on first load.
@@ -150,12 +137,7 @@ function announce(text) { status.textContent = text; }
 // shouldn't fill up the Back button.
 let synced = null;
 function syncUrl() {
-  const p = new URLSearchParams();
-  if (state.view === 'calendar') p.set('view', 'calendar');
-  if (state.group) p.set('group', state.group);
-  if (state.view === 'calendar' && state.day) p.set('day', state.day);
-  if (state.q) p.set('q', state.q);
-  const url = p.size ? `?${p}` : location.pathname;
+  const url = stateQuery(state) || location.pathname;
   const key = `${state.view}|${state.group}`;
   if (synced != null && synced !== key) history.pushState(null, '', url);
   else history.replaceState(null, '', url);
@@ -384,26 +366,6 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 // The key's "Pick a day" hint goes once a day has been picked (or a ?day=
 // link opened on one): its events are showing, so the hint has done its job.
 let dayPicked = !!state.day;
-const addMonths = (ym, n) => { const d = new Date(`${ym}-01T00:00:00Z`); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString().slice(0, 7); };
-const eventsOn = (key) => events
-  .filter((e) => dayKey(e.start) <= key && key <= lastDay(e.start, e.end) && matches(e.groups))
-  .sort((a, b) => a.start.localeCompare(b.start));
-
-function monthCells(ym) {
-  const first = `${ym}-01`;
-  const start = addDays(first, -new Date(first).getUTCDay());
-  const next = `${addMonths(ym, 1)}-01`;
-  const weeks = Math.ceil(daysBetween(start, next) / 7);
-  return Array.from({ length: weeks * 7 }, (_, i) => addDays(start, i));
-}
-
-function pickDay(ym) {
-  const keys = monthCells(ym).filter((k) => k.startsWith(ym));
-  if (today.startsWith(ym) && eventsOn(today).length) return today;
-  const pastMonth = ym < today.slice(0, 7);
-  return keys.find((k) => (pastMonth || k >= today) && eventsOn(k).length) ?? (today.startsWith(ym) ? today : keys[0]);
-}
-
 // One day of the month grid: a button with the date, up to three event pills
 // (dots on a phone) and a spoken summary.
 function dayCell(key) {
@@ -418,19 +380,19 @@ function dayCell(key) {
   const dots = list.filter((e) => !e.headliner).map(() => '<i class="dot"></i>').join('');
   const name = `${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}`;
   // Only the selected day is in the tab order; arrow keys move between days.
-  return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}"${inRange(key) ? '' : ' disabled'}>
+  return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}"${cal.inRange(key) ? '' : ' disabled'}>
     <span class="sr-only">${name}</span><span class="day-num" aria-hidden="true">${Number(key.slice(8))}</span><span class="pills" aria-hidden="true">${pills}</span><span class="dots" aria-hidden="true">${dots}</span>
   </button>`;
 }
 
 function renderCalendar() {
-  if (!state.day || !state.day.startsWith(state.month)) state.day = pickDay(state.month);
-  const cells = monthCells(state.month).map(dayCell);
+  if (!state.day || !state.day.startsWith(state.month)) state.day = cal.pick(state.month, state.group);
+  const cells = cal.cells(state.month).map(dayCell);
   const [y] = state.month.split('-');
   // At either end of the data the arrow stays in place (focus stays put) but says why it does nothing.
   const edge = (step) => {
-    if (step < 0 ? state.month > firstMonth : state.month < lastMonth) return `aria-label="${step < 0 ? 'Previous' : 'Next'} month"`;
-    const name = monthName(step < 0 ? firstMonth : lastMonth, true);
+    if (step < 0 ? state.month > cal.first : state.month < cal.last) return `aria-label="${step < 0 ? 'Previous' : 'Next'} month"`;
+    const name = monthName(step < 0 ? cal.first : cal.last, true);
     return `aria-disabled="true" aria-label="${step < 0 ? `No listings before ${name}` : `Nothing listed after ${name}`}" title="${step < 0 ? `No listings before ${name}` : `Nothing listed after ${name}`}"`;
   };
   // Rebuilding the grid drops focus. Remember what had it and put it back.
@@ -531,7 +493,7 @@ function settlePanel(held) {
 
 function renderMinical() {
   const ym = today.slice(0, 7);
-  const cells = monthCells(ym).map((key) => {
+  const cells = cal.cells(ym).map((key) => {
     if (!key.startsWith(ym)) return '<span class="blank" aria-hidden="true"></span>';
     const list = eventsOn(key);
     const cls = [list.length ? 'has' : '', list.some((e) => e.headliner) ? 'headliner' : '', key === today ? 'today' : '', key < today ? 'past' : ''].filter(Boolean).join(' ');
