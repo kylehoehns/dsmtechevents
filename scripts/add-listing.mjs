@@ -18,17 +18,15 @@
 // against the two patterns below, never passed to a shell.
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import YAML from 'yaml';
 import { lumaSlug, shortAddress } from '../src/lib/data.mjs';
 import { meetupSlug, meetupUrl } from '../src/lib/meetup.mjs';
 import { fmt, dayKey } from '../src/lib/format.mjs';
 import readLuma from './sources/luma.mjs';
 import { parseEventsPage } from './sources/meetup.mjs';
+import { refresh, get } from './refresh.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
-// Same as scripts/fetch-events.mjs, so sites see one polite visitor.
-const UA = 'dsmtechevents/1.0 (+https://dsmtechevents.com; community event calendar, fetched four times a day)';
 
 // A request this script won't do on its own; `message` says why, for the issue.
 export class LeaveIt extends Error {}
@@ -156,17 +154,6 @@ export function issueAnswers(body = '') {
   return answers;
 }
 
-async function get(url) {
-  const res = await fetch(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(20_000) });
-  if (!res.ok) throw new Error(`${res.status} from ${url}`);
-  return res.text();
-}
-
-// Fills in the new listing's cache the way the refresh will.
-function fetchOnly(id) {
-  execFileSync(process.execPath, [path.join(root, 'scripts/fetch-events.mjs'), '--only', id], { stdio: 'inherit' });
-}
-
 export async function addListing(link, { short, issue, now = Date.now() } = {}) {
   const target = classify(link);
   const file = (f) => path.join(root, 'data', f);
@@ -206,7 +193,9 @@ export async function addListing(link, { short, issue, now = Date.now() } = {}) 
 
   write();
   try {
-    fetchOnly(id);
+    // Fills in the new listing's cache the way the refresh will.
+    const { problems } = await refresh({ root, only: id });
+    if (problems.length) throw new Error(problems[0].message);
   } catch (err) {
     // Put the data back so a failed run leaves nothing half done.
     fs.writeFileSync(file('groups.yaml'), groupsText);

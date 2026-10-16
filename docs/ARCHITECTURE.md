@@ -47,7 +47,8 @@ flowchart TD
 
 ## The pieces
 
-- **Fetch.** `scripts/fetch-events.mjs` reads `data/groups.yaml`. A Meetup
+- **Fetch.** `scripts/refresh.mjs` (run by `scripts/fetch-events.mjs`) reads
+  `data/groups.yaml`. A Meetup
   group's upcoming events come from its public iCal feed; its events page
   adds venue, photo, RSVP count and recent past events. A group with
   `source:` uses a reader in `scripts/sources/` instead. Each group's result
@@ -112,7 +113,7 @@ their `load` event, so its install never competes with a first visit.
 
 A cache file must not change unless an event changed (the archive follows
 the same rule). `mergeCache()` in
-`scripts/sources/meetup.mjs` keeps the old `fetchedAt` when nothing else
+`scripts/refresh.mjs` keeps the old `fetchedAt` when nothing else
 moved, and optional facts (`members`, `pastCount`, `lastMet`) are left out when unknown
 rather than written as `null`. If a file changed on every run, every
 refresh would commit and redeploy the site four times a day for nothing.

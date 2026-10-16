@@ -2,7 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { meetupSlug, meetupPhoto } from '../src/lib/meetup.mjs';
-import { parseFeed, parseEventsPage, enrich, cancelledIds, mergeCache, checkEmptyFeed, formatAddress, cleanDescription } from '../scripts/sources/meetup.mjs';
+import { parseFeed, parseEventsPage, enrich, cancelledIds, checkEmptyFeed, formatAddress, cleanDescription, FROM_PAGE } from '../scripts/sources/meetup.mjs';
+import { mergeCache } from '../scripts/refresh.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
 const group = { id: 'iadnug', name: 'Iowa .NET User Group' };
@@ -150,10 +151,10 @@ test('mergeCache keeps the page details of upcoming events when the page read fa
   const enriched = { ...feedCopy, description: 'page text', venue: 'Source Allies', address: '4501 NW Urbandale Dr, Urbandale', online: false, hybrid: false, image: 'photo.jpg', going: 12 };
   const previous = { fetchedAt: 'THEN', logo: 'logo.jpg', members: 300, events: [enriched] };
 
-  const failed = mergeCache(previous, { events: [{ ...feedCopy }], logo: null, pageFailed: true }, { now, cutoff, fetchedAt: 'NOW' });
+  const failed = mergeCache(previous, { events: [{ ...feedCopy }], logo: null, keep: FROM_PAGE }, { now, cutoff, fetchedAt: 'NOW' });
   assert.equal(JSON.stringify(failed), JSON.stringify(previous), 'byte-identical: nothing lost, fetchedAt unchanged');
 
-  const retitled = mergeCache(previous, { events: [{ ...feedCopy, title: 'Renamed' }], pageFailed: true }, { now, cutoff, fetchedAt: 'NOW' });
+  const retitled = mergeCache(previous, { events: [{ ...feedCopy, title: 'Renamed' }], keep: FROM_PAGE }, { now, cutoff, fetchedAt: 'NOW' });
   assert.equal(retitled.events[0].title, 'Renamed', 'the feed still wins for the title');
   assert.equal(retitled.events[0].going, 12);
 
