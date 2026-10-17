@@ -59,6 +59,15 @@ test('a hand-added timed event without endTime fails loudly instead of ending as
   assert.equal(manualEvent({ title: 'Expo', start: '2026-11-07' }).allDay, true, 'an all-day event needs neither');
 });
 
+test('a misspelled key in events.yaml or groups.yaml fails loudly instead of being dropped', () => {
+  assert.throws(() => manualEvent({ title: 'Expo', start: '2026-11-07', venu: 'Hall A' }), /unknown venu:/);
+  assert.throws(() => manualEvent({ luma: 'https://luma.com/abc', headlinr: true }), /unknown headlinr:/);
+  const dir = mkdtempSync(path.join(tmpdir(), 'dsm-'));
+  cpSync(dataDir, dir, { recursive: true });
+  writeFileSync(path.join(dir, 'groups.yaml'), '- { id: x, name: X, short: X, meetups: https://www.meetup.com/x/ }\n');
+  assert.throws(() => loadData({ dataDir: dir, now }), /groups.yaml: "x" has unknown meetups:/);
+});
+
 test('a luma: event takes its details from the fetched copy, and its own fields win', () => {
   const details = { title: 'Dev Days | Des Moines, Iowa, USA', start: '2026-10-20T20:00:00.000Z', end: '2026-10-20T22:00:00.000Z', allDay: false, url: 'https://luma.com/abc123', venue: 'Lean Techniques Office', going: 14, description: 'Hands-on.' };
   const e = manualEvent({ luma: 'https://lu.ma/abc123', title: 'Dev Days', hosts: ['cijug'] }, { abc123: details });
