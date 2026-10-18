@@ -89,8 +89,19 @@ function readStatus(dataDir, groups) {
   return { checkedOn: read('built-on.txt')?.trim() || null };
 }
 
+// The keys each file documents in its header comment. Anything else is a typo
+// (`venu:`, `headlinr:`) that would otherwise be dropped without a word.
+const GROUP_KEYS = new Set(['id', 'name', 'short', 'meetup', 'ical', 'source', 'website', 'eventbrite', 'logo']);
+const EVENT_KEYS = new Set(['title', 'id', 'url', 'start', 'end', 'time', 'endTime', 'venue', 'address', 'description', 'tags', 'hosts', 'headliner', 'luma']);
+
+function onlyKnown(file, entry, keys) {
+  const unknown = Object.keys(entry).filter((k) => !keys.has(k));
+  if (unknown.length) throw new Error(`${file}: "${entry.title ?? entry.id ?? entry.luma}" has unknown ${unknown.map((k) => `${k}:`).join(', ')} (known: ${[...keys].join(', ')})`);
+}
+
 // A group from groups.yaml plus what the refresh cached for it.
 function readGroup(g, dataDir) {
+  onlyKnown('groups.yaml', g, GROUP_KEYS);
   const cacheFile = path.join(dataDir, 'cache', `${g.id}.json`);
   const cache = fs.existsSync(cacheFile) ? JSON.parse(fs.readFileSync(cacheFile, 'utf8')) : { events: [] };
   const slug = meetupSlug(g.meetup);
@@ -124,8 +135,9 @@ export function lumaSlug(link) {
 // `luma:` event the fetch hasn't read yet. The fetch uses it too, to archive
 // ended ones (scripts/archive.mjs).
 export function manualEvent(e, luma = {}) {
-  if (e.luma) return lumaEvent(e, luma[lumaSlug(e.luma)]);
   if ('featured' in e) throw new Error(`events.yaml: "${e.title}" uses featured:, which is now headliner:`);
+  onlyKnown('events.yaml', e, EVENT_KEYS);
+  if (e.luma) return lumaEvent(e, luma[lumaSlug(e.luma)]);
   const startDate = String(e.start);
   const endDate = String(e.end ?? e.start);
   const allDay = !e.time;

@@ -52,7 +52,7 @@ You need Node 26 or newer, the version in `.nvmrc` (CI and Cloudflare's build us
 npm install
 npm run fetch    # pull fresh events into data/cache/
 npm run dev      # http://localhost:4321
-npm test         # unit tests, on saved fixtures, no network
+npm test         # unit tests, on saved fixtures, no network; fails under 85% coverage
 npm run build    # tests, then astro build, then scripts/check-dist.mjs
 npm run spell    # spelling in page copy and docs (not event text)
 npm run check    # lint, knip, typecheck and spell: run before a PR
@@ -72,6 +72,10 @@ uses; delete them rather than keeping them "just in case". `typecheck`
 check is wrong about something deliberate, switch it off as narrowly as you
 can (one rule, one file) in `eslint.config.mjs` or `knip.jsonc`, with a
 comment that says why.
+
+`npm test` fails when unit-test coverage of the code (not the tests) drops
+below 85% of lines, branches or functions. It prints the table per file: a new
+script that shows low there needs tests, not a lower floor.
 
 ### Browser tests
 
