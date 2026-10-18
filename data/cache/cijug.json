@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-15T01:33:03.891Z",
+  "fetchedAt": "2026-10-18T14:03:11.863Z",
   "logo": "https://secure.meetupstatic.com/photos/event/7/8/6/c/600_460890828.jpeg",
   "members": 887,
   "pastCount": 77,
@@ -45,7 +45,7 @@
       "end": "2026-10-23T00:00:00.000Z",
       "allDay": false,
       "url": "https://www.meetup.com/central-iowa-java-users-group/events/316693968/",
-      "description": "CIJUG returns on Thursday, October 22nd from 5:30 to 7pm for a Lightning Talks night at Source Allies.\n\nLightning talks are a chance to hear several quick presentations, giving everyone exposure to a variety of ideas, technologies, and real-world experiences. The format keeps the evening fast-paced while creating plenty of opportunities to discover something new.\n\nThis month's speakers include Nathan Halko, folks from Des Moines Charity Hackathons, Adam Horning as well as Ben DeMouth from Source Allies. Following the presentations, there will be time for questions, discussion, and conversation with the speakers and other members of the Java community.\n\nWhether you're looking for useful takeaways, new perspectives, or simply an opportunity to connect with fellow practitioners, Lightning Talks are a great way to spend an evening with the local tech peers, and learn at lightning speed!\n\nHosted in person at Source Allies. RSVP so we can get a head count! Food/Drinks provided.",
+      "description": "CIJUG returns on Thursday, October 22nd from 5:30 to 7pm for a Lightning Talks night at Source Allies!\n\nLightning talks are a chance to hear several quick presentations in one evening. This month’s lineup covers everything from JVM internals to local AI to using your skills for good.\n\n**Garbage Out**\nBen DeMouth, Source Allies\nA look at how different JVM garbage collection configurations work and the tradeoffs each one makes.\n\n**Local AI Image Generation Is Getting Disturbingly Good**\nNathan Halko\nLocal AI image and video models have come a long way in the last year. Nathan will show what you can now run on a typical gaming PC and how people are using it to make money online.\n\n**Did Any of It Matter? Why Shipping Software Isn’t the Same as Delivering Value**\nAdam Horning\nA short, non-technical talk from a Product Owner perspective on the difference between shipping features and actually making a difference for the customer or business.\n\n**Turning Tech Skills Into Community Impact**\nDellen Burk-Flores, President of dsmHack\n\nHow dsmHack’s 48-hour charity hackathons bring tech professionals together to build solutions for local nonprofits, and how you can get involved.\n\nAfter the talks, stick around for questions and conversation with the speakers and other members of the community.\n\nHosted in person at Source Allies. Food and drinks provided. Please RSVP so we can get a head count!",
       "venue": "Source Allies",
       "address": "4501 NW Urbandale Dr, Urbandale, IA 50322",
       "online": false,
