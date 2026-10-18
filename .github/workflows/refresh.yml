@@ -79,6 +79,11 @@ jobs:
   publish:
     needs: refresh
     runs-on: ubuntu-24.04
+    # REFRESH_DEPLOY_KEY lives in this environment, which only main can use,
+    # so a workflow edited on a branch can't read it. No deployment record.
+    environment:
+      name: main-only
+      deployment: false
     # The live check below waits up to 10 minutes.
     timeout-minutes: 15
     permissions:
