@@ -1,5 +1,5 @@
-// `npm run lint`. Correctness only: no style rules, no formatter. The compact
-// style (one-line CSS rules, dense helpers) is on purpose.
+// `npm run lint`. Correctness only: no style rules. Prettier formats JS/TS
+// (`npm run format`); CSS keeps its one-line rules on purpose.
 import js from '@eslint/js';
 import astro from 'eslint-plugin-astro';
 import tseslint from 'typescript-eslint';

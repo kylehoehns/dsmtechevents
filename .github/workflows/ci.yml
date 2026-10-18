@@ -48,8 +48,10 @@ jobs:
       # a typo never blocks a data refresh or a deploy.
       - run: npm run spell
       # Code checks, also here and not in the build for the same reason:
-      # ESLint (eslint.config.mjs), unused files/exports/dependencies
-      # (knip.jsonc), and types in .astro/.ts files (astro check).
+      # Prettier on JS/TS (.prettierrc.json), ESLint (eslint.config.mjs),
+      # unused files/exports/dependencies (knip.jsonc), and types in
+      # .astro/.ts files (astro check).
+      - run: npm run format:check
       - run: npm run lint
       - run: npm run knip
       - run: npm run typecheck

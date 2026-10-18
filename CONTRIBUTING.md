@@ -55,7 +55,8 @@ npm run dev      # http://localhost:4321
 npm test         # unit tests, on saved fixtures, no network; fails under 85% coverage
 npm run build    # tests, then astro build, then scripts/check-dist.mjs
 npm run spell    # spelling in page copy and docs (not event text)
-npm run check    # lint, knip, typecheck and spell: run before a PR
+npm run format   # Prettier on .js/.mjs/.ts (CSS and .astro are left alone)
+npm run check    # format check, lint, knip, typecheck and spell: run before a PR
 ```
 
 The spelling check runs in CI next to the build. It covers the words we write

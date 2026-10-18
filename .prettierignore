@@ -1,0 +1,16 @@
+# JavaScript and TypeScript only. CSS keeps its one-line rules, which read
+# like a table; .astro files would need prettier-plugin-astro.
+*.css
+*.astro
+*.json
+*.jsonc
+*.yaml
+*.yml
+*.md
+*.html
+*.svg
+data/
+dist/
+dist-e2e/
+.astro/
+public/fonts/
