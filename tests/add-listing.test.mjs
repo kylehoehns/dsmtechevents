@@ -1,20 +1,44 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { tame, classify, alreadyListed, checkLumaEvent, checkMeetupGroup, defaultShort, uniqueId, insertGroup, appendEvent, pullRequest, issueAnswers, LeaveIt } from '../scripts/add-listing.mjs';
+import {
+  tame,
+  classify,
+  alreadyListed,
+  checkLumaEvent,
+  checkMeetupGroup,
+  defaultShort,
+  uniqueId,
+  insertGroup,
+  appendEvent,
+  pullRequest,
+  issueAnswers,
+  LeaveIt,
+} from '../scripts/add-listing.mjs';
 
 test('only exact Luma event and Meetup group links are automatic', () => {
   assert.deepEqual(classify('https://luma.com/04xz1l03'), { kind: 'luma', slug: '04xz1l03' });
   assert.deepEqual(classify(' https://lu.ma/04xz1l03/ '), { kind: 'luma', slug: '04xz1l03' });
   assert.deepEqual(classify('https://www.meetup.com/pyowa-iowa-python-user-group/'), { kind: 'meetup', slug: 'pyowa-iowa-python-user-group' });
   assert.deepEqual(classify('https://www.meetup.com/iadnug/events/312345678/?utm=x'), { kind: 'meetup', slug: 'iadnug' }, 'an event link means its group');
-  for (const link of ['https://example.com/', 'https://luma.com/dev-days/events', 'https://www.meetup.com/find/', 'http://luma.com/04xz1l03', '`rm -rf /`', '', undefined]) {
+  for (const link of [
+    'https://example.com/',
+    'https://luma.com/dev-days/events',
+    'https://www.meetup.com/find/',
+    'http://luma.com/04xz1l03',
+    '`rm -rf /`',
+    '',
+    undefined,
+  ]) {
     assert.throws(() => classify(link), LeaveIt, String(link));
   }
 });
 
 test('a link already in the data is caught, whatever its case', () => {
   const groups = [{ id: 'pyowa', name: 'Iowa Python User Group', meetup: 'https://www.meetup.com/pyowa-iowa-python-user-group/' }];
-  const events = [{ luma: 'https://luma.com/04xz1l03', title: 'GitHub Dev Days' }, { title: 'Code Camp', url: 'https://lu.ma/abc123' }];
+  const events = [
+    { luma: 'https://luma.com/04xz1l03', title: 'GitHub Dev Days' },
+    { title: 'Code Camp', url: 'https://lu.ma/abc123' },
+  ];
   assert.equal(alreadyListed({ kind: 'meetup', slug: 'Pyowa-Iowa-Python-User-Group' }, groups, events), 'Iowa Python User Group');
   assert.equal(alreadyListed({ kind: 'luma', slug: '04xz1l03' }, groups, events), 'GitHub Dev Days');
   assert.equal(alreadyListed({ kind: 'luma', slug: 'abc123' }, groups, events), 'Code Camp', 'a hand-written entry linking to it counts');
@@ -49,14 +73,25 @@ test('the pill name drops the place and "User Group", and ids never collide', ()
 });
 
 test('a new group goes after the last Meetup group, keeping the comments', () => {
-  const text = '# header\n#   id: ...\n\n- id: a\n  meetup: https://www.meetup.com/a/\n\n- id: b\n  meetup: https://www.meetup.com/b/\n\n- id: c\n  source: c\n';
-  assert.equal(insertGroup(text, '- id: new\n  meetup: https://www.meetup.com/new/\n'),
-    '# header\n#   id: ...\n\n- id: a\n  meetup: https://www.meetup.com/a/\n\n- id: b\n  meetup: https://www.meetup.com/b/\n\n- id: new\n  meetup: https://www.meetup.com/new/\n\n- id: c\n  source: c\n');
+  const text =
+    '# header\n#   id: ...\n\n- id: a\n  meetup: https://www.meetup.com/a/\n\n- id: b\n  meetup: https://www.meetup.com/b/\n\n- id: c\n  source: c\n';
+  assert.equal(
+    insertGroup(text, '- id: new\n  meetup: https://www.meetup.com/new/\n'),
+    '# header\n#   id: ...\n\n- id: a\n  meetup: https://www.meetup.com/a/\n\n- id: b\n  meetup: https://www.meetup.com/b/\n\n- id: new\n  meetup: https://www.meetup.com/new/\n\n- id: c\n  source: c\n',
+  );
   assert.equal(appendEvent('# events\n\n- title: X\n', '- luma: https://luma.com/abc\n'), '# events\n\n- title: X\n\n- luma: https://luma.com/abc\n');
 });
 
 test('the PR closes its issue and lists what to check', () => {
-  const pr = pullRequest({ title: 'Dev Days', entry: '- luma: https://luma.com/abc\n', facts: ['When: Tue'], warnings: ['It is online.'], preview: 'https://p.test/', id: 'luma-abc', issue: '12' });
+  const pr = pullRequest({
+    title: 'Dev Days',
+    entry: '- luma: https://luma.com/abc\n',
+    facts: ['When: Tue'],
+    warnings: ['It is online.'],
+    preview: 'https://p.test/',
+    id: 'luma-abc',
+    issue: '12',
+  });
   assert.equal(pr.title, 'Add Dev Days');
   assert.match(pr.body, /^## Summary\n/);
   assert.match(pr.body, /\*\*Check before merging:\*\*\n\n- It is online\./);

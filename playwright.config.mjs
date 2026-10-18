@@ -11,9 +11,14 @@ import { NOW } from './tests/e2e/fixtures.mjs';
 
 // A free port, picked once. Workers load this file again, but they inherit
 // the environment, so they all see the same port.
-process.env.E2E_PORT ??= String(await new Promise((resolve) => {
-  const srv = net.createServer().listen(0, () => { const { port } = srv.address(); srv.close(() => resolve(port)); });
-}));
+process.env.E2E_PORT ??= String(
+  await new Promise((resolve) => {
+    const srv = net.createServer().listen(0, () => {
+      const { port } = srv.address();
+      srv.close(() => resolve(port));
+    });
+  }),
+);
 const port = Number(process.env.E2E_PORT);
 
 export default defineConfig({
@@ -32,7 +37,11 @@ export default defineConfig({
   },
   projects: [
     { name: 'desktop', testIgnore: /offline/, use: { browserName: 'chromium', viewport: { width: 1280, height: 900 } } },
-    { name: 'phone', testIgnore: /offline/, use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 } },
+    {
+      name: 'phone',
+      testIgnore: /offline/,
+      use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 },
+    },
     // The one place sw.js runs: offline.spec.mjs checks the site works with no network.
     { name: 'offline', testMatch: /offline/, use: { browserName: 'chromium', viewport: { width: 1280, height: 900 }, serviceWorkers: 'allow' } },
   ],

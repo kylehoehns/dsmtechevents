@@ -269,7 +269,12 @@ test('a build from last week, opened Monday: the list sorts into this week again
   const section = (name) => page.locator('[data-sec]', { has: page.getByRole('heading', { name, exact: true }) });
   await expect(section('This week').locator('.show')).toHaveText([/Joint night - JVM vs\. CLR/, /Test Conf 2026/, /Conf Afterparty/]);
   await expect(section('This week').locator('[data-count]')).toHaveText('3 events');
-  await expect(section('Next week').locator('.show')).toHaveText([/Convention Center Tour/, /Remote DevOps Chat/, /Hack Night Returns/, /Fall Back Hack Night/]);
+  await expect(section('Next week').locator('.show')).toHaveText([
+    /Convention Center Tour/,
+    /Remote DevOps Chat/,
+    /Hack Night Returns/,
+    /Fall Back Hack Night/,
+  ]);
   await expect(tag(page, 'Joint night')).toHaveText('Tomorrow');
 
   // Filtering still works on the new sections.
@@ -285,16 +290,17 @@ test('midnight with the page hidden: one reload when it comes back, with the new
   await expect(tag(page, 'Python Office Hours')).toHaveText('Tomorrow');
 
   // A phone locks, or the tab goes to the background.
-  const setHidden = (hidden) => page.evaluate((h) => {
-    if (h) {
-      Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
-      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
-    } else {
-      delete document.hidden;
-      delete document.visibilityState;
-    }
-    document.dispatchEvent(new Event('visibilitychange'));
-  }, hidden);
+  const setHidden = (hidden) =>
+    page.evaluate((h) => {
+      if (h) {
+        Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+        Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
+      } else {
+        delete document.hidden;
+        delete document.visibilityState;
+      }
+      document.dispatchEvent(new Event('visibilitychange'));
+    }, hidden);
   await setHidden(true);
   await page.clock.runFor('08:00:00'); // Thu 7am; nothing re-checks while hidden
   expect(loads.n).toBe(1);

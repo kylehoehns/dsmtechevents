@@ -51,7 +51,11 @@ function readEventPage(html, url) {
   const presenting = toText(/<h3>Presenting:<\/h3>\s*<h4>([\s\S]*?)<\/h4>/.exec(article)?.[1] ?? '');
   // "Where: At Principal…" repeats the card's venue.
   const body = richText(/<section class="entry-content[^>]*>([\s\S]*?)<\/section>/.exec(article)?.[1] ?? '')
-    .split('\n').filter((line) => !/^Where:/i.test(line.trim())).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+    .split('\n')
+    .filter((line) => !/^Where:/i.test(line.trim()))
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
   const description = [presenting && `**Presenting:** ${presenting}`, body].filter(Boolean).join('\n\n');
 
   return { title, start, description, venue: name.trim() || null, address: rest?.trim() || null };

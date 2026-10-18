@@ -16,7 +16,10 @@ const serve = (body) => ({ get: async () => body });
 
 test('secdsm reads meetings, talks, venue and door time from the homepage', async () => {
   const events = await secdsm({ id: 'secdsm', website: 'https://secdsm.org/' }, serve(fixture('secdsm.html')));
-  assert.deepEqual(events.map((e) => e.id), ['secdsm-2026-11-05', 'secdsm-2026-12-03', 'secdsm-2027-01-07']);
+  assert.deepEqual(
+    events.map((e) => e.id),
+    ['secdsm-2026-11-05', 'secdsm-2026-12-03', 'secdsm-2027-01-07'],
+  );
 
   const [one, two, tba] = events;
   assert.equal(one.title, 'Tokens, Tickets, & Thievery');
@@ -35,7 +38,11 @@ test('secdsm reads meetings, talks, venue and door time from the homepage', asyn
 test('secdsm fails loudly when the page layout changes', async () => {
   await assert.rejects(secdsm({ id: 'secdsm' }, serve('<html>redesigned</html>')), /no schedule blocks/);
   // The venue box: without it, door time, venue and address would quietly go blank.
-  for (const [marker, broken] of [['doors=', 'opens='], ['addr=', 'where='], ['hosts us', 'welcomes us']]) {
+  for (const [marker, broken] of [
+    ['doors=', 'opens='],
+    ['addr=', 'where='],
+    ['hosts us', 'welcomes us'],
+  ]) {
     await assert.rejects(secdsm({ id: 'secdsm' }, serve(fixture('secdsm.html').replaceAll(marker, broken))), /venue box/, marker);
   }
   const noDates = fixture('secdsm.html').replaceAll('secdsm-job-date', 'secdsm-job-when');
@@ -44,19 +51,25 @@ test('secdsm fails loudly when the page layout changes', async () => {
 
 const PMI = { id: 'pmi', website: 'https://pmi-centraliowa.org/' };
 const pmiSite = (page = fixture('pmi-event.html')) => ({
-  get: async (url) => (url.includes('pmiAjaxGetEvent')
-    ? JSON.stringify([{ id: 47587, name: ' AI as Your Partner ', timeStartRaw: '2026-10-27 17:30:00.0', timeEndRaw: '2026-10-27 20:00:00.0' }])
-    : page),
+  get: async (url) =>
+    url.includes('pmiAjaxGetEvent')
+      ? JSON.stringify([{ id: 47587, name: ' AI as Your Partner ', timeStartRaw: '2026-10-27 17:30:00.0', timeEndRaw: '2026-10-27 20:00:00.0' }])
+      : page,
 });
 
 test('pmi-chapter maps the JSON calendar to events in local time, with venue from the event page', async () => {
   const [e] = await pmiChapter(PMI, pmiSite());
   const { description, ...rest } = e;
   assert.deepEqual(rest, {
-    id: 'pmi-47587', sourceId: '47587', title: 'AI as Your Partner',
-    start: '2026-10-27T22:30:00.000Z', end: '2026-10-28T01:00:00.000Z', allDay: false,
+    id: 'pmi-47587',
+    sourceId: '47587',
+    title: 'AI as Your Partner',
+    start: '2026-10-27T22:30:00.000Z',
+    end: '2026-10-28T01:00:00.000Z',
+    allDay: false,
     url: 'https://pmi-centraliowa.org/calendar?eventId=47587',
-    venue: "Christopher's", address: '2816 Beaver Avenue, Des Moines, IA 50310',
+    venue: "Christopher's",
+    address: '2816 Beaver Avenue, Des Moines, IA 50310',
   });
   await assert.rejects(pmiChapter(PMI, serve('{"error":1}')), /unexpected response/);
 });
@@ -71,7 +84,10 @@ test('pmi-chapter reads the full write-up, minus the date the card already shows
 });
 
 test('pmi-chapter allows an empty Location box', async () => {
-  const empty = fixture('pmi-event.html').replace(/(data-label="location"[^>]*>)[\s\S]*?<\/div>/, '$1<p class="page-split-right-side-header h5 underlined bold bigger">Location</p></div>');
+  const empty = fixture('pmi-event.html').replace(
+    /(data-label="location"[^>]*>)[\s\S]*?<\/div>/,
+    '$1<p class="page-split-right-side-header h5 underlined bold bigger">Location</p></div>',
+  );
   const [e] = await pmiChapter(PMI, pmiSite(empty));
   assert.equal(e.venue, null);
   assert.equal(e.address, null);
@@ -98,13 +114,16 @@ const iibaSite = (pages = {}) => ({
   now: Date.parse('2026-10-12T12:00:00Z'),
   since: Date.parse('2026-01-01T00:00:00Z'),
   get: async (url) => {
-    const body = url in pages ? pages[url] : {
-      'https://centraliowa.iiba.org/calendar-feed': fixture('iiba-feed.ics'),
-      'https://centraliowa.iiba.org/Events': fixture('iiba-events.html'),
-      'https://centraliowa.iiba.org/Events/iiba-trunk-or-treat': fixture('iiba-event.html'),
-      [iibaPage('iiba-trunk-or-treat')]: fixture('iiba-event.html'),
-      [iibaPage('ai-as-your-ba-partner-plan-faster.-lead-smarter.-deliver-better.')]: partnerPage,
-    }[url];
+    const body =
+      url in pages
+        ? pages[url]
+        : {
+            'https://centraliowa.iiba.org/calendar-feed': fixture('iiba-feed.ics'),
+            'https://centraliowa.iiba.org/Events': fixture('iiba-events.html'),
+            'https://centraliowa.iiba.org/Events/iiba-trunk-or-treat': fixture('iiba-event.html'),
+            [iibaPage('iiba-trunk-or-treat')]: fixture('iiba-event.html'),
+            [iibaPage('ai-as-your-ba-partner-plan-faster.-lead-smarter.-deliver-better.')]: partnerPage,
+          }[url];
     if (body == null) throw new Error(`404 from ${url}`);
     return body;
   },
@@ -112,14 +131,22 @@ const iibaSite = (pages = {}) => ({
 
 test('iiba-chapter reads the feed, with link and venue from each event page', async () => {
   const events = await iibaChapter(IIBA, iibaSite());
-  assert.deepEqual(events.map((e) => e.title), ['AI Tips & Tricks - Using AI as a Force Multiplier', PARTNER, 'IIBA Trunk or Treat']);
+  assert.deepEqual(
+    events.map((e) => e.title),
+    ['AI Tips & Tricks - Using AI as a Force Multiplier', PARTNER, 'IIBA Trunk or Treat'],
+  );
   const [tips, partner, trunk] = events;
   const { description, ...rest } = trunk;
   assert.deepEqual(rest, {
-    id: 'iiba-4015ea6b-10a3-436a-8d9f-5ebdc822aa32', sourceId: '4015ea6b-10a3-436a-8d9f-5ebdc822aa32',
-    title: 'IIBA Trunk or Treat', start: '2026-10-22T22:00:00.000Z', end: '2026-10-23T01:00:00.000Z', allDay: false,
+    id: 'iiba-4015ea6b-10a3-436a-8d9f-5ebdc822aa32',
+    sourceId: '4015ea6b-10a3-436a-8d9f-5ebdc822aa32',
+    title: 'IIBA Trunk or Treat',
+    start: '2026-10-22T22:00:00.000Z',
+    end: '2026-10-23T01:00:00.000Z',
+    allDay: false,
     url: iibaPage('iiba-trunk-or-treat'),
-    venue: 'Genesis Health Clubs', address: '4875 Mills Civic Parkway, West Des Moines, IA',
+    venue: 'Genesis Health Clubs',
+    address: '4875 Mills Civic Parkway, West Des Moines, IA',
   });
   // The slug keeps the periods from the title.
   assert.equal(partner.url, iibaPage('ai-as-your-ba-partner-plan-faster.-lead-smarter.-deliver-better.'));
@@ -151,11 +178,20 @@ test('iiba-chapter drops the lines the card already shows from the write-up', as
 });
 
 test('iiba-chapter fails loudly when the feed or pages change', async () => {
-  await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/calendar-feed': '<html>Just a moment...</html>' })), /did not return a calendar/);
+  await assert.rejects(
+    iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/calendar-feed': '<html>Just a moment...</html>' })),
+    /did not return a calendar/,
+  );
   await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/calendar-feed': 'BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n' })), /has no events/);
   const noGuess = { [iibaPage('iiba-trunk-or-treat')]: null };
-  await assert.rejects(iibaChapter(IIBA, iibaSite({ ...noGuess, 'https://centraliowa.iiba.org/Events': fixture('iiba-events.html').replaceAll('EAS-Name', 'EAS-Title') })), /no events listed/);
-  await assert.rejects(iibaChapter(IIBA, iibaSite({ [iibaPage('iiba-trunk-or-treat')]: fixture('iiba-event.html').replace('>Where<', '>Location<') })), /no Where box/);
+  await assert.rejects(
+    iibaChapter(IIBA, iibaSite({ ...noGuess, 'https://centraliowa.iiba.org/Events': fixture('iiba-events.html').replaceAll('EAS-Name', 'EAS-Title') })),
+    /no events listed/,
+  );
+  await assert.rejects(
+    iibaChapter(IIBA, iibaSite({ [iibaPage('iiba-trunk-or-treat')]: fixture('iiba-event.html').replace('>Where<', '>Location<') })),
+    /no Where box/,
+  );
   const oddLocation = fixture('iiba-feed.ics').replace('3001 Westown Parkway 3001 Westown Parkway', '3001 Westown Parkway');
   await assert.rejects(iibaChapter(IIBA, iibaSite({ 'https://centraliowa.iiba.org/calendar-feed': oddLocation })), /unexpected location/);
 });
@@ -171,12 +207,15 @@ const issaApril = fixture('issa-event.html')
 const issaSite = (pages = {}) => ({
   now: Date.parse('2026-10-12T12:00:00Z'),
   since: Date.parse('2026-01-01T00:00:00Z'),
-  get: async (url) => pages[url] ?? {
-    'https://issadesmoines.org/events/': fixture('issa-events.html'),
-    [issaPage('september-quarterly-issa-meeting')]: fixture('issa-event.html'),
-    [issaPage('coming-soon-information-about-a-fall-event')]: fixture('issa-event-coming-soon.html'),
-    [issaPage('april-issa-des-moines-chapter-meeting')]: issaApril,
-  }[url] ?? assert.fail(`unexpected fetch ${url}`),
+  get: async (url) =>
+    pages[url] ??
+    {
+      'https://issadesmoines.org/events/': fixture('issa-events.html'),
+      [issaPage('september-quarterly-issa-meeting')]: fixture('issa-event.html'),
+      [issaPage('coming-soon-information-about-a-fall-event')]: fixture('issa-event-coming-soon.html'),
+      [issaPage('april-issa-des-moines-chapter-meeting')]: issaApril,
+    }[url] ??
+    assert.fail(`unexpected fetch ${url}`),
 });
 
 test('issa-chapter reads each listed meeting page, skipping posts with no date yet', async () => {
@@ -184,10 +223,15 @@ test('issa-chapter reads each listed meeting page, skipping posts with no date y
   assert.equal(more.length, 0);
   const { description, ...rest } = sept;
   assert.deepEqual(rest, {
-    id: 'issa-september-quarterly-issa-meeting', sourceId: 'september-quarterly-issa-meeting',
-    title: 'September Quarterly ISSA Meeting', start: '2026-09-29T16:30:00.000Z', end: '2026-09-29T18:00:00.000Z', allDay: false,
+    id: 'issa-september-quarterly-issa-meeting',
+    sourceId: 'september-quarterly-issa-meeting',
+    title: 'September Quarterly ISSA Meeting',
+    start: '2026-09-29T16:30:00.000Z',
+    end: '2026-09-29T18:00:00.000Z',
+    allDay: false,
     url: issaPage('september-quarterly-issa-meeting'),
-    venue: 'Principal Financial Group', address: '750 Park Street, Des Moines IA 50309',
+    venue: 'Principal Financial Group',
+    address: '750 Park Street, Des Moines IA 50309',
   });
   assert.match(description, /^\*\*Presenting:\*\* Lucy Berry & Kaylee Fletcher \(DEFCON Talk\)/);
   assert.match(description, /\n\nWhat:\s+Free lunch/);
@@ -197,7 +241,10 @@ test('issa-chapter reads each listed meeting page, skipping posts with no date y
 
 test('issa-chapter skips meetings before the cutoff', async () => {
   const events = await issaChapter(ISSA, { ...issaSite(), since: Date.parse('2026-06-01T00:00:00Z') });
-  assert.deepEqual(events.map((e) => e.sourceId), ['september-quarterly-issa-meeting']);
+  assert.deepEqual(
+    events.map((e) => e.sourceId),
+    ['september-quarterly-issa-meeting'],
+  );
 });
 
 test('issa-chapter fails loudly when the pages change', async () => {
@@ -222,25 +269,52 @@ test('eventbrite reads every upcoming event on the organizer page, in local time
   assert.equal(more.length, 0, 'a cancelled event is left out');
   const { image, ...rest } = hackathon;
   assert.deepEqual(rest, {
-    id: 'dsmhack-2001000000001', sourceId: '2001000000001',
-    title: '13th Annual Des Moines Charity Hackathon', start: '2027-05-13T22:30:00.000Z', end: '2027-05-16T00:30:00.000Z', allDay: false,
+    id: 'dsmhack-2001000000001',
+    sourceId: '2001000000001',
+    title: '13th Annual Des Moines Charity Hackathon',
+    start: '2027-05-13T22:30:00.000Z',
+    end: '2027-05-16T00:30:00.000Z',
+    allDay: false,
     url: 'https://www.eventbrite.com/e/13th-annual-des-moines-charity-hackathon-tickets-2001000000001',
     description: 'Nonprofits and volunteers come together to build practical tech solutions that strengthen our community in just 48 hours.',
-    venue: 'West48', address: '1601 48th St, West Des Moines, IA 50266',
+    venue: 'West48',
+    address: '1601 48th St, West Des Moines, IA 50266',
   });
   assert.match(image, /^https:\/\/img\.evbuc\.com\//);
-  assert.deepEqual([hunger.venue, hunger.address], [null, '7200 Northwest 62nd Avenue, Johnston, IA 50131'], 'a venue named by its street has no separate name');
+  assert.deepEqual(
+    [hunger.venue, hunger.address],
+    [null, '7200 Northwest 62nd Avenue, Johnston, IA 50131'],
+    'a venue named by its street has no separate name',
+  );
   assert.deepEqual([info.venue, info.address, info.online], ['Online', null, true]);
 });
 
 test('eventbrite allows an organizer with nothing scheduled', async () => {
-  assert.deepEqual(await eventbrite(DSMHACK, ebPage(() => [])), []);
+  assert.deepEqual(
+    await eventbrite(
+      DSMHACK,
+      ebPage(() => []),
+    ),
+    [],
+  );
 });
 
 test('eventbrite fails loudly when the page changes', async () => {
   await assert.rejects(eventbrite(DSMHACK, serve('<html>redesigned</html>')), /no event list/);
-  await assert.rejects(eventbrite(DSMHACK, ebPage(([e]) => [{ ...e, start_date: undefined }])), /unreadable event/);
-  await assert.rejects(eventbrite(DSMHACK, ebPage(([e]) => [{ ...e, timezone: 'America/New_York' }])), /America\/New_York/);
+  await assert.rejects(
+    eventbrite(
+      DSMHACK,
+      ebPage(([e]) => [{ ...e, start_date: undefined }]),
+    ),
+    /unreadable event/,
+  );
+  await assert.rejects(
+    eventbrite(
+      DSMHACK,
+      ebPage(([e]) => [{ ...e, timezone: 'America/New_York' }]),
+    ),
+    /America\/New_York/,
+  );
 });
 
 // The feed fixture holds four TechBrews (Sept–Dec 2026) and one CIO
@@ -262,7 +336,10 @@ const techbrewSite = (pages = {}) => {
 test('tai-techbrew reads upcoming TechBrews with local times and venue from the event page', async () => {
   const site = techbrewSite();
   const events = await taiTechbrew({ id: 'techbrew' }, site);
-  assert.deepEqual(events.map((e) => e.id), ['techbrew-techbrew-october-2026', 'techbrew-techbrew-november-2026', 'techbrew-techbrew-december-2026']);
+  assert.deepEqual(
+    events.map((e) => e.id),
+    ['techbrew-techbrew-october-2026', 'techbrew-techbrew-november-2026', 'techbrew-techbrew-december-2026'],
+  );
 
   const [oct, nov] = events;
   assert.equal(oct.title, 'TechBrew – October 2026');
@@ -297,7 +374,10 @@ test('tai-techbrew skips TechBrews outside the Des Moines metro', async () => {
   const url = 'https://www.technologyiowa.org/events/techbrew-november-2026/';
   const cedarRapids = fixture('tai-techbrew-event.html').replace('22 9th Street, Des Moines.', '333 1st St SE, Cedar Rapids.');
   const events = await taiTechbrew({ id: 'techbrew' }, techbrewSite({ [url]: cedarRapids }));
-  assert.deepEqual(events.map((e) => e.sourceId), ['techbrew-october-2026', 'techbrew-december-2026']);
+  assert.deepEqual(
+    events.map((e) => e.sourceId),
+    ['techbrew-october-2026', 'techbrew-december-2026'],
+  );
 });
 
 test('tai-techbrew counts the wider metro: Norwalk, Bondurant, Indianola, Polk City', async () => {
@@ -312,7 +392,10 @@ test('tai-techbrew counts the wider metro: Norwalk, Bondurant, Indianola, Polk C
 test('tai-techbrew fails loudly when no TechBrew passes the city check', async () => {
   const noCity = fixture('tai-techbrew-event.html').replace('22 9th Street, Des Moines.', '22 9th Street Des Moines.');
   const site = techbrewSite();
-  await assert.rejects(taiTechbrew({ id: 'techbrew' }, { ...site, get: async (u) => (u === FEED ? site.get(u) : noCity) }), /every TechBrew was outside the metro/);
+  await assert.rejects(
+    taiTechbrew({ id: 'techbrew' }, { ...site, get: async (u) => (u === FEED ? site.get(u) : noCity) }),
+    /every TechBrew was outside the metro/,
+  );
 });
 
 test('tai-techbrew fails loudly when the feed or event page changes', async () => {
@@ -320,7 +403,10 @@ test('tai-techbrew fails loudly when the feed or event page changes', async () =
   const site = techbrewSite({ 'https://www.technologyiowa.org/events/techbrew-october-2026/': '<html>redesigned</html>' });
   await assert.rejects(taiTechbrew({ id: 'techbrew' }, site), /no venue\/location/);
   const noBody = fixture('tai-techbrew-event.html').replace('<!--end .sc_event_details-->', '');
-  await assert.rejects(taiTechbrew({ id: 'techbrew' }, techbrewSite({ 'https://www.technologyiowa.org/events/techbrew-october-2026/': noBody })), /no event text/);
+  await assert.rejects(
+    taiTechbrew({ id: 'techbrew' }, techbrewSite({ 'https://www.technologyiowa.org/events/techbrew-october-2026/': noBody })),
+    /no event text/,
+  );
 });
 
 test('html helpers decode entities and strip tags', () => {
@@ -331,12 +417,16 @@ test('html helpers decode entities and strip tags', () => {
 // The Iowans of Things homepage, and each event's own page (a bare one
 // unless given).
 const iotSite = (home = fixture('iowans-of-things.html'), pages = {}) => ({
-  get: async (url) => (url === 'https://iowansofthings.com/' ? home : pages[url] ?? '<div class="post-content"></div>'),
+  get: async (url) => (url === 'https://iowansofthings.com/' ? home : (pages[url] ?? '<div class="post-content"></div>')),
 });
 
 test('iowans-of-things reads the Upcoming Events section of the homepage', async () => {
   const events = await iowansOfThings({ id: 'iot', website: 'https://iowansofthings.com/' }, iotSite());
-  assert.deepEqual(events.map((e) => e.id), ['iot-ff-october-2026', 'iot-hh-november-2026'], 'past events are left out');
+  assert.deepEqual(
+    events.map((e) => e.id),
+    ['iot-ff-october-2026', 'iot-hh-november-2026'],
+    'past events are left out',
+  );
   const [ff, hh] = events;
   assert.equal(ff.title, 'Firmware Fellowship - October 2026');
   assert.equal(ff.start, '2026-10-09T00:00:00.000Z', '7pm CDT');
@@ -351,17 +441,21 @@ test('iowans-of-things reads the Upcoming Events section of the homepage', async
   // No " - " in the place: the address starts at the street number.
   assert.equal(hh.venue, 'Maple Studios');
   assert.equal(hh.address, '1207 Maple Street, West Des Moines, IA');
-  assert.equal(hh.description, 'Bring a board.', "not the homepage's \"Learn more and register…\" link after it");
+  assert.equal(hh.description, 'Bring a board.', 'not the homepage\'s "Learn more and register…" link after it');
 });
 
 test("iowans-of-things brings over the bulleted sections of the event's own page", async () => {
   const pages = { 'https://iowansofthings.com/hh-november-2026': fixture('iowans-of-things-event.html') };
   const [, hh] = await iowansOfThings({ id: 'iot', website: 'https://iowansofthings.com/' }, iotSite(undefined, pages));
-  assert.equal(hh.description, [
-    'Bring a board.',
-    '## Event Highlights\n• **Technical Talk:** Embedded in Motion\n• **Networking:** Mingle with like-minded individuals',
-    '## Event Agenda\n• 6:30 - Arrive, park, grab refreshments\n• 7:00 - Tech Talk & Open Discussion',
-  ].join('\n\n'), 'not the RSVP form, sponsor logos, parking notes or the page footer');
+  assert.equal(
+    hh.description,
+    [
+      'Bring a board.',
+      '## Event Highlights\n• **Technical Talk:** Embedded in Motion\n• **Networking:** Mingle with like-minded individuals',
+      '## Event Agenda\n• 6:30 - Arrive, park, grab refreshments\n• 7:00 - Tech Talk & Open Discussion',
+    ].join('\n\n'),
+    'not the RSVP form, sponsor logos, parking notes or the page footer',
+  );
 });
 
 test('iowans-of-things never ends an event before it starts', async () => {
@@ -398,14 +492,18 @@ test('secdsm says "at" inside a venue name written with "@"', async () => {
 test('safeLinks keeps only http(s) event links and photos', () => {
   assert.equal(httpUrl('https://www.meetup.com/pyowa/events/1/'), 'https://www.meetup.com/pyowa/events/1/');
   assert.equal(httpUrl('HTTP://example.com/'), 'HTTP://example.com/');
-  for (const bad of ['javascript:alert(1)', ' JavaScript:alert(1)', 'data:text/html,hi', '//evil.example/', '/relative', null, undefined, 42]) assert.equal(httpUrl(bad), null, String(bad));
+  for (const bad of ['javascript:alert(1)', ' JavaScript:alert(1)', 'data:text/html,hi', '//evil.example/', '/relative', null, undefined, 42])
+    assert.equal(httpUrl(bad), null, String(bad));
 
   const group = { website: 'https://pyowa.org/' };
-  const [bad, good, noImage] = safeLinks([
-    { id: 'a', url: 'javascript:alert(1)', image: 'data:image/svg+xml,<svg/>' },
-    { id: 'b', url: 'https://example.com/e', image: 'https://example.com/p.jpg' },
-    { id: 'c', url: null },
-  ], group);
+  const [bad, good, noImage] = safeLinks(
+    [
+      { id: 'a', url: 'javascript:alert(1)', image: 'data:image/svg+xml,<svg/>' },
+      { id: 'b', url: 'https://example.com/e', image: 'https://example.com/p.jpg' },
+      { id: 'c', url: null },
+    ],
+    group,
+  );
   assert.deepEqual(bad, { id: 'a', url: 'https://pyowa.org/', image: null }, "a bad link falls back to the group's site");
   assert.deepEqual(good, { id: 'b', url: 'https://example.com/e', image: 'https://example.com/p.jpg' });
   assert.ok(!('image' in noImage), 'no image key is added, so cache files stay byte-stable');
@@ -420,72 +518,132 @@ const lumaApi = (edit = (j) => j) => ({
   },
 });
 
-test('luma reads an event\'s time, place, photo, RSVPs and write-up', async () => {
+test("luma reads an event's time, place, photo, RSVPs and write-up", async () => {
   const { description, ...rest } = await readLuma(LUMA, lumaApi());
   assert.deepEqual(rest, {
     title: 'Github Dev Days | Des Moines, Iowa, USA',
-    start: '2026-10-20T20:00:00.000Z', end: '2026-10-20T22:00:00.000Z', allDay: false,
+    start: '2026-10-20T20:00:00.000Z',
+    end: '2026-10-20T22:00:00.000Z',
+    allDay: false,
     url: LUMA,
-    venue: 'Lean Techniques Office', address: '9131 Northpark Dr, Johnston, IA 50131',
+    venue: 'Lean Techniques Office',
+    address: '9131 Northpark Dr, Johnston, IA 50131',
     image: 'https://images.lumacdn.com/uploads/6c/d3c66d47-fef4-4f9d-b0b0-03ec162c8b3e.png',
     going: 14,
   });
   assert.match(description, /^✨ Dev Days is a global/);
   assert.match(description, /\n\nDisclaimer: this event utilizes AI credits\./, 'a quote is a paragraph');
   assert.match(description, /\n\n## Code of Conduct\n\n/);
-  assert.match(description, /\*\*Event Code of Conduct\*\*: https:\/\/github\.com\/github\/dev-days\/blob\/main\/EVENT_CODE_OF_CONDUCT\.md$/, 'a bare link stays bare');
+  assert.match(
+    description,
+    /\*\*Event Code of Conduct\*\*: https:\/\/github\.com\/github\/dev-days\/blob\/main\/EVENT_CODE_OF_CONDUCT\.md$/,
+    'a bare link stays bare',
+  );
 });
 
 test('luma: an online event has no place, and hidden RSVPs stay hidden', async () => {
-  const online = await readLuma(LUMA, lumaApi((j) => ({ ...j, data: { ...j.data, event: { ...j.data.event, location_type: 'online', hide_rsvp: true } } })));
+  const online = await readLuma(
+    LUMA,
+    lumaApi((j) => ({ ...j, data: { ...j.data, event: { ...j.data.event, location_type: 'online', hide_rsvp: true } } })),
+  );
   assert.equal(online.online, true);
   assert.ok(!('venue' in online) && !('address' in online) && !('going' in online));
 });
 
 // Place shapes seen on real Luma events (Oct 2026).
 const lumaPlace = async (geo) => {
-  const e = await readLuma(LUMA, lumaApi((j) => {
-    j.data.event.geo_address_info = geo;
-    return j;
-  }));
+  const e = await readLuma(
+    LUMA,
+    lumaApi((j) => {
+      j.data.event.geo_address_info = geo;
+      return j;
+    }),
+  );
   return [e.venue, e.address];
 };
 
 test("luma: Google's place name is the venue, and the organizer's note only when it names one", async () => {
-  assert.deepEqual(await lumaPlace({
-    address: 'CrossRoads Shooting Sports', description: 'Parking is available and free.',
-    full_address: 'CrossRoads Shooting Sports, 5550 NW Johnston Dr, Johnston, IA 50131, USA',
-  }), ['CrossRoads Shooting Sports', '5550 NW Johnston Dr, Johnston, IA 50131'], 'a parking note is not a venue');
-  assert.deepEqual(await lumaPlace({
-    address: 'Sheslow Auditorium', description: '', full_address: 'Sheslow Auditorium, 2507 University Ave, Des Moines, IA 50311, USA',
-  }), ['Sheslow Auditorium', '2507 University Ave, Des Moines, IA 50311'], 'the name is said once, not again in the address');
-  assert.deepEqual(await lumaPlace({ address: '315 5th St', short_address: '315 5th St, West Des Moines', full_address: '315 5th St, West Des Moines, IA 50265, USA' }), [null, '315 5th St, West Des Moines, IA 50265']);
+  assert.deepEqual(
+    await lumaPlace({
+      address: 'CrossRoads Shooting Sports',
+      description: 'Parking is available and free.',
+      full_address: 'CrossRoads Shooting Sports, 5550 NW Johnston Dr, Johnston, IA 50131, USA',
+    }),
+    ['CrossRoads Shooting Sports', '5550 NW Johnston Dr, Johnston, IA 50131'],
+    'a parking note is not a venue',
+  );
+  assert.deepEqual(
+    await lumaPlace({
+      address: 'Sheslow Auditorium',
+      description: '',
+      full_address: 'Sheslow Auditorium, 2507 University Ave, Des Moines, IA 50311, USA',
+    }),
+    ['Sheslow Auditorium', '2507 University Ave, Des Moines, IA 50311'],
+    'the name is said once, not again in the address',
+  );
+  assert.deepEqual(
+    await lumaPlace({ address: '315 5th St', short_address: '315 5th St, West Des Moines', full_address: '315 5th St, West Des Moines, IA 50265, USA' }),
+    [null, '315 5th St, West Des Moines, IA 50265'],
+  );
   assert.deepEqual(await lumaPlace({ city_state: 'Des Moines, IA', mode: 'obfuscated' }), [null, 'Des Moines, IA'], 'address for guests only');
-  assert.deepEqual(await lumaPlace({ address: 'Microsoft Memphis Office', short_address: null, full_address: null }), ['Microsoft Memphis Office', null], 'typed in by hand');
-  assert.deepEqual(await lumaPlace({
-    address: 'Via Jacopo Durandi, 10', short_address: 'Via Jacopo Durandi, 10, Torino', description: 'Aula 10',
-    full_address: 'Via Jacopo Durandi, 10, 10144 Torino TO, Italy',
-  }), ['Aula 10', 'Via Jacopo Durandi, 10, 10144 Torino TO, Italy'], 'a street with no number first is still a street');
+  assert.deepEqual(
+    await lumaPlace({ address: 'Microsoft Memphis Office', short_address: null, full_address: null }),
+    ['Microsoft Memphis Office', null],
+    'typed in by hand',
+  );
+  assert.deepEqual(
+    await lumaPlace({
+      address: 'Via Jacopo Durandi, 10',
+      short_address: 'Via Jacopo Durandi, 10, Torino',
+      description: 'Aula 10',
+      full_address: 'Via Jacopo Durandi, 10, 10144 Torino TO, Italy',
+    }),
+    ['Aula 10', 'Via Jacopo Durandi, 10, 10144 Torino TO, Italy'],
+    'a street with no number first is still a street',
+  );
 });
 
 test('luma fails loudly when Luma changes its response', async () => {
   await assert.rejects(readLuma(LUMA, serve('<html>Not found</html>')), /did not return JSON/);
-  await assert.rejects(readLuma(LUMA, lumaApi((j) => ({ ...j, kind: 'calendar' }))), /unexpected response/);
-  await assert.rejects(readLuma(LUMA, lumaApi((j) => {
-    delete j.data.event.start_at;
-    return j;
-  })), /unexpected response/);
+  await assert.rejects(
+    readLuma(
+      LUMA,
+      lumaApi((j) => ({ ...j, kind: 'calendar' })),
+    ),
+    /unexpected response/,
+  );
+  await assert.rejects(
+    readLuma(
+      LUMA,
+      lumaApi((j) => {
+        delete j.data.event.start_at;
+        return j;
+      }),
+    ),
+    /unexpected response/,
+  );
   await assert.rejects(readLuma('https://example.com/04xz1l03', lumaApi()), /not a Luma event link/);
 });
 
 test('luma descriptions keep lists, line breaks and links', () => {
   const text = (t, marks) => ({ type: 'text', text: t, ...(marks && { marks }) });
   const p = (...content) => ({ type: 'paragraph', content });
-  assert.equal(mirrorText({ content: [
-    p(text('Line one'), { type: 'hard_break' }, text('RSVP '), text('here', [{ type: 'link', attrs: { href: 'https://x.test/' } }])),
-    { type: 'bullet_list', content: [{ type: 'list_item', content: [p(text('Pizza'))] }, { type: 'list_item', content: [p(text('Talks'))] }] },
-    { type: 'ordered_list', content: [{ type: 'list_item', content: [p(text('Doors'))] }] },
-    p(text('bad', [{ type: 'link', attrs: { href: 'javascript:alert(1)' } }])),
-    { type: 'horizontal_rule' },
-  ] }), 'Line one\nRSVP [here](https://x.test/)\n\n- Pizza\n- Talks\n\n1. Doors\n\nbad');
+  assert.equal(
+    mirrorText({
+      content: [
+        p(text('Line one'), { type: 'hard_break' }, text('RSVP '), text('here', [{ type: 'link', attrs: { href: 'https://x.test/' } }])),
+        {
+          type: 'bullet_list',
+          content: [
+            { type: 'list_item', content: [p(text('Pizza'))] },
+            { type: 'list_item', content: [p(text('Talks'))] },
+          ],
+        },
+        { type: 'ordered_list', content: [{ type: 'list_item', content: [p(text('Doors'))] }] },
+        p(text('bad', [{ type: 'link', attrs: { href: 'javascript:alert(1)' } }])),
+        { type: 'horizontal_rule' },
+      ],
+    }),
+    'Line one\nRSVP [here](https://x.test/)\n\n- Pizza\n- Talks\n\n1. Doors\n\nbad',
+  );
 });

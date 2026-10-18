@@ -15,21 +15,30 @@ export const NOW = '2026-10-14T14:00:00Z';
 // with the CORS header Meetup's photo host sends.
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
 export const PHOTOS = 'https://secure.meetupstatic.com/**';
-export const fakePhotos = (target) => target.route(PHOTOS, (route) => route.fulfill({ contentType: 'image/png', headers: { 'access-control-allow-origin': '*' }, body: PNG }));
+export const fakePhotos = (target) =>
+  target.route(PHOTOS, (route) => route.fulfill({ contentType: 'image/png', headers: { 'access-control-allow-origin': '*' }, body: PNG }));
 
 export const test = base.extend({
   page: async ({ page, baseURL }, use) => {
     const errors = [];
-    page.on('console', (msg) => { if (msg.type() === 'error') errors.push(`console: ${msg.text()}`); });
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') errors.push(`console: ${msg.text()}`);
+    });
     page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
-    await page.route((url) => !url.href.startsWith(baseURL) && !url.protocol.startsWith('data'), (route) => route.abort());
+    await page.route(
+      (url) => !url.href.startsWith(baseURL) && !url.protocol.startsWith('data'),
+      (route) => route.abort(),
+    );
     await fakePhotos(page);
     const csp = /^\s*Content-Security-Policy:\s*(.+)$/m.exec(fs.readFileSync(new URL('../../dist-e2e/_headers', import.meta.url), 'utf8'))[1];
-    await page.route((url) => url.href.startsWith(baseURL), async (route) => {
-      if (route.request().resourceType() !== 'document') return route.fallback();
-      const response = await route.fetch();
-      await route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': csp } });
-    });
+    await page.route(
+      (url) => url.href.startsWith(baseURL),
+      async (route) => {
+        if (route.request().resourceType() !== 'document') return route.fallback();
+        const response = await route.fetch();
+        await route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': csp } });
+      },
+    );
     await page.clock.install({ time: new Date(NOW) });
     await use(page);
     expect(errors, 'console errors on the page').toEqual([]);

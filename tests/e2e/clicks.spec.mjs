@@ -8,7 +8,10 @@ test.beforeEach(async ({ page }) => {
 
 const beacons = (page) => {
   const sent = [];
-  page.route('**/api/click', (route) => { sent.push(JSON.parse(route.request().postData())); route.fulfill({ status: 204 }); });
+  page.route('**/api/click', (route) => {
+    sent.push(JSON.parse(route.request().postData()));
+    route.fulfill({ status: 204 });
+  });
   return sent;
 };
 

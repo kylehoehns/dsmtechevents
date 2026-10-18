@@ -45,7 +45,13 @@ export function assertion({ client_email, private_key }, now = Date.now()) {
 const pct = (n) => `${(n * 100).toFixed(1)}%`;
 const pos = (n) => n.toFixed(1);
 // Paths read better than full URLs in a table.
-const shortPage = (url) => { try { return new URL(url).pathname + new URL(url).search; } catch { return url; } };
+const shortPage = (url) => {
+  try {
+    return new URL(url).pathname + new URL(url).search;
+  } catch {
+    return url;
+  }
+};
 
 // Pure: Search Console rows in, Markdown out. totals are { clicks, impressions,
 // ctr, position } (or undefined with no data); queries and pages are rows with keys[0].
@@ -57,24 +63,39 @@ export function renderSearch({ week, prev, totals, prevTotals, queries, pages })
   }
   const cell = (now, before) => `**${num(now)}** ${trend(now, before)}`.trim();
   out.push(
-    table(['Shown in Google', 'Clicks', 'Click rate', 'Average position'], [[
-      cell(totals.impressions, prevTotals?.impressions),
-      cell(totals.clicks, prevTotals?.clicks),
-      pct(totals.ctr),
-      `**${pos(totals.position)}**${prevTotals?.impressions ? ` (was ${pos(prevTotals.position)})` : ''}`,
-    ]]),
+    table(
+      ['Shown in Google', 'Clicks', 'Click rate', 'Average position'],
+      [
+        [
+          cell(totals.impressions, prevTotals?.impressions),
+          cell(totals.clicks, prevTotals?.clicks),
+          pct(totals.ctr),
+          `**${pos(totals.position)}**${prevTotals?.impressions ? ` (was ${pos(prevTotals.position)})` : ''}`,
+        ],
+      ],
+    ),
     '',
     `${week.startDate} to ${week.endDate}; ▲▼ compare with the week from ${prev.startDate}. Google's numbers settle about three days late. A lower position is better: 1 is the top result.`,
     '',
     queries.length
-      ? fold(`<b>Searches that showed the site</b>: top is "${queries[0].keys[0]}", shown ${num(queries[0].impressions)} times`,
-        'Google leaves out rare searches, so these add up to less than the total.\n\n'
-        + table(['Search', 'Clicks', 'Shown', 'Click rate', 'Position'], queries.map((r) => [r.keys[0], num(r.clicks), num(r.impressions), pct(r.ctr), pos(r.position)])))
+      ? fold(
+          `<b>Searches that showed the site</b>: top is "${queries[0].keys[0]}", shown ${num(queries[0].impressions)} times`,
+          'Google leaves out rare searches, so these add up to less than the total.\n\n' +
+            table(
+              ['Search', 'Clicks', 'Shown', 'Click rate', 'Position'],
+              queries.map((r) => [r.keys[0], num(r.clicks), num(r.impressions), pct(r.ctr), pos(r.position)]),
+            ),
+        )
       : '_No searches listed yet._',
     '',
     '### Pages people reached from Google',
     '',
-    pages.length ? table(['Page', 'Clicks', 'Shown', 'Position'], pages.map((r) => [`\`${shortPage(r.keys[0])}\``, num(r.clicks), num(r.impressions), pos(r.position)])) : '_None yet._',
+    pages.length
+      ? table(
+          ['Page', 'Clicks', 'Shown', 'Position'],
+          pages.map((r) => [`\`${shortPage(r.keys[0])}\``, num(r.clicks), num(r.impressions), pos(r.position)]),
+        )
+      : '_None yet._',
     '',
   );
   return out.join('\n');
@@ -96,14 +117,21 @@ async function query(access, site, body) {
     headers: { authorization: `Bearer ${access}`, 'content-type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) { const err = new Error(`Search Console ${site}: ${res.status} ${await res.text()}`); err.status = res.status; throw err; }
+  if (!res.ok) {
+    const err = new Error(`Search Console ${site}: ${res.status} ${await res.text()}`);
+    err.status = res.status;
+    throw err;
+  }
   return (await res.json()).rows ?? [];
 }
 
 async function main() {
   // The run's summary page, and the log too: the summary can't be read
   // from the command line, the log can (gh run view --log).
-  const out = (md) => { console.log(md); if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${md}\n`); };
+  const out = (md) => {
+    console.log(md);
+    if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${md}\n`);
+  };
   if (!process.env.GSC_SERVICE_ACCOUNT) {
     out('## Google Search\n\n_Not set up: add the GSC_SERVICE_ACCOUNT secret (see docs/ANALYTICS.md)._\n');
     return;
@@ -112,9 +140,16 @@ async function main() {
     const access = await token(JSON.parse(process.env.GSC_SERVICE_ACCOUNT));
     const { week, prev } = windows();
     // Whichever property this account can read.
-    let site; let totals;
+    let site;
+    let totals;
     for (const s of SITES) {
-      try { [totals] = await query(access, s, week); site = s; break; } catch (e) { if (e.status !== 403 && e.status !== 404) throw e; }
+      try {
+        [totals] = await query(access, s, week);
+        site = s;
+        break;
+      } catch (e) {
+        if (e.status !== 403 && e.status !== 404) throw e;
+      }
     }
     if (!site) throw new Error(`the service account can't read ${SITES.join(' or ')}; add it as a user on the property`);
     const [[prevTotals], queries, pages] = await Promise.all([

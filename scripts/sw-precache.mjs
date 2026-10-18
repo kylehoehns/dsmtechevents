@@ -23,7 +23,8 @@ const LAZY_PLACEHOLDER = /^const LAZY = \[\];.*$/m;
 
 export function assetList(dist) {
   const dir = path.join(dist, '_astro');
-  return fs.readdirSync(dir, { recursive: true })
+  return fs
+    .readdirSync(dir, { recursive: true })
     .filter((f) => fs.statSync(path.join(dir, f)).isFile())
     .map((f) => `/_astro/${f.split(path.sep).join('/')}`)
     .sort();
@@ -32,7 +33,8 @@ export function assetList(dist) {
 // The files whose every mention in the built pages, scripts and styles is a
 // dynamic import("./name.js").
 export function lazyList(dist, assets) {
-  const text = fs.readdirSync(dist, { recursive: true })
+  const text = fs
+    .readdirSync(dist, { recursive: true })
     .filter((f) => /\.(html|js|css)$/.test(f) && f !== 'sw.js')
     .map((f) => fs.readFileSync(path.join(dist, f), 'utf8'))
     .join('\n');
@@ -52,12 +54,14 @@ export default function swPrecache() {
         const dist = fileURLToPath(dir);
         const sw = path.join(dist, 'sw.js');
         const src = fs.readFileSync(sw, 'utf8');
-        if (!PLACEHOLDER.test(src) || !LAZY_PLACEHOLDER.test(src)) throw new Error('sw-precache: no "const ASSETS = [];" and "const LAZY = [];" lines in sw.js to fill in');
+        if (!PLACEHOLDER.test(src) || !LAZY_PLACEHOLDER.test(src))
+          throw new Error('sw-precache: no "const ASSETS = [];" and "const LAZY = [];" lines in sw.js to fill in');
         const assets = assetList(dist);
         const lazy = lazyList(dist, assets);
-        fs.writeFileSync(sw, src
-          .replace(PLACEHOLDER, `const ASSETS = ${JSON.stringify(assets)};`)
-          .replace(LAZY_PLACEHOLDER, `const LAZY = ${JSON.stringify(lazy)};`));
+        fs.writeFileSync(
+          sw,
+          src.replace(PLACEHOLDER, `const ASSETS = ${JSON.stringify(assets)};`).replace(LAZY_PLACEHOLDER, `const LAZY = ${JSON.stringify(lazy)};`),
+        );
         logger.info(`${assets.length} files in /_astro/ listed in sw.js, ${lazy.length} saved on first use`);
       },
     },

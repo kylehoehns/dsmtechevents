@@ -36,8 +36,15 @@ test('the click report lists groups A to Z with no bars or top lists, and totals
   const md = renderReport(
     {
       week: [{ key: 'pyowa', clicks: 4 }],
-      month: [{ key: 'pyowa', clicks: 10 }, { key: '', clicks: 3 }, { key: 'cijug', clicks: 12 }],
-      kinds: [{ key: 'rsvp', clicks: 9 }, { key: 'map', clicks: 4 }],
+      month: [
+        { key: 'pyowa', clicks: 10 },
+        { key: '', clicks: 3 },
+        { key: 'cijug', clicks: 12 },
+      ],
+      kinds: [
+        { key: 'rsvp', clicks: 9 },
+        { key: 'map', clicks: 4 },
+      ],
       totals: { week: 4, prevWeek: 2, month: 20 }, // less than the groups' 25: joint meetups count once
     },
     { groupNames: { pyowa: 'Pyowa', cijug: 'CIJUG' } },
@@ -74,17 +81,40 @@ test('the traffic part folds the days, draws shares and calls blank referrers di
 
 test('weeks of traffic add up into one row per key, in the order asked for', () => {
   const rows = [day('direct', 300, 500), day('google', 10, 12), day('direct', 200, 400), day('linkedin', 40, 900)];
-  assert.deepEqual(mergeRows(rows, 'sum_visits_DESC').map((r) => [r.key, r.visits, r.views]), [['direct', 500, 900], ['linkedin', 40, 900], ['google', 10, 12]]);
-  assert.deepEqual(mergeRows(rows, 'count_DESC').map((r) => r.key).slice(0, 2).sort(), ['direct', 'linkedin']);
-  assert.deepEqual(mergeRows([day('2026-10-07', 1, 1), day('2026-10-09', 1, 1), day('2026-10-08', 1, 1)], 'date_DESC').map((r) => r.key), ['2026-10-09', '2026-10-08', '2026-10-07']);
+  assert.deepEqual(
+    mergeRows(rows, 'sum_visits_DESC').map((r) => [r.key, r.visits, r.views]),
+    [
+      ['direct', 500, 900],
+      ['linkedin', 40, 900],
+      ['google', 10, 12],
+    ],
+  );
+  assert.deepEqual(
+    mergeRows(rows, 'count_DESC')
+      .map((r) => r.key)
+      .slice(0, 2)
+      .sort(),
+    ['direct', 'linkedin'],
+  );
+  assert.deepEqual(
+    mergeRows([day('2026-10-07', 1, 1), day('2026-10-09', 1, 1), day('2026-10-08', 1, 1)], 'date_DESC').map((r) => r.key),
+    ['2026-10-09', '2026-10-08', '2026-10-07'],
+  );
 });
 
 test('the site signals: where people click, searches that found nothing, the app, link previews', () => {
   const md = renderSignals({
-    where: [{ key: 'this-week', clicks: 20 }, { key: 'search', clicks: 5 }],
+    where: [
+      { key: 'this-week', clicks: 20 },
+      { key: 'search', clicks: 5 },
+    ],
     misses: [{ key: 'rust', clicks: 4 }],
-    installs: 2, opens: 9,
-    previews: [{ key: 'slack', clicks: 6 }, { key: 'imessage', clicks: 3 }],
+    installs: 2,
+    opens: 9,
+    previews: [
+      { key: 'slack', clicks: 6 },
+      { key: 'imessage', clicks: 3 },
+    ],
   });
   assert.match(md, /\| This week \| 20 \| ██████████ \|/);
   assert.match(md, /\| Search results \| 5 \|/);

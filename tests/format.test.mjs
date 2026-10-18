@@ -1,6 +1,29 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, dayOf, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary, isNew, sectionOf } from '../src/lib/format.mjs';
+import {
+  dayKey,
+  weekday,
+  shortTime,
+  shortRange,
+  dateRange,
+  dayRange,
+  formatDescription,
+  todayWord,
+  whenLabel,
+  countdown,
+  dayOf,
+  monthName,
+  dayName,
+  plural,
+  addDays,
+  daysBetween,
+  liveLabel,
+  startsIn,
+  lineup,
+  recentSummary,
+  isNew,
+  sectionOf,
+} from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
@@ -27,15 +50,9 @@ test('shortTime prints flyer-style times', () => {
 test('shortRange covers single, all-day and multi-day events', () => {
   assert.equal(shortRange({ start: '2026-10-12T23:30:00.000Z', end: '2026-10-13T01:00:00.000Z' }), '6:30p–8p');
   assert.equal(shortRange({ allDay: true, start: '2026-11-07T05:00:00.000Z', end: '2026-11-08T04:59:00.000Z' }), 'All day');
-  assert.equal(
-    shortRange({ multiDay: true, start: '2026-10-15T13:00:00.000Z', end: '2026-10-16T22:00:00.000Z' }),
-    'through Fri Oct 16 · 8a–5p',
-  );
+  assert.equal(shortRange({ multiDay: true, start: '2026-10-15T13:00:00.000Z', end: '2026-10-16T22:00:00.000Z' }), 'through Fri Oct 16 · 8a–5p');
   // Where the start date isn't printed beside it: the whole range.
-  assert.equal(
-    shortRange({ multiDay: true, start: '2026-10-15T13:00:00.000Z', end: '2026-10-16T22:00:00.000Z' }, { full: true }),
-    'Thu–Fri Oct 15–16 · 8a–5p',
-  );
+  assert.equal(shortRange({ multiDay: true, start: '2026-10-15T13:00:00.000Z', end: '2026-10-16T22:00:00.000Z' }, { full: true }), 'Thu–Fri Oct 15–16 · 8a–5p');
   // An all-day run ending at midnight ends the day before.
   const allDays = { multiDay: true, allDay: true, start: '2026-10-30T05:00:00.000Z', end: '2026-11-02T05:00:00.000Z' };
   assert.equal(shortRange(allDays), 'through Sun Nov 1 · All day');

@@ -62,7 +62,12 @@ export function parseEventsPage(html, slug) {
   // count). The page lists the last ten events however old they are, so this
   // reaches further back than the cache's 90 days. The site uses it to hide
   // quiet groups and to say "Back!" when one returns.
-  const lastMet = [...events.values()].filter((e) => e.status === 'PAST').map((e) => e.start).sort().at(-1) ?? null;
+  const lastMet =
+    [...events.values()]
+      .filter((e) => e.status === 'PAST')
+      .map((e) => e.start)
+      .sort()
+      .at(-1) ?? null;
   return {
     // Who and where the group is, for scripts/add-listing.mjs. The fetch doesn't cache these.
     name: group.name?.trim() || null,
@@ -87,7 +92,10 @@ export function enrich(upcoming, details, group, { now, cutoff }) {
   for (let i = upcoming.length - 1; i >= 0; i--) {
     const page = details.events.get(upcoming[i].sourceId);
     if (!page) continue;
-    if (page.status === 'CANCELLED') { upcoming.splice(i, 1); continue; }
+    if (page.status === 'CANCELLED') {
+      upcoming.splice(i, 1);
+      continue;
+    }
     for (const k of FROM_PAGE) if (page[k] !== undefined && page[k] !== '') upcoming[i][k] = page[k];
   }
   const recent = [];

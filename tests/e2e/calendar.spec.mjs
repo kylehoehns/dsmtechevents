@@ -26,7 +26,7 @@ test('switches to the calendar and pages through months', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'October 2026' })).toBeVisible();
 });
 
-test('picking a day lists that day\'s events', async ({ page }) => {
+test("picking a day lists that day's events", async ({ page }) => {
   await page.goto('/?view=calendar');
   await page.getByRole('button', { name: 'Tuesday, October 20, 1 event' }).click();
 
@@ -68,7 +68,10 @@ test('scrolled down on a phone, a shorter day lets the page glide up rather than
   // height is still held, so the page hasn't jumped. Read in the same task as
   // the click: a separate round trip lands partway into the 0.3s ease-out
   // glide, which moves fastest at the start (a slow CI runner saw 25px gone).
-  const right = await page.evaluate(() => { document.querySelector('.day[data-day="2026-10-19"]').click(); return scrollY; });
+  const right = await page.evaluate(() => {
+    document.querySelector('.day[data-day="2026-10-19"]').click();
+    return scrollY;
+  });
   expect(right).toBeGreaterThan(from - 20);
   // ...then the panel settles at its own size and leaves no height behind.
   await expect.poll(() => page.evaluate(() => document.getElementById('day-panel').style.minHeight)).toBe('');
@@ -173,10 +176,11 @@ plain('opening the calendar from another page never shows Events as the current 
 // The day each calendar starts focus on already has a ring of its own (today
 // in the mini calendar, the picked day in the big one), so the focus ring has
 // to look different from it.
-const ring = (locator) => locator.evaluate((el) => {
-  const s = getComputedStyle(el);
-  return `${s.outlineStyle} ${s.outlineWidth} ${s.outlineColor} ${s.outlineOffset} | ${s.boxShadow}`;
-});
+const ring = (locator) =>
+  locator.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return `${s.outlineStyle} ${s.outlineWidth} ${s.outlineColor} ${s.outlineOffset} | ${s.boxShadow}`;
+  });
 
 test('focusing the picked day in the calendar changes how it looks', async ({ page }) => {
   await page.goto('/?view=calendar');

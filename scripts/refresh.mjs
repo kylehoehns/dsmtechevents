@@ -40,7 +40,15 @@ import { manualEvent, readLumaCache, lumaSlug } from '../src/lib/data.mjs';
 import { safeLinks, checkTimes } from './sources/html.mjs';
 import { sourceStatus } from './source-status.mjs';
 
-const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew, 'iowans-of-things': iowansOfThings, 'iiba-chapter': iibaChapter, 'issa-chapter': issaChapter, eventbrite };
+const SOURCES = {
+  secdsm,
+  'pmi-chapter': pmiChapter,
+  'tai-techbrew': taiTechbrew,
+  'iowans-of-things': iowansOfThings,
+  'iiba-chapter': iibaChapter,
+  'issa-chapter': issaChapter,
+  eventbrite,
+};
 
 // Every script that visits other sites sends this, so they see one polite visitor.
 export const UA = 'dsmtechevents/1.0 (+https://dsmtechevents.com; community event calendar, fetched four times a day)';
@@ -57,8 +65,7 @@ export async function get(url) {
 export async function refresh({ root, only = null, get: fetchText = get, now = Date.now(), pause = 500, log = console }) {
   const dataDir = path.join(root, 'data');
   const cacheDir = path.join(dataDir, 'cache');
-  const groups = YAML.parse(await fs.readFile(path.join(dataDir, 'groups.yaml'), 'utf8'))
-    .filter((g) => !only || g.id === only);
+  const groups = YAML.parse(await fs.readFile(path.join(dataDir, 'groups.yaml'), 'utf8')).filter((g) => !only || g.id === only);
   const eventsYaml = YAML.parse(await fs.readFile(path.join(dataDir, 'events.yaml'), 'utf8')) ?? [];
   const lumaEntries = eventsYaml.filter((e) => e.luma && (!only || `luma-${lumaSlug(e.luma)}` === only));
   if (only && !groups.length && !lumaEntries.length) throw new Error(`--only ${only}: no such group or luma: event`);
@@ -215,9 +222,7 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
   const cancelled = new Set(fresh.cancelled);
   const carried = previous.events.filter((e) => Date.parse(e.end) < now && Date.parse(e.end) >= cutoff && !cancelled.has(e.id));
   const before = new Map(previous.events.map((e) => [e.id, e]));
-  const freshEvents = fresh.keep
-    ? fresh.events.map((e) => ({ ...e, ...pick(before.get(e.id), fresh.keep) }))
-    : fresh.events;
+  const freshEvents = fresh.keep ? fresh.events.map((e) => ({ ...e, ...pick(before.get(e.id), fresh.keep) })) : fresh.events;
   const byId = new Map();
   for (const e of [...carried, ...freshEvents]) byId.set(e.id, { ...byId.get(e.id), ...e });
   const { fetchedAt: lastFetched, enriched, ...previousResult } = previous;
@@ -229,11 +234,13 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
   // have no record of appearing (a group's first fetch, or a cache from
   // before this was kept) takes the feed's created time, or goes without:
   // better no tag than a new group's whole calendar tagged New.
-  const events = [...byId.values()].map(({ status, created, ...e }) => {
-    const appeared = lastFetched && !before.has(e.id) && Date.parse(e.end) >= now;
-    const added = before.get(e.id)?.added ?? (appeared ? fetchedAt : created);
-    return added ? { ...e, added } : e;
-  }).sort((a, b) => a.start.localeCompare(b.start));
+  const events = [...byId.values()]
+    .map(({ status, created, ...e }) => {
+      const appeared = lastFetched && !before.has(e.id) && Date.parse(e.end) >= now;
+      const added = before.get(e.id)?.added ?? (appeared ? fetchedAt : created);
+      return added ? { ...e, added } : e;
+    })
+    .sort((a, b) => a.start.localeCompare(b.start));
 
   // Group facts from Meetup: kept from the last run if this one missed them,
   // and left out when unknown so files without them don't change.
@@ -262,5 +269,5 @@ async function readJson(file, fallback) {
 }
 
 async function writeIfChanged(file, text) {
-  if (await fs.readFile(file, 'utf8').catch(() => null) !== text) await fs.writeFile(file, text);
+  if ((await fs.readFile(file, 'utf8').catch(() => null)) !== text) await fs.writeFile(file, text);
 }

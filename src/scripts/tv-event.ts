@@ -14,8 +14,17 @@ import { weekday, day, month, shortRange, liveLabel } from '../lib/format.mjs';
 import { QR_OPTIONS, scanLabel, setLive } from '../lib/tv-poster.mjs';
 
 export type TvEvent = {
-  id: string; title: string; start: string; end: string; allDay: boolean; multiDay: boolean; repeat: boolean;
-  hosts: string; groups: string[]; where: string; url: string | null;
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  allDay: boolean;
+  multiDay: boolean;
+  repeat: boolean;
+  hosts: string;
+  groups: string[];
+  where: string;
+  url: string | null;
   photo: { src: string; width?: number; height?: number } | null;
   talks: { time: string; title: string; speaker: string }[];
 };
@@ -32,7 +41,12 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls = '', text?: stri
   return node;
 }
 // The pink plate behind display type reads its text from data-t (CSS attr()).
-const misprint = <T extends HTMLElement>(node: T, text: string) => { node.textContent = text; node.dataset.t = text; node.classList.add('misprint'); return node; };
+const misprint = <T extends HTMLElement>(node: T, text: string) => {
+  node.textContent = text;
+  node.dataset.t = text;
+  node.classList.add('misprint');
+  return node;
+};
 // Rows and lines come in one after another under the screen-print effect (tv-fx.css).
 const stagger = (parent: Element) => [...parent.children].forEach((c, i) => (c as HTMLElement).style.setProperty('--i', String(i)));
 
@@ -46,7 +60,9 @@ function qr(text: string, label: string, cls = '') {
   (qrLib ??= import('qrcode').then((m) => m.default ?? m))
     .then((lib) => lib.toString(text, QR_OPTIONS))
     // The SVG is the library's own drawing of the code: paths only, no text from the URL.
-    .then((svg: string) => { code.innerHTML = svg; })
+    .then((svg: string) => {
+      code.innerHTML = svg;
+    })
     .catch(() => box.remove());
   return box;
 }
@@ -116,13 +132,19 @@ const upcoming = (data: TvData, now: number) => data.events.filter((x) => Date.p
 // "Up next in DSM tech": the next few events from any group after this one,
 // by date only (never curated).
 function nextAll(e: TvEvent, data: TvData, now: number) {
-  const rows = upcoming(data, now).filter((x) => x.id !== e.id && !x.repeat && x.start >= e.start).slice(0, UP_NEXT);
+  const rows = upcoming(data, now)
+    .filter((x) => x.id !== e.id && !x.repeat && x.start >= e.start)
+    .slice(0, UP_NEXT);
   const head = el('div', 'ev-head');
   head.append(misprint(el('h2', 'ev-title'), 'Up next in DSM tech'), qr(data.site, 'Every event', 'site-qr'));
   const list = el('ol', 'ev-next');
   for (const x of rows) {
     const li = el('li');
-    li.append(el('span', 'row-date', `${weekday(x.start)} ${month(x.start)} ${day(x.start)}`), el('span', 'row-group', x.hosts), el('span', 'row-title', x.title));
+    li.append(
+      el('span', 'row-date', `${weekday(x.start)} ${month(x.start)} ${day(x.start)}`),
+      el('span', 'row-group', x.hosts),
+      el('span', 'row-title', x.title),
+    );
     list.append(li);
   }
   stagger(list);
@@ -187,7 +209,10 @@ export function eventMode(stage: HTMLElement, data: TvData, id: string, now = Da
         if (ended !== over) {
           over = ended;
           s.classList.toggle('ev-closing', ended);
-          if (ended) { s.replaceChildren(...closing(e, data.site)); stamp = null; } else {
+          if (ended) {
+            s.replaceChildren(...closing(e, data.site));
+            stamp = null;
+          } else {
             const poster = eventPoster(e);
             s.replaceChildren(...poster.nodes);
             stamp = poster.stamp;
@@ -211,7 +236,10 @@ export function eventMode(stage: HTMLElement, data: TvData, id: string, now = Da
       let key: string | null = null;
       updates.push((t) => {
         const out = kind === 'next-all' ? nextAll(e, data, t) : nextGroup(e, data, group, t);
-        if (out.key !== key) { key = out.key; s.replaceChildren(...out.nodes); }
+        if (out.key !== key) {
+          key = out.key;
+          s.replaceChildren(...out.nodes);
+        }
       });
     }
     stage.append(s);

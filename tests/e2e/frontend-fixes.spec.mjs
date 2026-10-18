@@ -3,17 +3,26 @@
 import { test, expect } from './fixtures.mjs';
 
 const SAFARI = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
-const CHROME_IOS = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0.6723.90 Mobile/15E148 Safari/604.1';
-const INSTAGRAM = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 350.0.0.0 (iPhone14,5; iOS 18_0; en_US)';
+const CHROME_IOS =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0.6723.90 Mobile/15E148 Safari/604.1';
+const INSTAGRAM =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 350.0.0.0 (iPhone14,5; iOS 18_0; en_US)';
 
 // Sum of layout shifts while the web fonts are held back, then let in.
 async function clsWithSlowFonts(page, url) {
   let release;
-  const gate = new Promise((r) => { release = r; });
-  await page.route('**/*.woff2', async (route) => { await gate; await route.continue(); });
+  const gate = new Promise((r) => {
+    release = r;
+  });
+  await page.route('**/*.woff2', async (route) => {
+    await gate;
+    await route.continue();
+  });
   await page.addInitScript(() => {
     window.__cls = 0;
-    new PerformanceObserver((list) => { for (const e of list.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; }).observe({ type: 'layout-shift', buffered: true });
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries()) if (!e.hadRecentInput) window.__cls += e.value;
+    }).observe({ type: 'layout-shift', buffered: true });
   });
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(500);
@@ -69,7 +78,10 @@ test.describe('iOS install hint', () => {
   });
 });
 
-for (const [name, ua] of [['Chrome on iOS', CHROME_IOS], ['an in-app browser', INSTAGRAM]]) {
+for (const [name, ua] of [
+  ['Chrome on iOS', CHROME_IOS],
+  ['an in-app browser', INSTAGRAM],
+]) {
   test.describe(`no install hint in ${name}`, () => {
     test.use({ userAgent: ua });
     test('even on a later visit', async ({ page }) => {

@@ -14,9 +14,7 @@ for (const colorScheme of ['light', 'dark']) {
       test(`${path} has no axe violations`, async ({ page }) => {
         await page.goto(path);
         await page.waitForLoadState('networkidle');
-        const { violations } = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'])
-          .analyze();
+        const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze();
         expect(violations.map((v) => `${v.id}: ${v.help} (${v.nodes.map((n) => n.target.join(' ')).join(', ')})`)).toEqual([]);
       });
     }

@@ -7,7 +7,8 @@ export const num = (n) => n.toLocaleString('en-US');
 
 // The first column and the bar columns (empty header) are left-aligned so
 // the bars all start at the same edge; the numbers are right-aligned.
-export const table = (head, rows) => [`| ${head.join(' | ')} |`, `|${head.map((h, i) => (i && h ? '---:' : '---')).join('|')}|`, ...rows.map((r) => `| ${r.join(' | ')} |`)].join('\n');
+export const table = (head, rows) =>
+  [`| ${head.join(' | ')} |`, `|${head.map((h, i) => (i && h ? '---:' : '---')).join('|')}|`, ...rows.map((r) => `| ${r.join(' | ')} |`)].join('\n');
 
 // "████": n as a share of max, out of 10 blocks. Anything above 0 gets at
 // least one block, so a small number doesn't look like none. No "░" padding:

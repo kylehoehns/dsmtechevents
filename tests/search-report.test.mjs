@@ -26,7 +26,8 @@ const prev = { startDate: '2026-10-10', endDate: '2026-10-16' };
 
 test('the section: totals with real changes, top searches and pages', () => {
   const md = renderSearch({
-    week, prev,
+    week,
+    prev,
     totals: { clicks: 12, impressions: 340, ctr: 12 / 340, position: 8.43 },
     prevTotals: { clicks: 11, impressions: 200, ctr: 0.055, position: 11.2 },
     queries: [{ keys: ['des moines tech events'], clicks: 7, impressions: 40, ctr: 0.175, position: 1.2 }],

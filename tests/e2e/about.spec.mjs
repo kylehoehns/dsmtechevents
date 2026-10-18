@@ -60,10 +60,12 @@ async function endScreenUnder(page, row, about, below) {
 // than the screen can't all show; it starts at the top instead.
 async function expectWholePanelShown(page, row) {
   await expect(row).not.toHaveAttribute('data-animating');
-  await expect.poll(async () => {
-    const { y, height } = await row.locator('.desc').boundingBox();
-    return y >= 0 && (y + height <= page.viewportSize().height || y <= 13);
-  }).toBe(true);
+  await expect
+    .poll(async () => {
+      const { y, height } = await row.locator('.desc').boundingBox();
+      return y >= 0 && (y + height <= page.viewportSize().height || y <= 13);
+    })
+    .toBe(true);
 }
 
 test('About opened at the bottom of the screen scrolls the whole panel into view', async ({ page }) => {

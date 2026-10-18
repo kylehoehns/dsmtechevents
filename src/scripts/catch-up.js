@@ -12,5 +12,7 @@ function catchUp() {
 }
 catchUp();
 document.addEventListener('visibilitychange', catchUp);
-addEventListener('pageshow', (e) => { if (e.persisted) catchUp(); });
+addEventListener('pageshow', (e) => {
+  if (e.persisted) catchUp();
+});
 setInterval(catchUp, 60_000);

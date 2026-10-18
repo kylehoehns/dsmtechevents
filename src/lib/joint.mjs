@@ -6,9 +6,21 @@
 
 // Where an event is, for spotting the same night listed twice: the street
 // number and name ("801 Grand"), else the venue name, or "online".
-export const placeKey = (e) => (e.online ? 'online' : (/^\s*(\d+\s+\S+(?:\s+\S+)?)/.exec(e.address ?? '')?.[1] ?? e.venue ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim());
+export const placeKey = (e) =>
+  e.online
+    ? 'online'
+    : (/^\s*(\d+\s+\S+(?:\s+\S+)?)/.exec(e.address ?? '')?.[1] ?? e.venue ?? '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
 const STOP = new Set(['the', 'and', 'with', 'for', 'night', 'meetup', 'joint', 'des', 'moines']);
-const titleWords = (t) => new Set(t.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && !STOP.has(w)));
+const titleWords = (t) =>
+  new Set(
+    t
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length >= 3 && !STOP.has(w)),
+  );
 const jointKey = (e) => `${e.start}|${e.title.toLowerCase().replace(/\W+/g, '')}`;
 
 // Two listings of one joint meetup? Exported for tests.
@@ -56,8 +68,12 @@ function fold(into, e) {
 // Who's putting it on, as plain text: "CIJUG + Pyowa", or for an event with
 // no group, "Conference" / "Community event". Every list uses this.
 export function hostsLabel(e, byId) {
-  return e.groupIds.map((id) => byId[id]?.short).filter(Boolean).join(' + ')
-    || (e.headliner || e.tags?.includes('conference') ? 'Conference' : 'Community event');
+  return (
+    e.groupIds
+      .map((id) => byId[id]?.short)
+      .filter(Boolean)
+      .join(' + ') || (e.headliner || e.tags?.includes('conference') ? 'Conference' : 'Community event')
+  );
 }
 
 // Archive records (data/archive/) name one host as `group`; as events, with

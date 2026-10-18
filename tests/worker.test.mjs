@@ -3,10 +3,20 @@ import assert from 'node:assert/strict';
 import worker, { parseClick, previewer, readCapped } from '../worker/index.js';
 
 test('parseClick keeps only a known kind, safe ids and a known part of the site', () => {
-  assert.deepEqual(parseClick('{"kind":"rsvp","groups":["pyowa"],"event":"pyowa-316749553","from":"this-week"}'), { kind: 'rsvp', groups: ['pyowa'], event: 'pyowa-316749553', from: 'this-week', term: '' });
+  assert.deepEqual(parseClick('{"kind":"rsvp","groups":["pyowa"],"event":"pyowa-316749553","from":"this-week"}'), {
+    kind: 'rsvp',
+    groups: ['pyowa'],
+    event: 'pyowa-316749553',
+    from: 'this-week',
+    term: '',
+  });
   assert.equal(parseClick('{"kind":"track-everything"}'), null);
   assert.equal(parseClick('not json'), null);
-  assert.deepEqual(parseClick('{"kind":"map","groups":["<script>",7,"cijug"],"event":"x y","from":"/secret?page"}'), { kind: 'map', groups: ['cijug'], event: '', from: '', term: '' }, 'odd values are dropped, not stored');
+  assert.deepEqual(
+    parseClick('{"kind":"map","groups":["<script>",7,"cijug"],"event":"x y","from":"/secret?page"}'),
+    { kind: 'map', groups: ['cijug'], event: '', from: '', term: '' },
+    'odd values are dropped, not stored',
+  );
   assert.deepEqual(parseClick('{"kind":"poster","groups":"pyowa"}'), { kind: 'poster', groups: [], event: '', from: '', term: '' });
   assert.equal(parseClick('{"kind":"preview"}'), null, 'only the Worker itself writes previews');
 });
@@ -22,9 +32,17 @@ test('a search miss keeps only a short, plain term; nothing else carries one', (
 
 test('link previews are told apart by the app that drew them; browsers are not previews', () => {
   assert.equal(previewer('Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)'), 'slack');
-  assert.equal(previewer('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.4 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.4 facebookexternalhit/1.1 Facebot Twitterbot/1.0'), 'imessage');
+  assert.equal(
+    previewer(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.4 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.4 facebookexternalhit/1.1 Facebot Twitterbot/1.0',
+    ),
+    'imessage',
+  );
   assert.equal(previewer('LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)'), 'linkedin');
-  assert.equal(previewer('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'), null);
+  assert.equal(
+    previewer('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'),
+    null,
+  );
   assert.equal(previewer('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'), null, 'search engines are not previews');
 });
 
@@ -40,7 +58,8 @@ test('the share image is served as ever, and a preview bot fetching it is counte
 test('the Worker records a click per host group and serves everything else from assets', async () => {
   const points = [];
   const env = { CLICKS: { writeDataPoint: (p) => points.push(p) }, ASSETS: { fetch: async () => new Response('static') } };
-  const post = (body, headers = { Origin: 'https://dsmtechevents.com' }) => new Request('https://dsmtechevents.com/api/click', { method: 'POST', body, headers });
+  const post = (body, headers = { Origin: 'https://dsmtechevents.com' }) =>
+    new Request('https://dsmtechevents.com/api/click', { method: 'POST', body, headers });
   assert.equal((await worker.fetch(post('{"kind":"rsvp","groups":["cijug","pyowa"],"event":"cijug-1","from":"search"}'), env)).status, 204);
   assert.equal((await worker.fetch(post('{"kind":"poster","groups":[],"event":"manual-devcon-2026-10-15"}'), env)).status, 204);
   // A joint meetup: a point per host, each half of the one click.
@@ -61,7 +80,8 @@ test('the Worker turns away other sites, floods and oversized bodies', async () 
     CLICKS: { writeDataPoint: (p) => points.push(p) },
     CLICK_LIMIT: { limit: async () => ({ success: left-- > 0 }) },
   };
-  const post = (body, origin = 'https://dsmtechevents.com') => new Request('https://dsmtechevents.com/api/click', { method: 'POST', body, headers: origin ? { Origin: origin } : {} });
+  const post = (body, origin = 'https://dsmtechevents.com') =>
+    new Request('https://dsmtechevents.com/api/click', { method: 'POST', body, headers: origin ? { Origin: origin } : {} });
   const ok = '{"kind":"rsvp","groups":["cijug"],"event":"cijug-1"}';
   assert.equal((await worker.fetch(post(ok, 'https://evil.example'), env)).status, 403);
   assert.equal((await worker.fetch(post(ok, null), env)).status, 403, 'no Origin header: not from a browser page');
@@ -74,15 +94,35 @@ test('the Worker refuses a large body before reading it', async () => {
   const env = { CLICKS: { writeDataPoint: () => assert.fail('nothing is stored') } };
   const headers = { Origin: 'https://dsmtechevents.com' };
   let pulled = 0;
-  const endless = new ReadableStream({ pull: (c) => { pulled++; c.enqueue(new Uint8Array(512)); } });
-  const stated = new Request('https://dsmtechevents.com/api/click', { method: 'POST', body: endless, duplex: 'half', headers: { ...headers, 'Content-Length': '999999' } });
+  const endless = new ReadableStream({
+    pull: (c) => {
+      pulled++;
+      c.enqueue(new Uint8Array(512));
+    },
+  });
+  const stated = new Request('https://dsmtechevents.com/api/click', {
+    method: 'POST',
+    body: endless,
+    duplex: 'half',
+    headers: { ...headers, 'Content-Length': '999999' },
+  });
   await new Promise((r) => setTimeout(r));
   pulled = 0; // a stream pre-fills one chunk on its own
   assert.equal((await worker.fetch(stated, env)).status, 413);
   assert.ok(stated.body && !stated.bodyUsed && pulled === 0, 'a stated Content-Length over the cap is refused unread');
 
   pulled = 0;
-  const chunked = new Request('https://dsmtechevents.com/api/click', { method: 'POST', body: new ReadableStream({ pull: (c) => { pulled++; c.enqueue(new Uint8Array(512)); } }), duplex: 'half', headers });
+  const chunked = new Request('https://dsmtechevents.com/api/click', {
+    method: 'POST',
+    body: new ReadableStream({
+      pull: (c) => {
+        pulled++;
+        c.enqueue(new Uint8Array(512));
+      },
+    }),
+    duplex: 'half',
+    headers,
+  });
   assert.equal((await worker.fetch(chunked, env)).status, 413);
   assert.ok(pulled <= 4, `stops reading at the cap (read ${pulled} chunks)`);
 

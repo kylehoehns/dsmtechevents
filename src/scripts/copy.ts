@@ -20,7 +20,9 @@ let status: HTMLElement | undefined;
 function announce(message: string) {
   // Cleared first, so a second copy of the same thing is announced again.
   status!.textContent = '';
-  setTimeout(() => { status!.textContent = message; }, 50);
+  setTimeout(() => {
+    status!.textContent = message;
+  }, 50);
 }
 
 // A button that copies `text()` and says so on itself for two seconds.
@@ -44,6 +46,10 @@ export function copyButton(button: HTMLButtonElement, text: () => string, shown:
     button.dataset.done = '';
     announce(copied ? 'Copied' : 'Selected. Copy it with your keyboard.');
     clearTimeout(reset);
-    reset = window.setTimeout(() => { button.textContent = label; button.style.minWidth = ''; delete button.dataset.done; }, 2000);
+    reset = window.setTimeout(() => {
+      button.textContent = label;
+      button.style.minWidth = '';
+      delete button.dataset.done;
+    }, 2000);
   });
 }

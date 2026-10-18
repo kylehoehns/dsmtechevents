@@ -6,7 +6,11 @@
 import { dayKey, lastDay, addDays, daysBetween, isDayKey } from './format.mjs';
 
 // "2026-10" plus n months.
-export const addMonths = (ym, n) => { const d = new Date(`${ym}-01T00:00:00Z`); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString().slice(0, 7); };
+export const addMonths = (ym, n) => {
+  const d = new Date(`${ym}-01T00:00:00Z`);
+  d.setUTCMonth(d.getUTCMonth() + n);
+  return d.toISOString().slice(0, 7);
+};
 
 // `events` is the page's calendar data ({ start, end, groups }); `group`
 // narrows a day to one group's events ('' for every group).
@@ -14,14 +18,27 @@ export function calendar(events, today) {
   // The months the data covers: the cache keeps about 90 days of past events
   // (plus the archive), so earlier months would look quiet when they're just
   // not on file. Paging and ?day= stay inside these, and this month always counts.
-  const first = events.reduce((m, e) => { const k = dayKey(e.start).slice(0, 7); return k < m ? k : m; }, today.slice(0, 7));
-  const last = events.reduce((m, e) => { const k = lastDay(e.start, e.end).slice(0, 7); return k > m ? k : m; }, today.slice(0, 7));
+  const first = events.reduce(
+    (m, e) => {
+      const k = dayKey(e.start).slice(0, 7);
+      return k < m ? k : m;
+    },
+    today.slice(0, 7),
+  );
+  const last = events.reduce(
+    (m, e) => {
+      const k = lastDay(e.start, e.end).slice(0, 7);
+      return k > m ? k : m;
+    },
+    today.slice(0, 7),
+  );
   const inRange = (key) => key.slice(0, 7) >= first && key.slice(0, 7) <= last;
 
   // Every event on a day, a multi-day one on each of its days, by start time.
-  const on = (key, group = '') => events
-    .filter((e) => dayKey(e.start) <= key && key <= lastDay(e.start, e.end) && (!group || e.groups.includes(group)))
-    .sort((a, b) => a.start.localeCompare(b.start));
+  const on = (key, group = '') =>
+    events
+      .filter((e) => dayKey(e.start) <= key && key <= lastDay(e.start, e.end) && (!group || e.groups.includes(group)))
+      .sort((a, b) => a.start.localeCompare(b.start));
 
   // The month's grid, whole weeks from Sunday, with the days around it.
   function cells(ym) {

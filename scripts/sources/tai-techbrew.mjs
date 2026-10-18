@@ -12,7 +12,23 @@ import { calendarEvents, times, created, eventUrl } from './ical.mjs';
 
 const FEED = 'https://www.technologyiowa.org/events/calendar/techbrews/ics/';
 const TECHBREW = /tech\s*brew/i;
-const METRO = ['Des Moines', 'West Des Moines', 'Urbandale', 'Clive', 'Johnston', 'Ankeny', 'Altoona', 'Grimes', 'Waukee', 'Windsor Heights', 'Pleasant Hill', 'Norwalk', 'Bondurant', 'Indianola', 'Polk City'];
+const METRO = [
+  'Des Moines',
+  'West Des Moines',
+  'Urbandale',
+  'Clive',
+  'Johnston',
+  'Ankeny',
+  'Altoona',
+  'Grimes',
+  'Waukee',
+  'Windsor Heights',
+  'Pleasant Hill',
+  'Norwalk',
+  'Bondurant',
+  'Indianola',
+  'Polk City',
+];
 
 // `since`: the fetch passes its 90-day cutoff, so recent past TechBrews (still
 // in the feed) fill Recently from the first run instead of only once they pass.
@@ -28,7 +44,10 @@ export default async function taiTechbrew(group, { get, now = Date.now(), since 
     const url = eventUrl(e);
     if (!url) throw new Error(`TechBrew "${e.summary}" has no URL`);
     const page = readEventPage(await get(url), url);
-    if (!METRO.includes(page.city)) { skippedCities.push(page.city); continue; }
+    if (!METRO.includes(page.city)) {
+      skippedCities.push(page.city);
+      continue;
+    }
     const sourceId = /\/events\/([^/?#]+)\/?$/.exec(url)?.[1] ?? e.uid;
     events.push({
       id: `${group.id}-${sourceId}`,
@@ -62,6 +81,7 @@ function readEventPage(html, url) {
   if (body == null) throw new Error(`no event text on ${url}`);
   const description = toText(body.replace(/<iframe[\s\S]*?<\/iframe>/gi, '').replace(/<\/(p|li|ul|h\d)>/gi, '$&\n'))
     .replace(/\s*Register (Now|Today)[:!]?\s*$/i, '')
-    .trim().slice(0, 2000);
+    .trim()
+    .slice(0, 2000);
   return { venue: toText(venueHtml) || null, city, address: location ? `${location}, IA` : null, description };
 }

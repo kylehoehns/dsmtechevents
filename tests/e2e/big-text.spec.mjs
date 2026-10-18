@@ -18,17 +18,19 @@ const VIEWS = [
   ['/404', null],
 ];
 
-const stickingOut = (page) => page.evaluate(() => {
-  const vw = document.documentElement.clientWidth;
-  const out = [];
-  for (const el of document.body.querySelectorAll('*')) {
-    if (el.closest('.headliners, .sr-only, script, style')) continue;
-    const r = el.getBoundingClientRect();
-    if (!r.width || !r.height || getComputedStyle(el).visibility === 'hidden') continue;
-    if (r.left < -1 || r.right > vw + 1) out.push(`${el.tagName.toLowerCase()}.${[...el.classList].join('.')}: ${Math.round(r.left)}–${Math.round(r.right)}px`);
-  }
-  return { scroll: document.documentElement.scrollWidth - vw, out: out.slice(0, 10) };
-});
+const stickingOut = (page) =>
+  page.evaluate(() => {
+    const vw = document.documentElement.clientWidth;
+    const out = [];
+    for (const el of document.body.querySelectorAll('*')) {
+      if (el.closest('.headliners, .sr-only, script, style')) continue;
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height || getComputedStyle(el).visibility === 'hidden') continue;
+      if (r.left < -1 || r.right > vw + 1)
+        out.push(`${el.tagName.toLowerCase()}.${[...el.classList].join('.')}: ${Math.round(r.left)}–${Math.round(r.right)}px`);
+    }
+    return { scroll: document.documentElement.scrollWidth - vw, out: out.slice(0, 10) };
+  });
 
 async function check(page, path, open) {
   await page.goto(path);
@@ -69,11 +71,14 @@ test.describe('320px wide with wider text spacing', () => {
   test.use({ viewport: { width: 320, height: 640 } });
   for (const [path, open] of VIEWS) {
     test(`${path}${open ? ' (opened)' : ''} still fits`, async ({ page }) => {
-      await page.addInitScript(() => document.addEventListener('DOMContentLoaded', () => {
-        const s = document.createElement('style');
-        s.textContent = '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }';
-        document.head.append(s);
-      }));
+      await page.addInitScript(() =>
+        document.addEventListener('DOMContentLoaded', () => {
+          const s = document.createElement('style');
+          s.textContent =
+            '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }';
+          document.head.append(s);
+        }),
+      );
       await check(page, path, open);
     });
   }
@@ -85,9 +90,11 @@ test.describe('320px wide with wider text spacing', () => {
 test('form fields are big enough that iPhone Safari does not zoom in on them', async ({ page }) => {
   for (const path of new Set(VIEWS.map(([path]) => path))) {
     await page.goto(path);
-    const small = await page.evaluate(() => [...document.querySelectorAll('input, select, textarea')]
-      .filter((el) => parseFloat(getComputedStyle(el).fontSize) < 16)
-      .map((el) => `#${el.id} ${getComputedStyle(el).fontSize}`));
+    const small = await page.evaluate(() =>
+      [...document.querySelectorAll('input, select, textarea')]
+        .filter((el) => parseFloat(getComputedStyle(el).fontSize) < 16)
+        .map((el) => `#${el.id} ${getComputedStyle(el).fontSize}`),
+    );
     expect(small, path).toEqual([]);
   }
 });

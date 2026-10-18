@@ -15,12 +15,18 @@ test('a newly broken source opens one issue', () => {
 
 test('a source that is still broken updates its issue instead of opening another', () => {
   const open = [{ number: 41, title: 'Source broken: TAI TechBrew (techbrew)' }];
-  assert.deepEqual(planIssues({ ok: [], problems: [broken] }, open).map((a) => [a.type, a.number]), [['update', 41]]);
+  assert.deepEqual(
+    planIssues({ ok: [], problems: [broken] }, open).map((a) => [a.type, a.number]),
+    [['update', 41]],
+  );
 });
 
 test('a source that works again closes its issue', () => {
   const open = [{ number: 41, title: 'Source broken: TAI TechBrew (techbrew)' }];
-  assert.deepEqual(planIssues({ ok: ['techbrew', 'pyowa'], problems: [] }, open).map((a) => [a.type, a.number]), [['close', 41]]);
+  assert.deepEqual(
+    planIssues({ ok: ['techbrew', 'pyowa'], problems: [] }, open).map((a) => [a.type, a.number]),
+    [['close', 41]],
+  );
 });
 
 test('ids are matched exactly, not as prefixes', () => {

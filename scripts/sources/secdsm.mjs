@@ -26,34 +26,40 @@ export default async function secdsm(group, { get }) {
   const events = meetings.flatMap((block) => {
     const date = /class="secdsm-job-date"[^>]*>(\d{4}-\d{2}-\d{2})</.exec(block)?.[1];
     if (!date) return [];
-    const talks = block.split(/class="secdsm-act secdsm-act-[^"]*"/).slice(1).map((act) => ({
-      time: textOf(act, 'secdsm-act-time'),
-      speaker: textOf(act, 'secdsm-act-speaker'),
-      title: textOf(act, 'secdsm-act-title'),
-      desc: textOf(act, 'secdsm-act-desc'),
-    })).filter((t) => t.title && !/^(tba|tbd)$|schedule pending/i.test(t.title));
+    const talks = block
+      .split(/class="secdsm-act secdsm-act-[^"]*"/)
+      .slice(1)
+      .map((act) => ({
+        time: textOf(act, 'secdsm-act-time'),
+        speaker: textOf(act, 'secdsm-act-speaker'),
+        title: textOf(act, 'secdsm-act-title'),
+        desc: textOf(act, 'secdsm-act-desc'),
+      }))
+      .filter((t) => t.title && !/^(tba|tbd)$|schedule pending/i.test(t.title));
 
-    const title = talks.length === 0 ? 'Monthly Security Meetup'
-      : talks.length === 1 ? talks[0].title
-      : `${talks[0].title} + ${talks.length - 1} more`;
+    const title = talks.length === 0 ? 'Monthly Security Meetup' : talks.length === 1 ? talks[0].title : `${talks[0].title} + ${talks.length - 1} more`;
     const description = [
       `Doors open at ${twelveHour(doors)}.`,
       ...talks.map((t) => `**${t.time} · ${t.title}**${t.speaker ? ` — ${t.speaker}` : ''}${t.desc ? `\n${t.desc}` : ''}`),
       talks.length ? '' : 'Talk schedule pending. Check the SecDSM Discord for updates.',
-    ].filter(Boolean).join('\n\n');
+    ]
+      .filter(Boolean)
+      .join('\n\n');
 
-    return [{
-      id: `${group.id}-${date}`,
-      sourceId: date,
-      title,
-      start: localToUtc(date, doors),
-      end: new Date(Date.parse(localToUtc(date, doors)) + 150 * 60_000).toISOString(), // they run about 2½ hours
-      allDay: false,
-      url: new URL('/#schedule', base).href,
-      description,
-      venue,
-      address,
-    }];
+    return [
+      {
+        id: `${group.id}-${date}`,
+        sourceId: date,
+        title,
+        start: localToUtc(date, doors),
+        end: new Date(Date.parse(localToUtc(date, doors)) + 150 * 60_000).toISOString(), // they run about 2½ hours
+        allDay: false,
+        url: new URL('/#schedule', base).href,
+        description,
+        venue,
+        address,
+      },
+    ];
   });
   // Blocks but no readable date means the date markup changed, not that
   // SecDSM stopped meeting.

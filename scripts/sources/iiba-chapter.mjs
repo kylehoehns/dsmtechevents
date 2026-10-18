@@ -24,8 +24,12 @@ export default async function iibaChapter(group, { get, now = Date.now(), since 
   const listed = async (title) => {
     if (!links) {
       const page = await get(`${origin}/Events`);
-      links = new Map([...page.matchAll(/class="EAS-Name">\s*<a href="[^"]*\/Events\/([^"/?#]+)">([^<]+)<\/a>/g)]
-        .map(([, slug, t]) => [toText(t), `${origin}/Events/${slug}`]));
+      links = new Map(
+        [...page.matchAll(/class="EAS-Name">\s*<a href="[^"]*\/Events\/([^"/?#]+)">([^<]+)<\/a>/g)].map(([, slug, t]) => [
+          toText(t),
+          `${origin}/Events/${slug}`,
+        ]),
+      );
       if (!links.size) throw new Error(`no events listed on ${origin}/Events`);
     }
     return links.get(title) ?? null;
@@ -36,7 +40,11 @@ export default async function iibaChapter(group, { get, now = Date.now(), since 
     const title = e.summary.trim();
     const fromFeed = feedLocation(e.location);
     // "AI as Your BA Partner: Plan Faster. Lead Smarter." → ai-as-your-ba-partner-plan-faster.-lead-smarter.
-    const guess = `${origin}/events/${title.toLowerCase().replace(/[^a-z0-9. -]/g, '').trim().replace(/[ -]+/g, '-')}/`;
+    const guess = `${origin}/events/${title
+      .toLowerCase()
+      .replace(/[^a-z0-9. -]/g, '')
+      .trim()
+      .replace(/[ -]+/g, '-')}/`;
     let url = null;
     let html = await get(guess).catch(() => null);
     if (html && toText(/<meta property="og:title" content="([^"]*)"/.exec(html)?.[1] ?? '') === title) url = guess;
@@ -88,6 +96,9 @@ function readEventPage(html, url, fromFeed) {
     return fromFeed;
   }
   const venue = toText(/class="location-name">([\s\S]*?)<\/div>/.exec(box)?.[1] ?? '') || fromFeed.venue;
-  const lines = toText(/class="location-address">([\s\S]*?)<\/div>/.exec(box)?.[1] ?? '').split('\n').map((s) => s.trim()).filter((s) => s && !/^United States/i.test(s));
+  const lines = toText(/class="location-address">([\s\S]*?)<\/div>/.exec(box)?.[1] ?? '')
+    .split('\n')
+    .map((s) => s.trim())
+    .filter((s) => s && !/^United States/i.test(s));
   return { venue, address: lines.join(', ') || fromFeed.address };
 }

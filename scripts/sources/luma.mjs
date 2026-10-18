@@ -48,7 +48,11 @@ export default async function readLuma(link, { get }) {
 // Luma's description (a ProseMirror document) as the text the cards format:
 // blank lines between blocks, **bold**, [links](url) and ## headings.
 export function mirrorText(doc) {
-  return (doc?.content ?? []).map(block).map((s) => s.trim()).filter(Boolean).join('\n\n');
+  return (doc?.content ?? [])
+    .map(block)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join('\n\n');
 }
 
 function block(node) {
@@ -64,14 +68,16 @@ function block(node) {
 }
 
 function inline(nodes) {
-  return nodes.map((n) => {
-    if (n.type === 'hard_break') return '\n';
-    if (n.type !== 'text') return inline(n.content ?? []);
-    const marks = n.marks ?? [];
-    let text = n.text ?? '';
-    const href = httpUrl(marks.find((m) => m.type === 'link')?.attrs?.href);
-    if (href && text.trim() !== href) text = `[${text}](${href})`; // a bare URL links itself
-    if (marks.some((m) => m.type === 'bold') && text.trim()) text = text.replace(/^(\s*)(.*?)(\s*)$/s, '$1**$2**$3');
-    return text;
-  }).join('');
+  return nodes
+    .map((n) => {
+      if (n.type === 'hard_break') return '\n';
+      if (n.type !== 'text') return inline(n.content ?? []);
+      const marks = n.marks ?? [];
+      let text = n.text ?? '';
+      const href = httpUrl(marks.find((m) => m.type === 'link')?.attrs?.href);
+      if (href && text.trim() !== href) text = `[${text}](${href})`; // a bare URL links itself
+      if (marks.some((m) => m.type === 'bold') && text.trim()) text = text.replace(/^(\s*)(.*?)(\s*)$/s, '$1**$2**$3');
+      return text;
+    })
+    .join('');
 }

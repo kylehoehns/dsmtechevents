@@ -42,11 +42,22 @@ function readEventPage(html, url) {
   if (box == null) throw new Error(`no Location box on ${url}`);
 
   // "📅 Date: Tuesday, October 27, 2026" repeats the card's own date.
-  const description = richText(body).split('\n').filter((line) => !/^\W*Date:/i.test(line)).join('\n').replace(/\n{3,}/g, '\n\n');
+  const description = richText(body)
+    .split('\n')
+    .filter((line) => !/^\W*Date:/i.test(line))
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n');
 
   const venue = toText(/<p class="h5 ">([\s\S]*?)<\/p>/.exec(box)?.[1] ?? '') || null;
   // "2816 Beaver Avenue<br>Des Moines, Iowa, 50310" → "2816 Beaver Avenue, Des Moines, IA 50310"
   const street = toText(/<p class="event-popup-info-header ">([\s\S]*?)<\/p>/.exec(box)?.[1] ?? '');
-  const address = street.split('\n').map((s) => s.trim()).filter(Boolean).join(', ').replace(/,?\s*Iowa,?\s*/i, ', IA ').trim() || null;
+  const address =
+    street
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join(', ')
+      .replace(/,?\s*Iowa,?\s*/i, ', IA ')
+      .trim() || null;
   return { description, venue, address };
 }

@@ -77,7 +77,14 @@ test('the overview says how many more are on the posters, and fills in as events
 test('asks the browser to keep the screen awake, and again when the tab comes back', async ({ page }) => {
   await page.addInitScript(() => {
     window.__locks = 0;
-    Object.defineProperty(navigator, 'wakeLock', { value: { request: async () => { window.__locks++; return { release: async () => {} }; } } });
+    Object.defineProperty(navigator, 'wakeLock', {
+      value: {
+        request: async () => {
+          window.__locks++;
+          return { release: async () => {} };
+        },
+      },
+    });
   });
   await page.goto('/tv/');
   await expect.poll(() => page.evaluate(() => window.__locks)).toBe(1);
@@ -162,7 +169,7 @@ test('a click or F toggles full screen', async ({ page }) => {
 
 // Titles clip their overflow (line clamp, ellipsis), so the line has to be
 // tall enough for g, j, p, q, y to hang below the baseline.
-test("clipped titles leave room for letters that hang below the line", async ({ page }) => {
+test('clipped titles leave room for letters that hang below the line', async ({ page }) => {
   await page.goto('/tv/?fx=off');
   await page.evaluate(() => document.fonts.ready);
   const short = await page.evaluate(() => {
@@ -180,7 +187,9 @@ test("clipped titles leave room for letters that hang below the line", async ({ 
 
 test("the hourly reload waits while the site can't be reached, and the slides keep going", async ({ page }) => {
   await page.goto('/tv/?fx=off');
-  await page.evaluate(() => { window.__before = true; });
+  await page.evaluate(() => {
+    window.__before = true;
+  });
   // The check before reloading fails, as it would with the Wi-Fi down. (Faked in the
   // page: a blocked request would log a console error, which fails every test.)
   await page.evaluate(() => {

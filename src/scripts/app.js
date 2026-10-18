@@ -5,7 +5,23 @@
 // so any view can be shared or bookmarked.
 import { fold, queryTerms, matchesAll, matchSpans, excerpt } from '../lib/search.mjs';
 import { calendar, readState, stateQuery, addMonths } from '../lib/calendar.mjs';
-import { dayKey, dayName, monthName, addDays, daysBetween, plural, shortTime, escapeHtml, whenLabel, countdown, dayOf, recentSummary, plainText, isNew, sectionOf } from '../lib/format.mjs';
+import {
+  dayKey,
+  dayName,
+  monthName,
+  addDays,
+  daysBetween,
+  plural,
+  shortTime,
+  escapeHtml,
+  whenLabel,
+  countdown,
+  dayOf,
+  recentSummary,
+  plainText,
+  isNew,
+  sectionOf,
+} from '../lib/format.mjs';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -37,26 +53,35 @@ let poolFailed = false;
 let poolReady = false;
 function loadPool() {
   pool ??= fetch('/cards/')
-    .then((res) => { if (!res.ok) throw new Error(`card pool: ${res.status}`); return res.text(); })
-    .then((html) => {
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      for (const el of $$('.show', doc)) {
-        if (!cards.has(el.dataset.id)) cards.set(el.dataset.id, document.adoptNode(el));
-      }
-      const rows = $$('#past > li', doc);
-      for (const li of rows) li.hidden = true;
-      $('ol', pastResults).replaceChildren(...rows.map((li) => document.adoptNode(li)));
-      poolFailed = false;
-      poolReady = true;
-      searchIndex = null; // rebuild with the new cards
-      // Redraw only what was waiting on it (a redraw would close an open About).
-      if (state.view === 'calendar' && $('[aria-busy], .show:not([data-id])', dayPanel)) renderDayPanel();
-      else if (state.q || state.group) { listShown = renderList(); renderSide(); }
-    }, () => {
-      poolFailed = true;
-      pool = null; // try again next time
-      if (state.view === 'calendar') renderDayPanel();
-    });
+    .then((res) => {
+      if (!res.ok) throw new Error(`card pool: ${res.status}`);
+      return res.text();
+    })
+    .then(
+      (html) => {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        for (const el of $$('.show', doc)) {
+          if (!cards.has(el.dataset.id)) cards.set(el.dataset.id, document.adoptNode(el));
+        }
+        const rows = $$('#past > li', doc);
+        for (const li of rows) li.hidden = true;
+        $('ol', pastResults).replaceChildren(...rows.map((li) => document.adoptNode(li)));
+        poolFailed = false;
+        poolReady = true;
+        searchIndex = null; // rebuild with the new cards
+        // Redraw only what was waiting on it (a redraw would close an open About).
+        if (state.view === 'calendar' && $('[aria-busy], .show:not([data-id])', dayPanel)) renderDayPanel();
+        else if (state.q || state.group) {
+          listShown = renderList();
+          renderSide();
+        }
+      },
+      () => {
+        poolFailed = true;
+        pool = null; // try again next time
+        if (state.view === 'calendar') renderDayPanel();
+      },
+    );
   return pool;
 }
 
@@ -67,7 +92,11 @@ function loadPool() {
 // has ended since. Returns whether it dropped anything.
 function freshen(t) {
   let dropped = false;
-  for (const el of $$('#list-view [data-end], .poster[data-end]')) if (Date.parse(el.dataset.end) <= t) { el.remove(); dropped = true; }
+  for (const el of $$('#list-view [data-end], .poster[data-end]'))
+    if (Date.parse(el.dataset.end) <= t) {
+      el.remove();
+      dropped = true;
+    }
   for (const el of $$('.show', listView)) {
     const tag = $('.when-tag', el);
     if (!tag) continue;
@@ -130,7 +159,9 @@ const readUrl = () => Object.assign(state, readState(location.search, { groups, 
 readUrl();
 
 // Tell screen readers what a click changed. Never called on first load.
-function announce(text) { status.textContent = text; }
+function announce(text) {
+  status.textContent = text;
+}
 
 // Switching view or group is a new history entry, so Back undoes it. Picking
 // a day or month just updates the current entry; paging through a calendar
@@ -158,7 +189,7 @@ function haystack(id) {
   if (!searchIndex) {
     searchIndex = new Map();
     const index = (el, sel) => {
-      const names = hostsOf(el).flatMap((g) => groups[g] ? [groups[g].short, groups[g].name] : []);
+      const names = hostsOf(el).flatMap((g) => (groups[g] ? [groups[g].short, groups[g].name] : []));
       // An About's words as shown: not its links' hidden "(opens in new tab)".
       const text = $$(sel, el).map((t) => (t.matches('.desc') ? plainAbout(t) : t.textContent));
       searchIndex.set(el.dataset.id, fold([...names, ...text].join(' ')));
@@ -171,7 +202,13 @@ function haystack(id) {
 // The query's terms, worked out once per query.
 let terms = [];
 let termsFor = '';
-const queryNow = () => { if (termsFor !== state.q) { terms = queryTerms(state.q); termsFor = state.q; } return terms; };
+const queryNow = () => {
+  if (termsFor !== state.q) {
+    terms = queryTerms(state.q);
+    termsFor = state.q;
+  }
+  return terms;
+};
 const found = (el) => !state.q || matchesAll(haystack(el.dataset.id), queryNow());
 const shows = (el) => matches(hostsOf(el)) && found(el);
 
@@ -183,7 +220,10 @@ function renderList() {
   for (const sec of $$('[data-sec]', listView)) {
     const items = $$('.show, .far > li', sec);
     let n = 0;
-    for (const el of items) { el.hidden = !shows(el); if (!el.hidden) n++; }
+    for (const el of items) {
+      el.hidden = !shows(el);
+      if (!el.hidden) n++;
+    }
     sec.hidden = n === 0;
     total += n;
     const count = $('[data-count]', sec);
@@ -195,7 +235,10 @@ function renderList() {
   // data-after: an event that was still on when the pool was built shows once it's over.
   const over = (li) => !(Date.parse(li.dataset.after) > Date.now());
   const pastShows = (li) => over(li) && (state.q ? found(li) : !!state.group && matches(hostsOf(li)));
-  for (const li of $$('li', pastResults)) { li.hidden = !pastShows(li); if (!li.hidden) pastShown++; }
+  for (const li of $$('li', pastResults)) {
+    li.hidden = !pastShows(li);
+    if (!li.hidden) pastShown++;
+  }
   // Past belongs to the list; the calendar shows past days itself.
   pastResults.hidden = pastShown === 0 || state.view !== 'list';
   $('[data-count]', pastResults).textContent = plural(pastShown, 'event');
@@ -203,13 +246,16 @@ function renderList() {
   empty.hidden = total > 0;
   if (!total && state.q) {
     // Until the pool (and its past rows) is in, only upcoming events were searched.
-    const none = poolReady && !pastShown ? `Nothing matches '${escapeHtml(state.q)}', coming up or past.` : `Nothing coming up matches '${escapeHtml(state.q)}'.`;
+    const none =
+      poolReady && !pastShown ? `Nothing matches '${escapeHtml(state.q)}', coming up or past.` : `Nothing coming up matches '${escapeHtml(state.q)}'.`;
     empty.innerHTML = `${none} <button type="button" class="btn btn-outline btn-small" data-clear-search>Clear search</button>`;
   } else if (!total && state.group) {
     const g = groups[state.group];
-    empty.innerHTML = `Nothing on the books for this group right now. ${g.url
-      ? `Check <a href="${escapeHtml(g.url)}" target="_blank" rel="noopener">their page<span class="sr-only"> (opens in new tab)</span></a> for what's next.`
-      : 'Check their page for what\'s next.'}`;
+    empty.innerHTML = `Nothing on the books for this group right now. ${
+      g.url
+        ? `Check <a href="${escapeHtml(g.url)}" target="_blank" rel="noopener">their page<span class="sr-only"> (opens in new tab)</span></a> for what's next.`
+        : "Check their page for what's next."
+    }`;
   }
   // A search that finds nothing at all, coming up or past, once the
   // typing has settled (docs/ANALYTICS.md). Only the words themselves, and
@@ -239,7 +285,10 @@ function squashRepeats() {
   let section = null;
   for (const el of $$('.show', listView)) {
     if (el.hidden || el.closest('[hidden]')) continue;
-    if (el.parentElement !== section) { section = el.parentElement; prevVenue = null; }
+    if (el.parentElement !== section) {
+      section = el.parentElement;
+      prevVenue = null;
+    }
     el.classList.toggle('same-day', el.dataset.day === prevDay && el.previousElementSibling != null);
     prevDay = el.dataset.day;
     const v = el.dataset.venue;
@@ -259,7 +308,11 @@ const marked = new Set();
 const aboutText = new WeakMap();
 function unmark() {
   for (const el of marked) {
-    for (const m of $$('mark', el)) { const parent = m.parentNode; m.replaceWith(...m.childNodes); parent.normalize(); }
+    for (const m of $$('mark', el)) {
+      const parent = m.parentNode;
+      m.replaceWith(...m.childNodes);
+      parent.normalize();
+    }
     $('.excerpt', el)?.remove();
   }
   marked.clear();
@@ -279,17 +332,25 @@ function highlight() {
     if (hit.size === terms.length) continue;
     // A row with no card carries its short description itself (an archived one).
     const desc = $('.desc', cards.get(el.dataset.id) ?? el);
-    const x = desc && excerpt(plainAbout(desc), terms.filter((_, n) => !hit.has(n)));
+    const x =
+      desc &&
+      excerpt(
+        plainAbout(desc),
+        terms.filter((_, n) => !hit.has(n)),
+      );
     if (!x) continue;
     const line = document.createElement(card ? 'p' : 'span');
     line.className = 'excerpt';
-    line.append(...x.parts.map((part) => {
-      if (!part.mark) return part.text;
-      const m = document.createElement('mark');
-      m.textContent = part.text;
-      return m;
-    }));
-    if (card) $('.body', el).append(line); else el.append(line);
+    line.append(
+      ...x.parts.map((part) => {
+        if (!part.mark) return part.text;
+        const m = document.createElement('mark');
+        m.textContent = part.text;
+        return m;
+      }),
+    );
+    if (card) $('.body', el).append(line);
+    else el.append(line);
     marked.add(el);
   }
 }
@@ -332,7 +393,9 @@ function plainAbout(desc) {
 function renderSide() {
   // Filtered to one group: say which, with a way to the group and a way out.
   $('#filter').hidden = !state.group;
-  if (state.group) $('#filter-note').innerHTML = `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <a href="/groups/#${encodeURIComponent(state.group)}">About the group</a>`;
+  if (state.group)
+    $('#filter-note').innerHTML =
+      `Showing only <b>${escapeHtml(groups[state.group].name)}</b>. <a href="/groups/#${encodeURIComponent(state.group)}">About the group</a>`;
 
   for (const p of $$('.poster')) p.hidden = !shows(p);
   // The calendar already shows conference days in pink; skip the posters there.
@@ -349,7 +412,10 @@ function renderSide() {
   }
   // The summary and the "All N" button count what the filter left.
   const visible = $$('li:not([hidden])', list);
-  $('#recent-sub').textContent = recentSummary(visible.length, visible.reduce((n, li) => n + Number(li.dataset.going), 0));
+  $('#recent-sub').textContent = recentSummary(
+    visible.length,
+    visible.reduce((n, li) => n + Number(li.dataset.going), 0),
+  );
   const all = $('#recent-all');
   if (all) {
     all.hidden = shown <= limit;
@@ -370,14 +436,30 @@ let dayPicked = !!state.day;
 // (dots on a phone) and a spoken summary.
 function dayCell(key) {
   const list = eventsOn(key);
-  const cls = ['day', key.startsWith(state.month) ? '' : 'outside', key < today ? 'past' : '', key === today ? 'today' : '', list.length ? 'has' : '', list.some((e) => e.headliner) ? 'headliner' : ''].filter(Boolean).join(' ');
-  const pills = list.slice(0, 3).map((e) => {
-    const ended = Date.parse(e.end) < now ? ' ended' : '';
-    return e.headliner
-      ? `<span class="pill headliner${ended}" title="${escapeHtml(e.title)}">${escapeHtml(e.label)}</span>`
-      : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : shortTime(e.start)}</i> ${escapeHtml(e.label)}</span>`;
-  }).join('') + (list.length > 3 ? `<span class="more-n">+${list.length - 3} more</span>` : '');
-  const dots = list.filter((e) => !e.headliner).map(() => '<i class="dot"></i>').join('');
+  const cls = [
+    'day',
+    key.startsWith(state.month) ? '' : 'outside',
+    key < today ? 'past' : '',
+    key === today ? 'today' : '',
+    list.length ? 'has' : '',
+    list.some((e) => e.headliner) ? 'headliner' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const pills =
+    list
+      .slice(0, 3)
+      .map((e) => {
+        const ended = Date.parse(e.end) < now ? ' ended' : '';
+        return e.headliner
+          ? `<span class="pill headliner${ended}" title="${escapeHtml(e.title)}">${escapeHtml(e.label)}</span>`
+          : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : shortTime(e.start)}</i> ${escapeHtml(e.label)}</span>`;
+      })
+      .join('') + (list.length > 3 ? `<span class="more-n">+${list.length - 3} more</span>` : '');
+  const dots = list
+    .filter((e) => !e.headliner)
+    .map(() => '<i class="dot"></i>')
+    .join('');
   const name = `${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}`;
   // Only the selected day is in the tab order; arrow keys move between days.
   return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}"${cal.inRange(key) ? '' : ' disabled'}>
@@ -444,9 +526,12 @@ function renderDayPanel() {
       // The pool didn't load (offline before it was ever saved): the title,
       // linked to the event's page, still says what was on.
       const href = e.url ?? groups[e.groups[0]]?.url;
-      ul.insertAdjacentHTML('beforeend', `<li class="show"><div class="body"><h3 class="title">${href
-        ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener" aria-describedby="new-tab">${escapeHtml(e.title)}</a>`
-        : escapeHtml(e.title)}</h3></div></li>`);
+      ul.insertAdjacentHTML(
+        'beforeend',
+        `<li class="show"><div class="body"><h3 class="title">${
+          href ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener" aria-describedby="new-tab">${escapeHtml(e.title)}</a>` : escapeHtml(e.title)
+        }</h3></div></li>`,
+      );
       continue;
     }
     card.hidden = false;
@@ -458,7 +543,11 @@ function renderDayPanel() {
     const time = $('.time[data-full]', card);
     if (time) time.textContent = time.dataset.full;
     const desc = $('.desc', card);
-    if (desc) { desc.id += '-day'; desc.hidden = true; $('.more', card)?.setAttribute('aria-controls', desc.id); }
+    if (desc) {
+      desc.id += '-day';
+      desc.hidden = true;
+      $('.more', card)?.setAttribute('aria-controls', desc.id);
+    }
     // Over (a past day, or earlier today): read it like Recent events does.
     // "went", not "going", and no RSVP button; the title still links to it.
     if (Date.parse(e.end) <= now) {
@@ -488,7 +577,14 @@ function settlePanel(held) {
   void dayPanel.offsetHeight; // start the transition from the held height
   dayPanel.style.transition = 'min-height 0.3s ease-out';
   dayPanel.style.minHeight = `${natural}px`;
-  dayPanel.addEventListener('transitionend', () => { dayPanel.style.transition = ''; dayPanel.style.minHeight = ''; }, { once: true });
+  dayPanel.addEventListener(
+    'transitionend',
+    () => {
+      dayPanel.style.transition = '';
+      dayPanel.style.minHeight = '';
+    },
+    { once: true },
+  );
 }
 
 function renderMinical() {
@@ -496,7 +592,9 @@ function renderMinical() {
   const cells = cal.cells(ym).map((key) => {
     if (!key.startsWith(ym)) return '<span class="blank" aria-hidden="true"></span>';
     const list = eventsOn(key);
-    const cls = [list.length ? 'has' : '', list.some((e) => e.headliner) ? 'headliner' : '', key === today ? 'today' : '', key < today ? 'past' : ''].filter(Boolean).join(' ');
+    const cls = [list.length ? 'has' : '', list.some((e) => e.headliner) ? 'headliner' : '', key === today ? 'today' : '', key < today ? 'past' : '']
+      .filter(Boolean)
+      .join(' ');
     // One tab stop (today); arrow keys move between days, as in the big calendar.
     return `<button type="button" class="${cls}" data-goto="${key}" tabindex="${key === today ? 0 : -1}" aria-label="${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}">${Number(key.slice(8))}</button>`;
   });
@@ -511,7 +609,8 @@ function render() {
   const groupName = state.group ? groups[state.group].short : state.q ? `'${state.q}'` : '';
   document.title = groupName || viewName ? [groupName, viewName, siteName].filter(Boolean).join(' · ') : siteTitle;
   for (const a of $$('.nav a[data-nav]')) {
-    if (a.dataset.nav === state.view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    if (a.dataset.nav === state.view) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
   }
   listView.hidden = state.view !== 'list';
   calView.hidden = state.view !== 'calendar';
@@ -521,7 +620,14 @@ function render() {
   else delete document.documentElement.dataset.view;
   // The calendar, a search and one group's past all read the card pool.
   if (state.view === 'calendar' || state.q || state.group) loadPool();
-  if (state.view === 'list') { listShown = renderList(); renderMinical(); } else { pastResults.hidden = true; highlight(); renderCalendar(); }
+  if (state.view === 'list') {
+    listShown = renderList();
+    renderMinical();
+  } else {
+    pastResults.hidden = true;
+    highlight();
+    renderCalendar();
+  }
   renderSide();
   syncSearchBox();
   syncUrl();
@@ -551,7 +657,10 @@ function searchSummary() {
   if (pastShown) return `Nothing coming up matches ${q}. Showing ${plural(pastShown, 'past event')}`;
   return poolReady ? `Nothing matches ${q}, coming up or past` : `Nothing coming up matches ${q}`;
 }
-const dayStatus = () => { const n = eventsOn(state.day).length; return `${dayName(state.day)}: ${n ? plural(n, 'event') : 'nothing scheduled'}`; };
+const dayStatus = () => {
+  const n = eventsOn(state.day).length;
+  return `${dayName(state.day)}: ${n ? plural(n, 'event') : 'nothing scheduled'}`;
+};
 
 // ---- search box ----
 // The magnifier opens a box under the nav. Typing filters the list at once and
@@ -570,23 +679,40 @@ function setQuery(q) {
   state.q = q.trim().slice(0, 100);
   // Leaving a group or the calendar for a search is one Back step (syncUrl
   // pushes when view or group change); each keystroke after that is not.
-  if (state.q) { state.group = ''; state.view = 'list'; }
+  if (state.q) {
+    state.group = '';
+    state.view = 'list';
+  }
   render();
   clearTimeout(announceTimer);
   announceTimer = setTimeout(announceFilter, 600);
 }
 function closeSearch() {
-  if (state.q) { searchInput.value = ''; setQuery(''); }
+  if (state.q) {
+    searchInput.value = '';
+    setQuery('');
+  }
   showSearchBox(false);
   searchBtn.focus();
 }
 searchBtn.addEventListener('click', () => {
-  if (searchForm.hidden) { showSearchBox(true); searchInput.focus(); } else closeSearch();
+  if (searchForm.hidden) {
+    showSearchBox(true);
+    searchInput.focus();
+  } else closeSearch();
 });
 searchInput.addEventListener('input', () => setQuery(searchInput.value));
-searchInput.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { ev.preventDefault(); closeSearch(); } });
+searchInput.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape') {
+    ev.preventDefault();
+    closeSearch();
+  }
+});
 // Enter puts the phone keyboard away so the results show.
-searchForm.addEventListener('submit', (ev) => { ev.preventDefault(); searchInput.blur(); });
+searchForm.addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  searchInput.blur();
+});
 $('#search-clear').addEventListener('click', closeSearch);
 // A shared ?q= link opens with the box showing what was searched.
 function syncSearchBox() {
@@ -610,16 +736,26 @@ document.addEventListener('click', (ev) => {
   if (nav) {
     ev.preventDefault();
     // The tab you're already on: while filtered, it means "everything".
-    if (nav.dataset.nav === state.view) { if (state.group) showAll(); else scrollTo({ top: 0 }); return; }
+    if (nav.dataset.nav === state.view) {
+      if (state.group) showAll();
+      else scrollTo({ top: 0 });
+      return;
+    }
     state.view = nav.dataset.nav;
-    if (state.view === 'calendar') { state.month = (state.day ?? today).slice(0, 7); state.q = ''; }
+    if (state.view === 'calendar') {
+      state.month = (state.day ?? today).slice(0, 7);
+      state.q = '';
+    }
     render();
     scrollTo({ top: 0 });
     announce(state.view === 'calendar' ? `Calendar, ${monthName(state.month, true)}` : 'Event list');
     return;
   }
 
-  if (t.closest('[data-show-all]')) { showAll(); return; }
+  if (t.closest('[data-show-all]')) {
+    showAll();
+    return;
+  }
 
   const groupLink = t.closest('a[data-group]');
   if (groupLink && !ev.metaKey && !ev.ctrlKey) {
@@ -746,7 +882,10 @@ addEventListener('popstate', () => {
 // to type. Read before render(), whose syncUrl tidies ?search out of the URL.
 const openSearch = new URLSearchParams(location.search).has('search') && !state.q;
 render();
-if (openSearch) { showSearchBox(true); searchInput.focus(); }
+if (openSearch) {
+  showSearchBox(true);
+  searchInput.focus();
+}
 
 // A page left open, or an app on a phone's home screen (which iOS resumes
 // as it was), keeps its labels current: when it comes back into view and once
@@ -767,10 +906,15 @@ function keepCurrent() {
     location.reload();
     return;
   }
-  if (freshen(t)) { listShown = renderList(); renderSide(); }
+  if (freshen(t)) {
+    listShown = renderList();
+    renderSide();
+  }
 }
 document.addEventListener('visibilitychange', keepCurrent);
-addEventListener('pageshow', (e) => { if (e.persisted) keepCurrent(); });
+addEventListener('pageshow', (e) => {
+  if (e.persisted) keepCurrent();
+});
 setInterval(keepCurrent, 60_000);
 
 // About opens and closes smoothly: the panel's height animates, and on
@@ -805,7 +949,10 @@ async function toggleAbout(more) {
     if (open) {
       // A photo with no width/height (not from Meetup) has no shape until it
       // loads; wait for it so the panel grows to its real height.
-      if (fly || (big && !big.hasAttribute('height'))) { big.loading = 'eager'; await big.decode().catch(() => {}); }
+      if (fly || (big && !big.hasAttribute('height'))) {
+        big.loading = 'eager';
+        await big.decode().catch(() => {});
+      }
       const from = fly && thumb.getBoundingClientRect();
       set(true);
       // Measure where the photo lands, and how far the page has to scroll,
@@ -817,7 +964,8 @@ async function toggleAbout(more) {
       const to = fly && big.getBoundingClientRect();
       const grow = slide(desc, true);
       if (by) scrollAlong(desc.getAnimations()[0], by);
-      if (fly) await flyImage(big, from, { left: to.left, top: to.top - by, width: to.width, height: to.height }, { rotate: [rotation(thumb), 0], hide: [big] });
+      if (fly)
+        await flyImage(big, from, { left: to.left, top: to.top - by, width: to.width, height: to.height }, { rotate: [rotation(thumb), 0], hide: [big] });
       await grow;
     } else {
       const from = fly && big.getBoundingClientRect();
@@ -867,7 +1015,10 @@ function slide(el, opening) {
   const none = { height: '0px', paddingTop: '0px', paddingBottom: '0px', marginTop: '0px', opacity: 0 };
   el.style.overflow = 'hidden';
   const anim = el.animate(opening ? [none, full] : [full, none], { duration: MS, easing: EASE, fill: 'forwards' });
-  return anim.finished.then(() => { anim.cancel(); el.style.overflow = ''; });
+  return anim.finished.then(() => {
+    anim.cancel();
+    el.style.overflow = '';
+  });
 }
 
 // Fly a copy of `img` from one box to another above the page, hiding the real

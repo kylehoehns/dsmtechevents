@@ -16,9 +16,10 @@ export function planIssues(report, openIssues, runUrl = '') {
   const issueFor = (id) => openIssues.find((i) => i.title.endsWith(tag(id)));
   const actions = [];
   for (const p of report.problems) {
-    const what = p.kind === 'details'
-      ? 'Its events still came in, but the extra details (venue, photo, RSVP count) from its Meetup events page did not.'
-      : 'Its events could not be read, so the site is showing what it had from the last good run.';
+    const what =
+      p.kind === 'details'
+        ? 'Its events still came in, but the extra details (venue, photo, RSVP count) from its Meetup events page did not.'
+        : 'Its events could not be read, so the site is showing what it had from the last good run.';
     const body = [
       `The scheduled refresh couldn't fully read **${p.name}** (\`${p.id}\`). ${what}`,
       '',
@@ -30,9 +31,9 @@ export function planIssues(report, openIssues, runUrl = '') {
       ...(runUrl ? ['', `Last failed run: ${runUrl}`] : []),
     ].join('\n');
     const open = issueFor(p.id);
-    actions.push(open
-      ? { type: 'update', number: open.number, id: p.id, body }
-      : { type: 'open', id: p.id, title: `Source broken: ${p.name} ${tag(p.id)}`, body });
+    actions.push(
+      open ? { type: 'update', number: open.number, id: p.id, body } : { type: 'open', id: p.id, title: `Source broken: ${p.name} ${tag(p.id)}`, body },
+    );
   }
   for (const id of report.ok) {
     const open = issueFor(id);
@@ -54,7 +55,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const actions = planIssues(report, open, run ?? '');
   if (!actions.length) console.log('Every source is fine; no issues to change.');
   if (!dryRun && actions.some((a) => a.type === 'open')) {
-    gh('label', 'create', LABEL, '--color', 'd73a4a', '--description', 'A group\'s events could not be fetched', '--force');
+    gh('label', 'create', LABEL, '--color', 'd73a4a', '--description', "A group's events could not be fetched", '--force');
   }
   for (const a of actions) {
     console.log(`${dryRun ? '[dry run] ' : ''}${a.type} ${a.id}${a.number ? ` #${a.number}` : ''}`);

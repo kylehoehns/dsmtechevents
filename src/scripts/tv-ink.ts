@@ -59,7 +59,6 @@ void main() {
   gl_FragColor = vec4(ink * on, on);
 }`;
 
-
 const hex = (css: string) => {
   const m = css.trim().match(/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
   return m ? m.slice(1).map((h) => parseInt(h, 16) / 255) : [0.88, 0.38, 0.62];
@@ -109,8 +108,15 @@ export function inkLayer(stage: HTMLElement) {
     gl.uniform1f(at('seed'), Math.random() * 100);
     gl.uniform1f(at('dpr'), dpr);
     // far enough that the wave's back has cleared the farthest corner
-    const far = Math.max(...[[box.left, box.top], [box.right, box.top], [box.left, box.bottom], [box.right, box.bottom]]
-      .map(([x, y]) => Math.hypot(x - origin.x, y - origin.y))) / box.height;
+    const far =
+      Math.max(
+        ...[
+          [box.left, box.top],
+          [box.right, box.top],
+          [box.left, box.bottom],
+          [box.right, box.bottom],
+        ].map(([x, y]) => Math.hypot(x - origin.x, y - origin.y)),
+      ) / box.height;
     const end = far + BAND + ROUGH;
     const sheet = slide.getBoundingClientRect();
     const cx = origin.x - sheet.left;
@@ -124,7 +130,10 @@ export function inkLayer(stage: HTMLElement) {
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       slide.style.clipPath = `circle(${Math.max(reach - SLACK, 0) * box.height}px at ${cx}px ${cy}px)`;
       if (p < 1) frame = requestAnimationFrame(draw);
-      else { gl.clear(gl.COLOR_BUFFER_BIT); slide.style.clipPath = ''; }
+      else {
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        slide.style.clipPath = '';
+      }
     };
     slide.style.clipPath = 'circle(0 at 0 0)';
     frame = requestAnimationFrame(draw);

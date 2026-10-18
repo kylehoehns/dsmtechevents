@@ -35,7 +35,10 @@ export class LeaveIt extends Error {}
 // it goes in an issue comment, the PR or the commit message: no backticks or
 // line breaks to break out of the formatting around it, and an invisible space
 // after each @ and #, so "@someone" pings nobody and "Fixes #3" closes nothing.
-export const tame = (s) => String(s).replace(/[`\r\n]+/g, ' ').replace(/[@#]/g, '$&\u200b');
+export const tame = (s) =>
+  String(s)
+    .replace(/[`\r\n]+/g, ' ')
+    .replace(/[@#]/g, '$&\u200b');
 
 // Which kind of link this is. Only exact Luma event and Meetup group links
 // (or one of the group's event links) get through.
@@ -58,7 +61,8 @@ export function alreadyListed({ kind, slug }, groups, events) {
 // Reasons a Luma event can't go in, and things the reviewer should check.
 export function checkLumaEvent(e, now) {
   if (Date.parse(e.end) < now) throw new LeaveIt(`"${tame(e.title)}" is already over.`);
-  if (!e.online && !/\b(IA|Iowa)\b/.test(e.address ?? '')) throw new LeaveIt(`"${tame(e.title)}" isn't in Iowa (Luma says ${tame(e.address ?? 'no address')}).`);
+  if (!e.online && !/\b(IA|Iowa)\b/.test(e.address ?? ''))
+    throw new LeaveIt(`"${tame(e.title)}" isn't in Iowa (Luma says ${tame(e.address ?? 'no address')}).`);
   return e.online ? ['It is online: check it is run by a local group.'] : [];
 }
 
@@ -81,7 +85,11 @@ export function defaultShort(name) {
 }
 
 export function uniqueId(short, groups) {
-  const base = short.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'group';
+  const base =
+    short
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'group';
   const taken = new Set(groups.map((g) => g.id));
   let id = base;
   for (let n = 2; taken.has(id); n++) id = `${base}-${n}`;
@@ -99,8 +107,9 @@ export function insertGroup(text, entry) {
 
 export const appendEvent = (text, entry) => `${text.trimEnd()}\n\n${entry.trimEnd()}\n`;
 
-const when = (e) => `${fmt({ weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(e.start))}`
-  + ` to ${fmt({ hour: 'numeric', minute: '2-digit' }).format(new Date(e.end))}`;
+const when = (e) =>
+  `${fmt({ weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(e.start))}` +
+  ` to ${fmt({ hour: 'numeric', minute: '2-digit' }).format(new Date(e.end))}`;
 
 // Cloudflare's preview for a branch: <branch>-dsmtechevents.kyhoehns.workers.dev.
 export const previewUrl = (branch, page = '/') => `https://${branch}-dsmtechevents.kyhoehns.workers.dev${page}`;
@@ -175,7 +184,8 @@ export async function addListing(link, { short, issue, now = Date.now() } = {}) 
       `Where: ${e.online ? 'Online' : [e.venue, shortAddress(e.address)].filter(Boolean).join(', ') || 'not given'}`,
       ...(e.going != null ? [`Going so far: ${e.going}`] : []),
     ];
-    if (/\s[|·–—-]\s/.test(e.title)) warnings.push(`Luma's title is "${tame(e.title)}". If part of it repeats the date or place, add a shorter \`title:\` to the entry.`);
+    if (/\s[|·–—-]\s/.test(e.title))
+      warnings.push(`Luma's title is "${tame(e.title)}". If part of it repeats the date or place, add a shorter \`title:\` to the entry.`);
     page = `/?view=calendar&day=${dayKey(e.start)}`;
     write = () => fs.writeFileSync(file('events.yaml'), appendEvent(eventsText, entry));
   } else {

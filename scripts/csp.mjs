@@ -37,7 +37,10 @@ export function inlineScripts(html) {
 export const scriptHash = (body) => `'sha256-${crypto.createHash('sha256').update(body, 'utf8').digest('base64')}'`;
 
 function htmlFiles(dir) {
-  return fs.readdirSync(dir, { recursive: true }).filter((f) => f.endsWith('.html')).map((f) => path.join(dir, f));
+  return fs
+    .readdirSync(dir, { recursive: true })
+    .filter((f) => f.endsWith('.html'))
+    .map((f) => path.join(dir, f));
 }
 
 // Every distinct inline-script hash across the built pages, sorted so the

@@ -12,7 +12,8 @@ const test = base.extend({
 
 const EVENT = 'cijug-joint';
 const current = (page) => page.locator('.slide.is-on');
-const kinds = (page) => page.locator('.tv-stage > .slide').evaluateAll((els) => els.map((el) => [...el.classList].find((c) => c.startsWith('ev-') && c !== 'ev-slide')));
+const kinds = (page) =>
+  page.locator('.tv-stage > .slide').evaluateAll((els) => els.map((el) => [...el.classList].find((c) => c.startsWith('ev-') && c !== 'ev-slide')));
 
 test("CIJUG's event: title, lineup and a QR code to RSVP, then the two Up next slides", async ({ page }) => {
   await page.goto(`/tv/?event=${EVENT}`);
@@ -61,7 +62,13 @@ test("CIJUG's event slide stays up longer than the rest", async ({ page }) => {
 test("Up next lists events after CIJUG's, by date, not CIJUG's own", async ({ page }) => {
   await page.goto(`/tv/?event=${EVENT}`);
   const rows = page.locator('.ev-next li');
-  await expect(rows.locator('.row-title')).toHaveText(['Test Conf 2026', 'Conf Afterparty', 'Convention Center Tour', 'Remote DevOps Chat', 'Hack Night Returns']);
+  await expect(rows.locator('.row-title')).toHaveText([
+    'Test Conf 2026',
+    'Conf Afterparty',
+    'Convention Center Tour',
+    'Remote DevOps Chat',
+    'Hack Night Returns',
+  ]);
   await expect(rows.first()).toContainText('Thu Oct 22');
   await expect(rows.first().locator('.row-group')).toHaveText('Conference');
   await expect(page.locator('.ev-next-all .qr-code svg')).toBeAttached();
@@ -95,7 +102,9 @@ test('an unknown event id says so, then carries on with the regular rotation', a
 test('the hourly reload keeps the query', async ({ page }) => {
   const path = `/tv/?event=${EVENT}&fx=off`;
   await page.goto(path);
-  await page.evaluate(() => { window.__before = true; });
+  await page.evaluate(() => {
+    window.__before = true;
+  });
   await page.clock.fastForward('01:01:00');
   // The jump fires the event slide's timer; step to the last slide, and
   // when it ends the page reloads instead of starting over.

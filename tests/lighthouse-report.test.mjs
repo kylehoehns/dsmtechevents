@@ -28,7 +28,12 @@ test('deltas show only past the noise thresholds', () => {
 test('pick reads scores and timings, and leaves SEO out for /tv/', () => {
   const lhr = {
     categories: { performance: { score: 0.99 }, accessibility: { score: 1 }, 'best-practices': { score: 0.96 }, seo: { score: 0.66 } },
-    audits: { 'largest-contentful-paint': { numericValue: 1200 }, 'cumulative-layout-shift': { numericValue: 0.02 }, 'total-blocking-time': { numericValue: 0 }, 'first-contentful-paint': { numericValue: 950 } },
+    audits: {
+      'largest-contentful-paint': { numericValue: 1200 },
+      'cumulative-layout-shift': { numericValue: 0.02 },
+      'total-blocking-time': { numericValue: 0 },
+      'first-contentful-paint': { numericValue: 950 },
+    },
   };
   assert.deepEqual(pick(lhr, '/'), { perf: 99, a11y: 100, bp: 96, seo: 66, lcp: 1200, cls: 0.02, tbt: 0, fcp: 950 });
   assert.equal(pick(lhr, '/tv/').seo, null);

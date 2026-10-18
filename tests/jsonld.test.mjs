@@ -3,7 +3,13 @@ import assert from 'node:assert/strict';
 import { localIso, eventJsonLd, toScript } from '../src/lib/jsonld.mjs';
 
 const byId = { cijug: { name: 'Central Iowa Java Users Group', meetupUrl: 'https://www.meetup.com/cijug/', logo: 'https://img/logo.jpeg' } };
-const base = { title: 'Lightning Talks', url: 'https://www.meetup.com/cijug/events/1/', start: '2026-10-22T22:30:00.000Z', end: '2026-10-23T00:00:00.000Z', groupIds: ['cijug'] };
+const base = {
+  title: 'Lightning Talks',
+  url: 'https://www.meetup.com/cijug/events/1/',
+  start: '2026-10-22T22:30:00.000Z',
+  end: '2026-10-23T00:00:00.000Z',
+  groupIds: ['cijug'],
+};
 
 test('localIso writes Des Moines time with its offset', () => {
   assert.equal(localIso('2026-10-22T22:30:00.000Z'), '2026-10-22T17:30:00-05:00');
@@ -12,7 +18,16 @@ test('localIso writes Des Moines time with its offset', () => {
 });
 
 test('an in-person event points at its Meetup page and full address', () => {
-  const ld = eventJsonLd({ ...base, venue: 'Source Allies', address: '4501 NW Urbandale Dr, Urbandale', fullAddress: '4501 NW Urbandale Dr, Urbandale, IA 50322', description: 'Five  minute\ntalks.' }, byId);
+  const ld = eventJsonLd(
+    {
+      ...base,
+      venue: 'Source Allies',
+      address: '4501 NW Urbandale Dr, Urbandale',
+      fullAddress: '4501 NW Urbandale Dr, Urbandale, IA 50322',
+      description: 'Five  minute\ntalks.',
+    },
+    byId,
+  );
   assert.equal(ld['@type'], 'Event');
   assert.equal(ld.url, base.url);
   assert.equal(ld.eventAttendanceMode, 'https://schema.org/OfflineEventAttendanceMode');

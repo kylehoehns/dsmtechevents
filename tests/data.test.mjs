@@ -13,7 +13,10 @@ const data = loadData({ dataDir, now });
 const find = (title) => data.events.find((e) => e.title === title);
 
 test('events split into upcoming and past around "now"', () => {
-  assert.deepEqual(data.past.map((e) => e.title), ['Spring recap']);
+  assert.deepEqual(
+    data.past.map((e) => e.title),
+    ['Spring recap'],
+  );
   assert.equal(data.upcoming[0].title, 'Hacktoberfest', 'upcoming is sorted by start');
 });
 
@@ -25,12 +28,16 @@ test('a meetup posted by two groups shows once, with both hosts', () => {
 
 test('a photo is shown only when it is not just the group logo', () => {
   assert.equal(find('Hacktoberfest').photo, null, 'same photo id as the Web Geeks logo');
-  assert.deepEqual(find('Joint Night: JVM vs CLR').photo, {
-    small: 'https://secure.meetupstatic.com/photos/event/a/b/global_888.webp',
-    large: 'https://secure.meetupstatic.com/photos/event/a/b/600_888.webp',
-    width: 600,
-    height: 338,
-  }, 'Meetup photos get their small webp copies');
+  assert.deepEqual(
+    find('Joint Night: JVM vs CLR').photo,
+    {
+      small: 'https://secure.meetupstatic.com/photos/event/a/b/global_888.webp',
+      large: 'https://secure.meetupstatic.com/photos/event/a/b/600_888.webp',
+      width: 600,
+      height: 338,
+    },
+    'Meetup photos get their small webp copies',
+  );
 });
 
 test('the full group name shows only when it adds something', () => {
@@ -69,7 +76,16 @@ test('a misspelled key in events.yaml or groups.yaml fails loudly instead of bei
 });
 
 test('a luma: event takes its details from the fetched copy, and its own fields win', () => {
-  const details = { title: 'Dev Days | Des Moines, Iowa, USA', start: '2026-10-20T20:00:00.000Z', end: '2026-10-20T22:00:00.000Z', allDay: false, url: 'https://luma.com/abc123', venue: 'Lean Techniques Office', going: 14, description: 'Hands-on.' };
+  const details = {
+    title: 'Dev Days | Des Moines, Iowa, USA',
+    start: '2026-10-20T20:00:00.000Z',
+    end: '2026-10-20T22:00:00.000Z',
+    allDay: false,
+    url: 'https://luma.com/abc123',
+    venue: 'Lean Techniques Office',
+    going: 14,
+    description: 'Hands-on.',
+  };
   const e = manualEvent({ luma: 'https://lu.ma/abc123', title: 'Dev Days', hosts: ['cijug'] }, { abc123: details });
   assert.deepEqual(
     [e.id, e.title, e.start, e.venue, e.going, e.groupIds, e.multiDay, e.headliner, e.source],
@@ -133,7 +149,10 @@ test('every hand-written event and group website link is a web address', async (
   const real = (f) => YAML.parse(readFileSync(new URL(`../data/${f}`, import.meta.url), 'utf8'));
   const links = [
     ...real('events.yaml').map((e) => [e.title, e.url]),
-    ...real('groups.yaml').flatMap((g) => [[g.id, g.website], [g.id, g.ical]]),
+    ...real('groups.yaml').flatMap((g) => [
+      [g.id, g.website],
+      [g.id, g.ical],
+    ]),
   ].filter(([, url]) => url != null);
   assert.ok(links.length > 3);
   for (const [name, url] of links) assert.match(String(url), /^https?:\/\//i, `${name}: ${url}`);
@@ -175,7 +194,10 @@ test('a quiet group that posts an event is listed and marked "Back!" on that eve
 test('an ordinary group is neither quiet nor returning', () => {
   const g = data.byId.webgeeks;
   assert.deepEqual([g.quiet, g.returning], [false, false]);
-  assert.deepEqual(data.events.filter((e) => e.back).map((e) => e.title), ['IDPA is back: SQL Server 2025']);
+  assert.deepEqual(
+    data.events.filter((e) => e.back).map((e) => e.title),
+    ['IDPA is back: SQL Server 2025'],
+  );
 });
 
 test('source health comes from status.json; no file means not checked yet', () => {
@@ -193,14 +215,25 @@ test('a group card is printed as it reads now and as it will once an event endin
   // Monday Oct 12, 9am: Hacktoberfest is tonight, the monthly series starts in November.
   const monday = loadData({ dataDir, now: Date.parse('2026-10-12T14:00:00Z') });
   const states = monday.byId.webgeeks.states.map((s) => [s.next?.title, s.last?.title, s.count, s.attrs]);
-  assert.deepEqual(states, [
-    ['Hacktoberfest', 'Spring recap', 2, { 'data-after': undefined, 'data-end': '2026-10-13T01:00:00.000Z', hidden: false }],
-    ['Web Geeks Monthly Meeting', 'Hacktoberfest', 1, { 'data-after': '2026-10-13T01:00:00.000Z', 'data-end': undefined, hidden: true }],
-  ], 'the series still counts once, and November is too far off to print what follows it');
+  assert.deepEqual(
+    states,
+    [
+      ['Hacktoberfest', 'Spring recap', 2, { 'data-after': undefined, 'data-end': '2026-10-13T01:00:00.000Z', hidden: false }],
+      ['Web Geeks Monthly Meeting', 'Hacktoberfest', 1, { 'data-after': '2026-10-13T01:00:00.000Z', 'data-end': undefined, hidden: true }],
+    ],
+    'the series still counts once, and November is too far off to print what follows it',
+  );
   assert.equal(monday.byId.webgeeks.states[0].count, monday.byId.webgeeks.upcomingCount);
   // Nothing coming up: one state, the "Nothing scheduled" one.
-  assert.deepEqual(monday.byId.uxdsm.states.map((s) => [s.next, s.count, s.attrs.hidden]), [[null, 0, false]]);
-  assert.deepEqual(monday.endingSoon.map((e) => e.title), ['Hacktoberfest'], 'Recent events gets it once it ends');
+  assert.deepEqual(
+    monday.byId.uxdsm.states.map((s) => [s.next, s.count, s.attrs.hidden]),
+    [[null, 0, false]],
+  );
+  assert.deepEqual(
+    monday.endingSoon.map((e) => e.title),
+    ['Hacktoberfest'],
+    'Recent events gets it once it ends',
+  );
 });
 
 test("a hand-added event's id: keeps its id (and /tv/?event= links) after a title change", async () => {

@@ -133,7 +133,11 @@ export function liveLabel(e, now = Date.now()) {
 
 // Flyer-style times: "5:30p", "12p".
 export function shortTime(iso) {
-  return timeFmt.format(new Date(iso)).replace(':00', '').replace(/\s?AM$/, 'a').replace(/\s?PM$/, 'p');
+  return timeFmt
+    .format(new Date(iso))
+    .replace(':00', '')
+    .replace(/\s?AM$/, 'a')
+    .replace(/\s?PM$/, 'p');
 }
 
 // "Oct 15–16", or "Oct 30–Nov 2" across a month. Ends on lastDay(), so an
@@ -177,7 +181,10 @@ export function formatDescription(text = '') {
     .map((para) => {
       const html = para
         .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" rel="noopener" target="_blank">$1<span class="sr-only"> (opens in new tab)</span></a>')
-        .replace(/(^|[\s(])(https?:\/\/[^\s<)]+?)(?=[.,;:!?]*(?:[\s<)]|$))/g, '$1<a href="$2" rel="noopener" target="_blank">$2<span class="sr-only"> (opens in new tab)</span></a>')
+        .replace(
+          /(^|[\s(])(https?:\/\/[^\s<)]+?)(?=[.,;:!?]*(?:[\s<)]|$))/g,
+          '$1<a href="$2" rel="noopener" target="_blank">$2<span class="sr-only"> (opens in new tab)</span></a>',
+        )
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
       const heading = /^#{1,6}\s+(.*)(?:\n([\s\S]*))?$/.exec(html);
       if (heading) return `<h4>${heading[1]}</h4>` + (heading[2] ? `<p>${heading[2].replace(/\n/g, '<br>')}</p>` : '');
@@ -188,14 +195,22 @@ export function formatDescription(text = '') {
 
 // A description as one line of plain text: no Markdown **bold** or ## heading
 // marks. For the search's excerpts and the structured data.
-export const plainText = (text) => text.replace(/\*{2,}|^[ \t]*#{1,6}[ \t]+/gm, '').replace(/\s+/g, ' ').trim();
+export const plainText = (text) =>
+  text
+    .replace(/\*{2,}|^[ \t]*#{1,6}[ \t]+/gm, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 
 // The talk lineup in a description, when it has one: SecDSM lists its talks
 // as bold "7:00 PM · Title" lines followed by "— Speaker".
 // [{ time: '7p', title, speaker }], or [] when there's no lineup.
 const TALK = /^\*\*\s*(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m\.?\s*[·•|–—-]\s*(.+?)\s*\*\*\s*(?:[—–-]\s*(.+?))?\s*$/gim;
 export function lineup(text = '') {
-  return [...String(text ?? '').replace(/\\([*_#[\]()-])/g, '$1').matchAll(TALK)].map(([, h, m, ap, title, speaker]) => ({
+  return [
+    ...String(text ?? '')
+      .replace(/\\([*_#[\]()-])/g, '$1')
+      .matchAll(TALK),
+  ].map(([, h, m, ap, title, speaker]) => ({
     time: `${Number(h)}${m && m !== '00' ? `:${m}` : ''}${ap.toLowerCase()}`,
     title,
     speaker: speaker ?? '',

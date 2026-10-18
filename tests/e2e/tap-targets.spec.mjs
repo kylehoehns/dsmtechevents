@@ -11,7 +11,10 @@ async function tapHeight(loc) {
     el.scrollIntoView({ block: 'center' });
     const r = el.getBoundingClientRect();
     const x = r.left + r.width / 2;
-    const hits = (y) => { const t = document.elementFromPoint(x, y); return !!t && el.contains(t); };
+    const hits = (y) => {
+      const t = document.elementFromPoint(x, y);
+      return !!t && el.contains(t);
+    };
     let top = r.top + r.height / 2;
     let bottom = top;
     while (hits(top - 1)) top--;

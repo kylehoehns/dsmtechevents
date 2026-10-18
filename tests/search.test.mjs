@@ -118,8 +118,7 @@ test('.NET, C# and Tech Fuse by the other names people type', () => {
   assert.ok(finds('techfuse', 'Tech Fuse DSM'));
 });
 
-test('a highlight covers just what matched'
-, () => {
+test('a highlight covers just what matched', () => {
   assert.deepEqual(marked('ai', 'AI Study Group'), ['AI']);
   assert.deepEqual(marked('ai', 'Pairing with Copilot and an LLM'), ['Copilot', 'LLM']);
   assert.deepEqual(marked('telemetry', 'Tracing with OpenTelemetry'), ['Telemetry']);
@@ -134,7 +133,8 @@ test('a highlight covers just what matched'
 const shown = (x) => x.parts.map((p) => (p.mark ? `[${p.text}]` : p.text)).join('');
 
 test('an excerpt shows about a dozen words around the match', () => {
-  const text = 'Bring a laptop and some questions. We will spend the evening pairing with Copilot on a small kata, then talk about what worked and what did not.';
+  const text =
+    'Bring a laptop and some questions. We will spend the evening pairing with Copilot on a small kata, then talk about what worked and what did not.';
   const x = excerpt(text, queryTerms('ai'));
   assert.equal(shown(x), '…spend the evening pairing with [Copilot] on a small kata, then talk…');
   const words = shown(x).split(/\s+/).length;
@@ -145,7 +145,8 @@ test('an excerpt shows about a dozen words around the match', () => {
 });
 
 test('with several words, the excerpt quotes where most of them appear together, all marked', () => {
-  const text = 'Leaders across industries are working out how to uniquely and durably unlock value with AI, and build reliable agentic systems. Join us as Priya Murthy, AI GTM & Strategic Partnerships with AWS will unpack the state of agents.';
+  const text =
+    'Leaders across industries are working out how to uniquely and durably unlock value with AI, and build reliable agentic systems. Join us as Priya Murthy, AI GTM & Strategic Partnerships with AWS will unpack the state of agents.';
   assert.equal(shown(excerpt(text, queryTerms('partnerships with'))), '…Murthy, AI GTM & Strategic [Partnerships] [with] AWS will unpack the state…');
   // One word alone still quotes its first match.
   assert.match(shown(excerpt(text, queryTerms('with'))), /^…uniquely and durably unlock value \[with\] AI/);

@@ -33,11 +33,16 @@ function setup({ groups = [{ id: 'iadnug', name: 'Iowa .NET User Group', short: 
 }
 
 // Every file under data/, with when it was last written.
-const snapshot = (root) => Object.fromEntries(fs.readdirSync(path.join(root, 'data'), { recursive: true })
-  .map((f) => path.join(root, 'data', f)).filter((f) => fs.statSync(f).isFile())
-  .map((f) => [path.relative(root, f), fs.statSync(f).mtimeMs]));
+const snapshot = (root) =>
+  Object.fromEntries(
+    fs
+      .readdirSync(path.join(root, 'data'), { recursive: true })
+      .map((f) => path.join(root, 'data', f))
+      .filter((f) => fs.statSync(f).isFile())
+      .map((f) => [path.relative(root, f), fs.statSync(f).mtimeMs]),
+  );
 
-test('a run writes each group\'s cache, Luma\'s and the status, and a second run with nothing new writes nothing', async () => {
+test("a run writes each group's cache, Luma's and the status, and a second run with nothing new writes nothing", async () => {
   const { root, run, read } = setup();
   const report = await run();
   assert.deepEqual(report, { ok: ['iadnug', 'luma-04xz1l03'], problems: [] });
@@ -51,7 +56,7 @@ test('a run writes each group\'s cache, Luma\'s and the status, and a second run
   assert.deepEqual(snapshot(root), before);
 });
 
-test('when the Meetup events page fails, the last run\'s venue and photo stay and the problem is a details one', async () => {
+test("when the Meetup events page fails, the last run's venue and photo stay and the problem is a details one", async () => {
   const pages = { ...PAGES };
   const { run, read } = setup({ pages });
   await run();
@@ -60,20 +65,28 @@ test('when the Meetup events page fails, the last run\'s venue and photo stay an
 
   delete pages['https://www.meetup.com/iadnug/events/'];
   const report = await run();
-  assert.deepEqual(report.problems.map((p) => [p.id, p.kind]), [['iadnug', 'details']]);
+  assert.deepEqual(
+    report.problems.map((p) => [p.id, p.kind]),
+    [['iadnug', 'details']],
+  );
   const after = read('cache/iadnug.json').events.find((e) => e.id === 'iadnug-300000001');
   assert.deepEqual([after.venue, after.image], [before.venue, before.image]);
 });
 
-test('a group whose source can\'t be read keeps its previous cache file, and the others carry on', async () => {
-  const { root, run, read } = setup({ groups: [
-    { id: 'gone', name: 'Gone', short: 'Gone', source: 'no-such-reader' },
-    { id: 'iadnug', name: 'Iowa .NET User Group', short: 'IADNUG', meetup: 'https://www.meetup.com/iadnug/' },
-  ] });
+test("a group whose source can't be read keeps its previous cache file, and the others carry on", async () => {
+  const { root, run, read } = setup({
+    groups: [
+      { id: 'gone', name: 'Gone', short: 'Gone', source: 'no-such-reader' },
+      { id: 'iadnug', name: 'Iowa .NET User Group', short: 'IADNUG', meetup: 'https://www.meetup.com/iadnug/' },
+    ],
+  });
   fs.mkdirSync(path.join(root, 'data/cache'));
   fs.writeFileSync(path.join(root, 'data/cache/gone.json'), '{"events":[],"kept":true}\n');
   const report = await run();
-  assert.deepEqual(report.problems.map((p) => [p.id, p.kind, p.message]), [['gone', 'fetch', 'unknown source "no-such-reader"']]);
+  assert.deepEqual(
+    report.problems.map((p) => [p.id, p.kind, p.message]),
+    [['gone', 'fetch', 'unknown source "no-such-reader"']],
+  );
   assert.equal(read('cache/gone.json').kept, true);
   assert.ok(read('cache/iadnug.json').events.length);
   assert.deepEqual(Object.keys(read('cache/status.json')), ['gone']);

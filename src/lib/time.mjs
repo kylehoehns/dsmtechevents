@@ -12,8 +12,17 @@ export function localToUtc(date, time = '00:00') {
 
 function tzOffsetMinutes(date) {
   const parts = Object.fromEntries(
-    new Intl.DateTimeFormat('en-US', { timeZone: site.timeZone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
-      .formatToParts(date).map((p) => [p.type, p.value]),
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: site.timeZone,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+      .formatToParts(date)
+      .map((p) => [p.type, p.value]),
   );
   const asUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute);
   return (asUtc - date.getTime()) / 60_000;

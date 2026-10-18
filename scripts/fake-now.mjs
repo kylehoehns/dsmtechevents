@@ -11,7 +11,12 @@ const Real = Date;
 const offset = Real.parse(process.env.FAKE_NOW) - Real.now();
 if (Number.isNaN(offset)) throw new Error('set FAKE_NOW to an ISO time, e.g. 2026-10-15T15:00:00Z');
 class FakeDate extends Real {
-  constructor(...args) { if (args.length === 0) super(Real.now() + offset); else super(...args); }
-  static now() { return Real.now() + offset; }
+  constructor(...args) {
+    if (args.length === 0) super(Real.now() + offset);
+    else super(...args);
+  }
+  static now() {
+    return Real.now() + offset;
+  }
 }
 globalThis.Date = FakeDate;

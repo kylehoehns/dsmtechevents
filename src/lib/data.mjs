@@ -21,7 +21,9 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   const groups = readYaml('groups.yaml').map((g) => readGroup(g, dataDir));
   const byId = Object.fromEntries(groups.map((g) => [g.id, g]));
   const luma = readLumaCache(dataDir);
-  const manual = readYaml('events.yaml').map((e) => manualEvent(e, luma)).filter(Boolean);
+  const manual = readYaml('events.yaml')
+    .map((e) => manualEvent(e, luma))
+    .filter(Boolean);
 
   const events = foldJoint([...groups.flatMap((g) => g._events), ...manual])
     .map(tidy)
@@ -40,12 +42,19 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
     markQuiet(g, archived[g.id], now);
   }
 
-  const fetched = groups.map((g) => g.fetchedAt).filter(Boolean).sort();
+  const fetched = groups
+    .map((g) => g.fetchedAt)
+    .filter(Boolean)
+    .sort();
   return {
     // Quiet groups are hidden everywhere but /status/; they come back on their own.
     groups: groups.filter((g) => !g.quiet),
     allGroups: groups,
-    byId, events, upcoming, past, archive,
+    byId,
+    events,
+    upcoming,
+    past,
+    archive,
     // For Recent events on the home page, which adds each one once it's over.
     endingSoon: upcoming.filter((e) => Date.parse(e.end) <= now + CATCH_UP),
     updatedAt: fetched.at(-1) ?? new Date(now).toISOString(),
@@ -58,7 +67,9 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
 function readArchive(dataDir) {
   const dir = path.join(dataDir, 'archive');
   if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir).filter((f) => f.endsWith('.json'))
+  return fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.json'))
     .flatMap((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
 }
 
@@ -82,7 +93,13 @@ function markQuiet(g, archived, now) {
 // no refresh has checked yet, so health is unknown rather than "fine".
 // built-on.txt is the Des Moines date of the latest refresh.
 function readStatus(dataDir, groups) {
-  const read = (f) => { try { return fs.readFileSync(path.join(dataDir, 'cache', f), 'utf8'); } catch { return null; } };
+  const read = (f) => {
+    try {
+      return fs.readFileSync(path.join(dataDir, 'cache', f), 'utf8');
+    } catch {
+      return null;
+    }
+  };
   const status = read('status.json');
   const problems = status ? JSON.parse(status) : null;
   for (const g of groups) g.health = problems ? (problems[g.id] ?? { kind: 'ok' }) : null;
@@ -96,7 +113,10 @@ const EVENT_KEYS = new Set(['title', 'id', 'url', 'start', 'end', 'time', 'endTi
 
 function onlyKnown(file, entry, keys) {
   const unknown = Object.keys(entry).filter((k) => !keys.has(k));
-  if (unknown.length) throw new Error(`${file}: "${entry.title ?? entry.id ?? entry.luma}" has unknown ${unknown.map((k) => `${k}:`).join(', ')} (known: ${[...keys].join(', ')})`);
+  if (unknown.length)
+    throw new Error(
+      `${file}: "${entry.title ?? entry.id ?? entry.luma}" has unknown ${unknown.map((k) => `${k}:`).join(', ')} (known: ${[...keys].join(', ')})`,
+    );
 }
 
 // A group from groups.yaml plus what the refresh cached for it.
@@ -285,5 +305,8 @@ export function shortAddress(a) {
 }
 
 function slugify(s) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 }

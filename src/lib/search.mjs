@@ -16,7 +16,11 @@
 import { SYNONYMS } from './synonyms.mjs';
 
 export const fold = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/['’]/g, '').toLowerCase();
-const queryWords = (q) => fold(q).split(/[^\p{L}\p{N}.#+]+/u).map((w) => w.replace(/\.+$/, '')).filter((w) => /[\p{L}\p{N}]/u.test(w));
+const queryWords = (q) =>
+  fold(q)
+    .split(/[^\p{L}\p{N}.#+]+/u)
+    .map((w) => w.replace(/\.+$/, ''))
+    .filter((w) => /[\p{L}\p{N}]/u.test(w));
 const loose = (w) => /^[\p{L}\p{N}]{4,}$/u.test(w);
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -92,7 +96,11 @@ export function excerpt(text, terms, around = 12) {
   const spans = matchSpans(text, terms);
   if (!spans.length) return null;
   const tokens = [...text.matchAll(/\S+/g)].map((m) => [m.index, m.index + m[0].length]);
-  const tokenAt = (pos) => { let t = 0; while (t + 1 < tokens.length && tokens[t + 1][0] <= pos) t++; return t; };
+  const tokenAt = (pos) => {
+    let t = 0;
+    while (t + 1 < tokens.length && tokens[t + 1][0] <= pos) t++;
+    return t;
+  };
   // A window of `around` words, with the anchor match about five words in.
   const windowFor = ([a]) => {
     const w0 = Math.max(0, Math.min(tokenAt(a) - 5, tokens.length - around));

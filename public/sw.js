@@ -33,34 +33,40 @@ const LAZY = [];
 const PAGE_IMAGES = { '/groups/': ['logo-img', LOGOS], '/tv/': ['tv-photo', IMAGES] };
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then(async (cache) => {
-    await cache.addAll([...PAGES, ...ASSETS.filter((a) => !LAZY.includes(a))]);
-    // Stamp the pages as just saved, so the first move between them is instant too.
-    await Promise.all(PAGES.map(async (page) => {
-      const res = await cache.match(page);
-      if (res) await cache.put(page, stamped(res, await res.blob()));
-    }));
-    // Pages saved here may never be opened online, so save their images now too.
-    await Promise.all(Object.keys(PAGE_IMAGES).map(async (page) => saveImages(page, await (await cache.match(page)).text()).catch(() => {})));
-  }));
+  e.waitUntil(
+    caches.open(CACHE).then(async (cache) => {
+      await cache.addAll([...PAGES, ...ASSETS.filter((a) => !LAZY.includes(a))]);
+      // Stamp the pages as just saved, so the first move between them is instant too.
+      await Promise.all(
+        PAGES.map(async (page) => {
+          const res = await cache.match(page);
+          if (res) await cache.put(page, stamped(res, await res.blob()));
+        }),
+      );
+      // Pages saved here may never be opened online, so save their images now too.
+      await Promise.all(Object.keys(PAGE_IMAGES).map(async (page) => saveImages(page, await (await cache.match(page)).text()).catch(() => {})));
+    }),
+  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil((async () => {
-    const keep = [CACHE, IMAGES, LOGOS];
-    await Promise.all((await caches.keys()).filter((k) => !keep.includes(k)).map((k) => caches.delete(k)));
-    // Files an older build made: no page of this build asks for them. Pages
-    // saved under the older build go too (install saved this build's PAGES):
-    // shown from the cache, they'd ask for those deleted files.
-    const cache = await caches.open(CACHE);
-    const current = new Set(ASSETS);
-    for (const k of await cache.keys()) {
-      const path = new URL(k.url).pathname;
-      if (path.startsWith('/_astro/') ? !current.has(path) : !PAGES.includes(path)) await cache.delete(k);
-    }
-    await self.clients.claim();
-  })());
+  e.waitUntil(
+    (async () => {
+      const keep = [CACHE, IMAGES, LOGOS];
+      await Promise.all((await caches.keys()).filter((k) => !keep.includes(k)).map((k) => caches.delete(k)));
+      // Files an older build made: no page of this build asks for them. Pages
+      // saved under the older build go too (install saved this build's PAGES):
+      // shown from the cache, they'd ask for those deleted files.
+      const cache = await caches.open(CACHE);
+      const current = new Set(ASSETS);
+      for (const k of await cache.keys()) {
+        const path = new URL(k.url).pathname;
+        if (path.startsWith('/_astro/') ? !current.has(path) : !PAGES.includes(path)) await cache.delete(k);
+      }
+      await self.clients.claim();
+    })(),
+  );
 });
 
 self.addEventListener('fetch', (e) => {
@@ -93,10 +99,7 @@ async function networkFirst(e) {
     return saved;
   }
   try {
-    return await Promise.race([
-      fetched,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
-    ]);
+    return await Promise.race([fetched, new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))]);
   } catch {
     return saved ?? offlinePage();
   }
@@ -106,7 +109,13 @@ async function networkFirst(e) {
 async function save(cache, key, res, e) {
   const body = await res.blob();
   await cache.put(key, stamped(res, body));
-  if (Object.hasOwn(PAGE_IMAGES, key)) e.waitUntil(body.text().then((html) => saveImages(key, html)).catch(() => {}));
+  if (Object.hasOwn(PAGE_IMAGES, key))
+    e.waitUntil(
+      body
+        .text()
+        .then((html) => saveImages(key, html))
+        .catch(() => {}),
+    );
 }
 
 function stamped(res, body) {
@@ -117,11 +126,12 @@ function stamped(res, body) {
 
 // A page never visited while online has no saved copy; say so rather than
 // showing another page under its address.
-const offlinePage = () => new Response(
-  '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline · DSM Tech Events</title>'
-  + '<body style="font:16px system-ui;padding:24px;max-width:36em"><h1>You\'re offline</h1><p>This page hasn\'t been saved on this device yet. <a href="/">The event list</a> works offline once you\'ve opened it.</p>',
-  { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
-);
+const offlinePage = () =>
+  new Response(
+    '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline · DSM Tech Events</title>' +
+      '<body style="font:16px system-ui;padding:24px;max-width:36em"><h1>You\'re offline</h1><p>This page hasn\'t been saved on this device yet. <a href="/">The event list</a> works offline once you\'ve opened it.</p>',
+    { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
+  );
 
 // The Groups page's logos load lazily, so most never would before going
 // offline, and the TV page's photos are on slides not showing yet; and a page
@@ -142,13 +152,15 @@ async function saveImages(page, html) {
   const keep = urls.slice(0, MAX_LOGOS);
   const cache = await caches.open(name);
   if (name === LOGOS) for (const k of await cache.keys()) if (!keep.includes(k.url)) await cache.delete(k);
-  await Promise.all(keep.map(async (src) => {
-    if (await cache.match(src)) return;
-    try {
-      const res = await fetch(src, { mode: 'cors', credentials: 'omit' });
-      if (res.ok && res.headers.get('Content-Type')?.startsWith('image/')) await cache.put(src, res);
-    } catch {} // a missing image now just means a missing image offline
-  }));
+  await Promise.all(
+    keep.map(async (src) => {
+      if (await cache.match(src)) return;
+      try {
+        const res = await fetch(src, { mode: 'cors', credentials: 'omit' });
+        if (res.ok && res.headers.get('Content-Type')?.startsWith('image/')) await cache.put(src, res);
+      } catch {} // a missing image now just means a missing image offline
+    }),
+  );
   if (name === IMAGES) await trim(cache);
 }
 
@@ -161,16 +173,18 @@ async function staleWhileRevalidate(req, name) {
   // Meetup's image host allows CORS, so fetch photos as readable responses:
   // an opaque one counts as ~7MB against the storage quota, a real one ~25KB.
   const fetched = name === IMAGES ? fetch(req.url, { mode: 'cors', credentials: 'omit' }).catch(() => fetch(req)) : fetch(req);
-  const fresh = fetched.then(async (res) => {
-    if (res.ok) {
-      // A full quota shouldn't turn a good download into a broken image.
-      try {
-        await cache.put(req, res.clone());
-        if (name === IMAGES) await trim(cache);
-      } catch {}
-    }
-    return res;
-  }).catch(() => cached ?? Response.error());
+  const fresh = fetched
+    .then(async (res) => {
+      if (res.ok) {
+        // A full quota shouldn't turn a good download into a broken image.
+        try {
+          await cache.put(req, res.clone());
+          if (name === IMAGES) await trim(cache);
+        } catch {}
+      }
+      return res;
+    })
+    .catch(() => cached ?? Response.error());
   return cached ?? fresh;
 }
 

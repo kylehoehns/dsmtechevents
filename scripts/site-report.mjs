@@ -18,8 +18,14 @@ const DATASET = 'dsmtechevents_clicks';
 // Web Analytics' id for dsmtechevents.com (the account also has other sites).
 const SITE_TAG = 'c4817706706548ee80786694560158f2';
 const KIND_NAMES = {
-  rsvp: 'RSVP button', title: 'Event title', map: 'Map link', poster: 'Headliner poster',
-  later: '"Further out" row', past: '"Recently" row', meetup: 'Groups page: Meetup', website: 'Groups page: website',
+  rsvp: 'RSVP button',
+  title: 'Event title',
+  map: 'Map link',
+  poster: 'Headliner poster',
+  later: '"Further out" row',
+  past: '"Recently" row',
+  meetup: 'Groups page: Meetup',
+  website: 'Groups page: website',
 };
 
 // Pure: the summary that opens the report. Visits and views come as Web
@@ -30,12 +36,17 @@ export function renderHeadline({ week, prevWeek, month, days, clicks, prevClicks
   return [
     '# Site report',
     '',
-    table(['Visits', 'Page views', 'Clicks out', 'Visits by day'], [[
-      cell(sum(week, 'visits'), sum(prevWeek, 'visits')),
-      cell(sum(week, 'views'), sum(prevWeek, 'views')),
-      cell(clicks, prevClicks),
-      days.length ? `\`${spark(daily(days).map((r) => r.visits))}\`` : '—',
-    ]]),
+    table(
+      ['Visits', 'Page views', 'Clicks out', 'Visits by day'],
+      [
+        [
+          cell(sum(week, 'visits'), sum(prevWeek, 'visits')),
+          cell(sum(week, 'views'), sum(prevWeek, 'views')),
+          cell(clicks, prevClicks),
+          days.length ? `\`${spark(daily(days).map((r) => r.visits))}\`` : '—',
+        ],
+      ],
+    ),
     '',
     `The last 7 days; ▲▼ compare with the 7 before. **${num(sum(month, 'visits'))}** visits in the last 30.`,
     '',
@@ -58,23 +69,43 @@ function daily(days) {
 export function renderTraffic({ days, pages, referrers, devices }) {
   const sum = (rows, k) => rows.reduce((n, r) => n + r[k], 0);
   const max = (rows, k) => Math.max(...rows.map((r) => r[k]));
-  const share = (rows) => { const t = sum(rows, 'visits') || 1; return rows.map((r) => [r.key || '(unknown)', num(r.visits), `${Math.round((r.visits / t) * 100)}%`, bar(r.visits, t)]); };
+  const share = (rows) => {
+    const t = sum(rows, 'visits') || 1;
+    return rows.map((r) => [r.key || '(unknown)', num(r.visits), `${Math.round((r.visits / t) * 100)}%`, bar(r.visits, t)]);
+  };
   const busiest = days.length && days.reduce((a, b) => (b.visits > a.visits ? b : a));
   return [
     days.length
-      ? fold(`Visits per day (UTC days): busiest ${busiest.key}, ${num(busiest.visits)} visits`,
-        table(['Day', 'Visits', 'Page views'], daily(days).reverse().map((r) => [r.key, num(r.visits), num(r.views)])))
+      ? fold(
+          `Visits per day (UTC days): busiest ${busiest.key}, ${num(busiest.visits)} visits`,
+          table(
+            ['Day', 'Visits', 'Page views'],
+            daily(days)
+              .reverse()
+              .map((r) => [r.key, num(r.visits), num(r.views)]),
+          ),
+        )
       : '_No visits yet._',
     '',
     '## Top pages, last 7 days',
     '',
-    pages.length ? table(['Page', 'Views', '', 'Visits'], pages.map((r) => [`\`${r.key}\``, num(r.views), bar(r.views, max(pages, 'views')), num(r.visits)])) : '_No page views yet._',
+    pages.length
+      ? table(
+          ['Page', 'Views', '', 'Visits'],
+          pages.map((r) => [`\`${r.key}\``, num(r.views), bar(r.views, max(pages, 'views')), num(r.visits)]),
+        )
+      : '_No page views yet._',
     '',
     '## Where visits come from, last 30 days',
     '',
     'Most links opened from Slack, Teams, iMessage or a bookmark carry no referrer, so they show as "direct".',
     '',
-    referrers.length ? table(['From', 'Visits', 'Share', ''], share(referrers).map(([k, ...rest]) => [k === '(unknown)' ? 'direct' : k, ...rest])) : '_None yet._',
+    referrers.length
+      ? table(
+          ['From', 'Visits', 'Share', ''],
+          share(referrers).map(([k, ...rest]) => [k === '(unknown)' ? 'direct' : k, ...rest]),
+        )
+      : '_None yet._',
     '',
     '## Phone or computer, last 30 days',
     '',
@@ -84,11 +115,29 @@ export function renderTraffic({ days, pages, referrers, devices }) {
 }
 
 const FROM_NAMES = {
-  'this-week': 'This week', 'next-week': 'Next week', later: 'Later this month and after', further: 'Further out',
-  headliners: 'Headliner posters', recent: '"Recently"', calendar: 'Calendar', search: 'Search results',
-  'group-filter': "One group's events", 'groups-page': 'Groups page', other: 'Elsewhere',
+  'this-week': 'This week',
+  'next-week': 'Next week',
+  later: 'Later this month and after',
+  further: 'Further out',
+  headliners: 'Headliner posters',
+  recent: '"Recently"',
+  calendar: 'Calendar',
+  search: 'Search results',
+  'group-filter': "One group's events",
+  'groups-page': 'Groups page',
+  other: 'Elsewhere',
 };
-const APP_NAMES = { imessage: 'iMessage', slack: 'Slack', teams: 'Teams', discord: 'Discord', linkedin: 'LinkedIn', facebook: 'Facebook', x: 'X', whatsapp: 'WhatsApp', telegram: 'Telegram' };
+const APP_NAMES = {
+  imessage: 'iMessage',
+  slack: 'Slack',
+  teams: 'Teams',
+  discord: 'Discord',
+  linkedin: 'LinkedIn',
+  facebook: 'Facebook',
+  x: 'X',
+  whatsapp: 'WhatsApp',
+  telegram: 'Telegram',
+};
 
 // Pure: the site's own signals, last 30 days. Rows are { key, clicks }:
 // where is clicks by part of the site, misses is search terms that found
@@ -100,11 +149,18 @@ export function renderSignals({ where, misses, installs, opens, previews }) {
   return [
     '## Around the site, last 30 days',
     '',
-    where.length ? fold('<b>Where on the site people click out</b>', table(['Part of the site', 'Clicks', ''], rows(where, FROM_NAMES))) : '_No clicks with a place yet._',
+    where.length
+      ? fold('<b>Where on the site people click out</b>', table(['Part of the site', 'Clicks', ''], rows(where, FROM_NAMES)))
+      : '_No clicks with a place yet._',
     '',
     '**Searches that found nothing**, seen 3 or more times (one-offs are left out, so a name typed once never shows):',
     '',
-    misses.length ? table(['Search', 'Times'], misses.map((r) => [`\`${r.key}\``, num(r.clicks)])) : '_None._',
+    misses.length
+      ? table(
+          ['Search', 'Times'],
+          misses.map((r) => [`\`${r.key}\``, num(r.clicks)]),
+        )
+      : '_None._',
     '',
     `**Installed app:** ${num(installs)} installed, ${num(opens)} times opened.`,
     '',
@@ -122,10 +178,10 @@ export function renderSignals({ where, misses, installs, opens, previews }) {
 // ranks one group against another.
 export function renderReport({ week, month, kinds, totals }, { groupNames = {} } = {}) {
   const max = (rows) => Math.max(...rows.map((r) => r.clicks));
-  const groupName = (id) => (id ? groupNames[id] ?? id : 'No group (conference / community event)');
+  const groupName = (id) => (id ? (groupNames[id] ?? id) : 'No group (conference / community event)');
   const weekBy = Object.fromEntries(week.map((r) => [r.key, r.clicks]));
   // A to Z by name; events with no group last.
-  const groups = [...month].sort((x, y) => (!x.key) - (!y.key) || groupName(x.key).localeCompare(groupName(y.key)));
+  const groups = [...month].sort((x, y) => !x.key - !y.key || groupName(x.key).localeCompare(groupName(y.key)));
   const top = (rows, name) => `${name(rows[0].key)}, ${num(rows[0].clicks)}`;
   const change = trend(totals.week, totals.prevWeek);
   const lines = [
@@ -137,11 +193,21 @@ export function renderReport({ week, month, kinds, totals }, { groupNames = {} }
     '',
     'A joint meetup counts for each of its hosts, so these add up to more than the total.',
     '',
-    groups.length ? table(['Group', 'Last 7 days', 'Last 30 days'], groups.map((r) => [groupName(r.key), num(weekBy[r.key] ?? 0), num(r.clicks)])) : '_No clicks yet._',
+    groups.length
+      ? table(
+          ['Group', 'Last 7 days', 'Last 30 days'],
+          groups.map((r) => [groupName(r.key), num(weekBy[r.key] ?? 0), num(r.clicks)]),
+        )
+      : '_No clicks yet._',
     '',
     kinds.length
-      ? fold(`<b>Which links get used, last 30 days</b>: top is ${top(kinds, (k) => KIND_NAMES[k] ?? k)}`,
-        table(['Link', 'Clicks', ''], kinds.map((r) => [KIND_NAMES[r.key] ?? r.key, num(r.clicks), bar(r.clicks, max(kinds))])))
+      ? fold(
+          `<b>Which links get used, last 30 days</b>: top is ${top(kinds, (k) => KIND_NAMES[k] ?? k)}`,
+          table(
+            ['Link', 'Clicks', ''],
+            kinds.map((r) => [KIND_NAMES[r.key] ?? r.key, num(r.clicks), bar(r.clicks, max(kinds))]),
+          ),
+        )
       : '_No clicks yet._',
     '',
   ];
@@ -150,7 +216,9 @@ export function renderReport({ week, month, kinds, totals }, { groupNames = {} }
 
 async function query(sql, token) {
   const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACCOUNT}/analytics_engine/sql`, {
-    method: 'POST', headers: { authorization: `Bearer ${token}` }, body: sql,
+    method: 'POST',
+    headers: { authorization: `Bearer ${token}` },
+    body: sql,
   });
   if (!res.ok) throw new Error(`Analytics Engine ${res.status}: ${(await res.text()).slice(0, 300)}`);
   return (await res.json()).data.map((r) => ({ key: r.key, clicks: Number(r.clicks) }));
@@ -190,7 +258,9 @@ export function mergeRows(rows, order) {
 // please try again later" (serviceUnavailable); try twice more before failing.
 async function trafficRetry(token, ...args) {
   for (let attempt = 1; ; attempt++) {
-    try { return await trafficOnce(token, ...args); } catch (e) {
+    try {
+      return await trafficOnce(token, ...args);
+    } catch (e) {
       if (attempt === 3 || !/serviceUnavailable|try again later/.test(e.message)) throw e;
       await new Promise((r) => setTimeout(r, attempt * 5000));
     }
@@ -202,7 +272,8 @@ async function trafficOnce(token, dim, from, to, limit = 10, order = 'sum_visits
     rumPageloadEventsAdaptiveGroups(limit: ${limit}, orderBy: [${order}], filter: { siteTag: "${SITE_TAG}", datetime_geq: $s, datetime_leq: $e }) {
       count sum { visits } dimensions { ${dim} } } } } }`;
   const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
-    method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+    method: 'POST',
+    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
     body: JSON.stringify({ query, variables: { a: ACCOUNT, s: from.toISOString(), e: to.toISOString() } }),
   });
   const json = await res.json();
@@ -230,7 +301,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const ONE = `SUM(_sample_interval * IF(double1 > 0, double1, 1.0))`;
   // Clicks out are the link kinds; the dataset also holds the site's own
   // signals (search-miss, install, app-open, preview).
-  const links = (days) => `${since(days)} AND blob1 IN (${Object.keys(KIND_NAMES).map((k) => `'${k}'`).join(', ')})`;
+  const links = (days) =>
+    `${since(days)} AND blob1 IN (${Object.keys(KIND_NAMES)
+      .map((k) => `'${k}'`)
+      .join(', ')})`;
   const prev = `${links(14)} AND timestamp <= NOW() - INTERVAL '7' DAY`;
   const kindIs = (kind) => `${since(30)} AND blob1 = '${kind}'`;
   const [week, month, kinds, [tw], [tp], [tm], where, misses, [installs], [opens], previews] = await Promise.all([
@@ -261,10 +335,14 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   ]);
   // Visits from our own pages (moving between pages) aren't "where from".
   const referrers = tRefs.filter((r) => r.key !== 'dsmtechevents.com' && r.visits > 0);
-  const report = renderHeadline({ week: tWeek, prevWeek: tPrev, month: tMonth, days: tDays, clicks: totals.week, prevClicks: totals.prevWeek })
-    + '\n' + renderTraffic({ days: tDays, pages: tPages, referrers, devices: tDevices })
-    + '\n' + renderReport({ week, month, kinds: whole(kinds), totals }, groupNames(path.resolve(import.meta.dirname, '..')))
-    + '\n' + renderSignals({ where: whole(where), misses, installs: installs?.clicks ?? 0, opens: opens?.clicks ?? 0, previews });
+  const report =
+    renderHeadline({ week: tWeek, prevWeek: tPrev, month: tMonth, days: tDays, clicks: totals.week, prevClicks: totals.prevWeek }) +
+    '\n' +
+    renderTraffic({ days: tDays, pages: tPages, referrers, devices: tDevices }) +
+    '\n' +
+    renderReport({ week, month, kinds: whole(kinds), totals }, groupNames(path.resolve(import.meta.dirname, '..'))) +
+    '\n' +
+    renderSignals({ where: whole(where), misses, installs: installs?.clicks ?? 0, opens: opens?.clicks ?? 0, previews });
   if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, report);
   console.log(report);
 }

@@ -23,7 +23,10 @@ test('the flyer prints on one Letter page with its QR code and URL', async ({ pa
   expect(foot.y + foot.height, 'footer inside the page').toBeLessThanOrEqual(sheet.y + sheet.height);
   expect(foot.y + foot.height, 'footer above the tear-off tabs').toBeLessThanOrEqual(tabs.y + 1);
   // Rows keep the four-column layout on paper, not the stacked phone layout.
-  const cols = await page.locator('.lineup li').first().evaluate((li) => getComputedStyle(li).gridTemplateColumns.split(' ').length);
+  const cols = await page
+    .locator('.lineup li')
+    .first()
+    .evaluate((li) => getComputedStyle(li).gridTemplateColumns.split(' ').length);
   expect(cols).toBe(3);
 });
 

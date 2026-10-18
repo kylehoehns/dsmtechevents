@@ -5,7 +5,7 @@ import { pastEvents } from '../src/lib/pool.mjs';
 const byId = { cijug: { short: 'CIJUG' }, iadnug: { short: 'IADNUG' } };
 const rec = (id, group, title, start) => ({ id, group, title, start, end: start, venue: 'Hub', url: `https://x/${id}` });
 
-test('past events: the cache\'s ones plus older archived ones, newest first, no repeats', () => {
+test("past events: the cache's ones plus older archived ones, newest first, no repeats", () => {
   const past = [{ id: 'c-2', title: 'Records', start: '2026-10-01T22:30:00Z', groupIds: ['cijug'], hostsLabel: 'CIJUG' }];
   const archive = [
     rec('c-2', 'cijug', 'Records', '2026-10-01T22:30:00Z'), // still in the cache
@@ -14,7 +14,10 @@ test('past events: the cache\'s ones plus older archived ones, newest first, no 
     rec('c-0', 'cijug', 'Kickoff', '2025-12-01T22:30:00Z'),
   ];
   const list = pastEvents({ past, archive, byId });
-  assert.deepEqual(list.map((e) => e.id), ['c-2', 'c-1', 'c-0']);
+  assert.deepEqual(
+    list.map((e) => e.id),
+    ['c-2', 'c-1', 'c-0'],
+  );
   assert.equal(list[1].hostsLabel, 'CIJUG + IADNUG');
   assert.deepEqual(list[1].groupIds, ['cijug', 'iadnug']);
 });
@@ -26,7 +29,13 @@ test('an archived hand-added event with no host reads as a conference or communi
     { ...noHost, id: 'manual-social', title: 'Holiday social', start: '2026-12-10T23:00:00Z' },
   ];
   const list = pastEvents({ past: [], archive, byId });
-  assert.deepEqual(list.map((e) => [e.hostsLabel, e.groupIds]), [['Community event', []], ['Conference', []]]);
+  assert.deepEqual(
+    list.map((e) => [e.hostsLabel, e.groupIds]),
+    [
+      ['Community event', []],
+      ['Conference', []],
+    ],
+  );
 });
 
 test('a joint night titled differently by each host is one row, from the archive or the cache', () => {
@@ -37,7 +46,15 @@ test('a joint night titled differently by each host is one row, from the archive
     rec('i-2', 'iadnug', 'Records, with CIJUG', '2026-10-01T22:30:00Z'),
   ];
   // The cache's copy of the second night, folded at build time, lists both ids.
-  const past = [{ id: 'c-2', ids: ['c-2', 'i-2'], title: 'Records', start: '2026-10-01T22:30:00Z', groupIds: ['cijug', 'iadnug'], hostsLabel: 'CIJUG + IADNUG' }];
+  const past = [
+    { id: 'c-2', ids: ['c-2', 'i-2'], title: 'Records', start: '2026-10-01T22:30:00Z', groupIds: ['cijug', 'iadnug'], hostsLabel: 'CIJUG + IADNUG' },
+  ];
   const list = pastEvents({ past, archive, byId });
-  assert.deepEqual(list.map((e) => [e.id, e.hostsLabel]), [['c-2', 'CIJUG + IADNUG'], ['c-1', 'CIJUG + IADNUG']]);
+  assert.deepEqual(
+    list.map((e) => [e.id, e.hostsLabel]),
+    [
+      ['c-2', 'CIJUG + IADNUG'],
+      ['c-1', 'CIJUG + IADNUG'],
+    ],
+  );
 });

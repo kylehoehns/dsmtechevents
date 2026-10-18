@@ -31,6 +31,20 @@ export function pastEvents({ past, archive = [], byId }) {
   const seen = new Set(past.flatMap((e) => e.ids ?? [e.id]));
   const older = archivedEvents(archive)
     .filter((r) => !r.ids.some((id) => seen.has(id)))
-    .map((r) => ({ id: r.id, title: r.title, start: r.start, end: r.end, venue: r.venue ?? null, online: !!r.online, going: r.going, url: r.url ?? null, groupIds: r.groupIds, headliner: !!r.headliner, description: r.description ?? '', archived: true, hostsLabel: hostsLabel(r, byId) }));
+    .map((r) => ({
+      id: r.id,
+      title: r.title,
+      start: r.start,
+      end: r.end,
+      venue: r.venue ?? null,
+      online: !!r.online,
+      going: r.going,
+      url: r.url ?? null,
+      groupIds: r.groupIds,
+      headliner: !!r.headliner,
+      description: r.description ?? '',
+      archived: true,
+      hostsLabel: hostsLabel(r, byId),
+    }));
   return [...past, ...older].sort((a, b) => b.start.localeCompare(a.start));
 }

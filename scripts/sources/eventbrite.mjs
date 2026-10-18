@@ -15,24 +15,26 @@ export default async function eventbrite(group, { get }) {
   // An empty list is normal (nothing scheduled); a missing or failed one isn't.
   if (!Array.isArray(page?.upcomingEvents) || page.upcomingEventsFailed) throw new Error(`no event list on ${group.eventbrite}`);
 
-  return page.upcomingEvents.filter((e) => !e.is_cancelled && !e.hide_start_date).map((e) => {
-    if (!e.id || !e.name || !e.url || !e.start_date || !e.start_time) throw new Error(`unreadable event in ${group.eventbrite}`);
-    if (e.timezone !== site.timeZone) throw new Error(`event ${e.id} is in ${e.timezone}, not ${site.timeZone}`);
-    const at = (date, time) => localToUtc(date, time.slice(0, 5));
-    const online = Boolean(e.is_online_event);
-    return {
-      id: `${group.id}-${e.id}`,
-      sourceId: String(e.id),
-      title: decode(e.name).trim(),
-      start: at(e.start_date, e.start_time),
-      end: at(e.end_date ?? e.start_date, e.end_time ?? e.start_time),
-      allDay: false,
-      url: e.url,
-      description: decode(e.summary ?? '').trim(),
-      ...(online ? { venue: 'Online', address: null, online } : place(e.primary_venue)),
-      image: e.image?.url ?? null,
-    };
-  });
+  return page.upcomingEvents
+    .filter((e) => !e.is_cancelled && !e.hide_start_date)
+    .map((e) => {
+      if (!e.id || !e.name || !e.url || !e.start_date || !e.start_time) throw new Error(`unreadable event in ${group.eventbrite}`);
+      if (e.timezone !== site.timeZone) throw new Error(`event ${e.id} is in ${e.timezone}, not ${site.timeZone}`);
+      const at = (date, time) => localToUtc(date, time.slice(0, 5));
+      const online = Boolean(e.is_online_event);
+      return {
+        id: `${group.id}-${e.id}`,
+        sourceId: String(e.id),
+        title: decode(e.name).trim(),
+        start: at(e.start_date, e.start_time),
+        end: at(e.end_date ?? e.start_date, e.end_time ?? e.start_time),
+        allDay: false,
+        url: e.url,
+        description: decode(e.summary ?? '').trim(),
+        ...(online ? { venue: 'Online', address: null, online } : place(e.primary_venue)),
+        image: e.image?.url ?? null,
+      };
+    });
 }
 
 // "West48" + "1601 48th St, West Des Moines, IA 50266". A venue named with

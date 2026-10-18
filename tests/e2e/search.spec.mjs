@@ -5,7 +5,10 @@ import { test, expect } from './fixtures.mjs';
 const list = (page) => page.getByRole('region', { name: 'Upcoming events' });
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const event = (page, title) => list(page).getByRole('heading', { name: new RegExp(`^${escape(title)}`) });
-const card = (page, title) => list(page).locator('.show').filter({ has: page.getByRole('heading', { name: new RegExp(`^${escape(title)}`) }) });
+const card = (page, title) =>
+  list(page)
+    .locator('.show')
+    .filter({ has: page.getByRole('heading', { name: new RegExp(`^${escape(title)}`) }) });
 const pastSec = (page) => page.getByRole('region', { name: 'Past' });
 const past = (page, title) => pastSec(page).getByRole('listitem').filter({ hasText: title });
 const box = (page) => page.getByRole('searchbox', { name: 'Search events' });
@@ -30,7 +33,7 @@ test('the search box stays closed until the magnifier opens it', async ({ page }
   await expect(btn).toBeFocused();
 });
 
-test('a word only in a group\'s full name finds its events', async ({ page }) => {
+test("a word only in a group's full name finds its events", async ({ page }) => {
   await page.goto('/');
   // "Java" is only in "Central Iowa Java Users Group"; the rows say CIJUG.
   await search(page, 'java');
@@ -65,7 +68,11 @@ test('a link\'s hidden "(opens in new tab)" isn\'t searched', async ({ page }) =
 test('words match from their start: "ai" finds AI, not "said"', async ({ page }) => {
   await page.goto('/');
   await search(page, 'ai');
-  await expect(list(page).getByRole('heading', { name: /^AI Study Group/ }).first()).toBeVisible();
+  await expect(
+    list(page)
+      .getByRole('heading', { name: /^AI Study Group/ })
+      .first(),
+  ).toBeVisible();
   // Coding Dojo's About text says "said".
   await expect(event(page, 'Coding Dojo')).toBeHidden();
   await expect(past(page, 'Hiring in the Age of AI')).toBeVisible();
@@ -100,12 +107,17 @@ test('the address is searched, so a town name works', async ({ page }) => {
 test('synonyms: "ai" finds an event that only says Copilot, and marks what matched', async ({ page }) => {
   await page.goto('/');
   // Each row's HTML, and how many text nodes it has (marks split them up).
-  const html = () => list(page).locator('.show, .far > li').evaluateAll((els) => els.map((el) => {
-    const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-    let n = 0;
-    while (walk.nextNode()) n++;
-    return [el.innerHTML, n];
-  }));
+  const html = () =>
+    list(page)
+      .locator('.show, .far > li')
+      .evaluateAll((els) =>
+        els.map((el) => {
+          const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+          let n = 0;
+          while (walk.nextNode()) n++;
+          return [el.innerHTML, n];
+        }),
+      );
   const before = await html();
   await search(page, 'ai');
   // re:Invent Recap (a Further out row) never says "AI": its About text says "Copilot".
@@ -266,9 +278,7 @@ for (const colorScheme of ['light', 'dark']) {
         await page.goto('/');
         await search(page, q);
         await expect(page).toHaveURL(new RegExp(`q=${q}$`));
-        const { violations } = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'])
-          .analyze();
+        const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze();
         expect(violations.map((v) => `${v.id}: ${v.help} (${v.nodes.map((n) => n.target.join(' ')).join(', ')})`)).toEqual([]);
       });
     }
@@ -276,7 +286,13 @@ for (const colorScheme of ['light', 'dark']) {
 }
 
 test('every page has the search button in the same spot; elsewhere it opens search on the events page', async ({ page }) => {
-  const spot = async (path) => { await page.goto(path); return page.getByRole('link', { name: 'Search events' }).or(page.getByRole('button', { name: 'Search events' })).boundingBox(); };
+  const spot = async (path) => {
+    await page.goto(path);
+    return page
+      .getByRole('link', { name: 'Search events' })
+      .or(page.getByRole('button', { name: 'Search events' }))
+      .boundingBox();
+  };
   const home = await spot('/');
   for (const path of ['/groups/', '/about/', '/organizers/']) expect(await spot(path), path).toEqual(home);
   await page.getByRole('link', { name: 'Search events' }).click();

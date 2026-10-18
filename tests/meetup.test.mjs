@@ -112,7 +112,11 @@ test('an event cancelled after its end time has passed is not carried forward', 
   const page = parseEventsPage(fixture('meetup-events-page-cancelled.html'), 'iadnug');
   const cached = { id: 'iadnug-300000001', title: '.NET@Noon', start: '2026-10-08T17:00:00.000Z', end: '2026-10-08T18:00:00.000Z' };
   const recent = enrich([], page, group, { now: later, cutoff });
-  const merged = mergeCache({ fetchedAt: 'THEN', logo: null, events: [cached] }, { events: recent, cancelled: cancelledIds(page, group) }, { now: later, cutoff });
+  const merged = mergeCache(
+    { fetchedAt: 'THEN', logo: null, events: [cached] },
+    { events: recent, cancelled: cancelledIds(page, group) },
+    { now: later, cutoff },
+  );
   assert.ok(!merged.events.some((e) => e.id === 'iadnug-300000001'), 'the cancelled event is gone from the cache');
 });
 
@@ -124,7 +128,11 @@ test('enrich fills feed events from the page and adds recent past events', () =>
   assert.equal(upcoming[0].going, 20);
   assert.equal(upcoming[0].venue, 'Online');
   assert.equal(upcoming[0].title, '.NET@Noon - Build a Voice Agent', "the feed's title wins over the page's");
-  assert.deepEqual(recent.map((e) => e.id), ['iadnug-299999990'], 'cancelled and older-than-cutoff events are left out');
+  assert.deepEqual(
+    recent.map((e) => e.id),
+    ['iadnug-299999990'],
+    'cancelled and older-than-cutoff events are left out',
+  );
 });
 
 test('mergeCache keeps past events, lets fresh copies win, and keeps fetchedAt when nothing changed', () => {
@@ -135,11 +143,19 @@ test('mergeCache keeps past events, lets fresh copies win, and keeps fetchedAt w
 
   const same = mergeCache(previous, { events: [next], logo: null }, { now, cutoff, fetchedAt: 'NOW' });
   assert.equal(same.fetchedAt, '2026-10-06T10:20:00.000Z', 'unchanged data keeps its timestamp');
-  assert.deepEqual(same.events.map((e) => e.id), ['g-1', 'g-2'], 'past events within 90 days are carried forward');
+  assert.deepEqual(
+    same.events.map((e) => e.id),
+    ['g-1', 'g-2'],
+    'past events within 90 days are carried forward',
+  );
   assert.equal(same.logo, 'logo.jpg', 'previous logo is kept if the fetch found none');
 
   const aged = mergeCache({ ...previous, events: [tooOld, past, next] }, { events: [next] }, { now, cutoff, fetchedAt: 'NOW' });
-  assert.deepEqual(aged.events.map((e) => e.id), ['g-1', 'g-2'], 'events older than 90 days drop off');
+  assert.deepEqual(
+    aged.events.map((e) => e.id),
+    ['g-1', 'g-2'],
+    'events older than 90 days drop off',
+  );
   assert.equal(aged.fetchedAt, 'NOW');
 
   const renamed = mergeCache(previous, { events: [{ ...next, title: 'Next (room change)', status: 'ACTIVE' }] }, { now, cutoff, fetchedAt: 'NOW' });
@@ -149,8 +165,27 @@ test('mergeCache keeps past events, lets fresh copies win, and keeps fetchedAt w
 });
 
 test('mergeCache keeps the page details of upcoming events when the page read failed', () => {
-  const feedCopy = { id: 'g-2', sourceId: '2', title: 'Next', start: '2026-10-20T23:00:00.000Z', end: '2026-10-21T01:00:00.000Z', allDay: false, url: 'https://www.meetup.com/g/events/2/', description: 'feed text', venue: 'feed location' };
-  const enriched = { ...feedCopy, description: 'page text', venue: 'Source Allies', address: '4501 NW Urbandale Dr, Urbandale', online: false, hybrid: false, image: 'photo.jpg', going: 12 };
+  const feedCopy = {
+    id: 'g-2',
+    sourceId: '2',
+    title: 'Next',
+    start: '2026-10-20T23:00:00.000Z',
+    end: '2026-10-21T01:00:00.000Z',
+    allDay: false,
+    url: 'https://www.meetup.com/g/events/2/',
+    description: 'feed text',
+    venue: 'feed location',
+  };
+  const enriched = {
+    ...feedCopy,
+    description: 'page text',
+    venue: 'Source Allies',
+    address: '4501 NW Urbandale Dr, Urbandale',
+    online: false,
+    hybrid: false,
+    image: 'photo.jpg',
+    going: 12,
+  };
   const previous = { fetchedAt: 'THEN', logo: 'logo.jpg', members: 300, events: [enriched] };
 
   const failed = mergeCache(previous, { events: [{ ...feedCopy }], logo: null, keep: FROM_PAGE }, { now, cutoff, fetchedAt: 'NOW' });
@@ -172,7 +207,10 @@ test('mergeCache dates each event by when it first showed up, once', () => {
   const merged = mergeCache(previous, { events: [{ ...next, created: '2026-09-30T00:00:00.000Z' }, fresh] }, { now, cutoff, fetchedAt: 'NOW' });
   assert.equal(merged.events[0].added, '2026-10-01T12:00:00.000Z', 'kept from the last run');
   assert.equal(merged.events[1].added, 'NOW', 'new to us: this run, not a created time from weeks ago (drafted, then announced)');
-  assert.ok(merged.events.every((e) => !('created' in e)), 'created is not stored');
+  assert.ok(
+    merged.events.every((e) => !('created' in e)),
+    'created is not stored',
+  );
 
   const again = mergeCache(merged, { events: [{ ...next }, { ...fresh }] }, { now: now + 6 * 3_600_000, cutoff, fetchedAt: 'LATER' });
   assert.equal(JSON.stringify(again), JSON.stringify(merged), 'the next run leaves the file alone');
@@ -181,12 +219,19 @@ test('mergeCache dates each event by when it first showed up, once', () => {
   assert.equal(first.events.find((e) => e.id === 'g-3').added, fresh.created, "a group's first fetch takes the feed's created time");
   assert.ok(!('added' in first.events.find((e) => e.id === 'g-2')), 'or nothing, rather than the whole calendar new');
 
-  const older = mergeCache({ fetchedAt: 'THEN', logo: null, events: [next, fresh].map(({ created, ...e }) => e) }, { events: [next, fresh] }, { now, cutoff, fetchedAt: 'NOW' });
+  const older = mergeCache(
+    { fetchedAt: 'THEN', logo: null, events: [next, fresh].map(({ created, ...e }) => e) },
+    { events: [next, fresh] },
+    { now, cutoff, fetchedAt: 'NOW' },
+  );
   assert.equal(older.events[1].added, fresh.created, 'a cache from before added was kept is backfilled from the feed');
   assert.ok(!('added' in older.events[0]));
 
   const pastNews = { id: 'g-1', title: 'Old', start: '2026-09-01T23:00:00.000Z', end: '2026-09-02T01:00:00.000Z' };
-  assert.ok(!('added' in mergeCache(previous, { events: [pastNews, next] }, { now, cutoff, fetchedAt: 'NOW' }).events[0]), 'an event already over is never new');
+  assert.ok(
+    !('added' in mergeCache(previous, { events: [pastNews, next] }, { now, cutoff, fetchedAt: 'NOW' }).events[0]),
+    'an event already over is never new',
+  );
 });
 
 test('mergeCache drops the old enriched flag without moving fetchedAt', () => {
@@ -215,7 +260,11 @@ test('mergeCache keeps group facts and leaves them out when unknown', () => {
   const facts = mergeCache({ events: [], members: 300 }, { events: [], members: 326, pastCount: 19 }, { now, cutoff });
   assert.deepEqual([facts.members, facts.pastCount], [326, 19]);
   assert.ok(!('lastMet' in facts), 'lastMet is left out when unknown, like the others');
-  assert.equal(mergeCache({ events: [], lastMet: '2024-08-28T23:00:00.000Z' }, { events: [], enriched: false }, { now, cutoff }).lastMet, '2024-08-28T23:00:00.000Z', 'kept when the page fails');
+  assert.equal(
+    mergeCache({ events: [], lastMet: '2024-08-28T23:00:00.000Z' }, { events: [], enriched: false }, { now, cutoff }).lastMet,
+    '2024-08-28T23:00:00.000Z',
+    'kept when the page fails',
+  );
 });
 
 test('enrich drops an upcoming event the page says is cancelled, and ignores missing page fields', () => {
@@ -223,12 +272,17 @@ test('enrich drops an upcoming event the page says is cancelled, and ignores mis
     { id: 'g-1', sourceId: '1', title: 'Kept', start: '2026-10-20T23:00:00Z', end: '2026-10-21T01:00:00Z' },
     { id: 'g-2', sourceId: '2', title: 'Called off', start: '2026-10-21T23:00:00Z', end: '2026-10-22T01:00:00Z' },
   ];
-  const details = { events: new Map([
-    ['1', { title: undefined, going: 7, venue: undefined, status: 'ACTIVE', end: '2026-10-21T01:00:00Z' }],
-    ['2', { status: 'CANCELLED', end: '2026-10-22T01:00:00Z' }],
-  ]) };
+  const details = {
+    events: new Map([
+      ['1', { title: undefined, going: 7, venue: undefined, status: 'ACTIVE', end: '2026-10-21T01:00:00Z' }],
+      ['2', { status: 'CANCELLED', end: '2026-10-22T01:00:00Z' }],
+    ]),
+  };
   enrich(upcoming, details, { id: 'g' }, { now, cutoff });
-  assert.deepEqual(upcoming.map((e) => e.title), ['Kept']);
+  assert.deepEqual(
+    upcoming.map((e) => e.title),
+    ['Kept'],
+  );
   assert.equal(upcoming[0].going, 7);
   assert.ok(!('venue' in upcoming[0]), 'an undefined page field does not overwrite');
 });

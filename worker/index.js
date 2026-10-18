@@ -27,7 +27,11 @@ const MAX_BODY = 1024; // a real beacon is about 80 bytes
 // is dropped rather than stored; a joint meetup has up to a few host groups.
 export function parseClick(text) {
   let body;
-  try { body = JSON.parse(text); } catch { return null; }
+  try {
+    body = JSON.parse(text);
+  } catch {
+    return null;
+  }
   if (!body || !KINDS.has(body.kind)) return null;
   const groups = (Array.isArray(body.groups) ? body.groups : []).filter((g) => typeof g === 'string' && ID.test(g)).slice(0, 4);
   const event = typeof body.event === 'string' && ID.test(body.event) ? body.event : '';
@@ -43,9 +47,14 @@ export function parseClick(text) {
 // names together, from a Mac browser string.
 const PREVIEWERS = [
   ['imessage', /facebookexternalhit.*Twitterbot|Twitterbot.*facebookexternalhit/i],
-  ['slack', /Slackbot/i], ['teams', /SkypeUriPreview|MicrosoftPreview/i], ['discord', /Discordbot/i],
-  ['linkedin', /LinkedInBot/i], ['facebook', /facebookexternalhit|Facebot/i], ['x', /Twitterbot/i],
-  ['whatsapp', /WhatsApp/i], ['telegram', /TelegramBot/i],
+  ['slack', /Slackbot/i],
+  ['teams', /SkypeUriPreview|MicrosoftPreview/i],
+  ['discord', /Discordbot/i],
+  ['linkedin', /LinkedInBot/i],
+  ['facebook', /facebookexternalhit|Facebot/i],
+  ['x', /Twitterbot/i],
+  ['whatsapp', /WhatsApp/i],
+  ['telegram', /TelegramBot/i],
 ];
 export const previewer = (ua = '') => PREVIEWERS.find(([, re]) => re.test(ua))?.[0] ?? null;
 
@@ -68,7 +77,10 @@ export async function readCapped(request, max) {
   }
   const bytes = new Uint8Array(size);
   let at = 0;
-  for (const c of chunks) { bytes.set(c, at); at += c.byteLength; }
+  for (const c of chunks) {
+    bytes.set(c, at);
+    at += c.byteLength;
+  }
   return new TextDecoder().decode(bytes);
 }
 
@@ -120,7 +132,11 @@ export default {
       // of the one click (1/hosts), so totals add up to real clicks.
       const hosts = click.groups.length ? click.groups : [''];
       for (const group of hosts) {
-        env.CLICKS?.writeDataPoint({ blobs: [click.kind, group, click.event, click.from, click.term], doubles: [1 / hosts.length], indexes: [group || 'none'] });
+        env.CLICKS?.writeDataPoint({
+          blobs: [click.kind, group, click.event, click.from, click.term],
+          doubles: [1 / hosts.length],
+          indexes: [group || 'none'],
+        });
       }
       return new Response(null, { status: 204 });
     }

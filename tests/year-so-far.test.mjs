@@ -18,9 +18,18 @@ test('counts this year by Des Moines date, a bar per month through this one', ()
   assert.equal(y.year, '2026');
   assert.equal(y.events, 11);
   assert.equal(y.groups, 2);
-  assert.deepEqual(y.months.map((m) => m.label), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
-  assert.deepEqual(y.months.map((m) => m.n), [0, 0, 10, 0, 0, 0, 0, 0, 0, 1, null, null]);
-  assert.deepEqual(y.months.map((m) => m.partial), [false, false, false, false, false, false, false, false, false, true, false, false]);
+  assert.deepEqual(
+    y.months.map((m) => m.label),
+    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  );
+  assert.deepEqual(
+    y.months.map((m) => m.n),
+    [0, 0, 10, 0, 0, 0, 0, 0, 0, 1, null, null],
+  );
+  assert.deepEqual(
+    y.months.map((m) => m.partial),
+    [false, false, false, false, false, false, false, false, false, true, false, false],
+  );
   assert.equal(y.busiest, 10);
 });
 
@@ -35,9 +44,16 @@ test('stays off while the year has too little to show', () => {
 
 test('in March, all twelve slots are there and only Jan-Mar have counts', () => {
   const march = Date.parse('2027-03-15T15:00:00Z');
-  const y = yearSoFar(tenIn('02').map((r) => ({ ...r, start: r.start.replace('2026', '2027') })), [], march);
+  const y = yearSoFar(
+    tenIn('02').map((r) => ({ ...r, start: r.start.replace('2026', '2027') })),
+    [],
+    march,
+  );
   assert.equal(y.year, '2027');
-  assert.deepEqual(y.months.map((m) => m.n), [0, 10, 0, null, null, null, null, null, null, null, null, null]);
+  assert.deepEqual(
+    y.months.map((m) => m.n),
+    [0, 10, 0, null, null, null, null, null, null, null, null, null],
+  );
 });
 
 test('a joint meetup counts once, and an event with no host is not a group', () => {

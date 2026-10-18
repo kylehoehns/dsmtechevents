@@ -49,7 +49,13 @@ test('a month opens on today, else its next day with events, else its first such
 
 test('the URL can only ask for groups, days and views that exist', () => {
   const known = { groups: { cijug: {} }, inRange: cal.inRange, today };
-  assert.deepEqual(readState('?view=calendar&group=cijug&day=2026-10-20', known), { view: 'calendar', group: 'cijug', day: '2026-10-20', month: '2026-10', q: '' });
+  assert.deepEqual(readState('?view=calendar&group=cijug&day=2026-10-20', known), {
+    view: 'calendar',
+    group: 'cijug',
+    day: '2026-10-20',
+    month: '2026-10',
+    q: '',
+  });
   assert.deepEqual(readState('', known), { view: 'list', group: '', day: null, month: '2026-10', q: '' });
   assert.equal(readState('?group=constructor', known).group, '', 'not an inherited name');
   assert.equal(readState('?group=nope', known).group, '');

@@ -41,9 +41,7 @@ function sections(page, url) {
   const more = body.indexOf('<!--more-->');
   if (more < 0) return [];
   return [...body.slice(more).matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>([\s\S]*?)(?=<h3|$)/g)].flatMap(([, heading, part]) => {
-    const items = [...part.matchAll(/<li>([\s\S]*?)<\/li>/g)]
-      .map((m) => toText(m[1].replace(/<strong>([^<]*\S[^<]*)<\/strong>/gi, '**$1**')))
-      .filter(Boolean);
+    const items = [...part.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => toText(m[1].replace(/<strong>([^<]*\S[^<]*)<\/strong>/gi, '**$1**'))).filter(Boolean);
     return items.length ? [`## ${toText(heading)}\n${items.map((i) => `• ${i}`).join('\n')}`] : [];
   });
 }
@@ -57,53 +55,65 @@ export default async function iowansOfThings(group, { get }) {
   if (start < 0 || end < start) throw new Error('no Upcoming Events section on iowansofthings.com');
   // Each item ends at its </article>: after it, the homepage adds a "Learn
   // more and register…" link to the event's page.
-  const items = html.slice(start, end).split('class="archive-item"').slice(1).map((item) => item.split('</article>')[0]);
+  const items = html
+    .slice(start, end)
+    .split('class="archive-item"')
+    .slice(1)
+    .map((item) => item.split('</article>')[0]);
 
-  const events = (await Promise.all(items.map(async (item) => {
-    const link = /<h4>\s*<a href="([^"]+)">([\s\S]*?)<\/a>/.exec(item);
-    const date = isoDate(field(item, 'Date') ?? '');
-    if (!link || !date) return [];
-    const url = new URL(link[1], base).href;
-    const [from, to] = (field(item, 'Time') ?? '').split(/\s*[-–]\s*/);
-    const startTime = hhmm(from);
-    const endTime = hhmm(to);
+  const events = (
+    await Promise.all(
+      items.map(async (item) => {
+        const link = /<h4>\s*<a href="([^"]+)">([\s\S]*?)<\/a>/.exec(item);
+        const date = isoDate(field(item, 'Date') ?? '');
+        if (!link || !date) return [];
+        const url = new URL(link[1], base).href;
+        const [from, to] = (field(item, 'Time') ?? '').split(/\s*[-–]\s*/);
+        const startTime = hhmm(from);
+        const endTime = hhmm(to);
 
-    // "Area515, Des Moines Maker Space - 108 Jefferson Avenue, Des Moines, IA 50314",
-    // or without the dash, "Maple Studios, 1207 Maple Street, West Des Moines, IA":
-    // then the address starts at the street number.
-    const place = field(item, 'Place') ?? '';
-    const [venue, address] = /\s[-–]\s/.test(place) ? place.split(/\s+[-–]\s+/) : (/^(.+?),\s*(\d.*)$/.exec(place)?.slice(1) ?? [place]);
+        // "Area515, Des Moines Maker Space - 108 Jefferson Avenue, Des Moines, IA 50314",
+        // or without the dash, "Maple Studios, 1207 Maple Street, West Des Moines, IA":
+        // then the address starts at the street number.
+        const place = field(item, 'Place') ?? '';
+        const [venue, address] = /\s[-–]\s/.test(place) ? place.split(/\s+[-–]\s+/) : (/^(.+?),\s*(\d.*)$/.exec(place)?.slice(1) ?? [place]);
 
-    // The write-up: the plain paragraphs after Place, minus images and the
-    // "Registration below." pointer to a form further down their page.
-    const paragraphs = [...item.slice(item.indexOf('Place:')).matchAll(/<p>([\s\S]*?)<\/p>/g)]
-      .map((m) => m[1])
-      .filter((p) => !/<img|registration below/i.test(p))
-      .map(toText)
-      .filter(Boolean);
+        // The write-up: the plain paragraphs after Place, minus images and the
+        // "Registration below." pointer to a form further down their page.
+        const paragraphs = [...item.slice(item.indexOf('Place:')).matchAll(/<p>([\s\S]*?)<\/p>/g)]
+          .map((m) => m[1])
+          .filter((p) => !/<img|registration below/i.test(p))
+          .map(toText)
+          .filter(Boolean);
 
-    const banner = /<img src="([^"]+)"/.exec(item.slice(0, item.indexOf('Date:')))?.[1];
-    const slug = link[1].replace(/^\/|\/$/g, '');
-    const startAt = localToUtc(date, startTime ?? '00:00');
-    // No end time: two hours, about one of their evenings. An end at or
-    // before the start ("7:00 PM - 12:00 AM") is the next day.
-    const endAt = !startTime ? localToUtc(date, '23:59')
-      : !endTime ? new Date(Date.parse(startAt) + 2 * 3_600_000).toISOString()
-      : localToUtc(endTime <= startTime ? addDays(date, 1) : date, endTime);
-    return [{
-      id: `${group.id}-${slug}`,
-      sourceId: slug,
-      title: decode(toText(link[2])),
-      start: startAt,
-      end: endAt,
-      allDay: !startTime,
-      url,
-      description: [...paragraphs, ...sections(await get(url), url)].join('\n\n').slice(0, 2000),
-      venue: venue?.trim() || null,
-      address: address?.trim() || null,
-      ...(banner && { image: new URL(banner, base).href }),
-    }];
-  }))).flat();
+        const banner = /<img src="([^"]+)"/.exec(item.slice(0, item.indexOf('Date:')))?.[1];
+        const slug = link[1].replace(/^\/|\/$/g, '');
+        const startAt = localToUtc(date, startTime ?? '00:00');
+        // No end time: two hours, about one of their evenings. An end at or
+        // before the start ("7:00 PM - 12:00 AM") is the next day.
+        const endAt = !startTime
+          ? localToUtc(date, '23:59')
+          : !endTime
+            ? new Date(Date.parse(startAt) + 2 * 3_600_000).toISOString()
+            : localToUtc(endTime <= startTime ? addDays(date, 1) : date, endTime);
+        return [
+          {
+            id: `${group.id}-${slug}`,
+            sourceId: slug,
+            title: decode(toText(link[2])),
+            start: startAt,
+            end: endAt,
+            allDay: !startTime,
+            url,
+            description: [...paragraphs, ...sections(await get(url), url)].join('\n\n').slice(0, 2000),
+            venue: venue?.trim() || null,
+            address: address?.trim() || null,
+            ...(banner && { image: new URL(banner, base).href }),
+          },
+        ];
+      }),
+    )
+  ).flat();
   // An empty section is fine (nothing scheduled); items that all fail to
   // parse mean the markup changed.
   if (items.length && !events.length) throw new Error(`${items.length} upcoming items on iowansofthings.com but none had a link and date`);

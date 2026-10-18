@@ -5,8 +5,15 @@ import { site } from './site.mjs';
 import { plainText } from './format.mjs';
 
 const offsetFmt = new Intl.DateTimeFormat('en-US', {
-  timeZone: site.timeZone, hourCycle: 'h23', timeZoneName: 'longOffset',
-  year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+  timeZone: site.timeZone,
+  hourCycle: 'h23',
+  timeZoneName: 'longOffset',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
 });
 
 // "2026-10-22T17:30:00-05:00" in Des Moines time, or "2026-11-07" for all-day.
@@ -20,11 +27,12 @@ export function localIso(iso, allDay = false) {
 // location, and some sources don't give one).
 export function eventJsonLd(e, byId) {
   if (!e.url) return null;
-  const place = e.venue && e.venue !== 'Online' && {
-    '@type': 'Place',
-    name: e.venue,
-    address: { '@type': 'PostalAddress', streetAddress: e.fullAddress ?? e.address ?? e.venue, addressRegion: 'IA', addressCountry: 'US' },
-  };
+  const place = e.venue &&
+    e.venue !== 'Online' && {
+      '@type': 'Place',
+      name: e.venue,
+      address: { '@type': 'PostalAddress', streetAddress: e.fullAddress ?? e.address ?? e.venue, addressRegion: 'IA', addressCountry: 'US' },
+    };
   const online = { '@type': 'VirtualLocation', url: e.url };
   const location = e.online ? online : e.hybrid && place ? [place, online] : place;
   if (!location) return null;

@@ -1,6 +1,22 @@
 // Tiny helpers for reading event details out of a group's own web page.
 
-const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', mdash: '—', ndash: '–', rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“', hellip: '…', middot: '·', rarr: '→' };
+const ENTITIES = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
+  mdash: '—',
+  ndash: '–',
+  rsquo: '’',
+  lsquo: '‘',
+  rdquo: '”',
+  ldquo: '“',
+  hellip: '…',
+  middot: '·',
+  rarr: '→',
+};
 
 export function decode(s = '') {
   return s.replace(/&(#x?[0-9a-f]+|\w+);/gi, (m, e) => {
@@ -16,19 +32,25 @@ export function textOf(html, className) {
 }
 
 export function toText(html = '') {
-  return decode(html.replace(/<br\s*\/?>\n?/gi, '\n').replace(/<[^>]+>/g, '')).replace(/[ \t]+/g, ' ').replace(/\n\s*\n\s*/g, '\n\n').trim();
+  return decode(html.replace(/<br\s*\/?>\n?/gi, '\n').replace(/<[^>]+>/g, ''))
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n\s*\n\s*/g, '\n\n')
+    .trim();
 }
 
 // An event write-up from a site's rich-text editor, as the description text
 // the cards format: paragraphs split by blank lines, <strong> as **bold**,
 // images dropped (the card has its own photo slot).
 export function richText(html = '') {
-  return toText(html
-    .replace(/<img[^>]*>/gi, '')
-    .replace(/<br[^>]*>/gi, '<br>') // toText only breaks lines at a bare <br>; editors add styles
-    .replace(/<(strong|b)>([^<]*\S[^<]*)<\/\1>/gi, '**$2**')
-    .replace(/<hr[^>]*>|<\/(p|div|h\d|li)>/gi, '$&\n\n'))
-    .replace(/\n{3,}/g, '\n\n').trim();
+  return toText(
+    html
+      .replace(/<img[^>]*>/gi, '')
+      .replace(/<br[^>]*>/gi, '<br>') // toText only breaks lines at a bare <br>; editors add styles
+      .replace(/<(strong|b)>([^<]*\S[^<]*)<\/\1>/gi, '**$2**')
+      .replace(/<hr[^>]*>|<\/(p|div|h\d|li)>/gi, '$&\n\n'),
+  )
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 // Every fetched event needs a real start and an end no earlier than it; a

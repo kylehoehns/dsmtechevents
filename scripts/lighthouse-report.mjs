@@ -53,7 +53,11 @@ const NAMES = { perf: 'Performance', a11y: 'Accessibility', bp: 'Best practices'
 export function renderTable(rows, prev = null) {
   const keys = [...Object.keys(SCORES), ...Object.keys(TIMINGS)];
   const before = (r) => prev?.find((p) => p.page === r.page && p.device === r.device);
-  const scores = rows.flatMap((r) => Object.keys(SCORES).filter((k) => r[k] != null).map((k) => ({ r, k, v: r[k] })));
+  const scores = rows.flatMap((r) =>
+    Object.keys(SCORES)
+      .filter((k) => r[k] != null)
+      .map((k) => ({ r, k, v: r[k] })),
+  );
   const low = scores.length && scores.reduce((a, b) => (b.v < a.v ? b : a));
   return [
     '## Lighthouse',
@@ -84,7 +88,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const rows = [];
   for (const page of PAGES) {
     for (const device of ['mobile', 'desktop']) {
-      const runs = Array.from({ length: RUNS }, () => lighthouse(SITE + page, device)).filter(Boolean).map((l) => pick(l, page));
+      const runs = Array.from({ length: RUNS }, () => lighthouse(SITE + page, device))
+        .filter(Boolean)
+        .map((l) => pick(l, page));
       const row = { page, device };
       for (const k of [...Object.keys(SCORES), ...Object.keys(TIMINGS)]) row[k] = median(runs.map((r) => r[k]));
       rows.push(row);

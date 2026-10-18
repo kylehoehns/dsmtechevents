@@ -7,10 +7,13 @@ export const GET: APIRoute = () => {
   const expires = new Date();
   expires.setUTCFullYear(expires.getUTCFullYear() + 1);
   expires.setUTCHours(0, 0, 0, 0);
-  return new Response(`Contact: mailto:${site.email}
+  return new Response(
+    `Contact: mailto:${site.email}
 Expires: ${expires.toISOString()}
 Preferred-Languages: en
 Canonical: ${site.url}/.well-known/security.txt
 Policy: ${site.repo}/blob/main/SECURITY.md
-`, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+`,
+    { headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
+  );
 };
