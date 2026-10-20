@@ -159,7 +159,10 @@ async function readFeed(group, { get, now, cutoff, hadUpcoming }) {
   let cancelled = [];
   if (slug) {
     try {
-      details = parseEventsPage(await get(meetupUrl(slug, 'events/')), slug);
+      // Meetup's CDN keeps copies of this page for hours, while the feed is
+      // current, so a new photo or venue would lag the new title. A query
+      // string it hasn't seen makes it fetch a fresh one.
+      details = parseEventsPage(await get(meetupUrl(slug, `events/?_=${now}`)), slug);
       logo = details.logo;
       recent = enrich(upcoming, details, group, { now, cutoff });
       cancelled = cancelledIds(details, group);
