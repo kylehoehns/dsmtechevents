@@ -165,11 +165,16 @@ export function shortRange(e, { full = false } = {}) {
 export const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 // Meetup descriptions are loose Markdown. Handle the common bits safely:
-// paragraphs, line breaks, **bold**, [links](url), bare URLs, "## headings",
-// and *** / --- rule lines (dropped; they only separate paragraphs).
+// paragraphs, line breaks, **bold**, *italics*, [links](url), bare URLs,
+// "## headings", and *** / --- rule lines (dropped; they only separate
+// paragraphs). Meetup puts a backslash before punctuation ("Monday\, 6pm \|
+// Source Allies"); drop it. An escaped star becomes &#42; so it can't start
+// bold or italics. Escaping runs first, so \& reaches here as \&amp;.
+const ESCAPE = /\\(&(?:amp|lt|gt|quot|#39);|[!-/:-@[-`{-~])/g;
+const ITALIC = /(^|[^\w*\\])\*(?=\S)([^*\n]*?\S)\*(?![\w*])/gm;
 export function formatDescription(text = '') {
   return escapeHtml(text)
-    .replace(/\\([*_#[\]()-])/g, '$1')
+    .replace(ESCAPE, (_, c) => (c === '*' ? '&#42;' : c))
     .replace(/^[ \t]*([-*_])(?:[ \t]*\1){2,}[ \t]*$/gm, '') // a *** / --- / ___ rule line: a paragraph break
     .split(/\n{2,}/)
     .map((para) => para.trim())
@@ -178,7 +183,8 @@ export function formatDescription(text = '') {
       const html = para
         .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" rel="noopener" target="_blank">$1<span class="sr-only"> (opens in new tab)</span></a>')
         .replace(/(^|[\s(])(https?:\/\/[^\s<)]+?)(?=[.,;:!?]*(?:[\s<)]|$))/g, '$1<a href="$2" rel="noopener" target="_blank">$2<span class="sr-only"> (opens in new tab)</span></a>')
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(ITALIC, '$1<em>$2</em>');
       const heading = /^#{1,6}\s+(.*)(?:\n([\s\S]*))?$/.exec(html);
       if (heading) return `<h4>${heading[1]}</h4>` + (heading[2] ? `<p>${heading[2].replace(/\n/g, '<br>')}</p>` : '');
       return `<p>${html.replace(/\n/g, '<br>')}</p>`;
@@ -186,9 +192,11 @@ export function formatDescription(text = '') {
     .join('');
 }
 
-// A description as one line of plain text: no Markdown **bold** or ## heading
-// marks. For the search's excerpts and the structured data.
-export const plainText = (text) => text.replace(/\*{2,}|^[ \t]*#{1,6}[ \t]+/gm, '').replace(/\s+/g, ' ').trim();
+// A description as one line of plain text: no Markdown **bold**, *italic*,
+// ## heading or backslash-escape marks. For the search's excerpts and the
+// structured data.
+export const plainText = (text) => text.replace(/\*{2,}|^[ \t]*#{1,6}[ \t]+/gm, '').replace(ITALIC, '$1$2')
+  .replace(ESCAPE, '$1').replace(/\s+/g, ' ').trim();
 
 // The talk lineup in a description, when it has one: SecDSM lists its talks
 // as bold "7:00 PM · Title" lines followed by "— Speaker".
