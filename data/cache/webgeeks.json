@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-19T01:20:59.786Z",
+  "fetchedAt": "2026-10-20T19:20:56.124Z",
   "logo": "https://secure.meetupstatic.com/photos/event/4/8/2/4/600_521178468.jpeg",
   "members": 1341,
   "pastCount": 102,
@@ -57,9 +57,9 @@
     {
       "id": "webgeeks-312416829",
       "sourceId": "312416829",
-      "title": "Web Geeks Monthly Meeting - New Trends in Web Development (TBD)",
+      "title": "What a Grasshopper Taught Me About Listening to Customers",
       "start": "2026-11-10T00:30:00.000Z",
-      "end": "2026-11-10T02:30:00.000Z",
+      "end": "2026-11-10T02:00:00.000Z",
       "allDay": false,
       "url": "https://www.meetup.com/des-moines-web-geeks/events/312416829/",
       "description": "Check out https://www.dsmwebgeeks.com/ for details on this and all future events.\n\nWe meet the second Monday of every month. Our topics focus on new trends and techniques in web development.",
