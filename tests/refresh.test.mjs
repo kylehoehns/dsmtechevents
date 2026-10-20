@@ -24,8 +24,9 @@ function setup({ groups = [{ id: 'iadnug', name: 'Iowa .NET User Group', short: 
   const asked = [];
   const get = async (url) => {
     asked.push(url);
-    if (!pages[url]) throw new Error(`404 from ${url}`);
-    return pages[url]();
+    const page = pages[url.replace(/\?_=\d+$/, '')];
+    if (!page) throw new Error(`404 from ${url}`);
+    return page();
   };
   const run = (opts = {}) => refresh({ root, get, now, pause: 0, log: quiet, ...opts });
   const read = (f) => JSON.parse(fs.readFileSync(path.join(root, 'data', f), 'utf8'));
@@ -49,6 +50,12 @@ test('a run writes each group\'s cache, Luma\'s and the status, and a second run
   await new Promise((r) => setTimeout(r, 20));
   await run({ now: now + 3_600_000 });
   assert.deepEqual(snapshot(root), before);
+});
+
+test('the Meetup events page is asked for with the run\'s time, so Meetup\'s CDN can\'t hand back an hours-old copy', async () => {
+  const { run, asked } = setup();
+  await run();
+  assert.ok(asked.includes(`https://www.meetup.com/iadnug/events/?_=${now}`), asked.join('\n'));
 });
 
 test('when the Meetup events page fails, the last run\'s venue and photo stay and the problem is a details one', async () => {
