@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, dayOf, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary, isNew, sectionOf } from '../src/lib/format.mjs';
+import { dayKey, weekday, shortTime, shortRange, dateRange, dayRange, formatDescription, todayWord, whenLabel, countdown, dayOf, monthName, dayName, plural, addDays, daysBetween, liveLabel, startsIn, lineup, recentSummary, isNew, sectionOf, plainText } from '../src/lib/format.mjs';
 import { localToUtc } from '../src/lib/time.mjs';
 import { lastDay, isDayKey } from '../src/lib/format.mjs';
 
@@ -244,6 +244,20 @@ test('lineup reads bold "time · title — speaker" lines', () => {
 test('formatDescription drops *** / --- / ___ rule lines instead of printing them', () => {
   assert.equal(formatDescription('One\n***\nTwo\n\n- - -\n\nThree\n___'), '<p>One</p><p>Two</p><p>Three</p>');
   assert.equal(formatDescription('**Agenda**\n- Pizza'), '<p><strong>Agenda</strong><br>- Pizza</p>', 'a list dash is not a rule');
+});
+
+test('formatDescription drops Meetup\'s backslash escapes and renders *italics*', () => {
+  assert.equal(
+    formatDescription('*Monday\\, November 9th \\| 6:30–8:00 PM \\| Source Allies*'),
+    '<p><em>Monday, November 9th | 6:30–8:00 PM | Source Allies</em></p>',
+  );
+  assert.equal(formatDescription('**Bold** and *italic*'), '<p><strong>Bold</strong> and <em>italic</em></p>');
+  assert.equal(formatDescription('2 * 3 * 4 and a \\*starred\\* word'), '<p>2 * 3 * 4 and a &#42;starred&#42; word</p>', 'spaced or escaped stars stay stars');
+  assert.equal(formatDescription('Pizza \\& \\<b\\>'), '<p>Pizza &amp; &lt;b&gt;</p>', 'still escaped as HTML');
+});
+
+test('plainText drops backslash escapes and *italic* marks', () => {
+  assert.equal(plainText('*Monday\\, Nov 9 \\| Source Allies* and **bold**'), 'Monday, Nov 9 | Source Allies and bold');
 });
 
 test('isNew: put up in the last day', () => {
