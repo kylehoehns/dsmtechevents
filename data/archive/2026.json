@@ -970,5 +970,37 @@
   "going": 6,
   "url": "https://www.meetup.com/des-moines-data-analytics/events/316389479/",
   "description": "This event is hosted by Iowa State University and is not affiliated with the Des Moines Data & Analytics Community group. This event does includes a cost. You must register with ISU to attend. [ISU Event Details](https://www.ivybusiness.iastate.edu/business-analytics-symposium/) This year’s event will focus on leading change with business analytics. Through real-world case studies and practitioner insights, speakers will share how organizations move from insight to action, from analysis to implementation, and from data-informed thinking to measurable business results."
+ },
+ {
+  "id": "luma-04xz1l03",
+  "title": "GitHub Dev Days",
+  "start": "2026-10-20T20:00:00.000Z",
+  "end": "2026-10-20T22:00:00.000Z",
+  "venue": "Lean Techniques Office",
+  "going": 22,
+  "url": "https://luma.com/04xz1l03",
+  "description": "✨ Dev Days is a global, in-person community-led initiative taking place from September 1st - October 31st, 2026. The series brings together developers, enthusiasts, and local tech communities to explore the power of GitHub Copilot through practical, hands-on experiences. Open to all developers, each session runs for approximately 2-3 hours and focuses on real-world workflows, hands-on activities, and workshops centered on GitHub Copilot in the Copilot app and the CLI. Disclaimer: this event utilizes AI credits. While the workshops can be completed with Copilot Free, it will take up a large"
+ },
+ {
+  "id": "dsmdata-316665472",
+  "group": "dsmdata",
+  "title": "Reimagining Analytics Delivery for the AI Era",
+  "start": "2026-10-20T21:00:00.000Z",
+  "end": "2026-10-20T22:30:00.000Z",
+  "venue": "Principal Financial",
+  "going": 47,
+  "url": "https://www.meetup.com/des-moines-data-analytics/events/316665472/",
+  "description": "As AI and advanced analytics capabilities continue to expand, many organizations are looking for ways to deliver greater business impact while helping their teams develop broader skills and stronger collaboration practices. Principal Financial has been experimenting with a model that brings business intelligence analysts, analytics engineers, and data scientists together to work as an integrated team on shared business challenges. While still early in the journey, they are already seeing changes in how work gets done, how knowledge is shared, and how individuals approach problem-solving. This"
+ },
+ {
+  "id": "dsmai-316356587",
+  "group": "dsmai",
+  "title": "Building a physical product in the age of AI",
+  "start": "2026-10-20T22:30:00.000Z",
+  "end": "2026-10-21T00:30:00.000Z",
+  "venue": "We Write Code",
+  "going": 30,
+  "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/316356587/",
+  "description": "What happens when a software developer decides to build a physical product? In this session, Levi Rosol will share the story behind GridSmith—a modular tabletop terrain system that started as a personal frustration with existing products and evolved into a real business. Along the way, AI became much more than a coding assistant. It became a design partner, a CAD tutor, a rubber duck, a technical writer, a marketing assistant, and an endless source of ideas. We'll explore the entire journey: identifying the problem worth solving, designing hundreds of iterations of a physical product,"
  }
 ]

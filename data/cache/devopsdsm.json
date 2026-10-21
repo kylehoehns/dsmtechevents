@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-10-19T12:56:42.883Z",
+  "fetchedAt": "2026-10-21T01:40:41.955Z",
   "logo": "https://secure.meetupstatic.com/photos/event/5/e/8/6/600_526884198.jpeg",
   "members": 1067,
   "pastCount": 62,
   "lastMet": "2026-09-23T23:00:00.000Z",
   "events": [
-    {
-      "id": "devopsdsm-315470117",
-      "sourceId": "315470117",
-      "allDay": false,
-      "title": "July Lightning Talks",
-      "start": "2026-07-22T23:00:00.000Z",
-      "end": "2026-07-23T00:00:00.000Z",
-      "description": "DevOpsDSM returns on Wednesday, July 22nd from 6 to 7pm for a Lightning Talks night at Source Allies.\n\nLightning talks are a chance to hear several quick presentations, giving everyone exposure to a variety of ideas, technologies, and real-world experiences. The format keeps the evening fast-paced while creating plenty of opportunities to discover something new.\n\nThis month's speakers include Austin Adamson, Joel Miller, Kyle Wagner, and Mason Spree. Our Lightning Talks will cover a wide range of topics, including deploying a simple LLM pipeline on Kubernetes with Seldon Core, using time series databases for observability, logging, and metrics, exploring why software engineering remains essential in an AI-driven world, and lessons learned from building and maintaining synthetic tests for platform and site reliability engineering. After the presentations, there will be plenty of time for questions, discussion, and sharing experiences with fellow attendees.\n\nWhether you're looking for practical takeaways, new perspectives, or simply an opportunity to connect with fellow practitioners, Lightning Talks are a great way to spend an evening with the local DevOps community, and learn at lightning speed! We will also be having a giveaway for a 1 year GitKracken subscription for in-person attendees.\n\nFood and drinks will be provided.\nHosted in person at Source Allies and streamed online. RSVP so we can get a head count!",
-      "url": "https://www.meetup.com/devopsdsm/events/315470117/",
-      "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr, Urbandale",
-      "online": false,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/9/a/9/7/600_535119575.jpeg",
-      "going": 18
-    },
     {
       "id": "devopsdsm-315859296",
       "sourceId": "315859296",
