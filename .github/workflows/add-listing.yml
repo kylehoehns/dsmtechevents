@@ -13,9 +13,9 @@ name: add listing
 # a patch and a JSON result. `publish` runs nothing from npm and is the only
 # job that sees the GitHub App's token. The App opens the PR because a PR
 # opened with the workflow's own token wouldn't start CI, which main requires.
-# The App's ID and private key are the LISTING_APP_ID and LISTING_APP_KEY
-# secrets; it can write contents, pull requests and issues on this repo only,
-# and doesn't bypass the ruleset.
+# The App's client ID and private key are the LISTING_APP_CLIENT_ID and
+# LISTING_APP_KEY secrets; it can write contents, pull requests and issues on
+# this repo only, and doesn't bypass the ruleset.
 
 on:
   # Only `labeled`: a new issue fires one for each label it's opened with,
@@ -96,7 +96,7 @@ jobs:
       - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         id: app
         with:
-          app-id: ${{ secrets.LISTING_APP_ID }}
+          client-id: ${{ secrets.LISTING_APP_CLIENT_ID }}
           private-key: ${{ secrets.LISTING_APP_KEY }}
           # Only what this job uses, even if the App is given more later.
           permission-contents: write
