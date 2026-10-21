@@ -86,6 +86,11 @@
   short: IDPA
   meetup: https://www.meetup.com/dsmsql/
 
+- id: scrum-masters
+  name: Scrum Masters of the Universe
+  short: Scrum Masters
+  meetup: https://www.meetup.com/scrum-masters-of-the-universe/
+
 - id: secdsm
   name: SecDSM Information Security Meetup
   short: SecDSM
