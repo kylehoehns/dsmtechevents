@@ -58,6 +58,11 @@ test('formatDescription only links http(s) URLs', () => {
   assert.ok(formatDescription('See https://example.com.').includes('<a href="https://example.com" '));
 });
 
+test('formatDescription shows a Markdown image as its alt text', () => {
+  // Meetup stores an emoji as an image of it.
+  assert.equal(formatDescription('Not an AI talk ![😉](https://fonts.gstatic.com/s/e/notoemoji/17.0/1f609/32.png)'), '<p>Not an AI talk 😉</p>');
+});
+
 test('formatDescription turns blank lines into paragraphs and ## into headings', () => {
   assert.equal(formatDescription('One\ntwo\n\n## Agenda\nTalks'), '<p>One<br>two</p><h4>Agenda</h4><p>Talks</p>');
 });
