@@ -165,7 +165,8 @@ export function shortRange(e, { full = false } = {}) {
 export const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 // Meetup descriptions are loose Markdown. Handle the common bits safely:
-// paragraphs, line breaks, **bold**, *italics*, [links](url), bare URLs,
+// paragraphs, line breaks, **bold**, *italics*, [links](url), ![images](url)
+// (shown as their alt text), bare URLs,
 // "## headings", and *** / --- rule lines (dropped; they only separate
 // paragraphs). Meetup puts a backslash before punctuation ("Monday\, 6pm \|
 // Source Allies"); drop it. An escaped star becomes &#42; so it can't start
@@ -181,6 +182,7 @@ export function formatDescription(text = '') {
     .filter(Boolean)
     .map((para) => {
       const html = para
+        .replace(/!\[([^\]]*)\]\([^)\s]*\)/g, '$1') // an ![image](url), which is how Meetup writes an emoji: keep its alt text
         .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" rel="noopener" target="_blank">$1<span class="sr-only"> (opens in new tab)</span></a>')
         .replace(/(^|[\s(])(https?:\/\/[^\s<)]+?)(?=[.,;:!?]*(?:[\s<)]|$))/g, '$1<a href="$2" rel="noopener" target="_blank">$2<span class="sr-only"> (opens in new tab)</span></a>')
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
