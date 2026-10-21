@@ -758,6 +758,17 @@
   "description": "AI can bring speed, structure, and fresh ideas, but you bring the experience, judgment, leadership, and credibility that move a project forward. This session puts the project manager firmly in control and shows how AI can strengthen the work without replacing the person behind it. Attendees will see practical ways to use AI for project plans, roadmaps, budgets, risk matrices, status updates, stakeholder communication, and decision support. The goal is simple: reduce busywork, improve clarity, and help project managers lead with greater confidence and deliver stronger results. Speaker Bio"
  },
  {
+  "id": "scrum-masters-315968759",
+  "group": "scrum-masters",
+  "title": "Ask Us Anything (We Might Know) with Paul Barrett & Jamie Kriegel",
+  "start": "2026-08-27T17:00:00.000Z",
+  "end": "2026-08-27T18:00:00.000Z",
+  "online": true,
+  "going": 38,
+  "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/315968759/",
+  "description": "You can find plenty of places to learn the mechanics of Agile. This gathering is about the moments that happen after the mechanics. The conversation that doesn't go the way you expected. The team whose energy slowly disappeared. The Product Owner whose priorities seem to shift every week. The stakeholder searching for certainty while the ground keeps moving. The retrospective that left everyone feeling farther apart than when it started. That one \"nobody wants to talk about it\" question that lingers in your mind. Bring the questions you've been carrying around. The stories you've been meaning"
+ },
+ {
   "id": "iadnug-316281444",
   "group": "iadnug",
   "title": "Social@.NET - 2026 Evening Social",
@@ -788,6 +799,17 @@
   "venue": "West End Architectural Salvage",
   "url": "https://www.technologyiowa.org/events/techbrew-september-2026/",
   "description": "Connect over coffee and dive into a tech focused discussion with Ted Hughes, Senior Vice President & Chief Information Officer at F&G What to Expect: 8:00 – 8:15 a.m. | Networking 8:15 – 8:45 a.m. | Interview with Ted Hughes Stick around after for more networking! ☕ Drip coffee provided by West End Salvage. Specialty drinks available for purchase. TechBrew is presented by Zirous"
+ },
+ {
+  "id": "scrum-masters-316354258",
+  "group": "scrum-masters",
+  "title": "AI in QA Automation: Where It Helps, Where It Doesn't (Yet)",
+  "start": "2026-09-10T17:00:00.000Z",
+  "end": "2026-09-10T18:00:00.000Z",
+  "online": true,
+  "going": 58,
+  "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/316354258/",
+  "description": "AI is showing up everywhere in software delivery - including testing - but most teams are still figuring out where it actually moves the needle versus where it's just noise. In this session, Saurabh Sharma will walk through the current landscape of AI in QA automation: what's genuinely reducing manual testing overhead and flaky test maintenance, what's still overhyped, and the real challenges organizations run into when they try to bring AI into their QA and CI/CD workflows (including the newer problem of testing AI agents themselves for accuracy and reliability). Expect a practical,"
  },
  {
   "id": "dsmdata-316271371",
@@ -885,6 +907,17 @@
   "venue": "Principal Financial Group",
   "url": "https://issadesmoines.org/events/september-quarterly-issa-meeting/",
   "description": "Presenting: Lucy Berry & Kaylee Fletcher (DEFCON Talk) | Andrew Leef (Why the model you use, has little effect on the outcome - AI) What: Free lunch and networking with your peers! Why: If you’re interested in hearing more about AI, please come join us for AI topics….more to share soon! Sign up early! Don’t forget, by attending ISSA meetings you can earn free CEU credits! Also, parking is free if you register by September 23rd,"
+ },
+ {
+  "id": "scrum-masters-316556329",
+  "group": "scrum-masters",
+  "title": "Agile Coaching in the Age of AI with Bob Galen",
+  "start": "2026-10-05T17:00:00.000Z",
+  "end": "2026-10-05T18:00:00.000Z",
+  "online": true,
+  "going": 176,
+  "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/316556329/",
+  "description": "There is an incredible amount of discussion around the role of AI in your Agile Coaching. How can you weave it into the coaching conversations, guidance, metrics, and client outcomes? It’s an incredibly exciting time, and those who ignore the implications, quite frankly, will have missed the boat. But . . . That’s not what we’ll be talking about in this session. Here we’re going to explore HI (Human Intelligence) and the tension AI plays in developing and accelerating your HI. We’ll explore what it looks like from the perspective of Agile Coaching skills and competencies. For example: * The"
  },
  {
   "id": "techbrew-techbrew-october-2026",

@@ -1,7 +1,7 @@
 {
-  "fetchedAt": "2026-10-21T01:52:22.821Z",
+  "fetchedAt": "2026-10-21T12:23:37.430Z",
   "logo": "https://secure.meetupstatic.com/photos/event/9/b/7/5/600_512859797.jpeg",
-  "members": 7627,
+  "members": 7629,
   "pastCount": 228,
   "lastMet": "2026-10-05T17:00:00.000Z",
   "events": [
@@ -67,7 +67,7 @@
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/1/f/d/6/600_536708150.jpeg",
-      "going": 40,
+      "going": 45,
       "added": "2026-10-20T15:28:21.000Z"
     },
     {
@@ -84,7 +84,7 @@
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/2/5/a/1/600_536709633.jpeg",
-      "going": 18,
+      "going": 21,
       "added": "2026-10-20T16:39:24.000Z"
     }
   ]
