@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-10-09T23:19:11.423Z",
+  "fetchedAt": "2026-10-22T22:25:11.492Z",
   "logo": "https://secure.meetupstatic.com/photos/event/7/6/7/a/600_517170330.jpeg",
   "members": 172,
   "pastCount": 14,
   "lastMet": "2026-10-09T13:30:00.000Z",
   "events": [
-    {
-      "id": "alf-315376050",
-      "sourceId": "315376050",
-      "allDay": false,
-      "title": "The AI-Human Edge",
-      "start": "2026-07-24T13:30:00.000Z",
-      "end": "2026-07-24T15:30:00.000Z",
-      "description": "How are you using GenAI to amplify your analytics team's expertise? How much impact does domain knowledge or context have in the different roles between AI and the expert? Join us for a lively discussion following a presentation by Bill Schmarzo, ISU Professor, where he will talk about the integration of causal AI with Generative AI to amplify human domain expertise.\n\nAgenda:\n8:30 - 8:45 Networking\n8:45 - 9:45 Presentation & Open Q&A\n9:45 - 10:15 Round Table Discussion\n10:15 - 10:30 Networking",
-      "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/315376050/",
-      "venue": "Corteva Carver Research Center",
-      "address": "7000 NW 62nd Ave, Johnston",
-      "online": false,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/7/6/7/a/600_517170330.jpeg",
-      "going": 34
-    },
     {
       "id": "alf-316515631",
       "sourceId": "316515631",
