@@ -3,9 +3,10 @@
 import ical from 'node-ical';
 
 // Every VEVENT in a feed. Throws if the response isn't a calendar at all (an
-// error page, a login wall), so the caller keeps its last good data.
+// error page, a login wall), so the caller keeps its last good data. The error
+// quotes the start of the response, so the source-broken issue shows which.
 export function calendarEvents(ics, what = 'feed') {
-  if (!ics.includes('BEGIN:VCALENDAR')) throw new Error(`${what} did not return a calendar`);
+  if (!ics.includes('BEGIN:VCALENDAR')) throw new Error(`${what} did not return a calendar ${sample(ics)}`);
   return Object.values(ical.sync.parseICS(ics)).filter((e) => e.type === 'VEVENT');
 }
 
@@ -25,3 +26,10 @@ export const created = (e) => e.created?.toISOString();
 
 // node-ical gives URL as a string or as { val }.
 export const eventUrl = (e) => e.url?.val ?? e.url ?? null;
+
+// The first 200 characters of a response, whitespace collapsed.
+function sample(text) {
+  const flat = text.replace(/\s+/g, ' ').trim();
+  if (!flat) return '(got an empty response)';
+  return `(got: ${flat.slice(0, 200)}${flat.length > 200 ? '…' : ''})`;
+}

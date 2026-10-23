@@ -45,6 +45,13 @@ test('parseFeed rejects something that is not a calendar', () => {
   assert.throws(() => parseFeed('<html>Rate limited</html>', group, { now }), /did not return a calendar/);
 });
 
+test('a non-calendar error quotes the start of what came back, so the issue shows what the site sent', () => {
+  assert.throws(() => parseFeed('<html>\n  <title>Just a moment...</title>', group, { now }), /\(got: <html> <title>Just a moment\.\.\.<\/title>\)/);
+  assert.throws(() => parseFeed('', group, { now }), /\(got an empty response\)/);
+  const long = `<html>${'x'.repeat(500)}</html>`;
+  assert.throws(() => parseFeed(long, group, { now }), (err) => err.message.includes(`(got: ${long.slice(0, 200)}…)`));
+});
+
 test('an empty feed throws when the events page still lists upcoming events, or could not be read', () => {
   const upcoming = parseFeed(fixture('meetup-feed-empty.ics'), group, { slug: 'iadnug', now });
   assert.deepEqual(upcoming, []);
