@@ -1035,5 +1035,26 @@
   "going": 30,
   "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/316356587/",
   "description": "What happens when a software developer decides to build a physical product? In this session, Levi Rosol will share the story behind GridSmith—a modular tabletop terrain system that started as a personal frustration with existing products and evolved into a real business. Along the way, AI became much more than a coding assistant. It became a design partner, a CAD tutor, a rubber duck, a technical writer, a marketing assistant, and an endless source of ideas. We'll explore the entire journey: identifying the problem worth solving, designing hundreds of iterations of a physical product,"
+ },
+ {
+  "id": "iiba-4015ea6b-10a3-436a-8d9f-5ebdc822aa32",
+  "group": "iiba",
+  "title": "IIBA Trunk or Treat",
+  "start": "2026-10-22T22:00:00.000Z",
+  "end": "2026-10-23T01:00:00.000Z",
+  "venue": "Genesis Health Clubs",
+  "url": "https://centraliowa.iiba.org/events/iiba-trunk-or-treat/",
+  "description": "🎃 Trick or treat, Des Moines Analysts! Central Iowa IIBA and PMI Central Iowa will be at Trunk or Treat trunk handing out candy. Expect a live DJ, mini-games, and treats from local trunk-decorating pros. It's a family-friendly night, and no registration is needed. Just show up! Come find our trunk, say hello, and meet fellow members of our Central Iowa business analysis community. Costumes encouraged. Bring the family and a friend who might enjoy meeting us. Event details: https://lnkd.in/gcAqJHA2"
+ },
+ {
+  "id": "cijug-316693968",
+  "group": "cijug",
+  "title": "CIJUG Lightning Talks",
+  "start": "2026-10-22T22:30:00.000Z",
+  "end": "2026-10-23T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 14,
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/316693968/",
+  "description": "CIJUG returns on Thursday, October 22nd from 5:30 to 7pm for a Lightning Talks night at Source Allies! Lightning talks are a chance to hear several quick presentations in one evening. This month’s lineup covers everything from JVM internals to local AI to using your skills for good. Garbage Out Ben DeMouth, Source Allies A look at how different JVM garbage collection configurations work and the tradeoffs each one makes. Local AI Image Generation Is Getting Disturbingly Good Nathan Halko Local AI image and video models have come a long way in the last year. Nathan will show what you can now"
  }
 ]
