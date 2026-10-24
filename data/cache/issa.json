@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-12T13:59:26.179Z",
+  "fetchedAt": "2026-10-24T18:13:12.994Z",
   "logo": "https://issadesmoines.org/wp-content/uploads/2020/03/apple-touch-icon.png",
   "events": [
     {
@@ -13,6 +13,19 @@
       "description": "**Presenting:** Lucy Berry & Kaylee Fletcher (DEFCON Talk) | Andrew Leef (Why the model you use, has little effect on the outcome - AI)\n\nWhat:  Free lunch and networking with your peers!\n\nWhy:  If you’re interested in hearing more about AI, please come join us for AI topics….more to share soon!  Sign up early!\n\nDon’t forget, by attending ISSA meetings you can earn free CEU credits!  Also, parking is free if you register by September 23rd,",
       "venue": "Principal Financial Group",
       "address": "750 Park Street, Des Moines IA 50309"
+    },
+    {
+      "id": "issa-4th-quarter-issa-event-cyber-connections-from-threat-intelligence-to-trust",
+      "sourceId": "4th-quarter-issa-event-cyber-connections-from-threat-intelligence-to-trust",
+      "title": "4th Quarter ISSA Event – Cyber Connections: From Threat Intelligence to Trust",
+      "start": "2026-11-12T18:30:00.000Z",
+      "end": "2026-11-12T20:00:00.000Z",
+      "allDay": false,
+      "url": "https://issadesmoines.org/events/4th-quarter-issa-event-cyber-connections-from-threat-intelligence-to-trust/",
+      "description": "**Presenting:** FBI, ISACA, InfraGard and ISSA\n\nHi everyone,\n\nWe would like to extend a special invitation to a joint membership meeting with our partner organizations, ISACA Iowa and ISSA Des Moines, on November 12, 12:30 PM – 4:30 PM, at the Iowa Bankers Association.   The agenda is as follows:\n\n12:30 – 1:00: Lunch (provided) and networking\n\n1:00 – 2:00:  Annual FBI Threat Briefing\n\n2:00 – 2:15:  Break and networking\n\n2:15 – 3:00: Stop Selling Cyber Risk and Start Speaking Business\n\n3:00 – 3:15: Break and networking\n\n3:15 – 3:45: ISACA State of Cyber Review\n\n3:45 – 4:00: Lighting Talk – Practitioner’s Journey from Passwords to Passwordless\n\n4:00 – 4:30: Chapter updates – ISACA, ISSA, and InfraGard\n\nRegister here: Eventbrite\n\nWe’re excited to join our partners with the Iowa chapters of ISACA and ISSA on this meeting, along with recognition of the Iowa Bankers Association of their continued support.",
+      "venue": "Iowa Bankers Association",
+      "address": null,
+      "added": "2026-10-24T18:13:12.994Z"
     }
   ]
 }
