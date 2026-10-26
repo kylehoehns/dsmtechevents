@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-15T01:33:17.674Z",
+  "fetchedAt": "2026-10-26T23:10:21.035Z",
   "logo": null,
   "events": [
     {
@@ -28,6 +28,19 @@
       "address": "1207 Maple Street, West Des Moines, IA",
       "image": "https://iowansofthings.com/assets/images/banner_hardware_hangout_2026_11.png",
       "added": "2026-10-14T19:28:00.924Z"
+    },
+    {
+      "id": "iot-ff-november-2026",
+      "sourceId": "ff-november-2026",
+      "title": "Firmware Fellowship - November 2026",
+      "start": "2026-11-12T22:30:00.000Z",
+      "end": "2026-11-13T00:30:00.000Z",
+      "allDay": false,
+      "url": "https://iowansofthings.com/ff-november-2026",
+      "description": "",
+      "venue": "Maple Studios",
+      "address": "1207 Maple Street, West Des Moines, IA",
+      "added": "2026-10-26T23:10:21.035Z"
     }
   ]
 }

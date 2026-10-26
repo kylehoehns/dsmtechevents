@@ -1,7 +1,7 @@
 {
-  "fetchedAt": "2026-10-26T16:49:29.522Z",
+  "fetchedAt": "2026-10-26T23:10:21.035Z",
   "logo": "https://secure.meetupstatic.com/photos/event/9/b/7/5/600_512859797.jpeg",
-  "members": 7638,
+  "members": 7639,
   "pastCount": 228,
   "lastMet": "2026-10-05T17:00:00.000Z",
   "events": [
@@ -54,6 +54,23 @@
       "going": 176
     },
     {
+      "id": "scrum-masters-317148547",
+      "sourceId": "317148547",
+      "title": "AI as Your Second Brain",
+      "start": "2026-10-28T16:00:00.000Z",
+      "end": "2026-10-28T17:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/317148547/",
+      "description": "***Cross-posting! We are joining with AgileBoston for this one! Please note, Zoom link not included. Please go [here](https://us06web.zoom.us/meeting/register/tJMqcu2qqz8iEt0zlAlKvvtnCxZrRug3-UB1#/registration) to register in advance.***\n\n*How I use AI to remember what my human brain can't, and show up as a better practitioner.*\n\nMost of us have tried an AI chat and received a decent answer. Far fewer have built it into how we work. I'll show what that looks like in practice: a personal knowledge system that turns meeting transcripts into decisions and action items, remembers what each stakeholder cares about, and preps me for the next conversation before I walk in.\n\nWhat surprised me was how human it makes the work. When I ask for a prep brief and get reminded that a teammate raised a concern three weeks ago, I show up as someone who listened. We'll walk through the system live, look at where it has earned my trust and where it needs a skeptical read, and talk about what Scrum Masters, Product Owners, and coaches might want their own second brain to remember.\n\n**You'll leave with**\n\n* A repeatable workflow from meeting to synthesis to next-meeting prep that you can try this week.\n* A simple rule for deciding when to trust AI output, when to treat it as a draft, and when to expect it to be wrong.\n* Ideas for what context is worth capturing about your teams and stakeholders, and what isn't.\n\n**Audience:** Scrum Masters, Product Owners, Agile coaches, and anyone who spends the day in back-to-back conversations. No technical background needed.\n\n**Format:** Conversational, with a live demo and discussion pauses.",
+      "venue": "Online",
+      "address": null,
+      "online": true,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/e/3/6/2/600_536818210.jpeg",
+      "going": 37,
+      "added": "2026-10-26T23:10:21.035Z"
+    },
+    {
       "id": "scrum-masters-317060536",
       "sourceId": "317060536",
       "title": "The Agile Credibility Crisis: Reclaiming the Scrum Master with AI Agents",
@@ -67,7 +84,7 @@
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/1/f/d/6/600_536708150.jpeg",
-      "going": 57,
+      "going": 58,
       "added": "2026-10-20T15:28:21.000Z"
     },
     {
@@ -84,7 +101,7 @@
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/2/5/a/1/600_536709633.jpeg",
-      "going": 32,
+      "going": 33,
       "added": "2026-10-20T16:39:24.000Z"
     }
   ]

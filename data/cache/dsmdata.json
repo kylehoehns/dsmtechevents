@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-10-26T16:49:29.522Z",
+  "fetchedAt": "2026-10-26T23:10:21.035Z",
   "logo": "https://secure.meetupstatic.com/photos/event/6/c/d/1/600_491667857.jpeg",
   "members": 2653,
   "pastCount": 111,
   "lastMet": "2026-10-20T21:00:00.000Z",
   "events": [
-    {
-      "id": "dsmdata-315499336",
-      "sourceId": "315499336",
-      "allDay": false,
-      "title": "Des Moines Data for Good Update",
-      "start": "2026-07-28T21:00:00.000Z",
-      "end": "2026-07-28T22:30:00.000Z",
-      "description": "The Des Moines Data for Good group has been utilizing their talents to help our community over the past several years. We will get to hear about their work and impact, a deep dive into a recent project and hear about opportunities to join the group. This is an event you don't want to miss!\n\nFor more information about this group, check out their website.\nhttps://www.dsmdataforgood.com/",
-      "url": "https://www.meetup.com/des-moines-data-analytics/events/315499336/",
-      "venue": "Wellmark Building",
-      "address": "1331 Grand Avenue, Des Moines",
-      "online": false,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/b/d/9/a/600_518268538.jpeg",
-      "going": 32
-    },
     {
       "id": "dsmdata-316271371",
       "sourceId": "316271371",
