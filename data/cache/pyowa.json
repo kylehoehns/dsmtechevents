@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-10-24T01:40:02.355Z",
+  "fetchedAt": "2026-10-27T02:08:39.301Z",
   "logo": "https://secure.meetupstatic.com/photos/event/2/b/9/b/600_525311163.jpeg",
   "members": 329,
   "pastCount": 19,
   "lastMet": "2026-09-22T22:30:00.000Z",
   "events": [
-    {
-      "id": "pyowa-315470463",
-      "sourceId": "315470463",
-      "allDay": false,
-      "title": "Sick Risk: From Messy Data to an Illness Risk Model",
-      "start": "2026-07-28T22:30:00.000Z",
-      "end": "2026-07-29T00:00:00.000Z",
-      "description": "How do you turn noisy, inconsistent public health data into something genuinely informative?\n\nAaron Hall with Source Allies walks us through the development of Sick Risk, a system that computes illness risk scores by zip code using CDC wastewater surveillance data. He will focus on extracting a stable, interpretable signal from messy real-world data, and the tradeoffs involved in doing so.\n\nAlong the way, he will explore the Python-based, cloud-hosted architecture behind the application.\n\nFinally, he taks a look at how modern AI coding assistants accelerated development, without drifting into \"AI slop.\"\n\nHosted at Source Allies, Tuesday, July 28th 5:30p-7pm. In-person or streamed online.\n\nSpeaker Bio: Dr. Aaron Hall\n\nGenAI & Data Science Consulting at Source Allies.\nAaron Hall is a hands-on AI engineer building real-world systems at the edge of modern machine learning. As a consultant at Source Allies, he ships production-ready solutions using generative AI and retrieval-augmented generation (RAG), focusing on what actually works beyond the demos. Previously, he was a Data Scientist at Los Alamos National Laboratory, applying machine learning at scale across high-performance computing environments and contributing to open-source ML infrastructure. With a PhD in Physics and experience spanning national labs, research, and full-stack development, Aaron brings a rare blend of technical depth and pragmatic engineering, helping teams turn powerful models into reliable, high-impact products.",
-      "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315470463/",
-      "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr, Urbandale",
-      "online": false,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/6/0/b/3/600_534984755.jpeg",
-      "going": 14
-    },
     {
       "id": "pyowa-315907190",
       "sourceId": "315907190",
