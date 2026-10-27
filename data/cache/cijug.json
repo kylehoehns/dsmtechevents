@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-23T01:36:02.022Z",
+  "fetchedAt": "2026-10-27T15:54:48.152Z",
   "logo": "https://secure.meetupstatic.com/photos/event/7/8/6/c/600_460890828.jpeg",
   "members": 893,
   "pastCount": 78,
@@ -53,6 +53,23 @@
       "image": "https://secure.meetupstatic.com/photos/event/2/d/2/0/600_536291552.jpeg",
       "going": 14,
       "added": "2026-09-24T14:19:18.000Z"
+    },
+    {
+      "id": "cijug-317160798",
+      "sourceId": "317160798",
+      "title": "Nobody Reads the Bytecode",
+      "start": "2026-11-10T23:30:00.000Z",
+      "end": "2026-11-11T01:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/central-iowa-java-users-group/events/317160798/",
+      "description": "AI agents are capable of writing more code than ever, but are our development practices keeping up?\n\nAs AI takes on more of the coding work, traditional approaches to code review and quality assurance can become bottlenecks. Developers are left trying to understand every line of AI-generated code while also wondering what this shift means for their own skills and responsibilities.\n\nAt our November CIJUG meetup, Tim Gifford, Chief Innovation Officer at Lean TECHniques, will challenge the assumption that developers need to personally read and understand every line of code before it ships.\n\nTim will explore how teams can build enough confidence in their software delivery processes to let AI agents handle the coding while engineers focus on higher-level decisions, system quality, and delivering value.\n\n**About the Speaker**\n\nTim Gifford is Chief Innovation Officer at Lean TECHniques and an experienced software craftsman, mentor, and software delivery coach. He has spent years helping Central Iowa organizations improve their engineering practices and has been an active contributor to the local technology community through Agile Iowa, Iowa .NET User Group, and DevOpsDays Des Moines.\n\nTuesday, November 10th, 2026\n5:30-7pm\nHosted at Lean TECHniques\nFood and drinks provided.",
+      "venue": "Lean Techniques, Inc.",
+      "address": "9131 Northpark Dr, Johnston, IA 50131",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/2/9/0/6/600_536830502.jpeg",
+      "going": 3,
+      "added": "2026-10-27T15:54:48.152Z"
     }
   ]
 }
