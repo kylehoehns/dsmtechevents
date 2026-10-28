@@ -1077,5 +1077,16 @@
   "going": 9,
   "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/316749553/",
   "description": "Pyowa returns to Source Allies on Tuesday, October 27th from 5:30–7pm with Dave Keller presenting a hands-on look at fraud detection, machine learning, and the importance of questioning results that seem a little too good. In this session, Dave will explore his work using the Elliptic Bitcoin transaction dataset to investigate fraud detection. When his initial models produced near-perfect performance, it raised an important question: was the model actually learning meaningful patterns, or was data leakage influencing the results? Dave will walk through rebuilding the experiment with a"
+ },
+ {
+  "id": "scrum-masters-317148547",
+  "group": "scrum-masters",
+  "title": "AI as Your Second Brain",
+  "start": "2026-10-28T16:00:00.000Z",
+  "end": "2026-10-28T17:00:00.000Z",
+  "online": true,
+  "going": 62,
+  "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/317148547/",
+  "description": "Cross-posting! We are joining with AgileBoston for this one! Please note, Zoom link not included. Please go [here](https://us06web.zoom.us/meeting/register/tJMqcu2qqz8iEt0zlAlKvvtnCxZrRug3-UB1#/registration) to register in advance. How I use AI to remember what my human brain can't, and show up as a better practitioner. Most of us have tried an AI chat and received a decent answer. Far fewer have built it into how we work. I'll show what that looks like in practice: a personal knowledge system that turns meeting transcripts into decisions and action items, remembers what each stakeholder"
  }
 ]

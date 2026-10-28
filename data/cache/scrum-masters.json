@@ -1,9 +1,9 @@
 {
-  "fetchedAt": "2026-10-28T16:41:59.276Z",
+  "fetchedAt": "2026-10-28T23:17:27.925Z",
   "logo": "https://secure.meetupstatic.com/photos/event/9/b/7/5/600_512859797.jpeg",
   "members": 7646,
-  "pastCount": 228,
-  "lastMet": "2026-10-05T17:00:00.000Z",
+  "pastCount": 229,
+  "lastMet": "2026-10-28T16:00:00.000Z",
   "events": [
     {
       "id": "scrum-masters-315968759",
@@ -67,7 +67,7 @@
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/e/3/6/2/600_536818210.jpeg",
-      "going": 63,
+      "going": 62,
       "added": "2026-10-26T23:10:21.035Z"
     },
     {
@@ -84,7 +84,7 @@
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/1/f/d/6/600_536708150.jpeg",
-      "going": 59,
+      "going": 60,
       "added": "2026-10-20T15:28:21.000Z"
     },
     {
