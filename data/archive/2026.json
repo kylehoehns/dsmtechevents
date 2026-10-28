@@ -1056,5 +1056,26 @@
   "going": 14,
   "url": "https://www.meetup.com/central-iowa-java-users-group/events/316693968/",
   "description": "CIJUG returns on Thursday, October 22nd from 5:30 to 7pm for a Lightning Talks night at Source Allies! Lightning talks are a chance to hear several quick presentations in one evening. This month’s lineup covers everything from JVM internals to local AI to using your skills for good. Garbage Out Ben DeMouth, Source Allies A look at how different JVM garbage collection configurations work and the tradeoffs each one makes. Local AI Image Generation Is Getting Disturbingly Good Nathan Halko Local AI image and video models have come a long way in the last year. Nathan will show what you can now"
+ },
+ {
+  "id": "pmi-47587",
+  "group": "pmi",
+  "title": "AI as Your Partner: Plan Faster. Lead Smarter. Deliver Better.",
+  "start": "2026-10-27T22:00:00.000Z",
+  "end": "2026-10-28T00:30:00.000Z",
+  "venue": "Christopher's",
+  "url": "https://pmi-centraliowa.org/calendar?eventId=47587",
+  "description": "Following our collaboration with IIBA for Professional Development Day, we are excited to continue connecting Central Iowa’s project and business analysis communities by welcoming Angie Weller as our featured speaker on Tuesday, October 27! Angie will present “AI as Your Partner: Plan Faster. Lead Smarter. Deliver Better.”, a practical session focused on how project professionals can use AI to strengthen their work without replacing the experience, judgment, and leadership they bring to the table. Attendees will explore practical ways to use AI for project plans, roadmaps, budgets, risk"
+ },
+ {
+  "id": "pyowa-316749553",
+  "group": "pyowa",
+  "title": "Fraud Detection on the Elliptic Bitcoin Dataset: Graphs, Leakage, and Topology",
+  "start": "2026-10-27T22:30:00.000Z",
+  "end": "2026-10-28T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 9,
+  "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/316749553/",
+  "description": "Pyowa returns to Source Allies on Tuesday, October 27th from 5:30–7pm with Dave Keller presenting a hands-on look at fraud detection, machine learning, and the importance of questioning results that seem a little too good. In this session, Dave will explore his work using the Elliptic Bitcoin transaction dataset to investigate fraud detection. When his initial models produced near-perfect performance, it raised an important question: was the model actually learning meaningful patterns, or was data leakage influencing the results? Dave will walk through rebuilding the experiment with a"
  }
 ]
