@@ -1088,5 +1088,16 @@
   "going": 62,
   "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/317148547/",
   "description": "Cross-posting! We are joining with AgileBoston for this one! Please note, Zoom link not included. Please go [here](https://us06web.zoom.us/meeting/register/tJMqcu2qqz8iEt0zlAlKvvtnCxZrRug3-UB1#/registration) to register in advance. How I use AI to remember what my human brain can't, and show up as a better practitioner. Most of us have tried an AI chat and received a decent answer. Far fewer have built it into how we work. I'll show what that looks like in practice: a personal knowledge system that turns meeting transcripts into decisions and action items, remembers what each stakeholder"
+ },
+ {
+  "id": "devopsdsm-316781004",
+  "group": "devopsdsm",
+  "title": "Human in the Loop:  Orchestrating Agents for Safety",
+  "start": "2026-10-28T23:00:00.000Z",
+  "end": "2026-10-29T00:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 16,
+  "url": "https://www.meetup.com/devopsdsm/events/316781004/",
+  "description": "Human in the Loop: Orchestrating Agents for Safety As AI agents take on more complex tasks and workflows, where and how should people remain part of the process? Join DevOpsDSM on Wednesday, October 28th for Ethan Spoestra’s presentation, “Human in the Loop: Orchestrating Agents for Safety.” The session will explore the intersection of AI agents, orchestration, human involvement, and safety, with a focus on the role people can play as increasingly capable agents become part of software and operational workflows. Come learn, ask questions, and continue the conversation with the tech community."
  }
 ]

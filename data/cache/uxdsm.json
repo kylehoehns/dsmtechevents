@@ -1,8 +1,26 @@
 {
-  "fetchedAt": "2026-10-16T01:27:31.297Z",
+  "fetchedAt": "2026-10-29T02:30:54.073Z",
   "logo": "https://secure.meetupstatic.com/photos/event/8/a/f/c/600_535115580.jpeg",
   "members": 1106,
   "pastCount": 85,
   "lastMet": "2024-08-28T23:00:00.000Z",
-  "events": []
+  "events": [
+    {
+      "id": "uxdsm-317184613",
+      "sourceId": "317184613",
+      "title": "How I AI",
+      "start": "2026-11-11T18:00:00.000Z",
+      "end": "2026-11-11T19:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/experiencing-ux/events/317184613/",
+      "description": "Not sure where AI fits into your work? Not sure it’s worth your time?\n\nJoin us ***online*** Wednesday, Nov. 11, from 12 to 1 PM for “How I AI,” a show-and-tell panel. Three practitioners will show how they use AI in their jobs. You’ll see real workflows, not hype.\n\nThis is a **virtual-only event on Google Meet**. We’ll record the session and post the recording on our YouTube channel.\n\n**Who you’ll hear from**\n\n* **Desarae Veit**, State Manager with the State of Iowa, who spent the last 2.5 years as a Capture Manager at General Dynamics Information Technology and is actively pursuing her PhD in HCI.\n* **Sarah Heilman**, Senior User Experience Designer at Workiva, who has spent 7+ years designing B2B SaaS platforms.\n* **Kathryn Downing**, Sr. Product Designer at Tractor Zoom, who also previously led UX teams at Hy-Vee, Shopify, and Gap, Inc.\n\n**How it works**\nEach presenter gets 10 minutes to show how they use AI. We’ll stop for Q&A after each demo, then move to the next person.\n\n**Who it’s for**\nAnyone who’s unsure how to use AI day to day, or what value it adds. Come with questions.",
+      "venue": "Online",
+      "address": null,
+      "online": true,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/8/2/f/c/600_536853532.jpeg",
+      "going": 1,
+      "added": "2026-10-29T02:30:54.073Z"
+    }
+  ]
 }

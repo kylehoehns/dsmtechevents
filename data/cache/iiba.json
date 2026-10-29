@@ -1,19 +1,7 @@
 {
-  "fetchedAt": "2026-10-12T14:25:49.461Z",
+  "fetchedAt": "2026-10-29T02:30:54.073Z",
   "logo": "https://clubrunner.blob.core.windows.net/00000400579/Favicon/macIcon.png",
   "events": [
-    {
-      "id": "iiba-a7d77fec-a49d-4b20-b264-76e5956205e6",
-      "sourceId": "a7d77fec-a49d-4b20-b264-76e5956205e6",
-      "title": "Exile Brewing Trivia Night with IIBA",
-      "start": "2026-07-30T23:00:00.000Z",
-      "end": "2026-07-31T01:00:00.000Z",
-      "allDay": false,
-      "url": "https://centraliowa.iiba.org/events/exile-brewing-trivia-night-with-iiba/",
-      "description": "",
-      "venue": "Exile Brewing Company",
-      "address": "1514 Walnut Street, Des Moines, IA"
-    },
     {
       "id": "iiba-9879fbf8-5df5-4fcc-86bc-3d5b0d860eec",
       "sourceId": "9879fbf8-5df5-4fcc-86bc-3d5b0d860eec",
