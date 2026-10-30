@@ -63,6 +63,12 @@ export default async function iowansOfThings(group, { get }) {
     const link = /<h4>\s*<a href="([^"]+)">([\s\S]*?)<\/a>/.exec(item);
     const date = isoDate(field(item, 'Date') ?? '');
     if (!link || !date) return [];
+    // A skipped month stays listed under a heading like "On Hiatus for
+    // November", with its date, time and place still filled in. Real events
+    // have no heading before Date, so only one that opens with the news
+    // counts: a talk called "Why we postponed moving to the cloud" stays.
+    const headings = [...item.slice(0, item.indexOf('Date:')).matchAll(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/g)].map((m) => toText(m[1]));
+    if (headings.some((h) => /^(on hiatus|cancell?ed|postponed)\b/i.test(h))) return [];
     const url = new URL(link[1], base).href;
     const [from, to] = (field(item, 'Time') ?? '').split(/\s*[-–]\s*/);
     const startTime = hhmm(from);

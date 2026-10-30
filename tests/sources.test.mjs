@@ -364,6 +364,28 @@ test("iowans-of-things brings over the bulleted sections of the event's own page
   ].join('\n\n'), 'not the RSVP form, sponsor logos, parking notes or the page footer');
 });
 
+// They keep a skipped month on the list under an "On Hiatus" heading, with the
+// usual date, time and place, pointing people to the other event that night.
+test('iowans-of-things leaves out a month the group says is on hiatus or cancelled', async () => {
+  const home = fixture('iowans-of-things.html');
+  const skipped = (heading) => home.replace('id="upcoming-events">', `id="upcoming-events">
+<article class="archive-item">
+<h4><a href="/ff-november-2026">Firmware Fellowship - November 2026</a></h4>
+<h2 id="skipped">${heading}</h2>
+<p>Since it is on the same day as Hardware Hangout, Firmware Fellowship is taking a break this month.</p>
+<p><strong>Date:</strong>  November 12th, 2026</p>
+<p><strong>Time:</strong>  4:30 PM - 6:30 PM</p>
+<p><strong>Place:</strong> Maple Studios, 1207 Maple Street, West Des Moines, IA</p>
+</article>`);
+  for (const heading of ['On Hiatus for November', 'Cancelled', 'Canceled', 'Postponed to December']) {
+    const events = await iowansOfThings({ id: 'iot' }, iotSite(skipped(heading)));
+    assert.deepEqual(events.map((e) => e.id), ['iot-ff-october-2026', 'iot-hh-november-2026'], heading);
+  }
+  // Only a heading that opens with the news: a talk about postponing is still on.
+  const talk = await iowansOfThings({ id: 'iot' }, iotSite(skipped('Why we postponed moving to the cloud')));
+  assert.deepEqual(talk.map((e) => e.id), ['iot-ff-november-2026', 'iot-ff-october-2026', 'iot-hh-november-2026']);
+});
+
 test('iowans-of-things never ends an event before it starts', async () => {
   const read = (time) => iowansOfThings({ id: 'iot' }, iotSite(fixture('iowans-of-things.html').replace(/7:00 PM\s*-\s*8:00 PM/, time)));
   const [late] = await read('7:00 PM - 12:00 AM');
