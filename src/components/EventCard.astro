@@ -62,9 +62,11 @@ const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURICompo
             </>
           ))
         : <span class="band-name">{e.hostsLabel}</span>}
-      {hosts.length === 1 && lead.showFullName && <span class="with">{lead.name}</span>}
-      {/* app.js takes it down once the day is up; the page can be hours old. */}
+      {/* Beside the name and "Back!", not after the full name, where it wrapped
+          onto a line of its own on phones. app.js takes it down once the day is
+          up; the page can be hours old. */}
       {isNew(e.added) && <span class="new-tag" data-added={e.added}>New</span>}
+      {hosts.length === 1 && lead.showFullName && <span class="with">{lead.name}</span>}
     </p>
     {e.series && (
       <p class="series"><b>{e.series.rule}</b>{e.series.count} dates through {e.series.until}</p>
