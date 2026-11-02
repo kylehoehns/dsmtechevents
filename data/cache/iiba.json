@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-29T02:30:54.073Z",
+  "fetchedAt": "2026-11-02T20:25:04.858Z",
   "logo": "https://clubrunner.blob.core.windows.net/00000400579/Favicon/macIcon.png",
   "events": [
     {
@@ -25,6 +25,19 @@
       "description": "🎃 Trick or treat, Des Moines Analysts!\n\nCentral Iowa IIBA and PMI Central Iowa will be at Trunk or Treat trunk handing out candy.\n\nExpect a live DJ, mini-games, and treats from local trunk-decorating pros. It's a family-friendly night, and no registration is needed. Just show up!\n\nCome find our trunk, say hello, and meet fellow members of our Central Iowa business analysis community. Costumes encouraged. Bring the family and a friend who might enjoy meeting us.\n\nEvent details: **https://lnkd.in/gcAqJHA2**",
       "venue": "Genesis Health Clubs",
       "address": "4875 Mills Civic Parkway, West Des Moines, IA"
+    },
+    {
+      "id": "iiba-65da34fb-0ca4-4d36-add1-208433eaa6ed",
+      "sourceId": "65da34fb-0ca4-4d36-add1-208433eaa6ed",
+      "title": "Answering Students' Most Asked AI Questions",
+      "start": "2026-11-12T01:00:00.000Z",
+      "end": "2026-11-12T02:30:00.000Z",
+      "allDay": false,
+      "url": "https://centraliowa.iiba.org/events/answering-students-most-asked-ai-questions/",
+      "description": "",
+      "venue": "Great Hall, Memorial Union",
+      "address": "2229 Lincoln Way, Ames, IA",
+      "added": "2026-11-02T20:25:04.858Z"
     }
   ]
 }
