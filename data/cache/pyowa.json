@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-28T02:22:07.977Z",
+  "fetchedAt": "2026-11-03T17:54:44.184Z",
   "logo": "https://secure.meetupstatic.com/photos/event/2/b/9/b/600_525311163.jpeg",
   "members": 330,
   "pastCount": 20,
@@ -53,6 +53,23 @@
       "image": "https://secure.meetupstatic.com/photos/event/4/3/7/7/600_536357271.jpeg",
       "going": 9,
       "added": "2026-09-28T14:17:44.000Z"
+    },
+    {
+      "id": "pyowa-317271099",
+      "sourceId": "317271099",
+      "title": "Wordle Solving Strategies in Rust and Python",
+      "start": "2026-12-01T23:30:00.000Z",
+      "end": "2026-12-02T01:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/317271099/",
+      "description": "How good is your Wordle strategy, and could a different approach improve your chances of solving the puzzle in fewer guesses?\n\nJoin Pyowa on Tuesday, December 1st, as Rusty Jones, TUFLOW Technical Lead, explores the programming and problem-solving behind an automated Wordle solver.\n\nRusty will demonstrate a tool designed to compare different Wordle-solving strategies, looking at how they perform in terms of win rate and average number of guesses. Originally written in Rust for speed, the project also raises some interesting questions about Python performance. How much slower is Python? Can straightforward optimizations narrow the gap? And can Rust and Python work together to get the best of both languages?\n\nSpeaker Bio:\nRusty has spent his career at the intersection of programming and water simulation engineering. After studying C++ at Brigham Young University and developing graphical interfaces for water simulations, he worked as an engineer at HDR, where he taught himself Python for automation and data analysis. Today, he works with FORTRAN, C++, and Python as a TUFLOW Technical Lead.\n\nTuesday\\, December 1st \\| 5:30–7pm\nHosted at Source Allies \\| Food and drinks provided",
+      "venue": "Source Allies",
+      "address": "4501 NW Urbandale Dr, Urbandale, IA 50322",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/5/3/1/2/600_536961266.jpeg",
+      "going": 2,
+      "added": "2026-11-03T17:54:44.184Z"
     }
   ]
 }
