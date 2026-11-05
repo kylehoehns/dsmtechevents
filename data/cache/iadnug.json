@@ -1,7 +1,7 @@
 {
-  "fetchedAt": "2026-11-04T00:00:50.082Z",
+  "fetchedAt": "2026-11-05T18:05:50.027Z",
   "logo": "https://secure.meetupstatic.com/photos/event/b/3/e/6/600_525706054.jpeg",
-  "members": 1498,
+  "members": 1508,
   "pastCount": 121,
   "lastMet": "2026-10-08T17:00:00.000Z",
   "events": [
@@ -40,18 +40,18 @@
     {
       "id": "iadnug-317221638",
       "sourceId": "317221638",
-      "title": ".NET@Night - Enterprise AI Needs a Semantic Layer",
+      "title": ".NET@Night - Open Discussion",
       "start": "2026-11-06T00:00:00.000Z",
       "end": "2026-11-06T01:00:00.000Z",
       "allDay": false,
       "url": "https://www.meetup.com/iadnug/events/317221638/",
-      "description": "**Agenda**\nThis will be a Zoom meeting at Night.\n\n5:50pm-6:00pm - Pre-Session Waiting Room\n6:00pm-7:00pm - Presentation, JetBrains giveaway\n\n**Building Deterministic, Accurate, and Cost-Effective AI in the Enterprise with a Semantic Layer**\nEnterprise AI is probabilistic, but your business semantics shouldn’t be. A semantic layer makes meaning explicit so models and agents stop guessing what your data, APIs, and business concepts mean. That improves accuracy, reduces cost, and keeps multi-agent systems aligned without adding another brittle AI framework. The advantage isn’t a new tool—it’s designing systems where meaning is deterministic.\n\n**Meeting and Platinum Sponsor – QCI**\nSince 1995, QCI has grown to be one of the largest, Iowa-based, technology consulting firms, one client at a time. There is no secret to our success. We simply hire the best people and support a culture that is obsessed with delivering excellent service to our clients. In QCI, our clients have a partner that is large enough to provide highly skilled consultants across a wide area of expertise. Our dedication to client service has resulted in a long-term relationships through which we understand that placing the interests of our clients first is the key to being a trusted partner.\n\nFor more information, visit [https://www.qci.com](https://www.qci.com/)\n\n**Platinum Sponsor – Source Allies**\nSource Allies is a local technical consultancy who values collaboration, craftsmanship, and an ownership mentality. We provide a home to our teammates where we encourage each other to grow not only technically, but as peers & consultants. This is evident in the quality software we deliver to clients.\n\nLearn about our “ownership mentality” at: [https://www.sourceallies.com](https://www.sourceallies.com/)",
+      "description": "20261105 Update:\nOur speaker is not feeling well today so we can meet to discuss open topics.\n\nWhat have you learned?\nHow are you coping with the changing environment?\nWhat would you like to learn more about?\n\nThis original session will be rescheduled and announced next week.\n--Dustin\n\n**Agenda**\nThis will be a Zoom meeting at Night.\n\n5:50pm-6:00pm - Pre-Session Waiting Room\n6:00pm-7:00pm - Presentation, JetBrains giveaway\n\n**Building Deterministic, Accurate, and Cost-Effective AI in the Enterprise with a Semantic Layer**\nEnterprise AI is probabilistic, but your business semantics shouldn’t be. A semantic layer makes meaning explicit so models and agents stop guessing what your data, APIs, and business concepts mean. That improves accuracy, reduces cost, and keeps multi-agent systems aligned without adding another brittle AI framework. The advantage isn’t a new tool—it’s designing systems where meaning is deterministic.\n\n**Meeting and Platinum Sponsor – QCI**\nSince 1995, QCI has grown to be one of the largest, Iowa-based, technology consulting firms, one client at a time. There is no secret to our success. We simply hire the best people and support a culture that is obsessed with delivering excellent service to our clients. In QCI, our clients have a partner that is large enough to provide highly skilled consultants across a wide area of expertise. Our dedication to client service has resulted in a long-term relationships through which we understand that placing the interests of our clients first is the key to being a trusted partner.\n\nFor more information, visit [https://www.qci.com](https://www.qci.com/)\n\n**Platinum Sponsor – Source Allies**\nSource Allies is a local technical consultancy who values collaboration, craftsmanship, and an ownership mentality. We provide a home to our teammates where we encourage each other to grow not only technically, but as peers & consultants. This is evident in the quality software we deliver to clients.\n\nLearn about our “ownershi",
       "venue": "Online",
       "address": null,
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/b/3/e/6/600_525706054.jpeg",
-      "going": 14,
+      "going": 15,
       "added": "2026-10-31T22:34:41.257Z"
     }
   ]

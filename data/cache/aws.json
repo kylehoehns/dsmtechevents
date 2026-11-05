@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-03T17:54:44.184Z",
+  "fetchedAt": "2026-11-05T18:05:50.027Z",
   "logo": "https://secure.meetupstatic.com/photos/event/b/2/0/e/600_461265582.jpeg",
   "members": 1332,
   "pastCount": 38,
@@ -38,6 +38,23 @@
       "image": "https://secure.meetupstatic.com/photos/event/b/2/0/e/600_461265582.jpeg",
       "going": 4,
       "added": "2026-10-03T16:44:11.000Z"
+    },
+    {
+      "id": "aws-317298690",
+      "sourceId": "317298690",
+      "title": "AWS Gameday!",
+      "start": "2027-03-09T23:30:00.000Z",
+      "end": "2027-03-10T01:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/aws-user-group-des-moines/events/317298690/",
+      "description": "Want to practice your AWS Skills and compete with your friends? We will be hosting an AWS Game Day for our March event. Stop by and enjoy free drinks and food, while participating in some friendly competition!",
+      "venue": "Lean Techniques, Inc.",
+      "address": "9131 Northpark Dr, Johnston, IA 50131",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/c/4/0/a/600_536990186.jpeg",
+      "going": 1,
+      "added": "2026-11-05T18:05:50.027Z"
     }
   ]
 }
