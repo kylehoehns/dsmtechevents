@@ -1099,5 +1099,26 @@
   "going": 16,
   "url": "https://www.meetup.com/devopsdsm/events/316781004/",
   "description": "Human in the Loop: Orchestrating Agents for Safety As AI agents take on more complex tasks and workflows, where and how should people remain part of the process? Join DevOpsDSM on Wednesday, October 28th for Ethan Spoestra’s presentation, “Human in the Loop: Orchestrating Agents for Safety.” The session will explore the intersection of AI agents, orchestration, human involvement, and safety, with a focus on the role people can play as increasingly capable agents become part of software and operational workflows. Come learn, ask questions, and continue the conversation with the tech community."
+ },
+ {
+  "id": "iadnug-317221638",
+  "group": "iadnug",
+  "title": ".NET@Night - Open Discussion",
+  "start": "2026-11-06T00:00:00.000Z",
+  "end": "2026-11-06T01:00:00.000Z",
+  "online": true,
+  "going": 15,
+  "url": "https://www.meetup.com/iadnug/events/317221638/",
+  "description": "20261105 Update: Our speaker is not feeling well today so we can meet to discuss open topics. What have you learned? How are you coping with the changing environment? What would you like to learn more about? This original session will be rescheduled and announced next week. --Dustin Agenda This will be a Zoom meeting at Night. 5:50pm-6:00pm - Pre-Session Waiting Room 6:00pm-7:00pm - Presentation, JetBrains giveaway Building Deterministic, Accurate, and Cost-Effective AI in the Enterprise with a Semantic Layer Enterprise AI is probabilistic, but your business semantics shouldn’t be. A semantic"
+ },
+ {
+  "id": "secdsm-2026-11-05",
+  "group": "secdsm",
+  "title": "Tokens, Tickets, & Thievery - Authentication Material Theft for Privilege Escalation and Defense Planning",
+  "start": "2026-11-06T00:00:00.000Z",
+  "end": "2026-11-06T02:30:00.000Z",
+  "venue": "T12 Distillery at The Foundry",
+  "url": "https://secdsm.org/#schedule",
+  "description": "Doors open at 6 PM. 7:00 PM · Tokens, Tickets, & Thievery - Authentication Material Theft for Privilege Escalation and Defense Planning — Andrew Ware We all know that you’re supposed to protect privileged accounts with strong passwords and MFA, but what if the authentication process itself can be undermined? In this talk I’ll explore how stolen authentication material can be used to hijack accounts without ever needing to obtain the actual credentials. We’ll look at classic Kerberos ticket theft and Microsoft Entra access token theft. The lesson for defenders: Strong credentials are only part"
  }
 ]
