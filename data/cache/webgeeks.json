@@ -1,7 +1,7 @@
 {
-  "fetchedAt": "2026-11-06T17:32:53.045Z",
+  "fetchedAt": "2026-11-07T16:30:29.669Z",
   "logo": "https://secure.meetupstatic.com/photos/event/4/8/2/4/600_521178468.jpeg",
-  "members": 1348,
+  "members": 1350,
   "pastCount": 102,
   "lastMet": "2026-10-12T23:30:00.000Z",
   "events": [
@@ -72,21 +72,21 @@
       "added": "2025-12-13T05:28:14.000Z"
     },
     {
-      "id": "webgeeks-xngjwryjcqbsb",
-      "sourceId": "xngjwryjcqbsb",
+      "id": "webgeeks-317321780",
+      "sourceId": "317321780",
       "title": "Web Geeks Monthly Meeting - New Trends in Web Development (TBD)",
       "start": "2026-12-15T00:30:00.000Z",
       "end": "2026-12-15T02:30:00.000Z",
       "allDay": false,
-      "url": "https://www.meetup.com/des-moines-web-geeks/events/xngjwryjcqbsb/",
+      "url": "https://www.meetup.com/des-moines-web-geeks/events/317321780/",
       "description": "Check out https://www.dsmwebgeeks.com/ for details on this and all future events.\n\nWe meet the second Monday of every month. Our topics focus on new trends and techniques in web development.",
       "venue": "Online",
       "address": null,
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/5/5/7/8/600_480561880.jpeg",
-      "going": 3,
-      "added": "2020-08-11T18:05:25.000Z"
+      "going": 4,
+      "added": "2026-11-07T16:30:29.669Z"
     },
     {
       "id": "webgeeks-xngjwrykccbpb",

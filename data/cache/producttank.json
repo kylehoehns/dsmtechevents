@@ -1,7 +1,7 @@
 {
-  "fetchedAt": "2026-11-06T23:45:31.498Z",
+  "fetchedAt": "2026-11-07T16:30:29.669Z",
   "logo": "https://secure.meetupstatic.com/photos/event/7/b/c/a/600_535291690.jpeg",
-  "members": 851,
+  "members": 852,
   "pastCount": 52,
   "lastMet": "2026-10-14T21:30:00.000Z",
   "events": [
@@ -57,18 +57,18 @@
     {
       "id": "producttank-316999014",
       "sourceId": "316999014",
-      "title": "November Meeting TBD",
+      "title": "Where You Add Value and Where You Stumble",
       "start": "2026-11-17T22:30:00.000Z",
       "end": "2026-11-18T00:00:00.000Z",
       "allDay": false,
       "url": "https://www.meetup.com/producttank-des-moines-ames/events/316999014/",
-      "description": "**Where You Add Value and Where You Stumble**\n\nWe all have strengths that help us connect, influence, and deliver results. We also have habits and blind spots that can unintentionally get in our way. Join Todd and Shawna for an interactive session where we'll explore both sides of the equation. Through discussion, shared experiences, and real-world examples, you'll gain new ideas from your peers, identify opportunities to increase your impact, and discover practical ways to lean into your strengths while navigating common challenges. It's also a great opportunity to showcase what works for you and learn from what's working for others.",
+      "description": "We all have strengths that help us connect, influence, and deliver results. We also have habits and blind spots that can unintentionally get in our way. Join Todd and Shawna for an interactive session where we'll explore both sides of the equation. Through discussion, shared experiences, and real-world examples, you'll gain new ideas from your peers, identify opportunities to increase your impact, and discover practical ways to lean into your strengths while navigating common challenges. It's also a great opportunity to showcase what works for you and learn from what's working for others.",
       "venue": "Lean Techniques, Inc.",
       "address": "9131 Northpark Dr, Johnston, IA 50131",
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/7/b/c/a/600_535291690.jpeg",
-      "going": 5,
+      "going": 9,
       "added": "2026-10-15T19:13:46.787Z"
     }
   ]
