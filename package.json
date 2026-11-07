@@ -27,13 +27,13 @@
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans": "^5.3.0",
     "@fontsource/permanent-marker": "^5.3.0",
-    "astro": "^7.4.0",
+    "astro": "^7.4.2",
     "node-ical": "^0.27.3",
     "qrcode": "^1.5.4",
     "yaml": "^2.9.1"
   },
   "devDependencies": {
-    "@astrojs/check": "0.9.10",
+    "@astrojs/check": "0.9.12",
     "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "10.0.1",
     "@playwright/test": "^1.64.1",
@@ -44,9 +44,9 @@
     "eslint": "10.13.0",
     "eslint-plugin-astro": "3.2.1",
     "globals": "17.13.0",
-    "knip": "6.42.0",
-    "satori": "^0.62.0",
+    "knip": "6.43.0",
+    "satori": "^0.63.2",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.71.2"
+    "typescript-eslint": "8.72.0"
   }
 }
