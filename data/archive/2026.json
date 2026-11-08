@@ -1120,5 +1120,15 @@
   "venue": "T12 Distillery at The Foundry",
   "url": "https://secdsm.org/#schedule",
   "description": "Doors open at 6 PM. 7:00 PM · Tokens, Tickets, & Thievery - Authentication Material Theft for Privilege Escalation and Defense Planning — Andrew Ware We all know that you’re supposed to protect privileged accounts with strong passwords and MFA, but what if the authentication process itself can be undermined? In this talk I’ll explore how stolen authentication material can be used to hijack accounts without ever needing to obtain the actual credentials. We’ll look at classic Kerberos ticket theft and Microsoft Entra access token theft. The lesson for defenders: Strong credentials are only part"
+ },
+ {
+  "id": "manual-iowa-code-camp-2026-2026-11-07",
+  "title": "Iowa Code Camp",
+  "start": "2026-11-07T14:00:00.000Z",
+  "end": "2026-11-07T23:00:00.000Z",
+  "venue": "FFA Enrichment Center, DMACC Ankeny",
+  "url": "https://iowacodecamp.com/",
+  "headliner": true,
+  "description": "Free, one-day, in-person conference for software developers: front-end frameworks, cloud infrastructure, databases, and working on engineering teams. Running since 2008, with about 240 people at each Des Moines-area camp. Community-run, by developers for developers, and never during work hours."
  }
 ]
