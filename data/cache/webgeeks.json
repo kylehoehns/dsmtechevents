@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-11-08T16:43:11.003Z",
+  "fetchedAt": "2026-11-09T02:43:18.993Z",
   "logo": "https://secure.meetupstatic.com/photos/event/4/8/2/4/600_521178468.jpeg",
   "members": 1354,
   "pastCount": 102,
   "lastMet": "2026-10-12T23:30:00.000Z",
   "events": [
-    {
-      "id": "webgeeks-312416822",
-      "sourceId": "312416822",
-      "allDay": false,
-      "title": "Coding Dojo",
-      "start": "2026-08-10T23:30:00.000Z",
-      "end": "2026-08-11T01:00:00.000Z",
-      "description": "Join the Web Geeks March Meetup on Monday, August 10th, 6:30-8pm at Source Allies for a Coding Dojo!\n\nAre you ready to dive into a collaborative coding challenge and explore new trends and techniques in software development? Web Geeks invites you to our next tech meetup where learning, experimentation, and community are at the forefront.\n\nWhat’s Happening?\nIn the spirit of a traditional coding kata done the old-fashioned dojo way, we'll break into groups based on the computers available—so please remember to bring your own laptop. Each group will be given 60 minutes to tackle a fun and challenging coding problem using any means necessary. Whether you're keen to explore a new tech stack, experiment with an unfamiliar framework, or sharpen your TDD skills, this is your opportunity to learn by doing!\n\nThe Dojo Experience\nCollaborative Challenge: Work with peers in small groups, exchange ideas, and learn from one another as you work through the coding kata.\n\nSafe to Fail, Safe to Learn: At Web Geeks, we value the learning journey over the destination. We're not looking for the perfect solution—just a thoughtful approach and a willingness to experiment.\n\nCommunity Presentations: At the end of the session, each group will share their results. This isn’t about who got it “right” but about discussing your thought process, the challenges you encountered, and the lessons you learned along the way.\n\nBring your computer and your curiosity. We will see you in the dojo!\n\nCheck out https://www.dsmwebgeeks.com/ for details on this and all future events.\n\nWe meet the second Monday of every month. Our topics focus on new trends and techniques in web development.",
-      "url": "https://www.meetup.com/des-moines-web-geeks/events/312416822/",
-      "venue": "Online",
-      "address": null,
-      "online": true,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/8/4/9/5/600_535293941.jpeg",
-      "going": 16
-    },
     {
       "id": "webgeeks-312416823",
       "sourceId": "312416823",
