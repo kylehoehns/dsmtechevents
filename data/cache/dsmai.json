@@ -1,7 +1,7 @@
 {
-  "fetchedAt": "2026-11-09T16:00:41.794Z",
+  "fetchedAt": "2026-11-09T20:50:13.118Z",
   "logo": "https://secure.meetupstatic.com/photos/event/5/5/7/600_514381367.jpeg",
-  "members": 1108,
+  "members": 1107,
   "pastCount": 31,
   "lastMet": "2026-10-20T22:30:00.000Z",
   "events": [
@@ -57,18 +57,18 @@
     {
       "id": "dsmai-316699314",
       "sourceId": "316699314",
-      "title": "DSM AI Group Monthly Meeting (Speaker TBD)",
+      "title": "The Distributed Graph: Unifying APIs for AI and the Enterprise",
       "start": "2026-11-17T23:30:00.000Z",
       "end": "2026-11-18T01:30:00.000Z",
       "allDay": false,
       "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/316699314/",
-      "description": "Join us for the next DSM AI Group!\n\nTopic and Speaker will be announced closer to the posted date.",
+      "description": "As organizations scale, their data often becomes trapped in fragmented microservices and siloed APIs. This slows down feature delivery, frustrates frontend teams, and makes integrating modern AI tools incredibly difficult due to a lack of unified context. The solution? Distributed GraphQL.\n\nIn this live coding session, we will build a distributed architecture from the ground up using Apollo Federation. We will start by creating multiple independent backend subgraphs representing different domains, and then seamlessly compose them into a single, unified distributed graph ready for enterprise consumption.\n\nBut we won't stop at the implementation. We will explore how this unified data graph provides the perfect semantic context layer, allowing AI tooling and agents to easily discover, understand, and query your organizational data. To tie it all together, I will share how we have leveraged this exact architecture at Source Allies to drive real-world success, reducing data redundancy, boosting team autonomy, and unlocking powerful capabilities for both AI-driven and traditional engineering efforts.",
       "venue": "We Write Code",
       "address": "130 E 3rd St Ste 202, Des Moines, IA 50309",
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/b/f/e/e/600_525949134.jpeg",
-      "going": 10,
+      "going": 12,
       "added": "2026-09-24T20:25:28.000Z"
     }
   ]
