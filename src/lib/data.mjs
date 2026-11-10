@@ -38,11 +38,12 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   for (const e of events) describe(e, byId);
   foldSeries(upcoming);
   const archive = readArchive(dataDir);
+  // Each group's latest archived event, for when the cache's 90 days hold none.
   const archived = {};
-  for (const r of archive) if (r.group && !(archived[r.group] >= r.start)) archived[r.group] = r.start;
+  for (const r of archive) if (r.group && !(archived[r.group]?.start >= r.start)) archived[r.group] = r;
   for (const g of groups) {
-    summarize(g, upcoming, past, now);
-    markQuiet(g, archived[g.id], now);
+    summarize(g, upcoming, past, archived[g.id], now);
+    markQuiet(g, archived[g.id]?.start, now);
   }
 
   const fetched = groups.map((g) => g.fetchedAt).filter(Boolean).sort();
@@ -261,13 +262,15 @@ export const seriesKey = (e) => `${e.groupIds.join('+')}|${e.title.trim().toLowe
 const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 // What the Groups page needs: next and last event, how many are coming up,
-// and which name and logo to show.
-function summarize(g, upcoming, past, now) {
+// and which name and logo to show. `archived` is the group's latest archive record.
+function summarize(g, upcoming, past, archived, now) {
   const mine = upcoming.filter((e) => e.groupIds.includes(g.id));
   g.nextEvent = mine[0] ?? null;
   // Matches the filter chip: a repeating series counts once, like its row.
   g.upcomingCount = mine.filter((e) => !e.repeat).length;
-  g.lastEvent = past.find((e) => e.groupIds.includes(g.id)) ?? null;
+  // A group quiet for 90 days has none in the cache; the archive has it, RSVPs
+  // and all, and the Events button's filtered page lists it from there too.
+  g.lastEvent = past.find((e) => e.groupIds.includes(g.id)) ?? archived ?? null;
   // The Groups and Status pages print the group as it reads now, then as it
   // will once each event ending in the next two days is over. `attrs` go on
   // each state's elements: src/scripts/catch-up.js shows a state from its

@@ -186,6 +186,8 @@ test('a group that met recently but has nothing scheduled stays listed', () => {
   assert.equal(azure.lastMet, '2026-07-22T17:00:00.000Z', 'only the archive knows this one');
   assert.equal(azure.quiet, false);
   assert.ok(data.groups.includes(azure));
+  assert.equal(azure.lastEvent?.start, '2026-07-22T17:00:00.000Z', 'its card says when, from the archive');
+  assert.equal(azure.states[0].last?.title, 'Azure in July');
 });
 
 test('a quiet group that posts an event is listed and marked "Back!" on that event only', () => {

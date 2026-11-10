@@ -33,6 +33,12 @@
   name: Des Moines Mobile Developers
   short: Mobile
   meetup: https://www.meetup.com/des-moines-mobile-developers/
+# Last met in July, over 90 days back: only archive/ has it, and its card
+# still says so.
+- id: azure
+  name: Iowa Microsoft Azure User Group
+  short: Azure
+  meetup: https://www.meetup.com/iowa-microsoft-azure-user-group/
 # Last met in 2024, nothing scheduled: quiet, so only /status/ lists it.
 # (DevOps last met in 2025, so its next event says "Back!".)
 - id: uxdsm
