@@ -237,6 +237,17 @@ test('mergeCache keeps group facts and leaves them out when unknown', () => {
   assert.equal(mergeCache({ events: [], lastMet: '2024-08-28T23:00:00.000Z' }, { events: [], enriched: false }, { now, cutoff }).lastMet, '2024-08-28T23:00:00.000Z', 'kept when the page fails');
 });
 
+// Member counts tick up and down by one or two (7665 ↔ 7666) between runs.
+// Each tick rewrote the file, so a commit and a deploy for nothing visible.
+test('mergeCache keeps the old member count until it moves by more than 1%', () => {
+  const before = { fetchedAt: 'THEN', logo: null, members: 7665, events: [] };
+  const run = (members) => mergeCache(before, { events: [], members }, { now, cutoff, fetchedAt: 'NOW' });
+  assert.deepEqual([run(7666).members, run(7666).fetchedAt], [7665, 'THEN'], 'a one-member wobble changes nothing');
+  assert.equal(run(7600).members, 7665, 'within 1% either way');
+  assert.deepEqual([run(7800).members, run(7800).fetchedAt], [7800, 'NOW'], 'a real change is written');
+  assert.equal(mergeCache({ events: [], members: 40 }, { events: [], members: 41 }, { now, cutoff }).members, 41, 'one in 40 is more than 1%, so a small group still moves');
+});
+
 test('enrich drops an upcoming event the page says is cancelled, and ignores missing page fields', () => {
   const upcoming = [
     { id: 'g-1', sourceId: '1', title: 'Kept', start: '2026-10-20T23:00:00Z', end: '2026-10-21T01:00:00Z' },

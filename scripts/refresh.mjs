@@ -46,8 +46,23 @@ const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew
 export const UA = 'dsmtechevents/1.0 (+https://dsmtechevents.com; community event calendar, fetched four times a day)';
 const BACKFILL_DAYS = 90;
 
-export async function get(url) {
-  const res = await fetch(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(20_000) });
+// A network error or a 5xx gets one more try after `wait`: on their own,
+// those blips opened (and hours later closed) every source-broken issue so
+// far. Any other status is the site's answer and throws straight away.
+export async function get(url, { fetch: send = fetch, wait = 3_000 } = {}) {
+  const once = () => send(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(20_000) });
+  let res;
+  try {
+    res = await once();
+  } catch {
+    await new Promise((r) => setTimeout(r, wait));
+    res = await once();
+  }
+  if (res.status >= 500) {
+    await res.body?.cancel();
+    await new Promise((r) => setTimeout(r, wait));
+    res = await once();
+  }
   if (!res.ok) throw new Error(`${res.status} from ${url}`);
   return res.text();
 }
@@ -245,6 +260,9 @@ export function mergeCache(previous, fresh, { now, cutoff, fetchedAt = new Date(
     const v = fresh[k] ?? previous[k];
     if (v != null) facts[k] = v;
   }
+  // Member counts wobble by one or two between runs, and each wobble was a
+  // commit and a deploy. The old count stands until it's more than 1% off.
+  if (previous.members && Math.abs(facts.members - previous.members) <= previous.members * 0.01) facts.members = previous.members;
   const result = { logo: fresh.logo ?? previous.logo ?? null, ...facts, events };
   // `enriched` was written by older versions; ignoring it (above) means
   // dropping it rewrites each file once without moving fetchedAt.

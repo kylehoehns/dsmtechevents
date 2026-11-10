@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { refresh } from '../scripts/refresh.mjs';
+import { refresh, get } from '../scripts/refresh.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
 const now = Date.parse('2026-10-07T17:00:00Z');
@@ -105,4 +105,21 @@ test('only: one listing is fetched, nothing else is written, and other Luma even
   assert.ok(!fs.existsSync(path.join(root, 'fetch-report.json')));
   assert.ok(!fs.existsSync(path.join(root, 'data/cache/status.json')));
   await assert.rejects(run({ only: 'nope' }), /no such group/);
+});
+
+// Every source-broken issue so far was one run's network blip (a timeout,
+// "fetch failed"), opened and closed hours later. One retry rides those out.
+test('get retries once on a network error or a server error, but not on a 404', async () => {
+  const replies = (...list) => { let n = 0; const f = async () => { const r = list[n++]; if (r instanceof Error) throw r; return r; }; f.calls = () => n; return f; };
+  const ok = new Response('fine');
+  const blip = replies(new TypeError('fetch failed'), ok);
+  assert.equal(await get('https://x.test/', { fetch: blip, wait: 0 }), 'fine');
+  assert.equal(blip.calls(), 2);
+  const busy = replies(new Response('', { status: 503 }), new Response('back'));
+  assert.equal(await get('https://x.test/', { fetch: busy, wait: 0 }), 'back');
+  const gone = replies(new Response('', { status: 404 }), ok);
+  await assert.rejects(get('https://x.test/', { fetch: gone, wait: 0 }), /404 from https:\/\/x.test\//);
+  assert.equal(gone.calls(), 1, 'a 404 is an answer, not a blip');
+  const down = replies(new TypeError('fetch failed'), new TypeError('fetch failed'));
+  await assert.rejects(get('https://x.test/', { fetch: down, wait: 0 }), /fetch failed/);
 });

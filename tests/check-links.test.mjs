@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { collectLinks, planIssue } from '../scripts/check-links.mjs';
+import { collectLinks, planIssue, linkWorks } from '../scripts/check-links.mjs';
 
 const ok = { url: 'https://www.meetup.com/pyowa/', where: 'groups.yaml: pyowa meetup', ok: true, detail: '200' };
 const bad = { url: 'https://gone.example/', where: 'groups.yaml: x website', ok: false, detail: '404 from GET' };
@@ -47,4 +47,12 @@ test('all links fine again: closes the open issue', () => {
 
 test('ignores other issues that happen to carry the label', () => {
   assert.equal(planIssue([bad], [{ number: 3, title: 'Something else' }]).type, 'open');
+});
+
+// LinkedIn answers bots 403 (999 is its own code for the same), and others
+// rate-limit with 429. That says nothing about whether a person can open the
+// link, so it isn't reported broken: #258 could never close otherwise.
+test('a site that refuses bots is not a broken link; a missing page is', () => {
+  for (const status of [200, 301, 401, 403, 429, 999]) assert.equal(linkWorks(status), true, String(status));
+  for (const status of [404, 410, 500, 503]) assert.equal(linkWorks(status), false, String(status));
 });
