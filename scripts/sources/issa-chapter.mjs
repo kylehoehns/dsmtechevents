@@ -16,14 +16,19 @@ export default async function issaChapter(group, { get, now = Date.now(), since 
   if (!urls.length) throw new Error(`no events listed on ${origin}/events/`);
 
   const events = [];
+  let dated = 0;
   for (const url of urls) {
     const page = readEventPage(await get(url), url);
+    if (page) dated++;
     if (!page || Date.parse(page.start) + LENGTH < since) continue;
     const sourceId = /\/events\/([a-z0-9-]+)\/$/.exec(url)[1];
     const { title, start, description, venue, address } = page;
     const end = new Date(Date.parse(start) + LENGTH).toISOString();
     events.push({ id: `${group.id}-${sourceId}`, sourceId, title, start, end, allDay: false, url, description, venue, address });
   }
+  // Past meetings stay listed with their dates, so a list where not one post
+  // has a date means the date moved, not that every post is an announcement.
+  if (!dated) throw new Error(`none of the ${urls.length} posts on ${origin}/events/ has a date`);
   return events;
 }
 

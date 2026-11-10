@@ -62,6 +62,11 @@ export function parseEventsPage(html, slug) {
   // count). The page lists the last ten events however old they are, so this
   // reaches further back than the cache's 90 days. The site uses it to hide
   // quiet groups and to say "Back!" when one returns.
+  const pastCount = (pastKey && group[pastKey]?.totalCount) ?? null;
+  // The page lists the group's last ten events, so one that has met but
+  // shows none means Meetup moved them; without this the page quietly adds
+  // nothing (no venues, photos, RSVPs or cancellations) and no alert fires.
+  if (pastCount > 0 && !events.size) throw new Error(`${slug} has met ${pastCount} times but the page lists no events`);
   const lastMet = [...events.values()].filter((e) => e.status === 'PAST').map((e) => e.start).sort().at(-1) ?? null;
   return {
     // Who and where the group is, for scripts/add-listing.mjs. The fetch doesn't cache these.
@@ -71,7 +76,7 @@ export function parseEventsPage(html, slug) {
     isPrivate: group.isPrivate === true,
     logo: photo(group.keyGroupPhoto),
     members: group.stats?.memberCounts?.all ?? null,
-    pastCount: (pastKey && group[pastKey]?.totalCount) ?? null,
+    pastCount,
     lastMet,
     events,
   };
@@ -106,13 +111,16 @@ export function cancelledIds(details, group) {
   return [...details.events].filter(([, e]) => e.status === 'CANCELLED').map(([id]) => `${group.id}-${id}`);
 }
 
-// A Meetup feed with nothing coming up, for a group whose last run had events
-// coming up. Fine if the events page agrees (the events were called off or
-// taken down); broken if the page still lists upcoming events, or couldn't be
-// read either (`details` null). Broken throws, so the last good cache stays
-// and a source-broken issue opens.
+// A Meetup feed with nothing coming up. Fine if the events page agrees
+// (nothing planned, or the events were called off or taken down); broken if
+// the page lists upcoming events. That's checked every run, not only after
+// one with events, or a quiet spell would switch it off for good. If the page
+// couldn't be read either (`details` null), it's broken only when the last
+// run had events coming up. Broken throws, so the last good cache stays and
+// a source-broken issue opens.
 export function checkEmptyFeed(upcoming, details, { now, hadUpcoming }) {
-  if (upcoming.length || !hadUpcoming) return;
+  if (upcoming.length) return;
+  if (!details && !hadUpcoming) return;
   if (!details) throw new Error(`feed lists no upcoming events (the last run had ${hadUpcoming}), and the events page couldn't be read to confirm`);
   const onPage = [...details.events.values()].filter((e) => e.status !== 'CANCELLED' && Date.parse(e.end) >= now).length;
   if (onPage) throw new Error(`feed lists no upcoming events, but the events page lists ${onPage}`);

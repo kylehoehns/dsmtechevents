@@ -206,6 +206,13 @@ test('issa-chapter fails loudly when the pages change', async () => {
   await assert.rejects(issaChapter(ISSA, issaSite({ [issaPage('september-quarterly-issa-meeting')]: noHeading })), /no date heading/);
   const oddDate = fixture('issa-event.html').replace('September 29, 2026 11:30 am', '9/29/2026 11:30');
   await assert.rejects(issaChapter(ISSA, issaSite({ [issaPage('september-quarterly-issa-meeting')]: oddDate })), /unreadable date/);
+  // Past meetings keep their dates, so a list where no post has one means the date moved.
+  const undated = (name) => fixture(name).replace(/<h2>[^<]*<\/h2>/, '<h2></h2>');
+  const allUndated = issaSite({
+    [issaPage('september-quarterly-issa-meeting')]: undated('issa-event.html'),
+    [issaPage('april-issa-des-moines-chapter-meeting')]: undated('issa-event.html'),
+  });
+  await assert.rejects(issaChapter(ISSA, allUndated), /none of the 3 posts on .* has a date/);
 });
 
 const DSMHACK = { id: 'dsmhack', eventbrite: 'https://www.eventbrite.com/o/dsmhackorg-9037669922' };
@@ -313,6 +320,13 @@ test('tai-techbrew fails loudly when no TechBrew passes the city check', async (
   const noCity = fixture('tai-techbrew-event.html').replace('22 9th Street, Des Moines.', '22 9th Street Des Moines.');
   const site = techbrewSite();
   await assert.rejects(taiTechbrew({ id: 'techbrew' }, { ...site, get: async (u) => (u === FEED ? site.get(u) : noCity) }), /every TechBrew was outside the metro/);
+});
+
+test('tai-techbrew fails loudly when no title in the feed says TechBrew', async () => {
+  // The feed is TAI's TechBrew category, so not one match means the titles changed, not the meetups.
+  const site = techbrewSite();
+  const renamed = async (u) => (u === FEED ? fixture('tai-techbrews.ics').replace(/tech\s*brew/gi, 'Coffee') : site.get(u));
+  await assert.rejects(taiTechbrew({ id: 'techbrew' }, { ...site, get: renamed }), /no title in the TAI TechBrew feed says TechBrew/);
 });
 
 test('tai-techbrew fails loudly when the feed or event page changes', async () => {

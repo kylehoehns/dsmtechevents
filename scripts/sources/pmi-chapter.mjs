@@ -9,6 +9,10 @@ export default async function pmiChapter(group, { get }) {
   const origin = new URL(group.website).origin;
   const list = JSON.parse(await get(`${origin}/action/pmiAjaxGetEvent?future=true`));
   if (!Array.isArray(list)) throw new Error('unexpected response from PMI events endpoint');
+  // An empty list can't be checked: the endpoint has no past events to
+  // compare with (future=false answers {}), so `[]` is taken at its word as
+  // nothing scheduled. The other readers throw when a page with events
+  // parses to none; this one can't tell.
 
   const toUtc = (raw) => {
     const [date, time] = raw.split(' ');
