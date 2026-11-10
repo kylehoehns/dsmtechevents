@@ -28,9 +28,12 @@ function setup({ groups = [{ id: 'iadnug', name: 'Iowa .NET User Group', short: 
     if (!page) throw new Error(`404 from ${url}`);
     return page();
   };
-  const run = (opts = {}) => refresh({ root, get, now, pause: 0, log: quiet, ...opts });
+  // Photo sizes come back as 800×450 without a fetch; `sized` lists what was asked.
+  const sized = [];
+  const sizeOf = async (url) => { sized.push(url); return { width: 800, height: 450 }; };
+  const run = (opts = {}) => refresh({ root, get, sizeOf, now, pause: 0, log: quiet, ...opts });
   const read = (f) => JSON.parse(fs.readFileSync(path.join(root, 'data', f), 'utf8'));
-  return { root, run, read, asked };
+  return { root, run, read, asked, sized };
 }
 
 // Every file under data/, with when it was last written.
@@ -122,4 +125,16 @@ test('get retries once on a network error or a server error, but not on a 404', 
   assert.equal(gone.calls(), 1, 'a 404 is an answer, not a blip');
   const down = replies(new TypeError('fetch failed'), new TypeError('fetch failed'));
   await assert.rejects(get('https://x.test/', { fetch: down, wait: 0 }), /fetch failed/);
+});
+
+// A photo without a known size (here Luma's) gets one, read once: the next
+// run keeps it without asking again, so the file doesn't change.
+test('an event photo gets its size once, and keeps it while the photo stays the same', async () => {
+  const { run, read, sized } = setup();
+  await run();
+  const luma = read('cache/luma.json')['04xz1l03'];
+  assert.deepEqual(luma.imageSize, { width: 800, height: 450 });
+  assert.deepEqual(sized, [luma.image], 'Meetup photos have a known size and are never asked about');
+  await run({ now: now + 3_600_000 });
+  assert.equal(sized.length, 1);
 });

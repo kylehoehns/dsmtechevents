@@ -198,6 +198,17 @@ function tidy(e) {
 // photo with the group's logo, which would repeat the group's name.
 const photoId = (url) => /_(\d+)\.\w+$/.exec(url ?? '')?.[1] ?? url;
 
+// { small, large, width?, height? } for a photo. Meetup's copies have a known
+// size; others carry the `imageSize` the refresh read (scripts/image-size.mjs),
+// scaled for Luma to the 600px copy shown. No size known, none given.
+export function photoOf(url, imageSize) {
+  const meetup = meetupPhoto(url);
+  if (meetup) return meetup;
+  const luma = lumaPhoto(url);
+  if (luma) return imageSize ? { ...luma, width: 600, height: Math.round((600 * imageSize.height) / imageSize.width) } : luma;
+  return { small: url, large: url, ...imageSize };
+}
+
 // The photo, host label and venue every card needs.
 function describe(e, byId) {
   const logos = e.groupIds.map((id) => photoId(byId[id]?.logo)).filter(Boolean);
@@ -205,7 +216,7 @@ function describe(e, byId) {
   // (Luma's through our own /img/luma/, see luma.mjs); any other image is
   // used as-is for both.
   const url = e.image && !logos.includes(photoId(e.image)) ? e.image : null;
-  e.photo = url && (meetupPhoto(url) ?? lumaPhoto(url) ?? { small: url, large: url });
+  e.photo = url && photoOf(url, e.imageSize);
   e.hostsLabel = hostsLabel(e, byId);
   // Same street address = same venue, even when it's spelled two ways
   // ("Community Choice Convention Center" vs "...Credit Union Convention Center").

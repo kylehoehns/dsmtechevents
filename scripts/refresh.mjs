@@ -36,6 +36,7 @@ import eventbrite from './sources/eventbrite.mjs';
 import readLuma from './sources/luma.mjs';
 import { parseFeed, parseEventsPage, enrich, cancelledIds, checkEmptyFeed, FROM_PAGE } from './sources/meetup.mjs';
 import { updateArchive } from './archive.mjs';
+import { fetchImageSize, sizeImages } from './image-size.mjs';
 import { manualEvent, readLumaCache, lumaSlug } from '../src/lib/data.mjs';
 import { safeLinks, checkTimes } from './sources/html.mjs';
 import { sourceStatus } from './source-status.mjs';
@@ -69,7 +70,8 @@ export async function get(url, { fetch: send = fetch, wait = 3_000 } = {}) {
 
 // One run. Returns the report: { ok: [ids], problems: [{ id, name, kind, message }] }.
 // `pause` is the wait between groups, to be polite to Meetup.
-export async function refresh({ root, only = null, get: fetchText = get, now = Date.now(), pause = 500, log = console }) {
+// `sizeOf`: an event photo's { width, height } (scripts/image-size.mjs).
+export async function refresh({ root, only = null, get: fetchText = get, sizeOf = (url) => fetchImageSize(url, { ua: UA }), now = Date.now(), pause = 500, log = console }) {
   const dataDir = path.join(root, 'data');
   const cacheDir = path.join(dataDir, 'cache');
   const groups = YAML.parse(await fs.readFile(path.join(dataDir, 'groups.yaml'), 'utf8'))
@@ -88,7 +90,7 @@ export async function refresh({ root, only = null, get: fetchText = get, now = D
   for (const [i, group] of groups.entries()) {
     if (i) await new Promise((r) => setTimeout(r, pause));
     try {
-      const { enrichError, ...result } = await refreshGroup(group, await readCache(group.id), { get: fetchText, now });
+      const { enrichError, ...result } = await refreshGroup(group, await readCache(group.id), { get: fetchText, sizeOf, now });
       await writeIfChanged(path.join(cacheDir, `${group.id}.json`), JSON.stringify(result, null, 2) + '\n');
       if (enrichError) log.warn(`  ${group.id}: enrichment skipped (${enrichError})`);
       const past = result.events.filter((e) => Date.parse(e.end) < now).length;
@@ -104,7 +106,7 @@ export async function refresh({ root, only = null, get: fetchText = get, now = D
 
   const lumaFile = path.join(cacheDir, 'luma.json');
   const lumaBefore = await readJson(lumaFile, {});
-  const luma = await refreshLuma(lumaEntries, lumaBefore, { get: fetchText, now, log });
+  const luma = await refreshLuma(lumaEntries, lumaBefore, { get: fetchText, sizeOf, now, log });
   report.ok.push(...luma.ok);
   report.problems.push(...luma.problems);
   // With `only`, every other entry stays as it was.
@@ -141,7 +143,7 @@ export async function refresh({ root, only = null, get: fetchText = get, now = D
 
 // One group's new cache file from its previous one. Throws when the group's
 // source can't be read, so the caller keeps the previous file.
-async function refreshGroup(group, previous, { get, now }) {
+async function refreshGroup(group, previous, { get, sizeOf, now }) {
   const cutoff = now - BACKFILL_DAYS * 86_400_000;
   let fresh;
   if (group.source) {
@@ -154,7 +156,7 @@ async function refreshGroup(group, previous, { get, now }) {
     fresh = await readFeed(group, { get, now, cutoff, hadUpcoming });
   }
 
-  fresh.events = safeLinks(checkTimes(fresh.events), group);
+  fresh.events = await sizeImages(safeLinks(checkTimes(fresh.events), group), previous.events, { sizeOf });
   return { ...mergeCache(previous, fresh, { now, cutoff }), enrichError: fresh.enrichError };
 }
 
@@ -196,7 +198,7 @@ async function readFeed(group, { get, now, cutoff, hadUpcoming }) {
 // Each `luma:` event's details, by slug. Like a group, one that fails keeps
 // what it had and gets a source-broken issue. An event that's over is not
 // read again: nothing about it can change, and Luma may take the page down.
-async function refreshLuma(entries, previous, { get, now, log = console }) {
+async function refreshLuma(entries, previous, { get, sizeOf, now, log = console }) {
   const next = {};
   const ok = [];
   const problems = [];
@@ -209,7 +211,7 @@ async function refreshLuma(entries, previous, { get, now, log = console }) {
       continue;
     }
     try {
-      [next[slug]] = safeLinks(checkTimes([await readLuma(e.luma, { get })]), {});
+      [next[slug]] = await sizeImages(safeLinks(checkTimes([await readLuma(e.luma, { get })]), {}), had ? [had] : [], { sizeOf, key: () => slug });
       log.log(`✓ ${id}: ${next[slug].title}`);
       ok.push(id);
     } catch (err) {
