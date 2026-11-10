@@ -35,7 +35,7 @@ const monogram = (name: string) => name.split(/\s+/).filter(Boolean)
           <p class="next" {...s.attrs}>
             {s.next
               ? <><span class="next-when">Next: {when(s.next)}</span><span class="sr-only">, </span><span class="next-title">{s.next.title}</span><span class="sr-only">, </span>{s.next.online ? 'Online' : `@\u00a0${s.next.venue ?? 'Venue TBA'}`} · {s.next.allDay ? 'All day' : shortTime(s.next.start)}</>
-              : <><span class="next-when idle">Nothing scheduled</span>Check their page for what's next.</>}
+              : <><span class="next-when idle">Nothing scheduled yet</span></>}
           </p>
         ))}
         {g.states.map((s: any) => s.last && (

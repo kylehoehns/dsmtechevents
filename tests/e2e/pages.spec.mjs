@@ -136,7 +136,7 @@ test('a group card catches up once its next event is over', async ({ page }) => 
   await expect(see).toHaveAttribute('href', '/?group=webgeeks');
 
   await page.clock.runFor('15:00'); // left open past 7:30p
-  await expect(card.locator('.next')).toHaveText("Nothing scheduledCheck their page for what's next.");
+  await expect(card.locator('.next')).toHaveText('Nothing scheduled yet');
   await expect(card.locator('.last')).toHaveText('Last event Oct 14 · 12 went');
   await expect(see).toHaveCount(1);
   // Pyowa's lunch tomorrow is still next.
