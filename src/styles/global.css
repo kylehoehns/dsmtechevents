@@ -322,7 +322,7 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 
 /* ---------- section heads ---------- */
 .sec { margin-top: 22px; }
-.sec:first-child { margin-top: 0; }
+.sec:first-child, #quiet-week[hidden] + .sec { margin-top: 0; } /* the quiet-week line, hidden, still comes first */
 .sec-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; border-bottom: 2px solid var(--line); padding-bottom: 4px; }
 .sec-head h2 { font: 900 var(--fs-h-section)/0.85 var(--display); text-transform: uppercase; margin: 0; }
 .sec-head .count { font-size: var(--fs-meta); }

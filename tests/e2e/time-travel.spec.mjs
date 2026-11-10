@@ -277,6 +277,35 @@ test('a build from last week, opened Monday: the list sorts into this week again
   await expect(list.getByRole('heading', { level: 2 }).locator('visible=true')).toHaveText(['This week']);
 });
 
+// Nothing in the fixtures from Sun Nov 1 to Thu Nov 12. A quiet week still
+// opens on "This week", so it doesn't read as a broken page.
+test('a week with nothing on still says "This week", until a filter or search takes over', async ({ page }) => {
+  await page.clock.setSystemTime(at('2026-11-02T15:00:00Z')); // Mon Nov 2, 9am
+  await page.goto('/');
+  const list = page.getByRole('region', { name: 'Upcoming events' });
+  await expect(list.getByRole('heading', { level: 2 })).toHaveText(['This week', 'Next week', 'Further out']);
+  await expect(page.locator('#quiet-week')).toHaveText(/This week\s*Nothing on the books\./);
+  await expect(page.locator('#quiet-week')).toBeInViewport();
+
+  // One group's view or a search has its own empty message instead.
+  await page.goto('/?group=cijug');
+  await expect(page.locator('#quiet-week')).toBeHidden();
+  await page.goto('/?q=hack');
+  await expect(page.locator('#quiet-week')).toBeHidden();
+});
+
+test('the week goes quiet while the page is open, once its last event ends', async ({ page }) => {
+  // Built Wed Oct 14; the last this week is Pyowa's office hours, Thu Oct 15 at noon.
+  await page.clock.setSystemTime(at('2026-10-15T17:50:00Z')); // Thu 12:50p
+  await page.goto('/');
+  await expect(page.locator('#quiet-week')).toBeHidden();
+  // Hidden, it still comes first in the list; the real first section keeps no top margin.
+  await expect(page.locator('#list-view [data-sec]').first()).toHaveCSS('margin-top', '0px');
+  await page.clock.runFor('30:00'); // past 1pm
+  await expect(page.locator('#quiet-week')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Upcoming events' }).getByRole('heading', { level: 2 }).first()).toHaveText('This week');
+});
+
 test('midnight with the page hidden: one reload when it comes back, with the new day right', async ({ page }) => {
   await page.clock.setSystemTime(at('2026-10-15T04:00:00Z')); // Wed Oct 14, 11pm
   const loads = countLoads(page);
