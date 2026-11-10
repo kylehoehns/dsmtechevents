@@ -117,6 +117,15 @@ const siteHost = new URL(site.url).host;
   @media screen and (max-width: 8.6in) { .sheet { min-height: 0; } .sheet h1 { font-size: 48px; } .sheet-foot { flex-wrap: wrap; } .sheet-foot p { flex: 1 1 240px; } /* under the QR code when the URL (240px at most) won't fit beside it */ .sheet-foot .url { font-size: clamp(18px, 6vw, 28px); } .lineup li { grid-template-columns: 1fr; grid-template-areas: 'd' 't' 'what' 'w'; } }
 
   @page { size: letter; margin: 0; }
+  /* 320px and under: a phone at 200% zoom or more. The paper's inch margins
+     would leave a word or two per line and push the footer past the edge. */
+  @media screen and (max-width: 320px) {
+    .sheet { padding: 16px 12px 1.5in; }
+    .sheet h1 { font-size: 14vw; }
+    .sheet-foot .through { font-size: 16px; }
+    .sheet-foot .url { font-size: 7vw; overflow-wrap: anywhere; }
+  }
+
   @media print {
     html:has(.print-page), html:has(.print-page) body { background: #fff; }
     .print-page { padding: 0; }

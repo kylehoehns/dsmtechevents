@@ -22,7 +22,7 @@ const monogram = (name: string) => name.split(/\s+/).filter(Boolean)
       <article id={g.id} data-groups={g.id} class="flyer">
         <div class="flyer-head">
           {g.logo
-            ? <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" />
+            ? <img class="logo-img" src={g.logoThumb} alt="" loading="lazy" width="60" height="60" data-mono={monogram(g.short)} />
             : <span class="logo-img logo-mono" aria-hidden="true">{monogram(g.short)}</span>}
           <h2>{g.short}{!g.showFullName && g.name !== g.short && <span class="sr-only"> ({g.name})</span>}{g.returning && <> <span class="back-tag" data-end={g.nextEvent.end}>Back!</span></>}</h2>
           {g.showFullName && <p class="full">{g.name}</p>}

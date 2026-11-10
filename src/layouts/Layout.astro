@@ -165,6 +165,8 @@ const speculation = toScript({
     </div>
 
     <script>
+      import '../scripts/broken-images.js';
+
       const store = {
         get: (k: string) => { try { return localStorage.getItem(k); } catch { return null; } },
         set: (k: string, v: string | null) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} },
