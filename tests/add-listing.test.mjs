@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { tame, classify, alreadyListed, checkLumaEvent, checkMeetupGroup, defaultShort, uniqueId, insertGroup, appendEvent, pullRequest, issueAnswers, LeaveIt } from '../scripts/add-listing.mjs';
+import { tame, classify, alreadyListed, checkLumaEvent, checkMeetupGroup, defaultShort, uniqueId, insertGroup, appendEvent, pullRequest, issueAnswers, LeaveIt, branchFor, outcome } from '../scripts/add-listing.mjs';
 
 test('only exact Luma event and Meetup group links are automatic', () => {
   assert.deepEqual(classify('https://luma.com/04xz1l03'), { kind: 'luma', slug: '04xz1l03' });
@@ -78,4 +78,23 @@ test("an issue form's answers are read by heading, and a blank one is empty", ()
   assert.deepEqual(issueAnswers(body), { Link: 'https://luma.com/04xz1l03', 'Short name': '', 'Does it fit?': '- [X] Public\n- [X] Tech' });
   assert.deepEqual(issueAnswers('### Link\r\n\r\nhttps://lu.ma/x\r\n'), { Link: 'https://lu.ma/x' });
   assert.deepEqual(issueAnswers(undefined), {});
+});
+
+// uniqueId only sees main, so two open requests for groups with the same
+// short name got one id, one branch, and the second force-pushed over the
+// first PR. The issue number keeps each request on its own branch, and a
+// retry for the same issue still lands on its own one.
+test('each request gets its own branch; a retry of the same issue reuses it', () => {
+  assert.equal(branchFor('python', 12), 'bot-add-python-12');
+  assert.notEqual(branchFor('python', 12), branchFor('python', 13));
+  assert.equal(branchFor('python', 12), branchFor('python', 12));
+  assert.equal(branchFor('python'), 'bot-add-python', 'run by hand, with no issue');
+});
+
+// Retrying after the PR merged answered "Already listed" and asked for a
+// person. Already listed is done, so the workflow can close the issue.
+test('a link that is already listed is reported as done, not as needing a person', () => {
+  assert.deepEqual(outcome(new LeaveIt('Already listed as pyowa.', { listed: true })), { ok: false, listed: true, reason: 'Already listed as pyowa.' });
+  assert.deepEqual(outcome(new LeaveIt('"Fest" is already over.')), { ok: false, reason: '"Fest" is already over.' });
+  assert.deepEqual(outcome(new Error('boom')), { ok: false, reason: 'Something went wrong: boom' });
 });

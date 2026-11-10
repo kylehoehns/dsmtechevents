@@ -28,8 +28,26 @@ import { refresh, get } from './refresh.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
 
-// A request this script won't do on its own; `message` says why, for the issue.
-export class LeaveIt extends Error {}
+// A request this script won't do on its own; `message` says why, for the
+// issue. `listed`: there's nothing to do because it's already on the site.
+export class LeaveIt extends Error {
+  constructor(message, { listed = false } = {}) {
+    super(message);
+    this.listed = listed;
+  }
+}
+
+// What listing.json says when the script stops short, for the workflow.
+export function outcome(err) {
+  if (!(err instanceof LeaveIt)) return { ok: false, reason: `Something went wrong: ${err.message}` };
+  return { ok: false, ...(err.listed && { listed: true }), reason: err.message };
+}
+
+// A prefix no person uses for a branch, since the workflow force-pushes it.
+// With the issue number, so two requests that come out with the same id
+// (uniqueId only sees main) don't share a branch, while a retry of the same
+// issue replaces its own.
+export const branchFor = (id, issue) => `bot-add-${id}${issue ? `-${issue}` : ''}`;
 
 // Text from a stranger's page (a title, name or address), made inert before
 // it goes in an issue comment, the PR or the commit message: no backticks or
@@ -161,7 +179,7 @@ export async function addListing(link, { short, issue, now = Date.now() } = {}) 
   const eventsText = fs.readFileSync(file('events.yaml'), 'utf8');
   const groups = YAML.parse(groupsText);
   const listed = alreadyListed(target, groups, YAML.parse(eventsText) ?? []);
-  if (listed) throw new LeaveIt(`Already listed as ${listed}.`);
+  if (listed) throw new LeaveIt(`Already listed as ${listed}.`, { listed: true });
 
   let id, title, entry, facts, warnings, page, write;
   if (target.kind === 'luma') {
@@ -202,8 +220,7 @@ export async function addListing(link, { short, issue, now = Date.now() } = {}) 
     fs.writeFileSync(file('events.yaml'), eventsText);
     throw new Error(`the fetch couldn't read ${id}`, { cause: err });
   }
-  // A prefix no person uses for a branch, since the workflow force-pushes it.
-  const branch = `bot-add-${id}`;
+  const branch = branchFor(id, issue);
   const preview = previewUrl(branch, page);
   return { ok: true, id, kind: target.kind, branch, preview, ...pullRequest({ title, entry, facts, warnings, preview, id, issue }) };
 }
@@ -226,9 +243,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     code = 0;
     console.log(`\n${result.title}\nbranch: ${result.branch}\npreview: ${result.preview}`);
   } catch (err) {
-    const leave = err instanceof LeaveIt;
-    result = { ok: false, reason: leave ? err.message : `Something went wrong: ${err.message}` };
-    code = leave ? 2 : 1;
+    result = outcome(err);
+    code = err instanceof LeaveIt ? 2 : 1;
     console.error(result.reason);
   }
   if (out) fs.writeFileSync(out, JSON.stringify(result, null, 2) + '\n');
