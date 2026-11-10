@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { mkdtempSync, cpSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { loadData, shortAddress, manualEvent } from '../src/lib/data.mjs';
+import { loadData, shortAddress, manualEvent, photoOf } from '../src/lib/data.mjs';
 import { sameNight } from '../src/lib/joint.mjs';
 
 const dataDir = fileURLToPath(new URL('./fixtures/data', import.meta.url));
@@ -31,6 +31,16 @@ test('a photo is shown only when it is not just the group logo', () => {
     width: 600,
     height: 338,
   }, 'Meetup photos get their small webp copies');
+});
+
+// The refresh reads the size of photos that don't come with one
+// (scripts/image-size.mjs), so the <img> can hold its space while it loads.
+test('a photo with a size read by the refresh carries it, scaled to the copy shown', () => {
+  const site = 'https://iowansofthings.com/assets/images/banner.png';
+  assert.deepEqual(photoOf(site, { width: 1200, height: 400 }), { small: site, large: site, width: 1200, height: 400 });
+  assert.deepEqual(photoOf(site), { small: site, large: site }, 'no size known: none given');
+  const luma = photoOf('https://images.lumacdn.com/event-covers/ab/cover.png', { width: 1000, height: 500 });
+  assert.deepEqual([luma.width, luma.height], [600, 300], "Luma's 600px copy, same shape");
 });
 
 test('the full group name shows only when it adds something', () => {
