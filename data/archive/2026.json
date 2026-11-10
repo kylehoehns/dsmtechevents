@@ -1130,5 +1130,16 @@
   "url": "https://iowacodecamp.com/",
   "headliner": true,
   "description": "Free, one-day, in-person conference for software developers: front-end frameworks, cloud infrastructure, databases, and working on engineering teams. Running since 2008, with about 240 people at each Des Moines-area camp. Community-run, by developers for developers, and never during work hours."
+ },
+ {
+  "id": "webgeeks-312416829",
+  "group": "webgeeks",
+  "title": "What a Grasshopper Taught Me About Listening to Customers",
+  "start": "2026-11-10T00:30:00.000Z",
+  "end": "2026-11-10T02:00:00.000Z",
+  "venue": "Source Allies",
+  "going": 14,
+  "url": "https://www.meetup.com/des-moines-web-geeks/events/312416829/",
+  "description": "What a Grasshopper Taught Me About Listening to Customers Monday, November 9th | 6:30–8:00 PM | Source Allies We all say we listen to customers. But how often do we stop to question whether what we think we know is actually true? When teams move quickly, assumptions can start sounding a lot like facts. Those assumptions can influence everything from product decisions to customer experience and business strategy. At our November DSM Web Geeks meetup, Clair Williams-Vavra will share an unexpected lesson from building a food startup that changed how she approaches customer experience. It started"
  }
 ]
