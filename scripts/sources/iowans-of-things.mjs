@@ -19,12 +19,25 @@ function isoDate(text) {
   return `${m[3]}-${String(month).padStart(2, '0')}-${m[2].padStart(2, '0')}`;
 }
 
-// "7:00 PM" → "19:00"
-function hhmm(text) {
-  const m = /(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m/i.exec(text ?? '');
-  if (!m) return null;
-  const h = (Number(m[1]) % 12) + (m[3].toLowerCase() === 'p' ? 12 : 0);
+// "7:00 PM" → "19:00". A time with no am/pm ("6:30" in "6:30 - 8:30 PM")
+// takes `meridiem`, the one after the other end of the range.
+function hhmm(text, meridiem) {
+  const m = /(\d{1,2})(?::(\d{2}))?\s*(?:([ap])\.?m)?/i.exec(text ?? '');
+  const ap = m?.[3] ?? meridiem;
+  if (!m || !ap) return null;
+  const h = (Number(m[1]) % 12) + (ap.toLowerCase() === 'p' ? 12 : 0);
   return `${String(h).padStart(2, '0')}:${m[2] ?? '00'}`;
+}
+const meridiemOf = (text) => /\d\s*([ap])\.?m/i.exec(text ?? '')?.[1]?.toLowerCase();
+
+// The start of "from - to". With no am/pm of its own it takes the end's,
+// unless that puts it after the end: "11:00 - 1:00 PM" starts at 11am.
+function startOf(from, to, endTime) {
+  const own = meridiemOf(from);
+  if (own) return hhmm(from, own);
+  const theirs = meridiemOf(to);
+  const borrowed = hhmm(from, theirs);
+  return borrowed && endTime && borrowed > endTime ? hhmm(from, theirs === 'p' ? 'a' : 'p') : borrowed;
 }
 
 const field = (html, name) => {
@@ -71,8 +84,8 @@ export default async function iowansOfThings(group, { get }) {
     if (headings.some((h) => /^(on hiatus|cancell?ed|postponed)\b/i.test(h))) return [];
     const url = new URL(link[1], base).href;
     const [from, to] = (field(item, 'Time') ?? '').split(/\s*[-–]\s*/);
-    const startTime = hhmm(from);
     const endTime = hhmm(to);
+    const startTime = startOf(from, to, endTime);
 
     // "Area515, Des Moines Maker Space - 108 Jefferson Avenue, Des Moines, IA 50314",
     // or without the dash, "Maple Studios, 1207 Maple Street, West Des Moines, IA":
