@@ -13,6 +13,11 @@ on:
     # mid-morning, mid-afternoon, and just before evening meetups start. Off
     # the hour because GitHub queues on-the-hour schedules and runs them late.
     - cron: '20 10,15,19,23 * * *'
+    # Backups for the morning. GitHub drops scheduled runs under load, and
+    # 10:20 is the one it drops most: over Oct 11–Nov 10 it ran on 12 of 31
+    # days, so mornings showed data from the night before. A backup that
+    # finds nothing new commits nothing.
+    - cron: '47 12,13 * * *'
     # Just after midnight Sunday night in Des Moines (01:05 summer, 00:05
     # winter), so "This week" / "Next week" roll over at midnight, not 5:20am.
     - cron: '5 6 * * 1'

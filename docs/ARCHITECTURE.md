@@ -56,7 +56,8 @@ flowchart TD
   events. Every ended event is also filed in `data/archive/<year>.json`
   (`scripts/archive.mjs`), the long-term record.
 - **Refresh.** `.github/workflows/refresh.yml` runs the fetch at 10:20,
-  15:20, 19:20 and 23:20 UTC, runs `npm run build`, and commits
+  15:20, 19:20 and 23:20 UTC, plus 12:47 and 13:47 as backups for the
+  morning run, which GitHub often drops. It runs `npm run build` and commits
   `data/cache/` and `data/archive/` if they changed. It also writes the Des
   Moines date to `data/cache/built-on.txt`, so it commits at least once a
   day. It pushes
