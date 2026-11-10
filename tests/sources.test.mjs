@@ -354,6 +354,18 @@ test('iowans-of-things reads the Upcoming Events section of the homepage', async
   assert.equal(hh.description, 'Bring a board.', "not the homepage's \"Learn more and register…\" link after it");
 });
 
+// "6:30 - 8:30 PM": am/pm only once, after the end time. The start takes the
+// end's, unless that would put it after the end ("11:00 - 1:00 PM" is 11am).
+test('iowans-of-things reads a time range with am/pm only on the end', async () => {
+  const at = async (time) => {
+    const home = fixture('iowans-of-things.html').replace('6:30 PM - 8:30 PM', time);
+    const [, hh] = await iowansOfThings({ id: 'iot', website: 'https://iowansofthings.com/' }, iotSite(home));
+    return [hh.start, hh.end, hh.allDay];
+  };
+  assert.deepEqual(await at('6:30 - 8:30 PM'), ['2026-11-13T00:30:00.000Z', '2026-11-13T02:30:00.000Z', false]);
+  assert.deepEqual(await at('11:00 - 1:00 PM'), ['2026-11-12T17:00:00.000Z', '2026-11-12T19:00:00.000Z', false]);
+});
+
 test("iowans-of-things brings over the bulleted sections of the event's own page", async () => {
   const pages = { 'https://iowansofthings.com/hh-november-2026': fixture('iowans-of-things-event.html') };
   const [, hh] = await iowansOfThings({ id: 'iot', website: 'https://iowansofthings.com/' }, iotSite(undefined, pages));
