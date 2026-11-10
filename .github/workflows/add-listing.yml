@@ -127,6 +127,16 @@ jobs:
             say "The bot hit an error before it could read the link: $RUN_URL"
             exit 1
           fi
+          # Already on the site (a retry after its PR merged, say): nothing
+          # is left to do, so close the issue rather than ask for a person.
+          if [ "$(jq -r .listed "$DIR/listing.json")" = true ]; then
+            say "$(printf "%s Nothing left to do, so this is closed." "$(jq -r .reason "$DIR/listing.json")")"
+            if [ -n "$ISSUE" ]; then
+              gh issue edit "$ISSUE" --remove-label needs-hands || true
+              gh issue close "$ISSUE"
+            fi
+            exit 0
+          fi
           if [ "$(jq -r .ok "$DIR/listing.json")" != true ]; then
             if [ -n "$ISSUE" ]; then
               gh label create needs-hands --color fbca04 --description "A listing request the bot couldn't add by itself" --force
@@ -153,8 +163,9 @@ jobs:
             say "The bot's change touched files outside the listing data, so it stopped: $RUN_URL"
             exit 1
           fi
-          # A second try for the same listing replaces the branch's commit,
-          # but only a branch this bot made: never a person's.
+          # A second try for the same issue replaces the branch's commit
+          # (the branch carries the issue number), but only a branch this
+          # bot made: never a person's.
           if [[ ! "$branch" =~ ^bot-add-[a-z0-9-]+$ ]]; then
             say "The bot made an unexpected branch name, so it stopped: $RUN_URL"
             exit 1
@@ -173,4 +184,6 @@ jobs:
           if [ -z "$pr" ]; then
             pr=$(gh pr create --head "$branch" --base main --title "$title" --body-file "$DIR/body.md")
           fi
+          # A retry that worked: a person no longer needs to step in.
+          if [ -n "$ISSUE" ]; then gh issue edit "$ISSUE" --remove-label needs-hands || true; fi
           say "$(printf "Opened %s.\n\nPreview, ready in a couple of minutes: %s" "$pr" "$preview")"
