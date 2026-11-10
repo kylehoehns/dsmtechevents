@@ -16,13 +16,17 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import YAML from 'yaml';
 import { UA } from './refresh.mjs';
+import { manualEvent, readLumaCache } from '../src/lib/data.mjs';
 
 const LABEL = 'broken-link';
 const TITLE = 'Broken links on the site';
 const TIMEOUT = 20_000;
 
-// Every link to check, once each, with where it came from. Pure.
-export function collectLinks(groups, events) {
+// Every link to check, once each, with where it came from. Pure. An event
+// that is over is skipped: nobody clicks through to it, and its site going
+// away would keep the broken-link issue open. `luma` is the fetched copy of
+// each luma: event (data/cache/luma.json); one not fetched yet is checked.
+export function collectLinks(groups, events, { now = Date.now(), luma = {} } = {}) {
   const links = new Map();
   const add = (url, where) => {
     if (url && !links.has(url)) links.set(url, where);
@@ -32,7 +36,11 @@ export function collectLinks(groups, events) {
     add(g.website, `groups.yaml: ${g.id} website`);
     add(g.logo, `groups.yaml: ${g.id} logo`);
   }
-  for (const e of events ?? []) add(e.url ?? e.luma, `events.yaml: ${e.title ?? e.luma}`);
+  for (const e of events ?? []) {
+    const ev = manualEvent(e, luma);
+    if (ev && Date.parse(ev.end) < now) continue;
+    add(e.url ?? e.luma, `events.yaml: ${e.title ?? e.luma}`);
+  }
   return [...links].map(([url, where]) => ({ url, where }));
 }
 
@@ -93,7 +101,7 @@ async function check(url) {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const root = path.resolve(import.meta.dirname, '..');
   const read = (f) => YAML.parse(fs.readFileSync(path.join(root, 'data', f), 'utf8')) ?? [];
-  const links = collectLinks(read('groups.yaml'), read('events.yaml'));
+  const links = collectLinks(read('groups.yaml'), read('events.yaml'), { luma: readLumaCache(path.join(root, 'data')) });
 
   const results = [];
   for (const link of links) {

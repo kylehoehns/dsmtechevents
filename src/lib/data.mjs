@@ -4,13 +4,17 @@ import path from 'node:path';
 import YAML from 'yaml';
 import { meetupSlug, meetupUrl, meetupPhoto } from './meetup.mjs';
 import { lumaPhoto } from './luma.mjs';
-import { dayKey, spansDays, weekday, fmt } from './format.mjs';
+import { dayKey, spansDays, weekday, fmt, addDays } from './format.mjs';
 import { localToUtc } from './time.mjs';
 import { foldJoint, hostsLabel, placeKey } from './joint.mjs';
 
 // The site rebuilds at least once a day (refresh.yml), so a page can be up to
 // a day old. Pages print what they'll need when events ending this soon end.
 const CATCH_UP = 2 * 86_400_000;
+
+// Past events stay in the cache this long (scripts/refresh.mjs); older ones
+// live in the archive. Hand-added events follow the same rule.
+export const KEEP_PAST_DAYS = 90;
 
 // Tests pass their own data folder and clock. The browser tests build the
 // whole site from a fixture folder by setting DSM_DATA_DIR (see
@@ -21,7 +25,8 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   const groups = readYaml('groups.yaml').map((g) => readGroup(g, dataDir));
   const byId = Object.fromEntries(groups.map((g) => [g.id, g]));
   const luma = readLumaCache(dataDir);
-  const manual = readYaml('events.yaml').map((e) => manualEvent(e, luma)).filter(Boolean);
+  const keepFrom = now - KEEP_PAST_DAYS * 86_400_000;
+  const manual = readYaml('events.yaml').map((e) => manualEvent(e, luma)).filter((e) => e && Date.parse(e.end) >= keepFrom);
 
   const events = foldJoint([...groups.flatMap((g) => g._events), ...manual])
     .map(tidy)
@@ -145,6 +150,11 @@ export function manualEvent(e, luma = {}) {
   if (!allDay && !e.endTime) throw new Error(`events.yaml: "${e.title}" has a time but no endTime`);
   const start = localToUtc(startDate, e.time ?? '00:00');
   const end = localToUtc(endDate, e.endTime ?? '23:59');
+  // Otherwise it counts as over before it starts, and quietly drops off the list.
+  if (end <= start) {
+    const night = !allDay && !e.end ? `; for a night past midnight, add end: ${addDays(startDate, 1)}` : '';
+    throw new Error(`events.yaml: "${e.title}" ends before it starts${night}`);
+  }
   return {
     // `id:` pins an event's id (shared /tv/?event= links use it) when its title changes.
     id: e.id ?? `manual-${slugify(e.title)}-${startDate}`,
