@@ -108,6 +108,13 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         <button type="button" class="btn btn-solid btn-small" data-show-all>Show all groups</button>
       </div>
       <section id="list-view" aria-label="Upcoming events" data-today={today}>
+        {/* A week with nothing on still opens on "This week", or the page
+            starts on a later month and reads as broken. app.js re-checks it
+            (renderList); a group's view or a search has its own empty line. */}
+        <section class="sec" id="quiet-week" hidden={sections[0]?.title === 'This week'}>
+          <div class="sec-head"><h2>This week</h2></div>
+          <p class="empty">Nothing on the books.</p>
+        </section>
         {sections.map((s) => (
           <section class="sec" data-sec>
             <div class="sec-head"><h2>{s.title}</h2><span class="count" data-count>{plural(s.items.length, 'event')}</span></div>

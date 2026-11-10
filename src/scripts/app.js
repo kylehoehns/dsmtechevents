@@ -199,6 +199,9 @@ function renderList() {
   // Past belongs to the list; the calendar shows past days itself.
   pastResults.hidden = pastShown === 0 || state.view !== 'list';
   $('[data-count]', pastResults).textContent = plural(pastShown, 'event');
+  // Nothing this week (none listed, or the last one just ended): say so
+  // under the week's heading, unless a group or search narrows the list.
+  $('#quiet-week').hidden = !!(state.q || state.group) || $$('.shows > .show', listView).some((el) => !el.hidden && sectionOf(el.dataset.day, today) === 'This week');
   const empty = $('#list-empty');
   empty.hidden = total > 0;
   if (!total && state.q) {
