@@ -211,3 +211,24 @@ test('the mini calendar stops highlighting a conference once it is over', async 
   await expect(conf).toHaveClass(/\bpast\b/);
   await expect(conf).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
 });
+
+test('the full calendar fades a conference once it is over: no pink day, a dot on a phone, an outlined card', async ({ page, isMobile }) => {
+  const PINK = 'rgb(255, 79, 163)';
+  const cell = page.locator('.day[data-day="2026-10-22"]');
+  const card = dayPanel(page).locator('.show.headliner');
+
+  // Coming up: the day is pink, with no dot, and the card is filled.
+  await page.goto('/?view=calendar&day=2026-10-22');
+  await expect(cell).toHaveCSS('background-color', PINK);
+  if (isMobile) await expect(cell.locator('.dot')).toHaveCount(1); // the afterparty, not the conference
+  await expect(card).not.toHaveClass(/\bposted\b/);
+
+  // Sat Oct 24, noon: Test Conf (Oct 22–23) is over.
+  await page.clock.setFixedTime(new Date('2026-10-24T17:00:00Z'));
+  await page.goto('/?view=calendar&day=2026-10-22');
+  await expect(cell).toHaveClass(/\bpast\b/);
+  await expect(cell).not.toHaveCSS('background-color', PINK);
+  if (isMobile) await expect(cell.locator('.dot')).toHaveCount(2);
+  await expect(card).toHaveClass(/\bposted\b/);
+  await expect(card).not.toHaveCSS('background-color', PINK);
+});
