@@ -20,6 +20,9 @@ export default async function taiTechbrew(group, { get, now = Date.now(), since 
   const all = calendarEvents(await get(FEED), 'TAI TechBrew feed');
   // TAI's feed always holds past TechBrews too; an empty one means it broke.
   if (!all.length) throw new Error('TAI TechBrew feed has no events');
+  // It's the TechBrew category, so a feed where no title matches means the
+  // titles changed, and every TechBrew would be dropped without a word.
+  if (!all.some((e) => TECHBREW.test(e.summary ?? ''))) throw new Error(`no title in the TAI TechBrew feed says TechBrew (first: "${all[0].summary}")`);
   const wanted = all.filter((e) => e.status !== 'CANCELLED' && (e.end ?? e.start).getTime() >= since && TECHBREW.test(e.summary ?? ''));
 
   const events = [];

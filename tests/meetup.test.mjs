@@ -61,6 +61,14 @@ test('an empty feed throws when the events page still lists upcoming events, or 
   assert.doesNotThrow(() => checkEmptyFeed(upcoming, null, { now, hadUpcoming: 0 }), 'a group with nothing scheduled before stays quiet');
 });
 
+// A group that had nothing coming up is checked too: otherwise one quiet
+// spell switches the check off for good, and a feed that breaks after it
+// looks like a group with nothing planned.
+test('an empty feed throws when the page lists upcoming events, even after a quiet spell', () => {
+  const page = parseEventsPage(fixture('meetup-events-page.html'), 'iadnug');
+  assert.throws(() => checkEmptyFeed([], page, { now, hadUpcoming: 0 }), /the events page lists 1/);
+});
+
 test('the events page says who and where the group is, for add-listing', () => {
   const { name, city, state, isPrivate } = parseEventsPage(fixture('meetup-events-page.html'), 'iadnug');
   assert.deepEqual({ name, city, state, isPrivate }, { name: 'Iowa .NET User Group', city: 'Des Moines', state: 'IA', isPrivate: false });
@@ -110,6 +118,10 @@ test('parseEventsPage throws when the page has no entry for the group', () => {
 test('parseEventsPage fails loudly when Meetup changes the page', () => {
   assert.throws(() => parseEventsPage('<html></html>', 'iadnug'), /no __NEXT_DATA__/);
   assert.throws(() => parseEventsPage('<script id="__NEXT_DATA__">{"props":{}}</script>', 'iadnug'), /no Apollo state/);
+  // The page always lists a group's last ten events, so a group that has met
+  // but shows none means the events moved somewhere we don't look.
+  const renamed = fixture('meetup-events-page.html').replaceAll('"Event:', '"MeetupEvent:');
+  assert.throws(() => parseEventsPage(renamed, 'iadnug'), /has met 120 times but the page lists no events/);
 });
 
 test('an event cancelled after its end time has passed is not carried forward', () => {
