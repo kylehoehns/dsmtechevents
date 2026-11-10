@@ -13,12 +13,25 @@ test('collects meetup, website, logo and event links once each, skipping blanks'
       { id: 'b', source: 'b', website: 'https://a.example/', logo: 'https://b.example/logo.png' },
       { id: 'c', meetup: 'https://www.meetup.com/c/' },
     ],
-    [{ title: 'Conf', url: 'https://conf.example/' }, { title: 'No link' }],
+    [{ title: 'Conf', url: 'https://conf.example/', start: '2099-01-01' }, { title: 'No link', start: '2099-01-01' }],
   );
   assert.deepEqual(links.map((l) => l.url), ['https://www.meetup.com/a/', 'https://a.example/', 'https://b.example/logo.png', 'https://www.meetup.com/c/', 'https://conf.example/']);
   assert.equal(links[1].where, 'groups.yaml: a website');
   assert.equal(links[2].where, 'groups.yaml: b logo');
   assert.equal(links[4].where, 'events.yaml: Conf');
+});
+
+test("skips hand-added events that are over, including a fetched Luma one, but keeps one not fetched yet", () => {
+  const now = Date.parse('2026-11-10T18:00:00Z');
+  const luma = { done: { title: 'Dev Days', start: '2026-10-20T20:00:00.000Z', end: '2026-10-20T22:00:00.000Z' } };
+  const links = collectLinks([], [
+    { title: 'Past conf', url: 'https://past.example/', start: '2026-10-16' },
+    { title: 'Today conf', url: 'https://today.example/', start: '2026-11-10' },
+    { title: 'Next conf', url: 'https://next.example/', start: '2026-12-01' },
+    { luma: 'https://luma.com/done' },
+    { luma: 'https://luma.com/new' },
+  ], { now, luma });
+  assert.deepEqual(links.map((l) => l.url), ['https://today.example/', 'https://next.example/', 'https://luma.com/new']);
 });
 
 test('all links fine and no issue open: nothing to do', () => {

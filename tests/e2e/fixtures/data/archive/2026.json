@@ -10,6 +10,16 @@
     "url": "https://www.meetup.com/central-iowa-java-users-group/events/old/"
   },
   {
+    "id": "azure-1",
+    "group": "azure",
+    "title": "Bicep from scratch",
+    "start": "2026-07-08T22:30:00.000Z",
+    "end": "2026-07-09T00:00:00.000Z",
+    "online": true,
+    "going": 12,
+    "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/1/"
+  },
+  {
     "id": "cijug-past",
     "group": "cijug",
     "title": "Records and sealed types",

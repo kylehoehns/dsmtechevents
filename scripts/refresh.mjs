@@ -13,7 +13,7 @@
 // Groups that aren't on Meetup and have no feed can name a reader in
 // scripts/sources/ with `source:` in groups.yaml (e.g. `source: secdsm`).
 //
-// Past events from the previous cache are carried forward for BACKFILL_DAYS,
+// Past events from the previous cache are carried forward for KEEP_PAST_DAYS,
 // so history keeps building even if Meetup stops showing an event.
 // If a group's feed fails, its previous cache file is left alone, so one bad
 // run never empties the calendar. Every file is written only when its
@@ -37,7 +37,7 @@ import readLuma from './sources/luma.mjs';
 import { parseFeed, parseEventsPage, enrich, cancelledIds, checkEmptyFeed, FROM_PAGE } from './sources/meetup.mjs';
 import { updateArchive } from './archive.mjs';
 import { fetchImageSize, sizeImages } from './image-size.mjs';
-import { manualEvent, readLumaCache, lumaSlug } from '../src/lib/data.mjs';
+import { manualEvent, readLumaCache, lumaSlug, KEEP_PAST_DAYS } from '../src/lib/data.mjs';
 import { safeLinks, checkTimes } from './sources/html.mjs';
 import { sourceStatus } from './source-status.mjs';
 
@@ -45,7 +45,6 @@ const SOURCES = { secdsm, 'pmi-chapter': pmiChapter, 'tai-techbrew': taiTechbrew
 
 // Every script that visits other sites sends this, so they see one polite visitor.
 export const UA = 'dsmtechevents/1.0 (+https://dsmtechevents.com; community event calendar, fetched four times a day)';
-const BACKFILL_DAYS = 90;
 
 // A network error or a 5xx gets one more try after `wait`: on their own,
 // those blips opened (and hours later closed) every source-broken issue so
@@ -144,7 +143,7 @@ export async function refresh({ root, only = null, get: fetchText = get, sizeOf 
 // One group's new cache file from its previous one. Throws when the group's
 // source can't be read, so the caller keeps the previous file.
 async function refreshGroup(group, previous, { get, sizeOf, now }) {
-  const cutoff = now - BACKFILL_DAYS * 86_400_000;
+  const cutoff = now - KEEP_PAST_DAYS * 86_400_000;
   let fresh;
   if (group.source) {
     const read = SOURCES[group.source];

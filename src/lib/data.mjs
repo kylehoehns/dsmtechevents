@@ -4,13 +4,17 @@ import path from 'node:path';
 import YAML from 'yaml';
 import { meetupSlug, meetupUrl, meetupPhoto } from './meetup.mjs';
 import { lumaPhoto } from './luma.mjs';
-import { dayKey, spansDays, weekday, fmt } from './format.mjs';
+import { dayKey, spansDays, weekday, fmt, addDays } from './format.mjs';
 import { localToUtc } from './time.mjs';
 import { foldJoint, hostsLabel, placeKey } from './joint.mjs';
 
 // The site rebuilds at least once a day (refresh.yml), so a page can be up to
 // a day old. Pages print what they'll need when events ending this soon end.
 const CATCH_UP = 2 * 86_400_000;
+
+// Past events stay in the cache this long (scripts/refresh.mjs); older ones
+// live in the archive. Hand-added events follow the same rule.
+export const KEEP_PAST_DAYS = 90;
 
 // Tests pass their own data folder and clock. The browser tests build the
 // whole site from a fixture folder by setting DSM_DATA_DIR (see
@@ -21,7 +25,8 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   const groups = readYaml('groups.yaml').map((g) => readGroup(g, dataDir));
   const byId = Object.fromEntries(groups.map((g) => [g.id, g]));
   const luma = readLumaCache(dataDir);
-  const manual = readYaml('events.yaml').map((e) => manualEvent(e, luma)).filter(Boolean);
+  const keepFrom = now - KEEP_PAST_DAYS * 86_400_000;
+  const manual = readYaml('events.yaml').map((e) => manualEvent(e, luma)).filter((e) => e && Date.parse(e.end) >= keepFrom);
 
   const events = foldJoint([...groups.flatMap((g) => g._events), ...manual])
     .map(tidy)
@@ -33,11 +38,12 @@ export function loadData({ dataDir = path.resolve(process.env.DSM_DATA_DIR || 'd
   for (const e of events) describe(e, byId);
   foldSeries(upcoming);
   const archive = readArchive(dataDir);
+  // Each group's latest archived event, for when the cache's 90 days hold none.
   const archived = {};
-  for (const r of archive) if (r.group && !(archived[r.group] >= r.start)) archived[r.group] = r.start;
+  for (const r of archive) if (r.group && !(archived[r.group]?.start >= r.start)) archived[r.group] = r;
   for (const g of groups) {
-    summarize(g, upcoming, past, now);
-    markQuiet(g, archived[g.id], now);
+    summarize(g, upcoming, past, archived[g.id], now);
+    markQuiet(g, archived[g.id]?.start, now);
   }
 
   const fetched = groups.map((g) => g.fetchedAt).filter(Boolean).sort();
@@ -144,6 +150,11 @@ export function manualEvent(e, luma = {}) {
   if (!allDay && !e.endTime) throw new Error(`events.yaml: "${e.title}" has a time but no endTime`);
   const start = localToUtc(startDate, e.time ?? '00:00');
   const end = localToUtc(endDate, e.endTime ?? '23:59');
+  // Otherwise it counts as over before it starts, and quietly drops off the list.
+  if (end <= start) {
+    const night = !allDay && !e.end ? `; for a night past midnight, add end: ${addDays(startDate, 1)}` : '';
+    throw new Error(`events.yaml: "${e.title}" ends before it starts${night}`);
+  }
   return {
     // `id:` pins an event's id (shared /tv/?event= links use it) when its title changes.
     id: e.id ?? `manual-${slugify(e.title)}-${startDate}`,
@@ -251,13 +262,15 @@ export const seriesKey = (e) => `${e.groupIds.join('+')}|${e.title.trim().toLowe
 const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 // What the Groups page needs: next and last event, how many are coming up,
-// and which name and logo to show.
-function summarize(g, upcoming, past, now) {
+// and which name and logo to show. `archived` is the group's latest archive record.
+function summarize(g, upcoming, past, archived, now) {
   const mine = upcoming.filter((e) => e.groupIds.includes(g.id));
   g.nextEvent = mine[0] ?? null;
   // Matches the filter chip: a repeating series counts once, like its row.
   g.upcomingCount = mine.filter((e) => !e.repeat).length;
-  g.lastEvent = past.find((e) => e.groupIds.includes(g.id)) ?? null;
+  // A group quiet for 90 days has none in the cache; the archive has it, RSVPs
+  // and all, and the Events button's filtered page lists it from there too.
+  g.lastEvent = past.find((e) => e.groupIds.includes(g.id)) ?? archived ?? null;
   // The Groups and Status pages print the group as it reads now, then as it
   // will once each event ending in the next two days is over. `attrs` go on
   // each state's elements: src/scripts/catch-up.js shows a state from its

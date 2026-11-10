@@ -4,7 +4,7 @@ import { test, expect } from './fixtures.mjs';
 test('groups page lists every active group alphabetically, and hides quiet ones', async ({ page }) => {
   await page.goto('/groups/');
   // UX hasn't met since 2024 and has nothing coming up, so it's hidden.
-  await expect(page.getByRole('heading', { level: 2 })).toHaveText([/^AWS/, /^CIJUG/, /^DevOps/, /^DSM AI/, /^IADNUG/, /^Mobile/, /^Pyowa/, /^Web Geeks/]);
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText([/^AWS/, /^Azure/, /^CIJUG/, /^DevOps/, /^DSM AI/, /^IADNUG/, /^Mobile/, /^Pyowa/, /^Web Geeks/]);
   // A group that met recently but has nothing posted still gets a card.
   await expect(page.locator('article#mobile')).toContainText('Nothing scheduled');
 });
@@ -26,7 +26,7 @@ test('status page lists every group, quiet ones included, with source and health
   await page.goto('/status/');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
   const row = (name) => page.locator('.sources li', { has: page.getByRole('heading', { name: new RegExp(`^${name}`) }) });
-  await expect(page.locator('.sources li')).toHaveCount(9);
+  await expect(page.locator('.sources li')).toHaveCount(10);
   await expect(row('UX')).toContainText('Quiet');
   await expect(row('UX').getByRole('link')).toHaveCount(0); // no Groups card to link to
   await expect(row('AWS')).toContainText('Partial since Oct 12');
@@ -141,6 +141,21 @@ test('a group card catches up once its next event is over', async ({ page }) => 
   await expect(see).toHaveCount(1);
   // Pyowa's lunch tomorrow is still next.
   await expect(page.locator('article#pyowa .next:visible')).toContainText('Python Office Hours');
+});
+
+// Azure last met in July, past the cache's 90 days, so only the archive has it.
+test("a group quiet for 90 days still shows its last event and its Events button", async ({ page }) => {
+  await page.goto('/groups/');
+  const card = page.locator('article#azure');
+  await expect(card.locator('.next')).toHaveText('Nothing scheduled yet');
+  await expect(card.locator('.last')).toHaveText('Last event Jul 8 · 12 went');
+  await card.getByRole('link', { name: 'Events by Azure' }).click();
+  await expect(page).toHaveURL(/\?group=azure$/);
+  await expect(page.locator('#past-results li:visible')).toContainText(['Bicep from scratch']);
+  // Mobile's last meetup is known only from its Meetup page: no record of
+  // ours to list, so no Events button leading to an empty page.
+  await page.goto('/groups/');
+  await expect(page.locator('article#mobile').getByRole('link', { name: /^Events/ })).toHaveCount(0);
 });
 
 test('status counts catch up on a page opened the next day', async ({ page }) => {
