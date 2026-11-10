@@ -197,3 +197,17 @@ test('focusing today in the mini calendar changes how it looks', async ({ page, 
   await today.focus();
   expect(await ring(today)).not.toBe(before);
 });
+
+test('the mini calendar stops highlighting a conference once it is over', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the mini calendar is desktop only');
+  const conf = page.locator('#minical button[data-goto="2026-10-22"]');
+  await page.goto('/');
+  await expect(conf).toHaveClass(/\bheadliner\b/);
+  await expect(conf).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+
+  // Sat Oct 24, noon: Test Conf (Oct 22–23) is over.
+  await page.clock.setFixedTime(new Date('2026-10-24T17:00:00Z'));
+  await page.goto('/');
+  await expect(conf).toHaveClass(/\bpast\b/);
+  await expect(conf).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+});
