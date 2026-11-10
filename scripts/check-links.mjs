@@ -58,8 +58,15 @@ export function planIssue(results, openIssues, runUrl = '') {
   return open ? { type: 'update', number: open.number, body } : { type: 'open', title: TITLE, body };
 }
 
+// 2xx and 3xx work. So do the answers a site gives bots it won't serve:
+// 401/403, 429 (rate limited) and LinkedIn's 999. They say nothing about
+// whether a person can open the link, and a link that always answers one
+// would keep the broken-link issue open for good.
+const REFUSES_BOTS = new Set([401, 403, 429, 999]);
+export const linkWorks = (status) => status < 400 || REFUSES_BOTS.has(status);
+
 // One try: HEAD, then GET if HEAD fails or is refused (some sites answer
-// HEAD with 403/405). Redirects are followed; 2xx and 3xx count as working.
+// HEAD with 403/405). Redirects are followed.
 async function tryOnce(url) {
   let last;
   for (const method of ['HEAD', 'GET']) {
@@ -67,6 +74,7 @@ async function tryOnce(url) {
       const res = await fetch(url, { method, redirect: 'follow', headers: { 'user-agent': UA }, signal: AbortSignal.timeout(TIMEOUT) });
       await res.body?.cancel();
       if (res.status < 400) return { ok: true, detail: `${res.status}` };
+      if (method === 'GET' && linkWorks(res.status)) return { ok: true, detail: `${res.status}: refuses bots, not checked` };
       last = `${res.status} from ${method}`;
     } catch (err) {
       last = `${err.cause?.code ?? err.name}: ${err.message}`;
