@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-30T16:43:23.195Z",
+  "fetchedAt": "2026-11-10T17:56:39.906Z",
   "logo": null,
   "events": [
     {
@@ -27,6 +27,10 @@
       "venue": "Maple Studios",
       "address": "1207 Maple Street, West Des Moines, IA",
       "image": "https://iowansofthings.com/assets/images/banner_hardware_hangout_2026_11.png",
+      "imageSize": {
+        "width": 1400,
+        "height": 400
+      },
       "added": "2026-10-14T19:28:00.924Z"
     }
   ]
