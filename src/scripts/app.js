@@ -377,7 +377,9 @@ function dayCell(key) {
       ? `<span class="pill headliner${ended}" title="${escapeHtml(e.title)}">${escapeHtml(e.label)}</span>`
       : `<span class="pill${ended}" title="${escapeHtml(e.title)}"><i>${e.allDay ? 'All day' : shortTime(e.start)}</i> ${escapeHtml(e.label)}</span>`;
   }).join('') + (list.length > 3 ? `<span class="more-n">+${list.length - 3} more</span>` : '');
-  const dots = list.filter((e) => !e.headliner).map(() => '<i class="dot"></i>').join('');
+  // A conference day's pink fill stands in for its dot, until the day is past
+  // and the fill goes (global.css); then it gets a dot like any other event.
+  const dots = list.filter((e) => !e.headliner || key < today).map(() => '<i class="dot"></i>').join('');
   const name = `${dayName(key)}, ${list.length ? plural(list.length, 'event') : 'nothing scheduled'}`;
   // Only the selected day is in the tab order; arrow keys move between days.
   return `<button type="button" class="${cls}" data-day="${key}" aria-pressed="${key === state.day}" tabindex="${key === state.day ? 0 : -1}"${cal.inRange(key) ? '' : ' disabled'}>
@@ -450,7 +452,7 @@ function renderDayPanel() {
       continue;
     }
     card.hidden = false;
-    card.classList.remove('same-day', 'addr-seen', 'posted'); // the calendar shows no posters, so a conference keeps its full fill here
+    card.classList.remove('same-day', 'addr-seen', 'posted'); // the calendar shows no posters, so a conference keeps its full fill here, until it's over (below)
     const tag = $('.when-tag', card);
     if (tag) tag.hidden = true;
     // The panel hides the card's date block, so a conference's time line
@@ -461,7 +463,9 @@ function renderDayPanel() {
     if (desc) { desc.id += '-day'; desc.hidden = true; $('.more', card)?.setAttribute('aria-controls', desc.id); }
     // Over (a past day, or earlier today): read it like Recent events does.
     // "went", not "going", and no RSVP button; the title still links to it.
+    // A conference that's over drops its pink fill for the outline.
     if (Date.parse(e.end) <= now) {
+      card.classList.toggle('posted', card.classList.contains('headliner'));
       const going = $('.going', card);
       if (going) going.lastChild.textContent = ' went';
       $('.rsvp', card)?.remove();
