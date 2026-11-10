@@ -69,6 +69,22 @@ test('a hand-added timed event without endTime fails loudly instead of ending as
   assert.equal(manualEvent({ title: 'Expo', start: '2026-11-07' }).allDay, true, 'an all-day event needs neither');
 });
 
+test('a hand-added end before its start fails loudly instead of the event vanishing', () => {
+  assert.throws(() => manualEvent({ title: 'NYE party', start: '2026-12-31', time: '20:00', endTime: '01:00' }), /"NYE party" ends before it starts.*end: 2027-01-01/);
+  assert.throws(() => manualEvent({ title: 'Conf', start: '2026-10-16', end: '2026-10-15' }), /"Conf" ends before it starts/);
+  assert.throws(() => manualEvent({ title: 'Blink', start: '2026-10-16', time: '18:00', endTime: '18:00' }), /ends before it starts/, 'zero length too');
+  assert.equal(manualEvent({ title: 'NYE party', start: '2026-12-31', end: '2027-01-01', time: '20:00', endTime: '01:00' }).end, '2027-01-01T07:00:00.000Z');
+});
+
+test('a hand-added event over 90 days ago is left to the archive, like a fetched one', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'dsm-'));
+  cpSync(dataDir, dir, { recursive: true });
+  writeFileSync(path.join(dir, 'events.yaml'), '- { title: Old conf, start: 2026-06-01 }\n- { title: Recent conf, start: 2026-09-01 }\n');
+  const titles = loadData({ dataDir: dir, now }).past.map((e) => e.title);
+  assert.ok(titles.includes('Recent conf'), 'inside 90 days: still listed');
+  assert.ok(!titles.includes('Old conf'), 'past 90 days: archive only');
+});
+
 test('a misspelled key in events.yaml or groups.yaml fails loudly instead of being dropped', () => {
   assert.throws(() => manualEvent({ title: 'Expo', start: '2026-11-07', venu: 'Hall A' }), /unknown venu:/);
   assert.throws(() => manualEvent({ luma: 'https://luma.com/abc', headlinr: true }), /unknown headlinr:/);
