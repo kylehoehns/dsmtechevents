@@ -642,7 +642,23 @@ mark {
 .snippet-head { display: flex; flex-wrap: wrap; row-gap: 6px; justify-content: space-between; align-items: center; padding: 6px 10px; border-bottom: 1.5px solid var(--line); font: var(--fs-meta)/1.2 var(--mono); }
 .snippet-head .btn { min-width: 6.5em; }
 .snippet pre { margin: 0; padding: 10px; overflow-x: auto; font: var(--fs-meta)/1.45 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
-.add-page > p { margin: 0; }
+.add-page > p, .add-page > .col > p { margin: 0; }
+/* Text pages (about, for organizers, status): one 64-character column on a
+   phone. On desktop, the home page's two columns: prose on the left (75ch,
+   the top of the comfortable range, to keep the gutter narrow), a side
+   column lined up with the home page's rail. Page order is the phone order;
+   the .col wrappers only group pieces for desktop. */
+.cols { max-width: 64ch; grid-template-columns: minmax(0, 1fr); }
+.cols > .col { display: contents; }
+@media (min-width: 1060px) {
+  .cols { max-width: none; grid-template-columns: minmax(0, 75ch) 320px; grid-template-rows: auto 1fr; justify-content: space-between; column-gap: 40px; align-items: start; }
+  .cols > .lede { grid-column: 1; grid-row: 1; }
+  .cols > .col { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .cols > .col-main { grid-column: 1; grid-row: 2; }
+  .cols > .col-side { grid-column: 2; grid-row: 1 / -1; }
+  /* 320px wide: the address on one line */
+  .col-side .email-box .address { font-size: 1.1875rem; }
+}
 /* ---------- for organizers: the TV screen builder ---------- */
 .builder-box { margin-top: 12px; border: 2px solid var(--line); background: var(--sheet); padding: 14px; display: grid; gap: 14px; }
 .builder .field { margin: 0; display: grid; gap: 4px; }
