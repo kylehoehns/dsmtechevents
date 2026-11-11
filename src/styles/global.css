@@ -282,25 +282,35 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 /* ---------- page layout: main column + side rail on desktop ---------- */
 /* Source order is the phone order: headliners, main (the group filter bar on
    top), then the desktop-only mini calendar, day panel, recent. The mini
-   calendar comes after main so the keyboard reaches This week before it. Desktop places the rail pieces in column 2,
-   one row each, with the day panel on top. The last row is 1fr so a tall main
-   column doesn't spread the rail. */
+   calendar comes after main so the keyboard reaches This week before it. Desktop places the rail in column 2:
+   the posters, then .rail-pin (mini calendar, day panel, recent) pinned below
+   them. The last row is 1fr so a tall main column doesn't spread the rail. */
 .layout { display: flex; flex-direction: column; margin-top: 22px; }
 .layout > .main { min-width: 0; }
-.lead, .side { display: contents; }
+.lead, .side, .rail-pin { display: contents; }
 .lead > .headliners { margin-bottom: 12px; }
-.layout > .minical { display: none; }
+.minical { display: none; }
 @media (min-width: 1060px) {
   .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; grid-template-rows: repeat(5, auto) 1fr; gap: 0 40px; align-items: start; }
   .layout > .main { grid-column: 1; grid-row: 1 / -1; }
-  .lead > *, .layout > .minical, .side > * { grid-column: 2; }
-  /* the 22px gap between rail pieces is each one's top margin; whichever
-     piece shows first gets none */
-  .side > .day-panel { grid-row: 1; margin-top: 0; }
-  .lead > .headliners { grid-row: 2; margin-top: 0; }
-  .layout > .minical { grid-row: 3; margin-top: 22px; display: block; }
-  .side > .recent { grid-row: 5; margin-top: 22px; }
-  .layout:not(:has(#headliners:not([hidden]))) > .minical { margin-top: 0; }
+  .lead > * { grid-column: 2; }
+  .lead > .headliners { grid-row: 1; margin-top: 0; }
+  /* Under the posters: the mini calendar and Recent events (or, in calendar
+     view, the day panel), one box spanning the rows to the end (the last is
+     1fr) so it has room to slide. The 22px gaps are top margins; whatever
+     shows first gets none. */
+  .rail-pin { display: block; grid-column: 2; grid-row: 2 / -1; }
+  .layout:has(#headliners:not([hidden])) .rail-pin { margin-top: 22px; }
+  .minical { display: block; }
+  .side > .day-panel { margin-top: 0; }
+  .side > .recent { margin-top: 22px; }
+  /* The rail ends long before the list does, so it stays pinned in view
+     while the list scrolls. Calendar and Recent together are about 700px,
+     so only on a screen tall enough to show them whole, and not once
+     "+ All" opens the full Recent list or in calendar view. */
+  @media (min-height: 760px) {
+    :root:not([data-view="calendar"]) .layout:not(:has(#recent-all[aria-expanded="true"])) .rail-pin { position: sticky; top: 16px; }
+  }
 }
 
 /* Calendar view. Layout.astro sets data-view before first paint on
