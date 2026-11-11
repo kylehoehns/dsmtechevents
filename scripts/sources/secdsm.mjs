@@ -9,6 +9,19 @@ const twelveHour = (hhmm) => {
   return `${h % 12 || 12}${m ? `:${String(m).padStart(2, '0')}` : ''} ${h < 12 ? 'AM' : 'PM'}`;
 };
 
+// A meeting's title from its talks. "+ 1 more" read like a cut-off title, so
+// two short talks are both named, and anything longer names the first and
+// counts the rest in words. Past 70 characters a joined title wraps to four
+// lines on a phone card.
+export function nightTitle(titles) {
+  if (!titles.length) return 'Monthly Security Meetup';
+  if (titles.length === 1) return titles[0];
+  const both = `${titles[0]} & ${titles[1]}`;
+  if (titles.length === 2 && both.length <= 70) return both;
+  const rest = titles.length - 1;
+  return `${titles[0]} and ${rest} more ${rest === 1 ? 'talk' : 'talks'}`;
+}
+
 export default async function secdsm(group, { get }) {
   const base = group.website ?? 'https://secdsm.org/';
   const html = await get(base);
@@ -33,9 +46,7 @@ export default async function secdsm(group, { get }) {
       desc: textOf(act, 'secdsm-act-desc'),
     })).filter((t) => t.title && !/^(tba|tbd)$|schedule pending/i.test(t.title));
 
-    const title = talks.length === 0 ? 'Monthly Security Meetup'
-      : talks.length === 1 ? talks[0].title
-      : `${talks[0].title} + ${talks.length - 1} more`;
+    const title = nightTitle(talks.map((t) => t.title));
     const description = [
       `Doors open at ${twelveHour(doors)}.`,
       ...talks.map((t) => `**${t.time} · ${t.title}**${t.speaker ? ` — ${t.speaker}` : ''}${t.desc ? `\n${t.desc}` : ''}`),
