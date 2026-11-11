@@ -34,8 +34,11 @@
   // When to start the event refresh (worker/index.js `scheduled`): the same
   // UTC times as the schedule in refresh.yml, which stays as the fallback. A
   // second run that finds nothing new commits nothing.
-  // Only the production Worker runs crons, never a preview. The token it
-  // needs is a Worker secret: `npx wrangler secret put REFRESH_DISPATCH_TOKEN`.
+  // Only the production Worker runs crons, never a preview. It signs in as a
+  // GitHub App whose client ID and key are the Worker secrets
+  // REFRESH_APP_CLIENT_ID and REFRESH_APP_KEY (`npx wrangler secret put`).
+  // Previews don't get Worker secrets (checked 2026-11-11: a preview's env
+  // held only ASSETS, CLICKS and CLICK_LIMIT), so branch code can't read them.
   "triggers": { "crons": ["20 10,15,19,23 * * *", "5 6 * * 1"] },
   "preview_urls": true,
   // `wrangler preview` (the Previews Base command) refuses to run without

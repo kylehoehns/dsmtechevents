@@ -59,7 +59,7 @@ flowchart TD
   15:20, 19:20 and 23:20 UTC, plus 12:47 and 13:47 as backups for the
   morning run, which GitHub often drops. The site's Cloudflare Worker also
   starts it at the same times (a cron trigger in `wrangler.jsonc` that calls
-  GitHub's API with the `REFRESH_DISPATCH_TOKEN` secret), since Cloudflare's
+  GitHub's API as a GitHub App, `worker/refresh.js`), since Cloudflare's
   cron fires on time. It runs `npm run build` and commits
   `data/cache/` and `data/archive/` if they changed. It also writes the Des
   Moines date to `data/cache/built-on.txt`, so it commits at least once a
@@ -140,11 +140,15 @@ Everything is shown in Des Moines time, wherever the viewer is.
 
 - **Refresh now** instead of waiting for the next scheduled run:
   `gh workflow run refresh.yml`.
-- **The dispatch token.** The Worker's cron needs a fine-grained GitHub
-  token with access to this repo only and Actions: read and write. Set it
-  with `npx wrangler secret put REFRESH_DISPATCH_TOKEN`. If it expires,
-  GitHub's own schedule keeps running, and the Worker's logs show the
-  refused cron runs.
+- **The refresh App.** The Worker's cron signs in as the "dsmtechevents
+  refresh" GitHub App, installed on this repo only, with Actions and Issues
+  set to read and write and nothing else. Its client ID and private key are
+  Worker secrets: `npx wrangler secret put REFRESH_APP_CLIENT_ID`, and for
+  the key, convert GitHub's download first and pipe it in:
+  `openssl pkcs8 -topk8 -nocrypt -in app.pem | npx wrangler secret put REFRESH_APP_KEY`.
+  When GitHub refuses a run, the App opens a "Refresh trigger broken" issue,
+  closed again once a run goes through. If the App can't sign in at all, the
+  error is only in the Worker's logs, and GitHub's own schedule carries on.
 - **The deploy key.** `main` takes no direct pushes; the refresh workflow is
   the one exception. It pushes event data with a deploy key (secret
   `REFRESH_DEPLOY_KEY`), and the ruleset lets deploy keys bypass it. To

@@ -119,16 +119,50 @@ test('the Worker passes a Luma photo through resized and without its cookie', as
   assert.equal(asked.length, 4, 'refused paths never reach Luma');
 });
 
-test('the cron asks GitHub to run the refresh, and says so when GitHub refuses', async (t) => {
+test('the cron signs in as the App, starts the refresh, and keeps one issue while GitHub refuses', async (t) => {
+  const pair = await crypto.subtle.generateKey({ name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' }, true, ['sign', 'verify']);
+  const pem = `-----BEGIN PRIVATE KEY-----\n${Buffer.from(await crypto.subtle.exportKey('pkcs8', pair.privateKey)).toString('base64')}\n-----END PRIVATE KEY-----\n`;
+  const env = { REFRESH_APP_CLIENT_ID: 'Iv1.abc', REFRESH_APP_KEY: pem };
+  let issues = [];
+  let dispatch = 204;
   const calls = [];
-  let status = 204;
-  t.mock.method(globalThis, 'fetch', async (url, init) => { calls.push({ url, init }); return new Response(status === 204 ? null : 'Bad credentials', { status }); });
-  await worker.scheduled({}, { REFRESH_DISPATCH_TOKEN: 'tok' });
-  assert.equal(calls[0].url, 'https://api.github.com/repos/kylehoehns/dsmtechevents/actions/workflows/refresh.yml/dispatches');
-  assert.equal(calls[0].init.method, 'POST');
-  assert.equal(calls[0].init.headers.Authorization, 'Bearer tok');
-  assert.deepEqual(JSON.parse(calls[0].init.body), { ref: 'main' });
-  status = 401;
-  await assert.rejects(worker.scheduled({}, { REFRESH_DISPATCH_TOKEN: 'tok' }), /401 Bad credentials/);
-  await assert.rejects(worker.scheduled({}, {}), /REFRESH_DISPATCH_TOKEN/);
+  t.mock.method(globalThis, 'fetch', async (url, init = {}) => {
+    const path = url.replace('https://api.github.com', '');
+    const auth = init.headers.Authorization.replace('Bearer ', '');
+    calls.push(`${init.method ?? 'GET'} ${path}`);
+    if (path === '/repos/kylehoehns/dsmtechevents/installation') {
+      // The JWT is signed with the App's key and names the App.
+      const [head, claims, sig] = auth.split('.');
+      assert.ok(await crypto.subtle.verify('RSASSA-PKCS1-v1_5', pair.publicKey, Buffer.from(sig, 'base64url'), new TextEncoder().encode(`${head}.${claims}`)));
+      assert.equal(JSON.parse(Buffer.from(claims, 'base64url')).iss, 'Iv1.abc');
+      return Response.json({ id: 42 });
+    }
+    if (path === '/app/installations/42/access_tokens') return Response.json({ token: 'ghs_hour' }, { status: 201 });
+    assert.equal(auth, 'ghs_hour', 'everything after sign-in uses the hour-long token');
+    if (path.startsWith('/repos/kylehoehns/dsmtechevents/issues?')) return Response.json(issues);
+    if (path.endsWith('/actions/workflows/refresh.yml/dispatches')) {
+      assert.deepEqual(JSON.parse(init.body), { ref: 'main' });
+      return new Response(dispatch === 204 ? null : 'Bad things', { status: dispatch });
+    }
+    return Response.json({}, { status: 201 });
+  });
+  const tail = () => calls.splice(0).slice(3);
+
+  await worker.scheduled({}, env);
+  assert.deepEqual(tail(), ['POST /repos/kylehoehns/dsmtechevents/actions/workflows/refresh.yml/dispatches']);
+
+  dispatch = 422;
+  await assert.rejects(worker.scheduled({}, env), /422 Bad things/);
+  assert.deepEqual(tail(), ['POST /repos/kylehoehns/dsmtechevents/actions/workflows/refresh.yml/dispatches', 'POST /repos/kylehoehns/dsmtechevents/issues']);
+
+  issues = [{ number: 7, title: 'Refresh trigger broken' }];
+  await assert.rejects(worker.scheduled({}, env), /422/);
+  assert.deepEqual(tail(), ['POST /repos/kylehoehns/dsmtechevents/actions/workflows/refresh.yml/dispatches', 'POST /repos/kylehoehns/dsmtechevents/issues/7/comments'], 'a second failure comments rather than opening another');
+
+  dispatch = 204;
+  await worker.scheduled({}, env);
+  assert.deepEqual(tail(), ['POST /repos/kylehoehns/dsmtechevents/actions/workflows/refresh.yml/dispatches', 'POST /repos/kylehoehns/dsmtechevents/issues/7/comments', 'PATCH /repos/kylehoehns/dsmtechevents/issues/7']);
+
+  await assert.rejects(worker.scheduled({}, {}), /REFRESH_APP_CLIENT_ID/);
+  await assert.rejects(worker.scheduled({}, { ...env, REFRESH_APP_KEY: '-----BEGIN RSA PRIVATE KEY-----\nabc' }), /openssl pkcs8/);
 });
