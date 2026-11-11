@@ -50,8 +50,9 @@ const snippets = [
   <div class="add-page cols">
     <p class="lede">Run a tech group or event in or around Des Moines? Send us its link and it's listed. No account needed.</p>
 
-    {/* Phones read these in page order; desktop puts the side column on the right (.cols in global.css). */}
-    <div class="col col-side">
+    {/* Phones read these in page order: getting listed, the reference bits,
+        then the tools. Desktop puts .col-side on the right (.cols in global.css). */}
+    <div class="col col-main">
       <section class="email-box" aria-labelledby="listed-h">
         <h2 id="listed-h">Get listed</h2>
         <p>Email your Meetup link to:</p>
@@ -66,14 +67,9 @@ const snippets = [
         <p>For a Meetup group, that's all: new events show up on their own within a few hours. Not on Meetup? Send your website or public calendar link. For a one-off event, like a conference, workshop or hack day, send the date, time, venue and a link where people RSVP.</p>
         <p>On GitHub? <a href={form('1-add-from-link.yml')}>Paste a Meetup or Luma link into this form</a> and a bot replies within minutes with a preview, or <a href={`${site.repo}#get-your-group-or-event-listed`}>open a pull request</a>.</p>
       </section>
-
-      <section>
-        <h2>Listing wrong?</h2>
-        <p>Fix the time, place or title on your Meetup page or website, and the site picks it up at its next check. The <a href="/status/">status page</a> shows whether that check worked. For anything else, use the <a href={form('3-fix-listing.yml')}>Fix a listing form</a> or email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
-      </section>
     </div>
 
-    <div class="col col-main">
+    <div class="col col-side">
       <section>
         <h2>What fits</h2>
         <ul>
@@ -83,6 +79,18 @@ const snippets = [
         </ul>
       </section>
 
+      <section>
+        <h2>Listing wrong?</h2>
+        <p>Fix the time, place or title on your Meetup page or website, and the site picks it up at its next check. The <a href="/status/">status page</a> shows whether that check worked. For anything else, use the <a href={form('3-fix-listing.yml')}>Fix a listing form</a> or email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+      </section>
+
+      <section>
+        <h2>Picking a date?</h2>
+        <p>Check <a href="/?view=calendar">the calendar</a> for clashes before you book the room.</p>
+      </section>
+    </div>
+
+    <div class="col col-main col-main-2">
       <section class="builder" aria-labelledby="screen-h">
         <h2 id="screen-h">Put your event on a screen</h2>
         <p>Show your event on the lobby TV: date, place, talks and a QR code to RSVP, then your next meetup and what else is coming up.</p>
@@ -131,11 +139,6 @@ const snippets = [
             <pre><code id={`snippet-${i}`}>{sn.code}</code></pre>
           </div>
         ))}
-      </section>
-
-      <section>
-        <h2>Picking a date?</h2>
-        <p>Check <a href="/?view=calendar">the calendar</a> for clashes before you book the room.</p>
       </section>
     </div>
   </div>
