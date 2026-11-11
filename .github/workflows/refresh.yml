@@ -7,6 +7,9 @@ name: refresh events
 # refresh right away.
 
 on:
+  # Cloudflare starts this workflow on the same schedule (the "triggers" cron
+  # in wrangler.jsonc), because GitHub drops scheduled runs. The schedule
+  # below stays as the fallback in case that ever stops working.
   schedule:
     # 10:20, 15:20, 19:20, 23:20 UTC = 5:20am, 10:20am, 2:20pm, 6:20pm
     # Des Moines in summer (an hour earlier in winter): before the workday,

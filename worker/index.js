@@ -10,6 +10,7 @@
 // and which part of the page. No IP address, cookie, user agent or anything
 // else about the visitor.
 import { LUMA_HOST, LUMA_WIDTHS, LUMA_PATH } from '../src/lib/luma.mjs';
+import { startRefresh } from './refresh.js';
 
 // Outbound links, then the page's own signals: a search that found nothing,
 // an app install, an installed app being opened.
@@ -95,6 +96,10 @@ async function lumaImage(path) {
 }
 
 export default {
+  // The cron in wrangler.jsonc: start the event refresh (worker/refresh.js).
+  async scheduled(controller, env) {
+    await startRefresh(env);
+  },
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/api/click') {

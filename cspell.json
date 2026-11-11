@@ -7,7 +7,7 @@
   "ignoreRegExpList": ["Urls", "/%[0-9A-F]{2}\\w*/g", "/\\b(?:FBAN|FBAV|EdgiOS)\\b/g"],
   "words": [
     "appinstalled", "beforeinstallprompt", "checkdist", "coworking", "dsmtechevents", "ical", "IIBA", "ISSA", "kyhoehns", "lede", "llms", "Luma",
-    "meetupstatic", "minical", "Moines", "precached", "prerendered", "pyowa", "qrcode", "setlist",
-    "speculationrules", "subgrid", "urlname", "webcal", "zizmor"
+    "meetupstatic", "minical", "nocrypt", "Moines", "precached", "prerendered", "pyowa", "qrcode", "setlist",
+    "speculationrules", "subgrid", "topk", "urlname", "webcal", "zizmor"
   ]
 }
