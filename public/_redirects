@@ -2,3 +2,11 @@
 # in READMEs, Meetup descriptions and search results still point at it.
 /add /organizers/ 301
 /add/ /organizers/ 301
+# Without the slash, Cloudflare's auto-trailing-slash answers 307 (temporary),
+# so search engines keep the slashless URL. Say it's permanent.
+/groups /groups/ 301
+/organizers /organizers/ 301
+/about /about/ 301
+/status /status/ 301
+/tv /tv/ 301
+/print /print/ 301
