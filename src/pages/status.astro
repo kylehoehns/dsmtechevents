@@ -27,47 +27,51 @@ const health = (h: any) => !h ? ['unknown', 'Not checked yet']
   description="Where each group's events come from on DSM Tech Events, when they last changed, and whether the latest refresh could read them.">
   <div class="page-head"><h1>Status</h1></div>
 
-  <div class="status-page">
+  <div class="status-page cols">
     <p class="lede">
       Where each group's events come from, and whether the site could read them.
       Every group is checked automatically{checkedOn && `, most recently on ${onDay(checkedOn)}`}.
     </p>
 
-    {/* A list, not a table: five columns don't fit a phone, and each line reads on its own. */}
-    <ul class="sources">
-      {sorted.map((g) => {
-        const [kind, label] = health(g.health);
-        return (
-          <li>
-            <h2>{g.quiet ? g.short : <a href={`/groups/#${g.id}`}>{g.short}</a>}{g.quiet && <span class="quiet">Quiet</span>}</h2>
-            <p class={`health ${kind}`}>{label}</p>
-            <p class="facts">{[source(g), g.fetchedAt && `changed ${date(g.fetchedAt)}, ${shortTime(g.fetchedAt)}`].filter(Boolean).join(' · ')} · {g.states.map((s: any) => <span {...s.attrs}>{s.count} coming up</span>)}</p>
-          </li>
-        );
-      })}
-    </ul>
+    <div class="col col-main">
+      {/* A list, not a table: five columns don't fit a phone, and each line reads on its own. */}
+      <ul class="sources">
+        {sorted.map((g) => {
+          const [kind, label] = health(g.health);
+          return (
+            <li>
+              <h2>{g.quiet ? g.short : <a href={`/groups/#${g.id}`}>{g.short}</a>}{g.quiet && <span class="quiet">Quiet</span>}</h2>
+              <p class={`health ${kind}`}>{label}</p>
+              <p class="facts">{[source(g), g.fetchedAt && `changed ${date(g.fetchedAt)}, ${shortTime(g.fetchedAt)}`].filter(Boolean).join(' · ')} · {g.states.map((s: any) => <span {...s.attrs}>{s.count} coming up</span>)}</p>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
 
-    <section>
-      <h2>What these mean</h2>
-      <dl>
-        <dt>Healthy</dt>
-        <dd>The latest check read the group's page without an error.</dd>
-        <dt>Partial</dt>
-        <dd>Its events came in, but the extra details from its Meetup events page (venue, photo, how many are going) didn't.</dd>
-        <dt>Failing</dt>
-        <dd>Its page couldn't be read, so the site is showing the events it had from the last good check. Each one has an <a href={`${site.repo}/issues?q=label%3Asource-broken`}>open issue on GitHub</a> until it's fixed.</dd>
-        <dt>Changed</dt>
-        <dd>When that group's listing here last changed: a new event, a new time, more people going. Not when it was last checked.</dd>
-        <dt>Quiet</dt>
-        <dd>Nothing coming up and no meetup in the past year. Quiet groups are hidden from the other pages and come back on their own when they post an event.</dd>
-      </dl>
-    </section>
+    <div class="col col-side">
+      <section>
+        <h2>What these mean</h2>
+        <dl>
+          <dt>Healthy</dt>
+          <dd>The latest check read the group's page without an error.</dd>
+          <dt>Partial</dt>
+          <dd>Its events came in, but the extra details from its Meetup events page (venue, photo, how many are going) didn't.</dd>
+          <dt>Failing</dt>
+          <dd>Its page couldn't be read, so the site is showing the events it had from the last good check. Each one has an <a href={`${site.repo}/issues?q=label%3Asource-broken`}>open issue on GitHub</a> until it's fixed.</dd>
+          <dt>Changed</dt>
+          <dd>When that group's listing here last changed: a new event, a new time, more people going. Not when it was last checked.</dd>
+          <dt>Quiet</dt>
+          <dd>Nothing coming up and no meetup in the past year. Quiet groups are hidden from the other pages and come back on their own when they post an event.</dd>
+        </dl>
+      </section>
+    </div>
   </div>
   <script>import '../scripts/catch-up.js';</script>
 </Layout>
 
 <style>
-  .status-page { max-width: 64ch; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 18px 0 8px; font-family: var(--sans); font-size: var(--fs-body); line-height: 1.55; }
+  .status-page { display: grid; gap: 22px; padding: 18px 0 8px; font-family: var(--sans); font-size: var(--fs-body); line-height: 1.55; }
   .lede { margin: 0; }
   .status-page a { color: var(--link-t); }
   .sources { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--line); }

@@ -13,30 +13,35 @@ const { updatedAt } = loadData();
   description="DSM Tech Events is one calendar of every public tech meetup, user group and conference in the Des Moines area, pulled automatically from each group's own page.">
   <div class="page-head"><h1>About</h1></div>
 
-  <div class="add-page">
+  <div class="add-page cols">
     <p class="lede">
       DSM Tech Events puts every public tech meetup, user group and conference in the Des Moines area on one calendar.
     </p>
-    <p>Anyone can come: students, people new to tech, people new to town. For cost and food, check the event on the group's own page.</p>
+    <div class="col col-main">
+      <p>Anyone can come: students, people new to tech, people new to town. For cost and food, check the event on the group's own page.</p>
 
-    <section>
-      <h2>Where the listings come from</h2>
-      <ul>
-        <li>Each group's events come straight from its Meetup page or website and update on their own (<a href="/status/">see each source's status</a>). Conferences and one-off events are added by hand.</li>
-        <li>The site only points the way: you RSVP on the group's own page, and the group runs the event.</li>
-        <li>It isn't affiliated with any of the groups. If a listing and the group's page disagree, trust the group's page.</li>
-      </ul>
-    </section>
-    <section>
-      <h2>Spot a mistake, or want to be listed?</h2>
-      <p>
-        Corrections, ideas or questions: <a href={`mailto:${site.email}`}>{site.email}</a>.
-        Run a group or an event that isn't here, or want this on a lobby TV or a corkboard? <a href="/organizers/">The organizers page</a> has you covered.
-      </p>
-    </section>
-    <section>
-      <h2>Privacy</h2>
-      <p>No accounts and no tracking cookies. Cloudflare Web Analytics counts visits, and the site counts which RSVP and event links get clicked, so groups can see how many people it sends them. It also counts searches that find nothing (just the word searched for), so missing topics can be added. None of it identifies anyone.</p>
-    </section>
+      <section>
+        <h2>Where the listings come from</h2>
+        <ul>
+          <li>Each group's events come straight from its Meetup page or website and update on their own (<a href="/status/">see each source's status</a>). Conferences and one-off events are added by hand.</li>
+          <li>The site only points the way: you RSVP on the group's own page, and the group runs the event.</li>
+          <li>It isn't affiliated with any of the groups. If a listing and the group's page disagree, trust the group's page.</li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="col col-side">
+      <section>
+        <h2>Spot a mistake, or want to be listed?</h2>
+        <p>
+          Corrections, ideas or questions: <a href={`mailto:${site.email}`}>{site.email}</a>.
+          Run a group or an event that isn't here, or want this on a lobby TV or a corkboard? <a href="/organizers/">The organizers page</a> has you covered.
+        </p>
+      </section>
+      <section>
+        <h2>Privacy</h2>
+        <p>No accounts and no tracking cookies. Cloudflare Web Analytics counts visits, and the site counts which RSVP and event links get clicked, so groups can see how many people it sends them. It also counts searches that find nothing (just the word searched for), so missing topics can be added. None of it identifies anyone.</p>
+      </section>
+    </div>
   </div>
 </Layout>
