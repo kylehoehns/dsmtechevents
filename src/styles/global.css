@@ -730,4 +730,5 @@ mark {
   .day.headliner:not(.past):hover { background: var(--pink-fill); }
   .foot .big a:hover { background: var(--on-blue); color: var(--blue-fill); }
   .btn:hover .out-arrow { transform: translate(0.15em, -0.15em); }
+  .gig-bill a:hover { background: var(--on-pink); color: var(--pink-fill); text-decoration: none; } /* the 404's bill */
 }

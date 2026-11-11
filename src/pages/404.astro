@@ -1,29 +1,75 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { loadData } from '../lib/data.mjs';
+
+const { groups } = loadData();
 ---
-<Layout title="Not found" nav={null} noindex blurb="That page isn't on the sheet.">
-  <div class="page-head"><h1>Nothing here</h1></div>
-  {/* Where a poster used to be: a clean patch of wall, the tape still up,
-      a scrap of the poster under one strip. */}
-  <div class="torn">
-    <span class="scrap" aria-hidden="true"></span>
-    <span class="tape left" aria-hidden="true"></span>
-    <span class="tape right" aria-hidden="true"></span>
-    <p class="torn-note">Someone tore this one down.</p>
-    <p class="empty"><a href="/">See what's coming up</a> or <a href="/groups/">browse the groups</a>.</p>
-  </div>
+<Layout title="Not found" nav={null} noindex>
+  {/* A gig poster for the show that isn't happening: the 404 is the
+      headliner, and the bill underneath is where to go instead. */}
+  <article class="gig">
+    <span class="tape t-left" aria-hidden="true"></span>
+    <span class="tape t-right" aria-hidden="true"></span>
+    <p class="gig-top"><span>Des Moines, Iowa</span><span>All ages</span></p>
+    <h1>
+      <span class="gig-num misprint" data-t="404" aria-hidden="true">404</span>
+      <span class="gig-head">Page not found</span>
+    </h1>
+    <p class="gig-sub">The act you came for cancelled. The rest of the bill is still on:</p>
+    <ul class="gig-bill">
+      <li class="l1"><a href="/">This week's events</a></li>
+      <li class="l2"><a href="/?view=calendar">The calendar</a></li>
+      <li class="l2"><a href="/groups/">All {groups.length} groups</a></li>
+    </ul>
+    <p class="gig-foot" aria-hidden="true"><span>Doors always open</span><span>Admit one</span></p>
+  </article>
 </Layout>
 
 <style>
-  .torn { position: relative; max-width: 420px; margin: 40px 0 8px; padding: 44px 22px 22px; background: var(--paper-2); }
-  .torn-note { margin: 0; font: 900 var(--fs-title)/1 var(--display); text-transform: uppercase; }
-  .torn .empty { padding: 10px 0 0; }
-  .tape { top: -12px; }
-  .tape.left { left: -18px; --tape-w: 92px; transform: rotate(-38deg); }
-  .tape.right { right: -16px; --tape-w: 84px; transform: rotate(33deg); }
-  /* the corner of the poster that wouldn't come off: pink stock, torn edges */
-  .scrap {
-    position: absolute; top: -6px; left: -8px; width: 74px; height: 58px; background: var(--pink-fill);
-    clip-path: polygon(0 0, 100% 0, 93% 14%, 97% 27%, 84% 38%, 78% 55%, 62% 61%, 51% 78%, 36% 80%, 22% 96%, 9% 89%, 0 100%);
+  .gig {
+    position: relative; margin: 36px 0 12px; padding: clamp(28px, 4vw, 48px) clamp(16px, 4vw, 56px) clamp(20px, 3vw, 32px);
+    background: var(--pink-fill); color: var(--on-pink); text-align: center; transform: rotate(-0.4deg);
   }
+  .gig::after { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: var(--grain); opacity: var(--poster-grain); mix-blend-mode: multiply; }
+  .tape { top: -12px; }
+  .t-left { left: 6%; --tape-w: 110px; transform: rotate(-4deg); }
+  .t-right { right: 6%; --tape-w: 96px; transform: rotate(3deg); }
+
+  .gig-top, .gig-foot {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; margin: 0;
+    font: 700 var(--fs-label)/1.2 var(--mono); text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .gig-top { border-bottom: 3px solid currentColor; padding-bottom: 10px; }
+  .gig-foot { border-top: 3px solid currentColor; padding-top: 10px; margin-top: clamp(20px, 3vw, 32px); justify-content: center; }
+  .gig-foot span + span::before { content: "★ "; }
+
+  h1 { margin: clamp(20px, 4vw, 32px) 0 0; font-weight: 900; }
+  /* the headliner: as wide as the poster allows */
+  .gig-num {
+    display: block; width: fit-content; margin: 0 auto;
+    font: 900 min(calc((100vw - 64px) * 0.58), 34rem)/0.78 var(--display); letter-spacing: -0.02em;
+  }
+  .gig-num::before { color: var(--blue-fill); mix-blend-mode: normal; transform: translate(0.04em, 0.03em); }
+  .gig-head {
+    display: inline-block; margin-top: clamp(14px, 3.2vw, 40px); padding: 6px 14px 3px;
+    background: var(--on-pink); color: var(--pink-fill);
+    font: 900 clamp(1.5rem, 5vw, 3.5rem)/0.95 var(--display); text-transform: uppercase;
+  }
+  .gig-sub { margin: clamp(14px, 2vw, 22px) auto 6px; max-width: 40ch; font: 600 var(--fs-lede)/1.35 var(--sans); }
+
+  /* the bill: biggest first, like a festival lineup */
+  .gig-bill { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; column-gap: 0.4em; font-family: var(--display); font-weight: 900; text-transform: uppercase; line-height: 1.1; row-gap: 10px; }
+  .gig-bill li { display: flex; align-items: baseline; }
+  .gig-bill li + li::before { content: "/"; content: "/" / ""; color: var(--blue-fill); margin-right: 0.4em; }
+  .gig-bill .l1 { flex-basis: 100%; justify-content: center; font-size: clamp(2rem, 7vw, 5rem); }
+  .gig-bill .l1::before { display: none; }
+  .gig-bill .l2 { font-size: clamp(1.375rem, 4vw, 2.75rem); }
+  .gig-bill .l2:nth-child(2)::before { display: none; }
+  /* too narrow for two acts on a line: stack them, no slash left dangling */
+  @media (max-width: 359px) {
+    .gig-bill .l2 { flex-basis: 100%; justify-content: center; }
+    .gig-bill .l2::before { display: none; }
+  }
+  .gig-bill a { text-decoration: underline; text-decoration-thickness: 0.06em; text-underline-offset: 0.12em; }
+  .gig-bill a:focus-visible { outline-color: var(--on-pink); }
 </style>
