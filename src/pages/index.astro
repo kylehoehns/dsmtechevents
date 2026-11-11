@@ -142,9 +142,11 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
       <section id="calendar-view" aria-label="Calendar" hidden></section>
     </div>
 
-    {/* Desktop only; phones hide it. After the list in the page, so the
-        keyboard and screen readers reach This week first; the grid still
-        draws it in the rail under the posters. */}
+    {/* The rail under the posters, pinned in view on desktop while the list
+        scrolls (global.css). After the list in the page, so the keyboard and
+        screen readers reach This week first. */}
+    <div class="rail-pin">
+    {/* Desktop only; phones hide it. */}
     <section class="minical" id="minical" aria-label="This month"></section>
 
     <aside class="side" aria-label="Day details and recent events">
@@ -162,6 +164,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         {recentRows.length > PAST_SHOWN && <button type="button" class="all btn btn-outline" id="recent-all" aria-expanded="false">+ All {past.length}</button>}
       </section>
     </aside>
+    </div>
   </div>
 
   {/* toScript escapes "<", so an event title can't close this tag. */}
