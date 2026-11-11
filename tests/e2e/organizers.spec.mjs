@@ -27,10 +27,10 @@ test('a repeating series is one choice in the screen picker, its next date', asy
 
 test('says how to fix a listing', async ({ page }) => {
   await page.goto('/organizers/');
-  const fix = page.locator('section', { has: page.getByRole('heading', { name: 'Something wrong?' }) });
+  const fix = page.locator('section', { has: page.getByRole('heading', { name: 'Listing wrong?' }) });
   await expect(fix).toContainText('picks it up at its next check');
   await expect(fix.getByRole('link', { name: 'Fix a listing form' })).toHaveAttribute('href', 'https://github.com/kylehoehns/dsmtechevents/issues/new?template=3-fix-listing.yml');
-  await expect(page.getByRole('link', { name: 'paste its link into this form' })).toHaveAttribute('href', 'https://github.com/kylehoehns/dsmtechevents/issues/new?template=1-add-from-link.yml');
+  await expect(page.getByRole('link', { name: 'Paste a Meetup or Luma link into this form' })).toHaveAttribute('href', 'https://github.com/kylehoehns/dsmtechevents/issues/new?template=1-add-from-link.yml');
 });
 
 test('copies the screen link and the badge snippets', async ({ page, context }) => {

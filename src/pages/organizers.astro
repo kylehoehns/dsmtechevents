@@ -48,32 +48,11 @@ const snippets = [
   <div class="page-head"><h1>For organizers</h1></div>
 
   <div class="add-page">
-    <p class="lede">Run a group or host an event? Here's how to get it listed, and what the site can do for you after that. None of it needs an account.</p>
+    <p class="lede">Run a tech group or event in or around Des Moines? Send us its link and it's listed. No account needed.</p>
 
-    <section>
-      <h2>Get listed</h2>
-      <p>The site lists public tech meetups, user groups and conferences in and around Des Moines. One-off events are welcome too: a conference, a workshop, a hack day. We link to your Meetup page or site, and people RSVP there, not here.</p>
-      <p>What fits:</p>
-      <ul>
-        <li>Tech-focused: software, data, security, product, design, hardware, and so on. Local chapters of associations for people who work in tech count too: project management, business analysis, data management, security.</li>
-        <li>Open to the public, paid or free. No members-only or invite-only events.</li>
-        <li>In the Des Moines area, or online and run by a local group.</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>What to send</h2>
-      <ul>
-        <li>Your group or event's name.</li>
-        <li>For a group: its Meetup link. Not on Meetup? A website or public calendar link works too.</li>
-        <li>For a one-off event: the date, time, venue, and a link where people can RSVP or learn more.</li>
-      </ul>
-      <p>If your group is on Meetup, that's all. New events show up on their own within a few hours.</p>
-      <p>On GitHub? The quickest way for a Meetup group or a Luma event is to <a href={form('1-add-from-link.yml')}>paste its link into this form</a>. A bot replies within minutes with a preview of the site with it added.</p>
-    </section>
-
-    <section class="email-box" aria-labelledby="email-h">
-      <h2 id="email-h">Send it here</h2>
+    <section class="email-box" aria-labelledby="listed-h">
+      <h2 id="listed-h">Get listed</h2>
+      <p>Email your Meetup link to:</p>
       <p class="address"><span id="add-email">{site.email}</span></p>
       <div class="email-actions">
         <button type="button" class="btn btn-outline" data-copy-from="add-email">Copy address</button>
@@ -81,24 +60,28 @@ const snippets = [
       </div>
     </section>
 
-    <p class="dev-note">
-      Prefer GitHub? The site is open source. <a href={`${site.repo}#get-your-group-or-event-listed`}>Open a pull request</a> with your group in <code>data/groups.yaml</code> or your event in <code>data/events.yaml</code>.
-    </p>
-
     <section>
-      <h2>Is your listing working?</h2>
-      <p>The <a href="/status/">status page</a> shows where each group's events come from, when they last changed, and whether the latest check worked.</p>
+      <p>For a Meetup group, that's all: new events show up on their own within a few hours. Not on Meetup? Send your website or public calendar link. For a one-off event, like a conference, workshop or hack day, send the date, time, venue and a link where people RSVP.</p>
+      <p>On GitHub? <a href={form('1-add-from-link.yml')}>Paste a Meetup or Luma link into this form</a> and a bot replies within minutes with a preview, or <a href={`${site.repo}#get-your-group-or-event-listed`}>open a pull request</a>.</p>
     </section>
 
     <section>
-      <h2>Something wrong?</h2>
-      <p>Most events come straight from your Meetup page or website. Fix the time, place or title there, and the site picks it up at its next check.</p>
-      <p>For anything else, like a wrong link or an event that shouldn't be listed, use the <a href={form('3-fix-listing.yml')}>Fix a listing form</a> on GitHub or email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+      <h2>What fits</h2>
+      <ul>
+        <li>Tech-focused: software, data, security, product, design, hardware. Local chapters of associations for people in tech count too.</li>
+        <li>Open to the public, paid or free.</li>
+        <li>In the Des Moines area, or online and run by a local group.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Listing wrong?</h2>
+      <p>Fix the time, place or title on your Meetup page or website, and the site picks it up at its next check. The <a href="/status/">status page</a> shows whether that check worked. For anything else, use the <a href={form('3-fix-listing.yml')}>Fix a listing form</a> or email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
     </section>
 
     <section class="builder" aria-labelledby="screen-h">
       <h2 id="screen-h">Put your event on a screen</h2>
-      <p>Show your event on the TV in your lobby: its date, time, place and talks with a QR code to RSVP, then your group's next meetup and what else is coming up.</p>
+      <p>Show your event on the lobby TV: date, place, talks and a QR code to RSVP, then your next meetup and what else is coming up.</p>
 
       <div class="builder-box" id="builder">
         {choices.length ? (
@@ -124,16 +107,16 @@ const snippets = [
       </div>
 
       <ul class="howto">
-        <li>Open the link on the computer or TV stick driving the lobby screen, then click it or press F to fill the screen. To hide the browser for good, start Chrome in kiosk mode with the link: <code>--kiosk</code>.</li>
-        <li>It keeps the screen awake, and switches to "Happening now" and then a thank-you slide on its own.</li>
-        <li>On a slow TV stick, add <code>&amp;fx=off</code> to the end of the link for plain transitions.</li>
+        <li>Open the link on the computer driving the screen and press F to fill it. To hide the browser for good, start Chrome with <code>--kiosk</code> and the link.</li>
+        <li>It keeps the screen awake and switches to "Happening now", then a thank-you slide, on its own.</li>
+        <li>On a slow TV stick, add <code>&amp;fx=off</code> to the link for plain transitions.</li>
       </ul>
       <p>A coworking space or office? <a href="/tv/">The regular TV page</a> rotates through everything coming up. Prefer paper? <a href="/print/">Print a flyer</a>.</p>
     </section>
 
     <section class="badge-kit" aria-labelledby="badge-h">
       <h2 id="badge-h">Point your members here</h2>
-      <p>Add this to your group's site or README so people can find the rest of the Des Moines tech scene.</p>
+      <p>Add this to your group's site or README so your members find the rest of the Des Moines tech scene.</p>
       <p><img src="/badge.svg" width="300" height="64" alt="Find more Des Moines tech events" /></p>
       {snippets.map((sn, i) => (
         <div class="snippet">
