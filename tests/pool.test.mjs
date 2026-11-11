@@ -29,6 +29,12 @@ test('an archived hand-added event with no host reads as a conference or communi
   assert.deepEqual(list.map((e) => [e.hostsLabel, e.groupIds]), [['Community event', []], ['Conference', []]]);
 });
 
+test('an archived hand-added event keeps the name of who ran it', () => {
+  const { group: _, ...noHost } = rec('x', 'none', '', '');
+  const list = pastEvents({ past: [], archive: [{ ...noHost, id: 'manual-happy-hour', title: 'Happy Hour', hostedBy: 'IA Women in Tech' }], byId });
+  assert.equal(list[0].hostsLabel, 'IA Women in Tech');
+});
+
 test('a joint night titled differently by each host is one row, from the archive or the cache', () => {
   const archive = [
     rec('c-1', 'cijug', 'Joint night - JVM vs. CLR', '2026-04-15T22:30:00Z'),

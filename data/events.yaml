@@ -3,6 +3,7 @@
 #
 #   title (no year: the date shows it), url, start (YYYY-MM-DD), end (optional, multi-day), time + endTime ("HH:MM"; an endTime at or before 6am the next day keeps it one night)
 #   venue, address, description, tags, hosts (group ids), headliner (a pink row, and a poster up top when it is close)
+#   hostedBy (optional, no hosts): who runs it, shown where a group's name goes; without it the row says "Conference" or "Community event"
 #   id (optional): keeps an event's id, and so its /tv/?event= link, after a title change
 #
 # An event on Luma needs only its link: `luma: https://luma.com/<slug>`. The refresh reads its title, time, place, photo
@@ -38,6 +39,7 @@
   headliner: true
 
 - title: Women in Tech Happy Hour
+  hostedBy: IA Women in Tech
   url: https://www.linkedin.com/company/ia-women-in-tech/
   start: 2026-11-18
   time: "15:00"

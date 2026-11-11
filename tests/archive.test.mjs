@@ -50,6 +50,14 @@ test('ended hand-added events are archived: no group without hosts, the first ho
   assert.deepEqual(updateArchive(changed, {}, now, [conf, joint, later]), {}, 'a quiet refresh changes nothing');
 });
 
+test('an archived hand-added event keeps hostedBy only when it has no host group', () => {
+  const social = ev('manual-happy-hour', '2026-09-30T20:00:00Z', { groupIds: [], hostedBy: 'IA Women in Tech' });
+  const hosted = ev('manual-joint', '2026-09-29T23:00:00Z', { groupIds: ['cijug'], hostedBy: 'Someone' });
+  const [joint, happy] = updateArchive({}, {}, now, [social, hosted])['2026'];
+  assert.equal(happy.hostedBy, 'IA Women in Tech');
+  assert.ok(!('hostedBy' in joint), 'a group host already names it');
+});
+
 test('an archived record keeps a short plain-text description for search', () => {
   const long = `**Agenda**\n\n## The talk\n${'word '.repeat(200)}`;
   const d = brief(long);
