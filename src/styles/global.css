@@ -386,8 +386,9 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
 .rsvp { display: inline-flex; align-items: center; gap: 8px; }
 /* A narrow phone (360-375px) can't fit "12 going", "RSVP on Meetup" and
    "About" on one line, so About wrapped onto a row of its own. There the
-   button says "RSVP"; its aria-label still names Meetup. */
-@container (max-width: 349px) { .acts:has(.going) .rsvp-where { display: none; } }
+   button says "RSVP"; its aria-label still names Meetup. Only in the list:
+   the calendar's day panel has no date column, so its row has room. */
+@container (max-width: 349px) { #list-view .acts:has(.going) .rsvp-where { display: none; } }
 .more { background: none; border: 0; padding: 4px 0; min-height: 24px; margin-block: -1.75px; /* 24px target, old 20.5px footprint */ font: 600 var(--fs-meta)/1 var(--mono); text-decoration: underline; text-underline-offset: 3px; }
 .more::before { content: "+ "; content: "+ " / ""; font-weight: 700; }
 .more[aria-expanded="true"]::before { content: "– "; content: "– " / ""; }
