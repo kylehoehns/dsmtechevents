@@ -187,7 +187,7 @@ function renderList() {
     sec.hidden = n === 0;
     total += n;
     const count = $('[data-count]', sec);
-    count.textContent = $('.far', sec) ? `${n} on the books` : plural(n, 'event');
+    count.textContent = plural(n, 'event');
   }
   // A search or one group's view looks back too: past events, newest first,
   // under the upcoming ones (the archive's rows come with the card pool).
@@ -366,8 +366,8 @@ function renderSide() {
 
 // ---- calendar ----
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-// The key's "Pick a day" hint goes once a day has been picked (or a ?day=
-// link opened on one): its events are showing, so the hint has done its job.
+// Whether someone chose the day (a tap, or a ?day= link), rather than the
+// calendar picking one for itself (see keepCurrent).
 let dayPicked = !!state.day;
 // One day of the month grid: a button with the date, up to three event pills
 // (dots on a phone) and a spoken summary.
@@ -415,7 +415,7 @@ function renderCalendar() {
       ${WEEKDAYS.map((d) => `<span class="weekday" aria-hidden="true">${d}</span>`).join('')}
       ${cells.join('')}
     </div>
-    <div class="cal-key"><span><i class="key-event"></i>Event</span><span><i class="key-headliner"></i>Conference</span>${dayPicked ? '' : '<span>Pick a day to see its events</span>'}</div>`;
+    <div class="cal-key"><span><i class="key-event"></i>Event</span><span><i class="key-headliner"></i>Conference</span></div>`;
   if (had?.dataset.month != null) $(`[data-month="${had.dataset.month}"]`, calView)?.focus({ preventScroll: true });
   else if (had?.dataset.day) $(`.day[data-day="${state.day}"]`, calView)?.focus({ preventScroll: true });
   renderDayPanel();

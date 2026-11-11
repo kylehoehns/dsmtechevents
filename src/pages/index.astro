@@ -123,7 +123,7 @@ const structured = [websiteJsonLd(), ...listed.map((e) => eventJsonLd(e, byId)).
         ))}
         {far.length > 0 && (
           <section class="sec" data-sec>
-            <div class="sec-head"><h2>Further out</h2><span class="count" data-count>{far.length} on the books</span></div>
+            <div class="sec-head"><h2>Further out</h2><span class="count" data-count>{plural(far.length, 'event')}</span></div>
             <ol class="setlist far">
               {far.map((e) => <EventRow event={e} kind="later" byId={byId} data-end={e.end} />)}
             </ol>
