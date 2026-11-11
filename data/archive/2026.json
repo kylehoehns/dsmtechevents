@@ -1163,5 +1163,27 @@
   "going": 6,
   "url": "https://www.meetup.com/aws-user-group-des-moines/events/316911568/",
   "description": "Let's get together virtually before Re: Invent. Is anyone going who wants to meet up there? Are there specific sessions you are excited about?"
+ },
+ {
+  "id": "scrum-masters-317060536",
+  "group": "scrum-masters",
+  "title": "The Agile Credibility Crisis: Reclaiming the Scrum Master with AI Agents",
+  "start": "2026-11-11T18:00:00.000Z",
+  "end": "2026-11-11T19:00:00.000Z",
+  "online": true,
+  "going": 101,
+  "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/317060536/",
+  "description": "Many enterprise leaders see the Scrum Master as a tactical necessity, not a strategic asset. As AI starts handling ticket triage and calendar management, our credibility depends on the coaching work only we can do. In this session we'll map the \"administrative drift\" that turns Scrum Masters into clerks. Then I'll show how proactive AI agents can take over status reporting and event scheduling, giving back 10+ hours a week for flow, stakeholder alignment and real improvement work. We'll start with a quick diagnostic where you plot your own week: admin work vs. strategic coaching. We'll finish"
+ },
+ {
+  "id": "uxdsm-317184613",
+  "group": "uxdsm",
+  "title": "How I AI",
+  "start": "2026-11-11T18:00:00.000Z",
+  "end": "2026-11-11T19:00:00.000Z",
+  "online": true,
+  "going": 20,
+  "url": "https://www.meetup.com/experiencing-ux/events/317184613/",
+  "description": "Not sure where AI fits into your work? Not sure it’s worth your time? Join us online Wednesday, Nov. 11, from 12 to 1 PM for “How I AI,” a show-and-tell panel. Three practitioners will show how they use AI in their jobs. You’ll see real workflows, not hype. This is a virtual-only event on Google Meet. We’ll record the session and post the recording on our YouTube channel. Who you’ll hear from * Desarae Veit, State Manager with the State of Iowa, who spent the last 2.5 years as a Capture Manager at General Dynamics Information Technology and is actively pursuing her PhD in HCI. * Sarah"
  }
 ]

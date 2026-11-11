@@ -1,9 +1,9 @@
 {
-  "fetchedAt": "2026-11-11T17:56:48.828Z",
+  "fetchedAt": "2026-11-11T19:21:09.875Z",
   "logo": "https://secure.meetupstatic.com/photos/event/8/a/f/c/600_535115580.jpeg",
   "members": 1108,
-  "pastCount": 85,
-  "lastMet": "2024-08-28T23:00:00.000Z",
+  "pastCount": 86,
+  "lastMet": "2026-11-11T18:00:00.000Z",
   "events": [
     {
       "id": "uxdsm-317184613",
@@ -19,7 +19,7 @@
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/8/2/f/c/600_536853532.jpeg",
-      "going": 18,
+      "going": 20,
       "added": "2026-10-29T02:30:54.073Z"
     }
   ]
