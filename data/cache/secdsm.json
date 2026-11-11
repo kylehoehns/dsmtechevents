@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-08T16:07:53.459Z",
+  "fetchedAt": "2026-11-11T23:21:27.075Z",
   "logo": "https://secdsm.org/images/og-logo.png",
   "events": [
     {
@@ -17,7 +17,7 @@
     {
       "id": "secdsm-2026-12-03",
       "sourceId": "2026-12-03",
-      "title": "Everything is a Date + 1 more",
+      "title": "Everything is a Date & DIY Flipper Zero",
       "start": "2026-12-04T00:00:00.000Z",
       "end": "2026-12-04T02:30:00.000Z",
       "allDay": false,
