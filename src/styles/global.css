@@ -658,7 +658,6 @@ mark {
 .tv-link-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .tv-link-actions .btn { min-height: 40px; display: inline-flex; align-items: center; }
 .builder .howto { margin-top: 12px; }
-.add-page .dev-note { margin: 0; font-size: var(--fs-small); color: var(--ink-soft); }
 .add-page code { font: var(--fs-meta) var(--mono); overflow-wrap: anywhere; background: var(--paper-2); padding: 0 4px; }
 .empty { padding: 16px 0; font-size: var(--fs-meta); margin: 0; }
 
