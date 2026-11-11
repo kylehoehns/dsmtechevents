@@ -21,6 +21,7 @@ export function brief(text = '') {
 const slim = (e, group) => ({
   id: e.id,
   ...(group && { group }),
+  ...(!group && e.hostedBy && { hostedBy: e.hostedBy }),
   title: e.title,
   start: e.start,
   end: e.end,

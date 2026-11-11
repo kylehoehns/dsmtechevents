@@ -64,6 +64,12 @@ test('hand-added events use Des Moines time and span days', () => {
   assert.equal(conf.address, '833 5th Ave');
 });
 
+test('a hand-added event with no group can name who runs it', () => {
+  const e = manualEvent({ title: 'Happy Hour', start: '2026-11-18', time: '15:00', endTime: '17:00', hostedBy: 'IA Women in Tech' });
+  assert.equal(e.hostedBy, 'IA Women in Tech');
+  assert.ok(!('hostedBy' in manualEvent({ title: 'Expo', start: '2026-11-07' })), 'left out when not set');
+});
+
 test('a hand-added timed event without endTime fails loudly instead of ending as it starts', () => {
   assert.throws(() => manualEvent({ title: 'Breakfast', start: '2026-11-07', time: '08:00' }), /endTime/);
   assert.equal(manualEvent({ title: 'Expo', start: '2026-11-07' }).allDay, true, 'an all-day event needs neither');

@@ -42,6 +42,11 @@ test('a conference with no host group has no organizer', () => {
   assert.equal(ld.startDate, '2026-10-22');
 });
 
+test('a hand-added event with hostedBy names it as the organizer', () => {
+  const ld = eventJsonLd({ ...base, groupIds: [], venue: 'Source Allies', hostedBy: 'IA Women in Tech' }, byId);
+  assert.deepEqual(ld.organizer, [{ '@type': 'Organization', name: 'IA Women in Tech' }]);
+});
+
 test('toScript keeps </script> in a description from closing the tag', () => {
   assert.ok(!toScript({ d: '</script><b>' }).includes('</script>'));
 });

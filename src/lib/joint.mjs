@@ -54,9 +54,11 @@ function fold(into, e) {
 }
 
 // Who's putting it on, as plain text: "CIJUG + Pyowa", or for an event with
-// no group, "Conference" / "Community event". Every list uses this.
+// no group, its hostedBy: from events.yaml ("IA Women in Tech"), else
+// "Conference" / "Community event". Every list uses this.
 export function hostsLabel(e, byId) {
   return e.groupIds.map((id) => byId[id]?.short).filter(Boolean).join(' + ')
+    || e.hostedBy
     || (e.headliner || e.tags?.includes('conference') ? 'Conference' : 'Community event');
 }
 

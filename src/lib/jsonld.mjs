@@ -72,6 +72,7 @@ export function eventJsonLd(e, byId) {
   };
   if (e.description) ld.description = plainText(e.description).slice(0, 300);
   if (hosts.length) ld.organizer = hosts.map((g) => ({ '@type': 'Organization', name: g.name, url: g.meetupUrl ?? g.website }));
+  else if (e.hostedBy) ld.organizer = [{ '@type': 'Organization', name: e.hostedBy }];
   return ld;
 }
 
