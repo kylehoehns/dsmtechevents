@@ -298,9 +298,13 @@ html.has-hint { scroll-padding-bottom: calc(var(--hint-h, 84px) + 12px); } /* ke
      piece shows first gets none */
   .side > .day-panel { grid-row: 1; margin-top: 0; }
   .lead > .headliners { grid-row: 2; margin-top: 0; }
-  .layout > .minical { grid-row: 3; margin-top: 22px; display: block; }
-  .side > .recent { grid-row: 5; margin-top: 22px; }
-  .layout:not(:has(#headliners:not([hidden]))) > .minical { margin-top: 0; }
+  .side > .recent { grid-row: 3; margin-top: 22px; }
+  .layout:not(:has(#headliners:not([hidden]))) .recent { margin-top: 0; }
+  /* The rail ends long before the list does, so the month stays pinned in
+     view while the list scrolls: it spans the rows to the end (the last is
+     1fr) to have room to slide. Recent events sits above it and scrolls
+     away; the two together are taller than a laptop screen. */
+  .layout > .minical { grid-row: 4 / -1; margin-top: 22px; display: block; position: sticky; top: 16px; }
 }
 
 /* Calendar view. Layout.astro sets data-view before first paint on
