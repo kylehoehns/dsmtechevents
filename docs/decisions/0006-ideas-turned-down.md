@@ -40,6 +40,8 @@ suggested isn't evidence people want it; what reopens one is listed below.
 | A personal bio on /about/ | Felt out of place. | Not planned |
 | A "Usually meets" line on group cards ("Usually 2nd Mondays, evenings, online", worked out from the archive) | Built as a mockup (PR #174) and turned down by the owner. | Not planned |
 | A "may be out of date" banner | The footer's last-updated time covers it; the refresh failing emails the owner. | Not planned |
+| A page per group (`/groups/<id>/`), for search | Weighed 2026-11-11 (#288). There's no description of our own to put on it, only what we'd copy from the group's Meetup page, and a page about one group becomes that group's landing spot in search instead of pointing to it. `/groups/` is the page for "Des Moines Python meetup" style searches: every group's full name, one link out each. | Search Console showing group or topic searches that `/groups/` doesn't answer |
+| Showing a group's full name ("Technology Association of Iowa") only on its first event card | Weighed 2026-11-11 (#293). The owner prefers every card to say who the group is, even when it repeats. | Not planned |
 
 ## Consequences
 
