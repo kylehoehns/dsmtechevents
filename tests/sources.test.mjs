@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import secdsm from '../scripts/sources/secdsm.mjs';
+import secdsm, { nightTitle } from '../scripts/sources/secdsm.mjs';
 import pmiChapter from '../scripts/sources/pmi-chapter.mjs';
 import taiTechbrew from '../scripts/sources/tai-techbrew.mjs';
 import iowansOfThings from '../scripts/sources/iowans-of-things.mjs';
@@ -27,9 +27,18 @@ test('secdsm reads meetings, talks, venue and door time from the homepage', asyn
   assert.match(one.description, /Doors open at 6 PM\./);
   assert.match(one.description, /\*\*7:00 PM · Tokens, Tickets, & Thievery\*\* — Pat Example\nLine one\.\nLine two\./);
 
-  assert.equal(two.title, 'Main talk + 1 more');
+  assert.equal(two.title, 'Main talk & Lightning one');
   assert.equal(tba.title, 'Monthly Security Meetup', 'placeholder talks get a generic title');
   assert.match(tba.description, /schedule pending/i);
+});
+
+test('a SecDSM night with several talks names them, or counts them in words when long', () => {
+  assert.equal(nightTitle([]), 'Monthly Security Meetup');
+  assert.equal(nightTitle(['Everything is a Date']), 'Everything is a Date');
+  assert.equal(nightTitle(['Everything is a Date', 'DIY Flipper Zero']), 'Everything is a Date & DIY Flipper Zero');
+  const long = 'Tokens, Tickets, & Thievery - Authentication Material Theft for Privilege Escalation';
+  assert.equal(nightTitle([long, 'DIY Flipper Zero']), `${long} and 1 more talk`);
+  assert.equal(nightTitle(['A', 'B', 'C']), 'A and 2 more talks');
 });
 
 test('secdsm fails loudly when the page layout changes', async () => {
