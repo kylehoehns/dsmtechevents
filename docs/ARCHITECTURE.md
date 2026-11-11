@@ -57,7 +57,10 @@ flowchart TD
   (`scripts/archive.mjs`), the long-term record.
 - **Refresh.** `.github/workflows/refresh.yml` runs the fetch at 10:20,
   15:20, 19:20 and 23:20 UTC, plus 12:47 and 13:47 as backups for the
-  morning run, which GitHub often drops. It runs `npm run build` and commits
+  morning run, which GitHub often drops. The site's Cloudflare Worker also
+  starts it at the same times (a cron trigger in `wrangler.jsonc` that calls
+  GitHub's API with the `REFRESH_DISPATCH_TOKEN` secret), since Cloudflare's
+  cron fires on time. It runs `npm run build` and commits
   `data/cache/` and `data/archive/` if they changed. It also writes the Des
   Moines date to `data/cache/built-on.txt`, so it commits at least once a
   day. It pushes
@@ -137,6 +140,11 @@ Everything is shown in Des Moines time, wherever the viewer is.
 
 - **Refresh now** instead of waiting for the next scheduled run:
   `gh workflow run refresh.yml`.
+- **The dispatch token.** The Worker's cron needs a fine-grained GitHub
+  token with access to this repo only and Actions: read and write. Set it
+  with `npx wrangler secret put REFRESH_DISPATCH_TOKEN`. If it expires,
+  GitHub's own schedule keeps running, and the Worker's logs show the
+  refused cron runs.
 - **The deploy key.** `main` takes no direct pushes; the refresh workflow is
   the one exception. It pushes event data with a deploy key (secret
   `REFRESH_DEPLOY_KEY`), and the ruleset lets deploy keys bypass it. To

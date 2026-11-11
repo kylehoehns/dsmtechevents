@@ -4,6 +4,7 @@
   // committed to data/cache/. Cloudflare never fetches events itself: the
   // GitHub Action (.github/workflows/refresh.yml, four times a day) does, and its commit
   // is what triggers a deploy. So what is live is always exactly what is in git.
+  // The cron below only tells GitHub when to run it.
   //
   // Dashboard settings (Workers & Pages → dsmtechevents → Settings → Build).
   // The build command stays empty because both wrangler commands run `build`
@@ -30,6 +31,12 @@
   // branch push gets a preview URL. Both are wrangler's defaults; declaring
   // them here silences the deploy warning and keeps them from changing.
   "workers_dev": true,
+  // When to start the event refresh (worker/index.js `scheduled`): the same
+  // UTC times as the schedule in refresh.yml, which stays as the fallback. A
+  // second run that finds nothing new commits nothing.
+  // Only the production Worker runs crons, never a preview. The token it
+  // needs is a Worker secret: `npx wrangler secret put REFRESH_DISPATCH_TOKEN`.
+  "triggers": { "crons": ["20 10,15,19,23 * * *", "5 6 * * 1"] },
   "preview_urls": true,
   // `wrangler preview` (the Previews Base command) refuses to run without
   // this block. Previews don't inherit the bindings below, so they get their

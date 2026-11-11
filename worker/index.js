@@ -94,7 +94,33 @@ async function lumaImage(path) {
   return new Response(res.body, { headers: { ...IMAGE_HEADERS, 'Content-Type': type, 'Cache-Control': `public, max-age=${LUMA_TTL}` } });
 }
 
+// Cloudflare's cron (wrangler.jsonc "triggers") starts the event refresh.
+// GitHub's own schedule drops runs under load, the early-morning one most;
+// Cloudflare's fires on time. The Worker only asks GitHub to run
+// refresh.yml, the same as `gh workflow run refresh.yml`: the fetch and the
+// push stay on GitHub. REFRESH_DISPATCH_TOKEN is a fine-grained token that
+// can only start this repo's workflows (Actions: read and write).
+const REFRESH_DISPATCH = 'https://api.github.com/repos/kylehoehns/dsmtechevents/actions/workflows/refresh.yml/dispatches';
+async function startRefresh(env) {
+  if (!env.REFRESH_DISPATCH_TOKEN) throw new Error('REFRESH_DISPATCH_TOKEN is not set');
+  const res = await fetch(REFRESH_DISPATCH, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.REFRESH_DISPATCH_TOKEN}`,
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'dsmtechevents-worker',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+    body: JSON.stringify({ ref: 'main' }),
+  });
+  // Thrown, so the failure shows in the Worker's logs and cron history.
+  if (!res.ok) throw new Error(`GitHub refused the refresh: ${res.status} ${await res.text()}`);
+}
+
 export default {
+  async scheduled(controller, env) {
+    await startRefresh(env);
+  },
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/api/click') {

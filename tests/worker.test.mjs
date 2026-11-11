@@ -118,3 +118,17 @@ test('the Worker passes a Luma photo through resized and without its cookie', as
   assert.equal((await get('/img/luma/600/uploads/6c/abc.png', 'POST')).status, 405);
   assert.equal(asked.length, 4, 'refused paths never reach Luma');
 });
+
+test('the cron asks GitHub to run the refresh, and says so when GitHub refuses', async (t) => {
+  const calls = [];
+  let status = 204;
+  t.mock.method(globalThis, 'fetch', async (url, init) => { calls.push({ url, init }); return new Response(status === 204 ? null : 'Bad credentials', { status }); });
+  await worker.scheduled({}, { REFRESH_DISPATCH_TOKEN: 'tok' });
+  assert.equal(calls[0].url, 'https://api.github.com/repos/kylehoehns/dsmtechevents/actions/workflows/refresh.yml/dispatches');
+  assert.equal(calls[0].init.method, 'POST');
+  assert.equal(calls[0].init.headers.Authorization, 'Bearer tok');
+  assert.deepEqual(JSON.parse(calls[0].init.body), { ref: 'main' });
+  status = 401;
+  await assert.rejects(worker.scheduled({}, { REFRESH_DISPATCH_TOKEN: 'tok' }), /401 Bad credentials/);
+  await assert.rejects(worker.scheduled({}, {}), /REFRESH_DISPATCH_TOKEN/);
+});
