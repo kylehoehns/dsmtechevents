@@ -93,8 +93,8 @@ const APP_NAMES = { imessage: 'iMessage', slack: 'Slack', teams: 'Teams', discor
 // Pure: the site's own signals, last 30 days. Rows are { key, clicks }:
 // where is clicks by part of the site, misses is search terms that found
 // nothing (already only those seen 3+ times), previews is link previews by
-// app; installs and opens are numbers.
-export function renderSignals({ where, misses, installs, opens, previews }) {
+// app; installs, opens and calendar (page loads that showed the calendar) are numbers.
+export function renderSignals({ where, misses, installs, opens, calendar, previews }) {
   const max = (rows) => Math.max(...rows.map((r) => r.clicks));
   const rows = (list, names) => list.map((r) => [names[r.key] ?? r.key, num(r.clicks), bar(r.clicks, max(list))]);
   return [
@@ -105,6 +105,8 @@ export function renderSignals({ where, misses, installs, opens, previews }) {
     '**Searches that found nothing**, seen 3 or more times (one-offs are left out, so a name typed once never shows):',
     '',
     misses.length ? table(['Search', 'Times'], misses.map((r) => [`\`${r.key}\``, num(r.clicks)])) : '_None._',
+    '',
+    `**Calendar:** shown on ${num(calendar)} page loads. Page views count it as \`/\`, so this is the only count of it.`,
     '',
     `**Installed app:** ${num(installs)} installed, ${num(opens)} times opened.`,
     '',
@@ -229,11 +231,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   // totals use the weights. Points from before the weights count whole.
   const ONE = `SUM(_sample_interval * IF(double1 > 0, double1, 1.0))`;
   // Clicks out are the link kinds; the dataset also holds the site's own
-  // signals (search-miss, install, app-open, preview).
+  // signals (search-miss, install, app-open, calendar, preview).
   const links = (days) => `${since(days)} AND blob1 IN (${Object.keys(KIND_NAMES).map((k) => `'${k}'`).join(', ')})`;
   const prev = `${links(14)} AND timestamp <= NOW() - INTERVAL '7' DAY`;
   const kindIs = (kind) => `${since(30)} AND blob1 = '${kind}'`;
-  const [week, month, kinds, [tw], [tp], [tm], where, misses, [installs], [opens], previews] = await Promise.all([
+  const [week, month, kinds, [tw], [tp], [tm], where, misses, [installs], [opens], [calendar], previews] = await Promise.all([
     query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${links(7)} GROUP BY key`, token),
     query(`SELECT blob2 AS key, SUM(_sample_interval) AS clicks ${links(30)} GROUP BY key`, token),
     query(`SELECT blob1 AS key, ${ONE} AS clicks ${links(30)} GROUP BY key ORDER BY clicks DESC`, token),
@@ -244,6 +246,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     query(`SELECT blob5 AS key, SUM(_sample_interval) AS clicks ${kindIs('search-miss')} GROUP BY key HAVING clicks >= 3 ORDER BY clicks DESC LIMIT 20`, token),
     query(`SELECT 'all' AS key, SUM(_sample_interval) AS clicks ${kindIs('install')}`, token),
     query(`SELECT 'all' AS key, SUM(_sample_interval) AS clicks ${kindIs('app-open')}`, token),
+    query(`SELECT 'all' AS key, SUM(_sample_interval) AS clicks ${kindIs('calendar')}`, token),
     query(`SELECT blob4 AS key, SUM(_sample_interval) AS clicks ${kindIs('preview')} GROUP BY key ORDER BY clicks DESC`, token),
   ]);
   const whole = (rows) => rows.map((r) => ({ ...r, clicks: Math.round(r.clicks) }));
@@ -264,7 +267,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const report = renderHeadline({ week: tWeek, prevWeek: tPrev, month: tMonth, days: tDays, clicks: totals.week, prevClicks: totals.prevWeek })
     + '\n' + renderTraffic({ days: tDays, pages: tPages, referrers, devices: tDevices })
     + '\n' + renderReport({ week, month, kinds: whole(kinds), totals }, groupNames(path.resolve(import.meta.dirname, '..')))
-    + '\n' + renderSignals({ where: whole(where), misses, installs: installs?.clicks ?? 0, opens: opens?.clicks ?? 0, previews });
+    + '\n' + renderSignals({ where: whole(where), misses, installs: installs?.clicks ?? 0, opens: opens?.clicks ?? 0, calendar: calendar?.clicks ?? 0, previews });
   if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, report);
   console.log(report);
 }

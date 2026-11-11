@@ -65,3 +65,17 @@ test('Groups page links count as meetup or website for that group', async ({ pag
   await flyer.locator('[data-click="meetup"]').click();
   await expect.poll(() => sent).toEqual([{ kind: 'meetup', groups: [await flyer.getAttribute('id')], event: '', from: 'groups-page' }]);
 });
+
+test('showing the calendar sends one calendar signal per page load, and the list sends none', async ({ page }) => {
+  const sent = beacons(page);
+  const nav = (name) => page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name, exact: true });
+  await page.goto('/');
+  await nav('Calendar').click();
+  await expect(page.locator('#calendar-view')).toBeVisible();
+  await nav('Events').click();
+  await nav('Calendar').click();
+  await expect.poll(() => sent).toEqual([{ kind: 'calendar' }]);
+  await page.goto('/?view=calendar');
+  await expect.poll(() => sent.length).toBe(2);
+  expect(sent[1]).toEqual({ kind: 'calendar' });
+});

@@ -83,15 +83,16 @@ test('the site signals: where people click, searches that found nothing, the app
   const md = renderSignals({
     where: [{ key: 'this-week', clicks: 20 }, { key: 'search', clicks: 5 }],
     misses: [{ key: 'rust', clicks: 4 }],
-    installs: 2, opens: 9,
+    installs: 2, opens: 9, calendar: 31,
     previews: [{ key: 'slack', clicks: 6 }, { key: 'imessage', clicks: 3 }],
   });
   assert.match(md, /\| This week \| 20 \| ██████████ \|/);
   assert.match(md, /\| Search results \| 5 \|/);
   assert.match(md, /\| `rust` \| 4 \|/);
   assert.match(md, /\*\*Installed app:\*\* 2 installed, 9 times opened\./);
+  assert.match(md, /\*\*Calendar:\*\* shown on 31 page loads\./);
   assert.match(md, /\| Slack \| 6 \|/);
   assert.match(md, /\| iMessage \| 3 \|/);
-  const empty = renderSignals({ where: [], misses: [], installs: 0, opens: 0, previews: [] });
+  const empty = renderSignals({ where: [], misses: [], installs: 0, opens: 0, calendar: 0, previews: [] });
   assert.match(empty, /_None\._/);
 });

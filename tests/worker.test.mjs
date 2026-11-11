@@ -18,6 +18,7 @@ test('a search miss keeps only a short, plain term; nothing else carries one', (
   assert.equal(parseClick('{"kind":"search-miss","term":"a very long sentence someone pasted in"}'), null);
   assert.equal(parseClick('{"kind":"rsvp","term":"rust"}').term, '');
   assert.deepEqual(parseClick('{"kind":"app-open"}'), { kind: 'app-open', groups: [], event: '', from: '', term: '' });
+  assert.deepEqual(parseClick('{"kind":"calendar"}'), { kind: 'calendar', groups: [], event: '', from: '', term: '' });
 });
 
 test('link previews are told apart by the app that drew them; browsers are not previews', () => {
