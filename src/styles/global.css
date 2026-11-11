@@ -644,13 +644,14 @@ mark {
 .snippet pre { margin: 0; padding: 10px; overflow-x: auto; font: var(--fs-meta)/1.45 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
 .add-page > p, .add-page > .col > p { margin: 0; }
 /* Text pages (about, for organizers, status): one 64-character column on a
-   phone. On desktop, the home page's two columns: prose on the left, a side
+   phone. On desktop, the home page's two columns: prose on the left (75ch,
+   the top of the comfortable range, to keep the gutter narrow), a side
    column lined up with the home page's rail. Page order is the phone order;
    the .col wrappers only group pieces for desktop. */
 .cols { max-width: 64ch; grid-template-columns: minmax(0, 1fr); }
 .cols > .col { display: contents; }
 @media (min-width: 1060px) {
-  .cols { max-width: none; grid-template-columns: minmax(0, 64ch) 320px; grid-template-rows: auto 1fr; justify-content: space-between; column-gap: 40px; align-items: start; }
+  .cols { max-width: none; grid-template-columns: minmax(0, 75ch) 320px; grid-template-rows: auto 1fr; justify-content: space-between; column-gap: 40px; align-items: start; }
   .cols > .lede { grid-column: 1; grid-row: 1; }
   .cols > .col { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
   .cols > .col-main { grid-column: 1; grid-row: 2; }
