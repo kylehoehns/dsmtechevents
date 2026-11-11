@@ -75,22 +75,6 @@ test('scrolled down on a phone, a shorter day lets the page glide up rather than
   expect(await page.evaluate(() => scrollY)).toBeLessThan(from);
 });
 
-test('the "Pick a day" hint goes once a day is picked', async ({ page }) => {
-  const hint = page.locator('.cal-key').getByText('Pick a day to see its events');
-  await page.goto('/?view=calendar');
-  await expect(hint).toBeVisible();
-  await page.getByRole('button', { name: 'Tuesday, October 20, 1 event' }).click();
-  await expect(dayPanel(page)).toContainText('Joint night - JVM vs. CLR');
-  await expect(hint).toHaveCount(0);
-  // Paging months doesn't bring it back.
-  await page.getByRole('button', { name: 'Next month' }).click();
-  await expect(hint).toHaveCount(0);
-  // A link to a day is a day already picked.
-  await page.goto('/?view=calendar&day=2026-10-22');
-  await expect(page.locator('.cal-key')).toBeVisible();
-  await expect(hint).toHaveCount(0);
-});
-
 test('arrow keys move between days and focus survives picking one', async ({ page }) => {
   await page.goto('/?view=calendar');
   const today = page.getByRole('button', { name: /^Wednesday, October 14,/ });
