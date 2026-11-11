@@ -513,7 +513,21 @@ function renderMinical() {
 
 // ---- render ----
 let listShown = 0;
+// The calendar is this page with ?view=calendar, which page-view counts
+// can't tell apart from the list, so it sends its own signal: once per page
+// load that shows it (docs/ANALYTICS.md). Layout's beacon may not be set up
+// yet on a page that opens on the calendar, hence the wait for load. The
+// flag lives on the function: render() runs before a let further down the
+// file would exist.
+function countCalendar() {
+  if (countCalendar.done) return;
+  countCalendar.done = true;
+  const send = () => window.dsmBeacon?.({ kind: 'calendar' });
+  if (window.dsmBeacon) send(); else addEventListener('load', send, { once: true });
+}
+
 function render() {
+  if (state.view === 'calendar') countCalendar();
   const viewName = state.view === 'calendar' ? 'Calendar' : '';
   const groupName = state.group ? groups[state.group].short : state.q ? `'${state.q}'` : '';
   document.title = groupName || viewName ? [groupName, viewName, siteName].filter(Boolean).join(' · ') : siteTitle;

@@ -1,7 +1,7 @@
 // The only server-side code: counts outbound clicks (RSVP, details, maps) so
 // organizers can see how many people the site sends their way, plus a few
-// site signals (searches that found nothing, app installs and opens, link
-// previews; docs/ANALYTICS.md), and passes Luma event photos through from
+// site signals (searches that found nothing, app installs and opens,
+// calendar views, link previews; docs/ANALYTICS.md), and passes Luma event photos through from
 // our own domain (see src/lib/luma.mjs). Everything else is static files,
 // served by Cloudflare before this runs (wrangler.jsonc routes only /api/*,
 // /img/luma/* and the share image here).
@@ -13,9 +13,9 @@ import { LUMA_HOST, LUMA_WIDTHS, LUMA_PATH } from '../src/lib/luma.mjs';
 import { startRefresh } from './refresh.js';
 
 // Outbound links, then the page's own signals: a search that found nothing,
-// an app install, an installed app being opened.
+// an app install, an installed app being opened, a page load showing the calendar.
 const LINK_KINDS = ['rsvp', 'title', 'map', 'poster', 'later', 'past', 'meetup', 'website'];
-const KINDS = new Set([...LINK_KINDS, 'search-miss', 'install', 'app-open']);
+const KINDS = new Set([...LINK_KINDS, 'search-miss', 'install', 'app-open', 'calendar']);
 // Which part of the site a link was clicked in (Layout.astro works it out).
 const FROMS = new Set(['this-week', 'next-week', 'later', 'further', 'headliners', 'recent', 'calendar', 'search', 'group-filter', 'groups-page', 'other']);
 const ID = /^[a-z0-9-]{1,120}$/i;

@@ -55,6 +55,9 @@ The same dataset holds a few non-click points, kept out of the click counts:
   aren't recorded. The report lists terms seen 3 or more times in 30 days,
   so one person's one-off never shows. This is the evidence decision 0006
   asks for before topic tags come back.
+- `calendar`: a page load that showed the calendar, opened from a link or
+  switched to (`app.js`, once per load). The calendar is the home page with
+  `?view=calendar`, which page-view counts can't tell from the list.
 - `install` (the browser's `appinstalled`) and `app-open` (a page load in the
   installed app that didn't come from one of its own pages): openings, not
   people.

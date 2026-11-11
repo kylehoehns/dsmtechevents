@@ -30,6 +30,10 @@ export const test = base.extend({
       const response = await route.fetch();
       await route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': csp } });
     });
+    // The site's own signals (a calendar view, docs/ANALYTICS.md) go to the
+    // Worker, which the static test server doesn't have; answer as it would.
+    // clicks.spec.mjs routes it again to read what was sent.
+    await page.route('**/api/click', (route) => route.fulfill({ status: 204 }));
     await page.clock.install({ time: new Date(NOW) });
     await use(page);
     expect(errors, 'console errors on the page').toEqual([]);
