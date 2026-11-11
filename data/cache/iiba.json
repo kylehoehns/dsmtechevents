@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-03T03:57:41.593Z",
+  "fetchedAt": "2026-11-11T13:17:09.688Z",
   "logo": "https://clubrunner.blob.core.windows.net/00000400579/Favicon/macIcon.png",
   "events": [
     {
@@ -38,6 +38,19 @@
       "venue": "Great Hall, Memorial Union",
       "address": "2229 Lincoln Way, Ames, IA",
       "added": "2026-11-02T20:25:04.858Z"
+    },
+    {
+      "id": "iiba-7a892404-50dc-4573-82e8-367258d4178c",
+      "sourceId": "7a892404-50dc-4573-82e8-367258d4178c",
+      "title": "Professional Development Day 2027",
+      "start": "2027-04-30T12:30:00.000Z",
+      "end": "2027-04-30T21:30:00.000Z",
+      "allDay": false,
+      "url": "https://centraliowa.iiba.org/events/professional-development-day-2027/",
+      "description": "In today’s fast-paced business environment, project success requires far more than rigid frameworks and static plans. Rapid technological advancements, shifting organizational priorities, and evolving market demands mean that Business Analysts, Project Managers, and Product Leaders must excel in environments where the only constant is change.\n\n\"Navigating Ambiguity: Delivering in Times of Constant Change\" is Central Iowa’s premier joint professional development conference brought to you by the IIBA Central Iowa and PMI Central Iowa chapters.\n\nThis full-day event brings together regional practitioners, executives, and industry pioneers to move beyond surface-level buzzwords. You will gain actionable frameworks, real-world case studies, and practical tools to lead through uncertainty, harness emerging technologies, and consistently deliver high-value outcomes for your organization.\n\nConference Tracks\n\nOur session line-up is structured around three core tracks designed to deliver immediate, cross-functional value for Business Analysts, Project Managers, Agile Coaches, and Technology Leaders:\n\nStrategic Leadership & Adaptability\n\nNavigating ambiguity at the organizational level. Focuses on executive alignment, managing shifting priorities, driving strategic outcomes, and leading teams through change when direction is fluid.\n\nAI & Tech-Driven Delivery in Flux\n\nHarnessing innovation amidst constant technological shift. Explores practical applications of generative AI, predictive analytics, and automated workflows in requirements elicitation, risk forecasting, and project delivery.\n\nDynamic Execution & Delivering Value\n\nAdapting execution when traditional frameworks fall short. Covers hybrid delivery models (Agile/Waterfall), continuous backlog refinement, rapid prototyping, and de-risking high-ambiguity initiatives.",
+      "venue": "Hilton Garden Inn",
+      "address": "205 South 64th Street, West Des Moines, IA",
+      "added": "2026-11-11T13:17:09.688Z"
     }
   ]
 }

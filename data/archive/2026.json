@@ -1141,5 +1141,27 @@
   "going": 14,
   "url": "https://www.meetup.com/des-moines-web-geeks/events/312416829/",
   "description": "What a Grasshopper Taught Me About Listening to Customers Monday, November 9th | 6:30–8:00 PM | Source Allies We all say we listen to customers. But how often do we stop to question whether what we think we know is actually true? When teams move quickly, assumptions can start sounding a lot like facts. Those assumptions can influence everything from product decisions to customer experience and business strategy. At our November DSM Web Geeks meetup, Clair Williams-Vavra will share an unexpected lesson from building a food startup that changed how she approaches customer experience. It started"
+ },
+ {
+  "id": "cijug-317160798",
+  "group": "cijug",
+  "title": "Nobody Reads the Bytecode",
+  "start": "2026-11-10T23:30:00.000Z",
+  "end": "2026-11-11T01:00:00.000Z",
+  "venue": "Lean Techniques, Inc.",
+  "going": 20,
+  "url": "https://www.meetup.com/central-iowa-java-users-group/events/317160798/",
+  "description": "AI agents are capable of writing more code than ever, but are our development practices keeping up? As AI takes on more of the coding work, traditional approaches to code review and quality assurance can become bottlenecks. Developers are left trying to understand every line of AI-generated code while also wondering what this shift means for their own skills and responsibilities. At our November CIJUG meetup, Tim Gifford, Chief Innovation Officer at Lean TECHniques, will challenge the assumption that developers need to personally read and understand every line of code before it ships. Tim"
+ },
+ {
+  "id": "aws-316911568",
+  "group": "aws",
+  "title": "Pre RE:Invent Virtual Get Together",
+  "start": "2026-11-11T00:00:00.000Z",
+  "end": "2026-11-11T01:00:00.000Z",
+  "online": true,
+  "going": 6,
+  "url": "https://www.meetup.com/aws-user-group-des-moines/events/316911568/",
+  "description": "Let's get together virtually before Re: Invent. Is anyone going who wants to meet up there? Are there specific sessions you are excited about?"
  }
 ]
