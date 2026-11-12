@@ -21,17 +21,17 @@ export function toText(html = '') {
 
 // A link in a write-up as Markdown, which the cards turn back into a link
 // (formatDescription): [Eventbrite](https://…). Only web addresses: a
-// mailto: or javascript: link keeps just its text. A link whose text is a web
-// address stays that bare address (the cards link those too), even when the
-// href is a redirect around it, like LinkedIn's "leaving LinkedIn" page
-// wrapping a lnkd.in link the author wrote. One with no text (an image
-// button) is dropped, as before. Brackets in the text, and ")" or spaces in
-// the address, would end the Markdown early, so they go.
+// mailto: or javascript: link keeps just its text. The link goes exactly
+// where the group's page points it, redirect or not: we never swap in a
+// different address. A link whose text is its own address stays a bare URL
+// (the cards link those too). One with no text (an image button) is
+// dropped, as before. Brackets in the text, and ")" or spaces in the
+// address, would end the Markdown early, so they go.
 function linkToMarkdown(_, href, inner) {
   const text = toText(inner).replace(/[[\]]/g, '').replace(/\s+/g, ' ').trim();
   const url = httpUrl(decode(href))?.replace(/\)/g, '%29').replace(/\s/g, '%20');
-  if (!text || !url || (httpUrl(text) && !/\s/.test(text))) return text;
-  return `[${text}](${url})`;
+  if (!text || !url) return text;
+  return text === url ? url : `[${text}](${url})`;
 }
 
 // An event write-up from a site's rich-text editor, as the description text

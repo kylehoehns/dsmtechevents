@@ -82,7 +82,7 @@ test('pmi-chapter reads the full write-up, minus the date the card already shows
 test('a write-up keeps its links as [text](url) for the cards to link', () => {
   assert.equal(richText('<p>Register on <a href="https://us.list-manage.com/x?e=1&amp;c=2" target="_blank">Eventbrite</a>.</p>'), 'Register on [Eventbrite](https://us.list-manage.com/x?e=1&c=2).');
   assert.equal(richText('<a href="https://ex.com/a">https://ex.com/a</a>'), 'https://ex.com/a', 'a link that is its own address stays bare');
-  assert.equal(richText('<a href="https://www.linkedin.com/safety/go/?url=https%3A%2F%2Flnkd%2Ein%2Fg">https://lnkd.in/g</a>'), 'https://lnkd.in/g', 'the address the author wrote, not a redirect around it');
+  assert.equal(richText('<a href="https://www.linkedin.com/safety/go/?url=https%3A%2F%2Flnkd%2Ein%2Fg">https://lnkd.in/g</a>'), '[https://lnkd.in/g](https://www.linkedin.com/safety/go/?url=https%3A%2F%2Flnkd%2Ein%2Fg)', 'the link goes where the page points it, never rewritten');
   assert.equal(richText('Email <a href="mailto:a@b.org">us</a>'), 'Email us', 'not a web address: just the text');
   assert.equal(richText('<a href="javascript:alert(1)">click</a>'), 'click');
   assert.equal(richText('<a href="https://ex.com"><img src="x.png"></a>Next'), 'Next', 'an image-only link goes, as images do');
