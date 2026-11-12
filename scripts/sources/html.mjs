@@ -19,11 +19,27 @@ export function toText(html = '') {
   return decode(html.replace(/<br\s*\/?>\n?/gi, '\n').replace(/<[^>]+>/g, '')).replace(/[ \t]+/g, ' ').replace(/\n\s*\n\s*/g, '\n\n').trim();
 }
 
+// A link in a write-up as Markdown, which the cards turn back into a link
+// (formatDescription): [Eventbrite](https://…). Only web addresses: a
+// mailto: or javascript: link keeps just its text. The link goes exactly
+// where the group's page points it, redirect or not: we never swap in a
+// different address. A link whose text is its own address stays a bare URL
+// (the cards link those too). One with no text (an image button) is
+// dropped, as before. Brackets in the text, and ")" or spaces in the
+// address, would end the Markdown early, so they go.
+function linkToMarkdown(_, href, inner) {
+  const text = toText(inner).replace(/[[\]]/g, '').replace(/\s+/g, ' ').trim();
+  const url = httpUrl(decode(href))?.replace(/\)/g, '%29').replace(/\s/g, '%20');
+  if (!text || !url) return text;
+  return text === url ? url : `[${text}](${url})`;
+}
+
 // An event write-up from a site's rich-text editor, as the description text
 // the cards format: paragraphs split by blank lines, <strong> as **bold**,
-// images dropped (the card has its own photo slot).
+// links as [text](url), images dropped (the card has its own photo slot).
 export function richText(html = '') {
   return toText(html
+    .replace(/<a\b[^>]*?\bhref="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, linkToMarkdown)
     .replace(/<img[^>]*>/gi, '')
     .replace(/<br[^>]*>/gi, '<br>') // toText only breaks lines at a bare <br>; editors add styles
     .replace(/<(strong|b)>([^<]*\S[^<]*)<\/\1>/gi, '**$2**')

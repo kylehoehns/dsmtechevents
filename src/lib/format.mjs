@@ -195,9 +195,10 @@ export function formatDescription(text = '') {
 }
 
 // A description as one line of plain text: no Markdown **bold**, *italic*,
-// ## heading or backslash-escape marks. For the search's excerpts and the
-// structured data.
-export const plainText = (text) => text.replace(/\*{2,}|^[ \t]*#{1,6}[ \t]+/gm, '').replace(ITALIC, '$1$2')
+// ## heading, [link](url) or backslash-escape marks (a link keeps its text).
+// For the search's excerpts and the structured data.
+export const plainText = (text) => text.replace(/!?\[([^\]]*)\]\(https?:\/\/[^)\s]*\)/g, '$1')
+  .replace(/\*{2,}|^[ \t]*#{1,6}[ \t]+/gm, '').replace(ITALIC, '$1$2')
   .replace(ESCAPE, '$1').replace(/\s+/g, ' ').trim();
 
 // The talk lineup in a description, when it has one: SecDSM lists its talks
