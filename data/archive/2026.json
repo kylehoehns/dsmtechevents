@@ -701,7 +701,7 @@
   "venue": "Source Allies",
   "going": 21,
   "url": "https://www.meetup.com/producttank-des-moines-ames/events/315588233/",
-  "description": "What if the PM’s job isn’t to write — it’s to ask the right questions? In this session, we explore how one team is using AI not to automate product management, but to make it sharper. Come for a demonstration of the tooling Jon Harcey uses every day to build production products. Attendees will leave with: a new frame for AI as a thinking partner (not a replacement), practical guidance on enterprise-safe AI infrastructure, and a workflow they can adapt for their own team immediately. Thanks to our sponsor: [Source Allies](https://www.sourceallies.com/) 4:30 - 5:00 Networking 5:00 - 6:00"
+  "description": "What if the PM’s job isn’t to write — it’s to ask the right questions? In this session, we explore how one team is using AI not to automate product management, but to make it sharper. Come for a demonstration of the tooling Jon Harcey uses every day to build production products. Attendees will leave with: a new frame for AI as a thinking partner (not a replacement), practical guidance on enterprise-safe AI infrastructure, and a workflow they can adapt for their own team immediately. Thanks to our sponsor: Source Allies 4:30 - 5:00 Networking 5:00 - 6:00 Presentation"
  },
  {
   "id": "dsmai-311239023",
@@ -788,7 +788,7 @@
   "venue": "Source Allies",
   "going": 5,
   "url": "https://www.meetup.com/des-moines-mobile-developers/events/316098796/",
-  "description": "Join us for an exciting DM Mobile Engineering Meetup at Source Allies! Calling all mobile enthusiasts, professionals, students, and software engineers to come together for our next meetup on Sep 9, 2026, from 5:30 to 7 PM - [4501 NW Urbandale Dr, Urbandale, IA 50322](https://maps.app.goo.gl/LCSWNL5jHCJeuvTP6)[.](https://maps.app.goo.gl/Hsy1GwdkiHFf1pL39) Whether you're a seasoned professional or just starting your journey in iOS or Android development, this event promises insightful discussions and opportunities to connect with like-minded individuals. Topic * From Code to Pixel: How Mobile"
+  "description": "Join us for an exciting DM Mobile Engineering Meetup at Source Allies! Calling all mobile enthusiasts, professionals, students, and software engineers to come together for our next meetup on Sep 9, 2026, from 5:30 to 7 PM - 4501 NW Urbandale Dr, Urbandale, IA 50322. Whether you're a seasoned professional or just starting your journey in iOS or Android development, this event promises insightful discussions and opportunities to connect with like-minded individuals. Topic * From Code to Pixel: How Mobile Frameworks Actually Render UI Speaker * Mahmoud Eraqi Why Attend? * Networking: Connect"
  },
  {
   "id": "techbrew-techbrew-september-2026",
@@ -959,7 +959,7 @@
   "venue": "Corteva Carver Research Center",
   "going": 26,
   "url": "https://www.meetup.com/analytics-leadership-forum-iowa/events/316515631/",
-  "description": "Agentic AI is shifting how we work and redefining our roles. Agents are moving from answering questions to understanding, reasoning, and acting alongside people. As intelligence becomes abundant, the new leadership questions are: how can you uniquely and durably unlock value with AI, and build reliable agentic systems at scale? [Sagar Murthy](https://www.linkedin.com/in/sagar-murthy-13064a8/), AI GTM & Strategic Partnerships with AWS will unpack the state of agentic AI, the emerging patterns, and real production deployment outcomes. You will leave with a practical framework to take your"
+  "description": "Agentic AI is shifting how we work and redefining our roles. Agents are moving from answering questions to understanding, reasoning, and acting alongside people. As intelligence becomes abundant, the new leadership questions are: how can you uniquely and durably unlock value with AI, and build reliable agentic systems at scale? Sagar Murthy, AI GTM & Strategic Partnerships with AWS will unpack the state of agentic AI, the emerging patterns, and real production deployment outcomes. You will leave with a practical framework to take your agentic systems from pilot to production, with trusted"
  },
  {
   "id": "webgeeks-312416826",
@@ -1002,7 +1002,7 @@
   "venue": "Community Choice Credit Union Convention Center",
   "going": 6,
   "url": "https://www.meetup.com/des-moines-data-analytics/events/316389479/",
-  "description": "This event is hosted by Iowa State University and is not affiliated with the Des Moines Data & Analytics Community group. This event does includes a cost. You must register with ISU to attend. [ISU Event Details](https://www.ivybusiness.iastate.edu/business-analytics-symposium/) This year’s event will focus on leading change with business analytics. Through real-world case studies and practitioner insights, speakers will share how organizations move from insight to action, from analysis to implementation, and from data-informed thinking to measurable business results."
+  "description": "This event is hosted by Iowa State University and is not affiliated with the Des Moines Data & Analytics Community group. This event does includes a cost. You must register with ISU to attend. ISU Event Details This year’s event will focus on leading change with business analytics. Through real-world case studies and practitioner insights, speakers will share how organizations move from insight to action, from analysis to implementation, and from data-informed thinking to measurable business results."
  },
  {
   "id": "luma-04xz1l03",
@@ -1087,7 +1087,7 @@
   "online": true,
   "going": 62,
   "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/317148547/",
-  "description": "Cross-posting! We are joining with AgileBoston for this one! Please note, Zoom link not included. Please go [here](https://us06web.zoom.us/meeting/register/tJMqcu2qqz8iEt0zlAlKvvtnCxZrRug3-UB1#/registration) to register in advance. How I use AI to remember what my human brain can't, and show up as a better practitioner. Most of us have tried an AI chat and received a decent answer. Far fewer have built it into how we work. I'll show what that looks like in practice: a personal knowledge system that turns meeting transcripts into decisions and action items, remembers what each stakeholder"
+  "description": "Cross-posting! We are joining with AgileBoston for this one! Please note, Zoom link not included. Please go here to register in advance. How I use AI to remember what my human brain can't, and show up as a better practitioner. Most of us have tried an AI chat and received a decent answer. Far fewer have built it into how we work. I'll show what that looks like in practice: a personal knowledge system that turns meeting transcripts into decisions and action items, remembers what each stakeholder cares about, and preps me for the next conversation before I walk in. What surprised me was how"
  },
  {
   "id": "devopsdsm-316781004",
