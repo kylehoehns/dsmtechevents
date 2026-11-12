@@ -9,7 +9,7 @@ import iibaChapter from '../scripts/sources/iiba-chapter.mjs';
 import issaChapter from '../scripts/sources/issa-chapter.mjs';
 import eventbrite from '../scripts/sources/eventbrite.mjs';
 import readLuma, { mirrorText } from '../scripts/sources/luma.mjs';
-import { decode, toText, httpUrl, safeLinks, checkTimes } from '../scripts/sources/html.mjs';
+import { decode, toText, richText, httpUrl, safeLinks, checkTimes } from '../scripts/sources/html.mjs';
 
 const fixture = (f) => fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
 const serve = (body) => ({ get: async () => body });
@@ -77,6 +77,16 @@ test('pmi-chapter reads the full write-up, minus the date the card already shows
   assert.match(description, /\n\n\*\*Speaker Bio\*\*\n\nAngie Weller is a product/);
   assert.match(description, /leadership at the core\.$/);
   assert.doesNotMatch(description, /Date:|<|Register/);
+});
+
+test('a write-up keeps its links as [text](url) for the cards to link', () => {
+  assert.equal(richText('<p>Register on <a href="https://us.list-manage.com/x?e=1&amp;c=2" target="_blank">Eventbrite</a>.</p>'), 'Register on [Eventbrite](https://us.list-manage.com/x?e=1&c=2).');
+  assert.equal(richText('<a href="https://ex.com/a">https://ex.com/a</a>'), 'https://ex.com/a', 'a link that is its own address stays bare');
+  assert.equal(richText('<a href="https://www.linkedin.com/safety/go/?url=https%3A%2F%2Flnkd%2Ein%2Fg">https://lnkd.in/g</a>'), 'https://lnkd.in/g', 'the address the author wrote, not a redirect around it');
+  assert.equal(richText('Email <a href="mailto:a@b.org">us</a>'), 'Email us', 'not a web address: just the text');
+  assert.equal(richText('<a href="javascript:alert(1)">click</a>'), 'click');
+  assert.equal(richText('<a href="https://ex.com"><img src="x.png"></a>Next'), 'Next', 'an image-only link goes, as images do');
+  assert.equal(richText('<a href="https://ex.com/a_(b) c">[Map]</a>'), '[Map](https://ex.com/a_(b%29%20c)');
 });
 
 test('pmi-chapter allows an empty Location box', async () => {
@@ -200,6 +210,7 @@ test('issa-chapter reads each listed meeting page, skipping posts with no date y
   });
   assert.match(description, /^\*\*Presenting:\*\* Lucy Berry & Kaylee Fletcher \(DEFCON Talk\)/);
   assert.match(description, /\n\nWhat:\s+Free lunch/);
+  assert.match(description, /\n\nRegister here: \[Eventbrite\]\(https:\/\/www\.eventbrite\.com\/e\/issa-september-meeting-tickets-1999633196720\?aff=oddtdtcreator&x=1\)$/, 'a link in the write-up is kept');
   assert.doesNotMatch(description, /Where:|-->|September 29/, 'no venue line repeated, nothing from the commented-out markup');
   assert.deepEqual([april.venue, april.address], ['Apex Systems', null], 'a place with no street is a name alone');
 });

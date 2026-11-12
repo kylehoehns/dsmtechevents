@@ -19,11 +19,27 @@ export function toText(html = '') {
   return decode(html.replace(/<br\s*\/?>\n?/gi, '\n').replace(/<[^>]+>/g, '')).replace(/[ \t]+/g, ' ').replace(/\n\s*\n\s*/g, '\n\n').trim();
 }
 
+// A link in a write-up as Markdown, which the cards turn back into a link
+// (formatDescription): [Eventbrite](https://…). Only web addresses: a
+// mailto: or javascript: link keeps just its text. A link whose text is a web
+// address stays that bare address (the cards link those too), even when the
+// href is a redirect around it, like LinkedIn's "leaving LinkedIn" page
+// wrapping a lnkd.in link the author wrote. One with no text (an image
+// button) is dropped, as before. Brackets in the text, and ")" or spaces in
+// the address, would end the Markdown early, so they go.
+function linkToMarkdown(_, href, inner) {
+  const text = toText(inner).replace(/[[\]]/g, '').replace(/\s+/g, ' ').trim();
+  const url = httpUrl(decode(href))?.replace(/\)/g, '%29').replace(/\s/g, '%20');
+  if (!text || !url || (httpUrl(text) && !/\s/.test(text))) return text;
+  return `[${text}](${url})`;
+}
+
 // An event write-up from a site's rich-text editor, as the description text
 // the cards format: paragraphs split by blank lines, <strong> as **bold**,
-// images dropped (the card has its own photo slot).
+// links as [text](url), images dropped (the card has its own photo slot).
 export function richText(html = '') {
   return toText(html
+    .replace(/<a\b[^>]*?\bhref="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, linkToMarkdown)
     .replace(/<img[^>]*>/gi, '')
     .replace(/<br[^>]*>/gi, '<br>') // toText only breaks lines at a bare <br>; editors add styles
     .replace(/<(strong|b)>([^<]*\S[^<]*)<\/\1>/gi, '**$2**')

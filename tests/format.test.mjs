@@ -261,6 +261,10 @@ test('formatDescription drops Meetup\'s backslash escapes and renders *italics*'
   assert.equal(formatDescription('Pizza \\& \\<b\\>'), '<p>Pizza &amp; &lt;b&gt;</p>', 'still escaped as HTML');
 });
 
+test('plainText keeps a link\'s text and drops its address', () => {
+  assert.equal(plainText('Register on [Eventbrite](https://ex.com/e?x=1). See ![logo](https://ex.com/l.png) too.'), 'Register on Eventbrite. See logo too.');
+});
+
 test('plainText drops backslash escapes and *italic* marks', () => {
   assert.equal(plainText('*Monday\\, Nov 9 \\| Source Allies* and **bold**'), 'Monday, Nov 9 | Source Allies and bold');
 });
