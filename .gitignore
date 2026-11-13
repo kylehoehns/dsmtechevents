@@ -19,3 +19,6 @@ prev/
 *.tfstate
 *.tfstate.*
 .terraform.tfstate.lock.info
+
+# Written by the refresh workflow for the Discord sync
+discord-events.json

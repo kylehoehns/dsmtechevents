@@ -12,7 +12,8 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 
 ## What it builds
 
-- **Start Here** (read-only): `#rules`, `#announcements`. `#rules` holds one message posted by the bot from `rules.md`; edit that file and apply to change it (the message is edited in place, with no new post or ping).
+- **Start Here** (read-only): `#rules`, `#announcements`, `#events`.
+  - `#events` is a forum with one post per upcoming event on dsmtechevents.com, which members reply in but can't start. `scripts/discord-events.mjs` makes and edits the posts after each refresh (the `discord-events` job in `refresh.yml`; `docs/decisions/0007`), so they're never edited by hand. `#rules` holds one message posted by the bot from `rules.md`; edit that file and apply to change it (the message is edited in place, with no new post or ping).
 - **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell` (forum), `#off-topic`
 - **Organizers** (hidden; every organizer role can see it): `#organizers`, one room for the organizers of all groups. It holds a pinned guide posted by the bot from `organizers.md`, edited in place like the rules.
 - **Admins** (hidden): `#mod-updates`
@@ -63,6 +64,7 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 
   - Tags: 💼 `Hiring` and 👀 `Looking`, with "Require people to select tags when posting" on, so every post has one.
   - List layout, sorted by newest post, and a 1-hour slowmode on new posts: enough to stop a flood, while a recruiter with a few roles can still post them all in a day.
+- Set up the `#events` forum: post guidelines "One post per event on dsmtechevents.com, kept up to date automatically. Reply to say you're going, find a ride, or share slides afterwards. RSVP on the group's page, linked in each post.", a 🙋 default reaction, and list layout.
 - Set up the `#show-and-tell` forum's post guidelines the same way:
 
     > One post per project, talk or write-up. Say what it is, add a link, and say what feedback you'd like.
