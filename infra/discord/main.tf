@@ -34,9 +34,9 @@ locals {
 
 # What an organizer can do inside their own group's section, and nowhere else:
 # moderate it and ping their members. Not granted:
-# - Manage Channels: channels change through this repo. A channel deleted by
-#   hand loses its history, and the provider then fails every plan until the
-#   state is repaired.
+# - Manage Channels on the two channels this config makes: one deleted by hand
+#   loses its history, and the provider then fails every plan until the state
+#   is repaired. (They do get it on the category, below, to add their own.)
 # - Manage Permissions (they could widen their own access) and Manage Webhooks.
 # - Events: Discord's own event listings would be a second calendar beside
 #   each group's page, and the permission only works on voice channels anyway.
@@ -58,6 +58,23 @@ data "discord_permission" "read_only" {
 
 # The organizer's permissions plus posting, for their read-only announcements
 # channel. allow_extends builds on the bits above rather than adding numbers.
+# On the group's category: the above, plus Manage Channels so organizers can
+# add channels of their own. Channels they add copy the category's
+# permissions, so they can rename and delete those. Discord ties creating
+# channels in a category to managing the category, so this also lets them
+# rename or delete the category itself (behind a typed confirmation; the
+# README has the recovery).
+data "discord_permission" "organizer_category" {
+  allow_extends   = data.discord_permission.organizer.allow_bits
+  manage_channels = "allow"
+}
+
+# Denied on the channels this config makes, so organizers can't rename or
+# delete them. A channel's own overwrite wins over its category's.
+data "discord_permission" "no_manage_channels" {
+  manage_channels = "deny"
+}
+
 data "discord_permission" "organizer_post" {
   allow_extends = data.discord_permission.organizer.allow_bits
   send_messages = "allow"

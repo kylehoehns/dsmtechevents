@@ -38,7 +38,7 @@ resource "discord_channel_permission" "group_organizer" {
   channel_id   = discord_category_channel.group[each.key].id
   type         = "role"
   overwrite_id = discord_role.organizer[each.key].id
-  allow        = data.discord_permission.organizer.allow_bits
+  allow        = data.discord_permission.organizer_category.allow_bits
 }
 
 resource "discord_text_channel" "group_chat" {
@@ -53,9 +53,19 @@ resource "discord_text_channel" "group_chat" {
     # Last, so no punctuation runs into the link.
     try("Meetups: ${coalesce(try(each.value.meetup, null), try(each.value.website, null), try(each.value.eventbrite, null))}", null),
   ]))
-  position                 = local.channel_position.group_first + 2 * index(local.group_ids, each.key) + 1
-  sync_perms_with_category = true
-  depends_on               = [discord_channel_permission.group_organizer]
+  position = local.channel_position.group_first + 2 * index(local.group_ids, each.key) + 1
+  # Its own permissions, not the category's: organizers moderate it but
+  # can't rename or delete it (group_chat_organizer).
+  sync_perms_with_category = false
+}
+
+resource "discord_channel_permission" "group_chat_organizer" {
+  for_each     = local.groups
+  channel_id   = discord_text_channel.group_chat[each.key].id
+  type         = "role"
+  overwrite_id = discord_role.organizer[each.key].id
+  allow        = data.discord_permission.organizer.allow_bits
+  deny         = data.discord_permission.no_manage_channels.deny_bits
 }
 
 # Organizers post; members read. Not synced with the category, so it carries
@@ -84,6 +94,7 @@ resource "discord_channel_permission" "group_announcements_organizer" {
   type         = "role"
   overwrite_id = discord_role.organizer[each.key].id
   allow        = data.discord_permission.organizer_post.allow_bits
+  deny         = data.discord_permission.no_manage_channels.deny_bits
 }
 
 # One room for every group's organizers. Hidden from everyone else; each
