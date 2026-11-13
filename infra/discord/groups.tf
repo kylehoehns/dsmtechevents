@@ -50,7 +50,7 @@ resource "discord_text_channel" "group_chat" {
     "${each.value.name}.",
     try("Meetups: ${coalesce(try(each.value.meetup, null), try(each.value.website, null), try(each.value.eventbrite, null))}", null),
   ]))
-  position                 = 1
+  position                 = local.channel_position.group_first + 2 * index(local.group_ids, each.key) + 1
   sync_perms_with_category = true
   depends_on               = [discord_channel_permission.group_organizer]
 }
@@ -63,7 +63,7 @@ resource "discord_news_channel" "group_announcements" {
   category                 = discord_category_channel.group[each.key].id
   name                     = "${each.key}-announcements"
   topic                    = "News from ${each.value.short} organizers."
-  position                 = 0
+  position                 = local.channel_position.group_first + 2 * index(local.group_ids, each.key)
   sync_perms_with_category = false
 }
 
@@ -111,7 +111,7 @@ resource "discord_text_channel" "organizers" {
   category                 = discord_category_channel.organizers.id
   name                     = "organizers"
   topic                    = "A place for organizers of every group to talk with each other."
-  position                 = 0
+  position                 = local.channel_position.organizers
   sync_perms_with_category = true
   depends_on = [
     discord_channel_permission.organizers_hidden,

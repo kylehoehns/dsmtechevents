@@ -21,7 +21,7 @@ resource "discord_text_channel" "rules" {
   category                 = discord_category_channel.start_here.id
   name                     = "rules"
   topic                    = "How we treat each other here."
-  position                 = 0
+  position                 = local.channel_position.rules
   sync_perms_with_category = true
   depends_on               = [discord_channel_permission.start_here_read_only]
 }
@@ -31,7 +31,7 @@ resource "discord_news_channel" "announcements" {
   category                 = discord_category_channel.start_here.id
   name                     = "announcements"
   topic                    = "Server-wide news."
-  position                 = 1
+  position                 = local.channel_position.announcements
   sync_perms_with_category = true
   depends_on               = [discord_channel_permission.start_here_read_only]
 }
@@ -48,7 +48,7 @@ resource "discord_text_channel" "general" {
   category                 = discord_category_channel.community.id
   name                     = "general"
   topic                    = "Anything about tech in Des Moines: code, product, data, design, business, careers."
-  position                 = 0
+  position                 = local.channel_position.general
   sync_perms_with_category = true
 }
 
@@ -57,7 +57,7 @@ resource "discord_text_channel" "introductions" {
   category                 = discord_category_channel.community.id
   name                     = "introductions"
   topic                    = "Say hi: what you do and which groups you're in."
-  position                 = 1
+  position                 = local.channel_position.introductions
   sync_perms_with_category = true
 }
 
@@ -65,7 +65,7 @@ resource "discord_forum_channel" "jobs" {
   server_id                = var.server_id
   category                 = discord_category_channel.community.id
   name                     = "jobs"
-  position                 = 2
+  position                 = local.channel_position.jobs
   sync_perms_with_category = true
   # The post guidelines and tags are set by hand (see the README): provider
   # 2.7 accepts `topic` on a forum but never sends it to Discord.
@@ -76,7 +76,7 @@ resource "discord_text_channel" "show_and_tell" {
   category                 = discord_category_channel.community.id
   name                     = "show-and-tell"
   topic                    = "Things you built, wrote or spoke about."
-  position                 = 3
+  position                 = local.channel_position.show_and_tell
   sync_perms_with_category = true
 }
 
@@ -85,7 +85,7 @@ resource "discord_text_channel" "off_topic" {
   category                 = discord_category_channel.community.id
   name                     = "off-topic"
   topic                    = "Everything that isn't work: pets, food, games, weekend plans."
-  position                 = 4
+  position                 = local.channel_position.off_topic
   sync_perms_with_category = true
 }
 
@@ -121,7 +121,7 @@ resource "discord_text_channel" "mod_updates" {
   category                 = discord_category_channel.admins.id
   name                     = "mod-updates"
   topic                    = "Discord's Community notices, and admin chat."
-  position                 = 0
+  position                 = local.channel_position.mod_updates
   sync_perms_with_category = true
   depends_on               = [discord_channel_permission.admins_hidden]
 }
