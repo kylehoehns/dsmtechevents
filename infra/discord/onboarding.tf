@@ -1,4 +1,6 @@
 locals {
+  group_by_member_role = { for id, r in discord_role.member : r.id => id }
+
   # Every member sees these. Discord asks for at least 7, 5 of them chattable
   # (the #jobs forum counts). This is exactly 7 and 5: removing any one fails.
   default_channel_ids = [
@@ -39,8 +41,14 @@ resource "discord_server_onboarding" "this" {
     required      = false
     in_onboarding = true
 
+    # In the order groups were added, not groups.yaml order. The provider keeps
+    # each answer's Discord ID by its place in this list, and members' picks
+    # are saved by that ID, so an answer inserted mid-list would take over
+    # another group's ID. Discord IDs grow over time (all 19 digits for
+    # years yet, so they sort as strings), so sorting by the member role's ID
+    # puts a new group last.
     dynamic "option" {
-      for_each = local.group_ids
+      for_each = [for id in sort([for r in discord_role.member : r.id]) : local.group_by_member_role[id]]
       content {
         title       = local.groups[option.value].short
         description = local.groups[option.value].name
