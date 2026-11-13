@@ -30,7 +30,9 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 ## Still done by hand
 
 - Turn on Community mode, choosing `#rules` as the rules channel and `#mod-updates` as the updates channel (Server Settings > Enable Community). See "First run" below for when.
-- Name the server **Des Moines Tech** and give it the site's icon (`public/icons/icon-512.png`) in Server Settings > Overview. The provider could only set these by owning the server's other settings too.
+- Name the server **Des Moines Tech**, give it the site's icon (`public/icons/icon-512.png`) and this description, in Server Settings > Overview (or once through the API). The provider could only set these by owning the server's other settings too.
+
+    > Des Moines tech between meetups: developers, designers, PMs, recruiters and students in central Iowa.
 - Write the Server Guide (Server Settings > Onboarding > Server Guide):
   - Welcome message: two sentences, ending with the Channels & Roles line under "Joining and leaving groups".
   - New member to-dos: read `#rules`, say hi in `#introductions`, pick your groups in Channels & Roles.
@@ -43,24 +45,29 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
     - Suspected spam content: block.
     - Commonly flagged words: slurs and sexual content on, profanity off.
     - Custom keywords, block and alert: `discord.gg/*`, `discord.com/invite/*`, `free nitro`, `steam gift`, `airdrop`, `seed phrase`.
+    - "No @everyone or @here": custom keywords `@everyone` and `@here`, block with the message "Pings to the whole server aren't allowed. Organizers: ping your group's member role instead." and alert. Organizers can mention everyone inside their section (see their role above), so this stops a slip from pinging the whole server.
   - Require 2FA for moderation, once the account that owns the bot has 2FA on; without it, applies can start failing.
 - Bot (Developer Portal > Bot): turn Public Bot off, and leave every privileged intent off. OpenTofu only calls Discord's REST API and needs none.
-- Set up the `#jobs` forum (Edit Channel > Overview). The provider can't do either part: it ignores a forum's `topic`, and it has no forum tags.
+- Set up the `#jobs` forum (Edit Channel). The provider can't: it ignores a forum's `topic` and has no tags, layout, sort order or slowmode. Discord's API can set all of them.
   - Post guidelines:
 
     > **Tag your post Hiring or Looking.**
     >
-    > **Hiring:** one post per role. Include the company, role, on-site, hybrid or remote, salary range, and a link to apply.
+    > **Hiring:** one post per role. Include the company, role, on-site, hybrid or remote, salary range, and a link to apply. Agencies welcome: say you're an agency, and name the client if you can.
     >
-    > **Looking:** say what you do, what you want next, and on-site, hybrid or remote. A resume or LinkedIn link helps.
+    > **Looking:** say what you do, what you want next, and on-site, hybrid or remote. Students and career-changers welcome: say what you're learning and what role or internship you want.
     >
-    > No "DM me for details". Job posts go here and nowhere else.
+    > No "DM me for details".
 
-  - Tags: `Hiring` and `Looking`, with "Require people to select tags when posting" on, so every post has one.
+  - Tags: 💼 `Hiring` and 👀 `Looking`, with "Require people to select tags when posting" on, so every post has one.
+  - List layout, sorted by newest post, and a 1-hour slowmode on new posts: enough to stop a flood, while a recruiter with a few roles can still post them all in a day.
 - Set up the `#show-and-tell` forum's post guidelines the same way:
 
     > One post per project, talk or write-up. Say what it is, add a link, and say what feedback you'd like.
+
+  and a 🔥 default reaction, so anyone can cheer a post with one tap.
 - Give people their Admin and organizer roles. Admin has the Administrator permission, is the only role with its own block in the member list, and anyone can ping it.
+  - An organizer asks an admin for their role (the rules say how to reach one). Check that they're listed as an organizer on the group's Meetup page, then give them `<short> organizer` in Server Settings > Members. To step down or hand over, they tell an admin in `#organizers` (the pinned guide says so).
 - Keep the bot's role at the top of the role list, with Admin right under it (Server Settings > Roles; the provider can't order roles). A role can only manage roles below it. The group roles' order doesn't matter, since nothing else shows it.
 
 ## Joining and leaving groups
