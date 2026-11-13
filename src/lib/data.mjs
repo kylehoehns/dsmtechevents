@@ -97,7 +97,7 @@ function readStatus(dataDir, groups) {
 
 // The keys each file documents in its header comment. Anything else is a typo
 // (`venu:`, `headlinr:`) that would otherwise be dropped without a word.
-const GROUP_KEYS = new Set(['id', 'name', 'short', 'meetup', 'ical', 'source', 'website', 'eventbrite', 'logo']);
+const GROUP_KEYS = new Set(['id', 'name', 'short', 'meetup', 'ical', 'source', 'website', 'eventbrite', 'logo', 'discord']);
 const EVENT_KEYS = new Set(['title', 'id', 'url', 'start', 'end', 'time', 'endTime', 'venue', 'address', 'description', 'tags', 'hosts', 'hostedBy', 'headliner', 'luma']);
 
 function onlyKnown(file, entry, keys) {
