@@ -59,7 +59,7 @@ resource "discord_text_channel" "general" {
   server_id                = var.server_id
   category                 = discord_category_channel.community.id
   name                     = "general"
-  topic                    = "The one catch-all conversation."
+  topic                    = "Anything about tech in Des Moines: code, product, data, design, business, careers."
   position                 = 0
   sync_perms_with_category = true
 }
@@ -96,7 +96,7 @@ resource "discord_text_channel" "off_topic" {
   server_id                = var.server_id
   category                 = discord_category_channel.community.id
   name                     = "off-topic"
-  topic                    = "Everything else."
+  topic                    = "Everything that isn't work: pets, food, games, weekend plans."
   position                 = 4
   sync_perms_with_category = true
 }

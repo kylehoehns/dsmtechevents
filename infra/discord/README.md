@@ -36,6 +36,26 @@ The reasoning behind each choice is in the setup decisions doc (DSM Community Di
   - Tags: hiring, looking, contract, remote.
 - Give people their organizer roles.
 
+## Joining and leaving groups
+
+Members do this themselves. Onboarding asks "Which user groups do you want to follow?" when they join, and they can change their answer at any time under **Channels & Roles**, at the top of the channel list. Ticking a group gives them its member role and its category; unticking takes both away.
+
+People new to Discord won't find Channels & Roles on their own, so say where it is in three places:
+
+- **Server Guide**: a new member to-do and a line in the welcome message.
+- **`#rules`**: one line at the end.
+- **`#announcements`**: a post whenever a group is added.
+
+Wording to paste:
+
+> Want to follow another user group, or stop following one? Click **Channels & Roles** at the top of the channel list and tick or untick it.
+
+## Adding a group
+
+1. Add a `discord:` block with a `color:` to the group's entry in `data/groups.yaml`.
+2. Run `tofu apply`. The group gets its category, channels and roles, and becomes a new answer to the onboarding question.
+3. Existing members aren't asked again. Post in `#announcements` that the group is here and how to join it (see above).
+
 Onboarding is owned by this config: anything changed by hand in Server Settings > Onboarding is replaced on the next apply.
 
 ## Running it
