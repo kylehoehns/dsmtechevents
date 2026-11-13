@@ -21,6 +21,7 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
   - `#<id>-chat`
   - `<id>-member` role: given by onboarding, not mentionable by members. No color: Discord colors a name by the highest colored role, so with one color per group most names would show whichever group sits on top, and that group would look favored.
   - `<id>-organizer` role: no server-wide powers. Inside its own category it can delete and pin messages, manage threads, and ping its member role. Discord has no permission for pinging one role only, so it can also ping @everyone, @here and other groups' roles there; organizers should ping only their own members.
+    - It can't add, rename or delete channels: those change through this repo, since a channel deleted by hand loses its history. For another space (a workshop, a study group), organizers start a thread off a message in `#<id>-chat`. Anyone can follow it, and it archives itself when it goes quiet. If a group outgrows threads, add channels for it here.
   - The chat channel's topic links to the group's own page (`meetup`, else `website` or `eventbrite`), where people RSVP.
 - **Onboarding**:
   - the seven Start Here and Community channels as defaults: exactly Discord's minimum of 7, with 5 that members can post in, so removing any one breaks onboarding
