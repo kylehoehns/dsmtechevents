@@ -2,10 +2,11 @@ locals {
   group_by_member_role = { for id, r in discord_role.member : r.id => id }
 
   # Every member sees these. Discord asks for at least 7, 5 of them chattable
-  # (the #jobs forum counts). This is exactly 7 and 5: removing any one fails.
+  # (the #jobs forum counts; #events doesn't, since members only reply there).
   default_channel_ids = [
     discord_text_channel.rules.id,
     discord_news_channel.announcements.id,
+    discord_forum_channel.events.id,
     discord_text_channel.general.id,
     discord_text_channel.introductions.id,
     discord_forum_channel.jobs.id,

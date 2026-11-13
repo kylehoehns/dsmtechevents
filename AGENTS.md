@@ -12,7 +12,7 @@ DSM Tech Events lists every public Des Moines tech meetup, user group and confer
 
 ## Product rules
 
-- **Pointer, not source of truth.** The site links to each group's own page; people RSVP there. Calendar exports, feeds, sign-up forms and per-event pages are out of scope.
+- **Pointer, not source of truth.** The site links to each group's own page; people RSVP there. Calendar exports, feeds, sign-up forms and per-event pages are out of scope. The one exception is the community Discord's `#events` forum, whose posts the refresh keeps current (`docs/decisions/0007`).
 - **Say it once.** Each fact appears once on screen: hide a repeated date, address, logo-as-photo, or a full name that only restates the short one. New UI follows the same rule.
 - **This week stays above the fold** on a phone and a desktop.
 - **Hands-off.** Prefer features that maintain themselves from data already fetched.

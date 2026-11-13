@@ -21,14 +21,15 @@ locals {
   channel_position = {
     rules         = 0
     announcements = 1
-    general       = 2
-    introductions = 3
-    jobs          = 4
-    show_and_tell = 5
-    off_topic     = 6
-    group_first   = 7
-    organizers    = 7 + 2 * length(local.group_ids)
-    mod_updates   = 8 + 2 * length(local.group_ids)
+    events        = 2
+    general       = 3
+    introductions = 4
+    jobs          = 5
+    show_and_tell = 6
+    off_topic     = 7
+    group_first   = 8
+    organizers    = 8 + 2 * length(local.group_ids)
+    mod_updates   = 9 + 2 * length(local.group_ids)
   }
 }
 

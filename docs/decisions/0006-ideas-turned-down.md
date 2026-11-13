@@ -22,7 +22,7 @@ suggested isn't evidence people want it; what reopens one is listed below.
 |---|---|---|
 | Calendar feed (ICS/webcal), per event "add to calendar", per-group or per-topic feeds | Copies of times go stale on people's calendars and skip the RSVP the group needs. Linking to a group's own Meetup feed doesn't help either: it skips the RSVP just the same, and the Meetup link is already on every card. | Organizers asking for it |
 | Weekly digest (email, RSS, RSS-to-email) | A feed in a nicer wrapper; same reasons as above. | Organizers asking for it |
-| Auto-posting "this week" to Bluesky, LinkedIn or X | Same as the digest. | Organizers asking for it |
+| Auto-posting "this week" to Bluesky, LinkedIn or X | Same as the digest. (The community Discord's #events forum is the one exception, because its posts are edited to stay current: [decision 7](0007-discord-event-posts.md).) | Organizers asking for it |
 | Speakers wanted / open calls for speakers | Needs hand-kept data; no evidence anyone would use it. | A group asking to list a CFP |
 | Topic tags and filter chips | Needs a hand-kept topic list or guessing from scraped titles. Search covers it, past talks included. Chips were built and removed. | Search data showing people can't find topics |
 | "New since your last visit" | Needs to remember each visitor in their browser; tried as an idea and turned down by the owner. (Not the same as the "New" tag on an event posted in the last day, which is the same for everyone and comes from the refresh.) | Not planned |

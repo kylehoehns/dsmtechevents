@@ -36,6 +36,20 @@ resource "discord_news_channel" "announcements" {
   depends_on               = [discord_channel_permission.start_here_read_only]
 }
 
+# One post per event on dsmtechevents.com, made and kept current by
+# scripts/discord-events.mjs after each refresh (decision 0007). In Start
+# Here, so members can't start posts (Send Messages is denied) but can reply
+# in them (Send Messages in Threads isn't). Its guidelines and default
+# reaction are set by hand; see the README.
+resource "discord_forum_channel" "events" {
+  server_id                = var.server_id
+  category                 = discord_category_channel.start_here.id
+  name                     = "events"
+  position                 = local.channel_position.events
+  sync_perms_with_category = true
+  depends_on               = [discord_channel_permission.start_here_read_only]
+}
+
 # COMMUNITY: anyone can post.
 resource "discord_category_channel" "community" {
   server_id = var.server_id

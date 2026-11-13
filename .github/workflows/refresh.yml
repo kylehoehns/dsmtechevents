@@ -83,6 +83,14 @@ jobs:
             data/archive/
           if-no-files-found: error
           retention-days: 3
+      # The events for the Discord sync below, reduced to what a post needs.
+      - run: node scripts/discord-events.mjs --write discord-events.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: discord-events
+          path: discord-events.json
+          if-no-files-found: error
+          retention-days: 3
 
   publish:
     needs: refresh
@@ -182,3 +190,37 @@ jobs:
           done
           echo "::error::$SHA was pushed but dsmtechevents.com still serves ${live:-an unknown build} after 10 minutes. Check Workers Builds in the Cloudflare dashboard."
           exit 1
+
+  # Keeps the community Discord's #events forum in step with the site: a post
+  # per upcoming event, edited when it changes, closed after it's over
+  # (scripts/discord-events.mjs, docs/decisions/0007). Like publish, this job
+  # holds a secret (the Discord bot's token), so it installs nothing from npm:
+  # it runs only the repo's own script, with plain Node, on the refresh job's
+  # events file. It runs beside publish, so Discord being down never holds up
+  # the site.
+  discord-events:
+    needs: refresh
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: discord
+      deployment: false
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: discord-events
+          path: ${{ runner.temp }}/discord-events
+      - name: sync the #events forum
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          DISCORD_SERVER_ID: ${{ vars.DISCORD_SERVER_ID }}
+        run: node scripts/discord-events.mjs --from "$RUNNER_TEMP/discord-events/discord-events.json"
