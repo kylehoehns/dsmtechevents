@@ -1,0 +1,133 @@
+name: discord
+
+# Keeps the community Discord server (infra/discord) in step with the repo.
+# A pull request that touches it gets a plan: what would change in Discord,
+# in the run's summary. A merge to main applies it. Running it by hand
+# (workflow_dispatch) applies main, e.g. after fixing something in Discord.
+#
+# Secrets and variables live in the `discord` environment (Settings >
+# Environments): DISCORD_TOKEN (the bot), AWS_ACCESS_KEY_ID and
+# AWS_SECRET_ACCESS_KEY (the R2 key pair for the state), plus the variables
+# DISCORD_SERVER_ID and AWS_ENDPOINT_URL_S3. See infra/discord/README.md.
+
+on:
+  pull_request:
+    paths:
+      - 'infra/discord/**'
+      - 'data/groups.yaml'
+      - '.github/workflows/discord.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'infra/discord/**'
+      - 'data/groups.yaml'
+      - '.github/workflows/discord.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: infra/discord
+
+jobs:
+  plan:
+    # Secrets aren't given to forks or Dependabot, and the plan can't run
+    # without them.
+    if: >-
+      github.event_name == 'pull_request'
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: discord
+    # A new push to the PR replaces the plan for the old one.
+    concurrency:
+      group: discord-plan-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_ENDPOINT_URL_S3: ${{ vars.AWS_ENDPOINT_URL_S3 }}
+      TF_VAR_server_id: ${{ vars.DISCORD_SERVER_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version: 1.13.9
+          tofu_wrapper: false
+      - run: tofu init -input=false -lockfile=readonly
+      # -lock=false: a plan only reads, so it shouldn't hold the state lock
+      # an apply on main may be waiting for.
+      - run: tofu plan -input=false -lock=false -out=tfplan
+      - name: plan in the run summary
+        run: |
+          {
+            echo '## What this PR changes in Discord'
+            echo '```'
+            tofu show -no-color tfplan
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      # Deleting a channel loses its messages, and deleting a member role
+      # drops everyone from the group. Changing a group's `id` does both
+      # without looking like it. Fail loudly unless the PR has the
+      # `discord-destroy` label to say it's meant.
+      - name: no channel or member role deleted by accident
+        env:
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: |
+          deleted=$(tofu show -json tfplan | jq -r '
+            .resource_changes[]
+            | select(.change.actions | index("delete"))
+            | select(.type | test("^discord_(text|news|forum|voice|category)_channel$") or (.address | startswith("discord_role.member")))
+            | .address')
+          if [ -n "$deleted" ] && ! echo "$LABELS" | jq -e 'index("discord-destroy")' > /dev/null; then
+            echo "::error::This PR deletes Discord channels or member roles. Their messages or memberships can't come back. If that's intended, add the discord-destroy label."
+            echo "$deleted"
+            exit 1
+          fi
+
+  apply:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: discord
+    # One apply at a time, and never cancel one halfway.
+    concurrency:
+      group: discord-apply
+      cancel-in-progress: false
+    env:
+      DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_ENDPOINT_URL_S3: ${{ vars.AWS_ENDPOINT_URL_S3 }}
+      TF_VAR_server_id: ${{ vars.DISCORD_SERVER_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version: 1.13.9
+          tofu_wrapper: false
+      - run: tofu init -input=false -lockfile=readonly
+      # Discord ignores a new channel's position, so after creating channels
+      # a second apply moves them into place. Apply until a plan is clean.
+      - name: apply until there are no changes
+        run: |
+          for attempt in 1 2 3; do
+            set +e
+            tofu plan -input=false -detailed-exitcode -out=tfplan
+            code=$?
+            set -e
+            if [ "$code" -eq 0 ]; then exit 0; fi
+            if [ "$code" -ne 2 ]; then exit "$code"; fi
+            echo "Apply $attempt"
+            tofu apply -input=false tfplan
+          done
+          echo "::error::Discord still differs from the config after three applies."
+          exit 1
