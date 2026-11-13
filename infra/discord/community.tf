@@ -133,3 +133,24 @@ resource "discord_text_channel" "mod_updates" {
   sync_perms_with_category = true
   depends_on               = [discord_channel_permission.admins_hidden]
 }
+
+# The rules, posted by the bot. Edit rules.md; an apply edits this message in
+# place (no new post, no ping). Discord caps a message at 2,000 characters.
+resource "discord_message" "rules" {
+  channel_id = discord_text_channel.rules.id
+  # trimspace: Discord drops the file's final newline, which would otherwise
+  # show as a change on every plan.
+  content = trimspace(templatefile("${path.module}/rules.md", {
+    general       = discord_text_channel.general.id
+    off_topic     = discord_text_channel.off_topic.id
+    jobs          = discord_forum_channel.jobs.id
+    show_and_tell = discord_text_channel.show_and_tell.id
+  }))
+
+  # Discord adds a preview card for a bare link, which provider 2.7 reads back
+  # as an embed and then crashes trying to remove. Links in rules.md are
+  # wrapped in <...> so Discord makes no card, and any card is ignored here.
+  lifecycle {
+    ignore_changes = [embed]
+  }
+}

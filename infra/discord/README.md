@@ -14,7 +14,7 @@ The reasoning behind each choice is in the setup decisions doc (DSM Community Di
 
 ## What it builds
 
-- **Start Here** (read-only): `#rules`, `#announcements`, `#upcoming-events`
+- **Start Here** (read-only): `#rules`, `#announcements`, `#upcoming-events`. `#rules` holds one message posted by the bot from `rules.md`; edit that file and apply to change it (the message is edited in place, with no new post or ping).
 - **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell`, `#off-topic`, and the Lounge voice channel
 - **Organizers** (hidden; every `<id>-organizer` role can see it): `#organizers`, one room for the organizers of all groups
 - **Admins** (hidden): `#mod-updates`
