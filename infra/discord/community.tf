@@ -36,7 +36,8 @@ resource "discord_news_channel" "announcements" {
   depends_on               = [discord_channel_permission.start_here_read_only]
 }
 
-# Filled by a webhook from dsmtechevents.com later.
+# Kept for a possible dsmtechevents.com feed. Whether to build one is
+# undecided (feeds are ruled out in docs/decisions/0006), so nothing posts here yet.
 resource "discord_news_channel" "upcoming_events" {
   server_id                = var.server_id
   category                 = discord_category_channel.start_here.id
@@ -78,12 +79,8 @@ resource "discord_forum_channel" "jobs" {
   name                     = "jobs"
   position                 = 2
   sync_perms_with_category = true
-  # A forum's topic is its post guidelines. Tags (hiring, looking, contract,
-  # remote) aren't supported by the provider yet; add them by hand.
-  topic = <<-EOT
-    One post per role. Include: company, role, location or remote, salary range, and a link to apply.
-    No "DM me for details". Job posts go here and nowhere else.
-  EOT
+  # The post guidelines and tags are set by hand (see the README): provider
+  # 2.7 accepts `topic` on a forum but never sends it to Discord.
 }
 
 resource "discord_text_channel" "show_and_tell" {
@@ -117,7 +114,7 @@ resource "discord_voice_channel" "lounge" {
 resource "discord_category_channel" "admins" {
   server_id = var.server_id
   name      = "Admins"
-  position  = 100
+  position  = 2 + length(local.group_ids)
 }
 
 resource "discord_channel_permission" "admins_hidden" {

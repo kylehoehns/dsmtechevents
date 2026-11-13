@@ -26,7 +26,7 @@ resource "discord_category_channel" "group" {
   for_each  = local.groups
   server_id = var.server_id
   name      = each.value.short
-  position  = 10 + index(local.group_ids, each.key)
+  position  = 2 + index(local.group_ids, each.key)
 }
 
 resource "discord_channel_permission" "group_organizer" {
@@ -73,5 +73,5 @@ resource "discord_channel_permission" "group_announcements_organizer" {
   channel_id   = discord_news_channel.group_announcements[each.key].id
   type         = "role"
   overwrite_id = discord_role.organizer[each.key].id
-  allow        = data.discord_permission.organizer.allow_bits + data.discord_permission.post.allow_bits
+  allow        = data.discord_permission.organizer_post.allow_bits
 }

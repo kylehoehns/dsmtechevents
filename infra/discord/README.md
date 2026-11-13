@@ -29,9 +29,11 @@ The reasoning behind each choice is in the setup decisions doc (DSM Community Di
 
 ## Still done by hand
 
-- Turn on Community mode, choosing `#rules` as the rules channel and `#mod-updates` as the updates channel (Server Settings > Enable Community). Do this after the first apply, since those channels must exist first.
+- Turn on Community mode, choosing `#rules` as the rules channel and `#mod-updates` as the updates channel (Server Settings > Enable Community). See "First run" below for when.
 - Write the Server Guide (welcome message, new member to-dos).
-- Add the `#jobs` forum tags (hiring, looking, contract, remote). The provider can't set forum tags yet.
+- Set up the `#jobs` forum (Edit Channel > Overview). The provider can't do either part: it ignores a forum's `topic`, and it has no forum tags.
+  - Post guidelines: "One post per role. Include: company, role, location or remote, salary range, and a link to apply. No "DM me for details". Job posts go here and nowhere else."
+  - Tags: hiring, looking, contract, remote.
 - Give people their organizer roles.
 
 Onboarding is owned by this config: anything changed by hand in Server Settings > Onboarding is replaced on the next apply.
@@ -39,14 +41,37 @@ Onboarding is owned by this config: anything changed by hand in Server Settings 
 ## Running it
 
 1. Create a bot in the [Discord Developer Portal](https://discord.com/developers/applications).
-2. Invite the bot to the server with the **Manage Server**, **Manage Roles** and **Manage Channels** permissions.
+2. Invite the bot with this link, filling in its application ID:
+   `https://discord.com/oauth2/authorize?client_id=<application id>&scope=bot&permissions=8`
+
+   `8` is Administrator. The bot needs it because the read-only and hidden channels deny things to @everyone, and those denials apply to the bot as well: it can't see a hidden category, and Discord won't let it set a channel permission it has lost there. Administrator is the only permission that skips channel rules. It also makes the token a full admin key for the server, so keep it out of files and chat, and reset it in the Developer Portal if it leaks.
 3. Drag the bot's role above every role it will manage (Server Settings > Roles).
-4. Run:
+4. Set the token in your shell, never in a file: `export DISCORD_TOKEN=...`
+5. Run `tofu init` in this folder.
+
+### First run
+
+Announcement channels and onboarding only exist on a Community server, and Community mode needs the rules and updates channels to exist first. So the first run has three steps:
 
 ```sh
-cd infra/discord
-export DISCORD_TOKEN=...            # the bot token; never commit it
-tofu init
+# 1. Just the two channels Community mode asks for
+tofu apply -var server_id=<server id> \
+  -target=discord_text_channel.rules -target=discord_text_channel.mod_updates
+```
+
+2. Server Settings > Enable Community: choose `#rules` and `#mod-updates`.
+
+```sh
+# 3. Everything else
+tofu apply -var server_id=<server id>
+```
+
+4. Run `tofu apply` once more. Discord ignores a channel's position when creating it, so this second run moves channels into their configured order. A plan after that should say "No changes".
+5. Delete the starter channels Discord made with the server ("Text Channels", "Voice Channels" and what's in them). This config doesn't manage them, and they sort above Start Here.
+
+### After that
+
+```sh
 tofu plan  -var server_id=<server id>
 tofu apply -var server_id=<server id>
 ```
