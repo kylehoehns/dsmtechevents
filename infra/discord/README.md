@@ -37,7 +37,7 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 - Safety (Server Settings > Safety Setup):
   - Safety alerts channel: `#mod-updates`.
   - Raid protection on, with CAPTCHA for suspicious joins.
-  - AutoMod, each rule exempting `admin` and the organizer roles:
+  - AutoMod (in Safety Setup). No role exemptions, so nothing to update when groups change; Discord already skips anyone with Administrator or Manage Server. The provider has no AutoMod, but Discord's API does, except for editing the built-in mention spam rule before it has been saved once in the app:
     - Mention spam: block at about 8 mentions, alert in `#mod-updates`, and time out for an hour.
     - Suspected spam content: block.
     - Commonly flagged words: slurs and sexual content on, profanity off.
