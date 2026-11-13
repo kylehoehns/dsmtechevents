@@ -17,7 +17,7 @@ locals {
   # Channel positions count across the whole server, not within a category:
   # Discord renumbers them that way (rules 0, announcements 1, ...), and
   # numbering per category would show as drift every time it does. Each
-  # group takes three places (announcements, chat, then its organizers' room).
+  # group takes two places (announcements, then chat).
   channel_position = {
     rules         = 0
     announcements = 1
@@ -27,8 +27,8 @@ locals {
     show_and_tell = 5
     off_topic     = 6
     group_first   = 7
-    organizers    = 7 + 3 * length(local.group_ids)
-    mod_updates   = 8 + 3 * length(local.group_ids)
+    organizers    = 7 + 2 * length(local.group_ids)
+    mod_updates   = 8 + 2 * length(local.group_ids)
   }
 }
 
@@ -73,12 +73,6 @@ data "discord_permission" "organizer_category" {
 # delete them. A channel's own overwrite wins over its category's.
 data "discord_permission" "no_manage_channels" {
   manage_channels = "deny"
-}
-
-# The group's organizers' room: see it, plus the usual organizer powers.
-data "discord_permission" "organizer_room" {
-  allow_extends = data.discord_permission.organizer.allow_bits
-  view_channel  = "allow"
 }
 
 data "discord_permission" "organizer_post" {
