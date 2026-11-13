@@ -60,7 +60,7 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
     > No "DM me for details".
 
   - Tags: 💼 `Hiring` and 👀 `Looking`, with "Require people to select tags when posting" on, so every post has one.
-  - List layout, sorted by newest post, and a 6-hour slowmode on new posts so no one floods it.
+  - List layout, sorted by newest post, and a 1-hour slowmode on new posts: enough to stop a flood, while a recruiter with a few roles can still post them all in a day.
 - Set up the `#show-and-tell` forum's post guidelines the same way:
 
     > One post per project, talk or write-up. Say what it is, add a link, and say what feedback you'd like.
