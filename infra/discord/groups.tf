@@ -78,3 +78,39 @@ resource "discord_channel_permission" "group_announcements_organizer" {
   overwrite_id = discord_role.organizer[each.key].id
   allow        = data.discord_permission.organizer_post.allow_bits
 }
+
+# One room for every group's organizers. Hidden from everyone else; each
+# organizer role can see it, so a new group's organizers are in automatically.
+resource "discord_category_channel" "organizers" {
+  server_id = var.server_id
+  name      = "Organizers"
+  position  = 2 + length(local.group_ids)
+}
+
+resource "discord_channel_permission" "organizers_hidden" {
+  channel_id   = discord_category_channel.organizers.id
+  type         = "role"
+  overwrite_id = local.everyone
+  deny         = data.discord_permission.hidden.deny_bits
+}
+
+resource "discord_channel_permission" "organizers_visible" {
+  for_each     = local.groups
+  channel_id   = discord_category_channel.organizers.id
+  type         = "role"
+  overwrite_id = discord_role.organizer[each.key].id
+  allow        = data.discord_permission.view.allow_bits
+}
+
+resource "discord_text_channel" "organizers" {
+  server_id                = var.server_id
+  category                 = discord_category_channel.organizers.id
+  name                     = "organizers"
+  topic                    = "A place for organizers of every group to talk with each other."
+  position                 = 0
+  sync_perms_with_category = true
+  depends_on = [
+    discord_channel_permission.organizers_hidden,
+    discord_channel_permission.organizers_visible,
+  ]
+}

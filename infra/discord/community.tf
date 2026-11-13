@@ -114,7 +114,7 @@ resource "discord_voice_channel" "lounge" {
 resource "discord_category_channel" "admins" {
   server_id = var.server_id
   name      = "Admins"
-  position  = 2 + length(local.group_ids)
+  position  = 3 + length(local.group_ids)
 }
 
 resource "discord_channel_permission" "admins_hidden" {

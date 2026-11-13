@@ -16,6 +16,7 @@ The reasoning behind each choice is in the setup decisions doc (DSM Community Di
 
 - **Start Here** (read-only): `#rules`, `#announcements`, `#upcoming-events`
 - **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell`, `#off-topic`, and the Lounge voice channel
+- **Organizers** (hidden; every `<id>-organizer` role can see it): `#organizers`, one room for the organizers of all groups
 - **Admins** (hidden): `#mod-updates`
 - **For each group**, a category named after the group's `short` name, containing:
   - `#<id>-announcements`: only organizers post

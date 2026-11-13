@@ -10,7 +10,7 @@ locals {
   everyone = var.server_id
 
   # Category order: Start Here, Community, the groups in groups.yaml order,
-  # then Admins. Positions stay contiguous because Discord stores what it is
+  # Organizers, then Admins. Positions stay contiguous because Discord stores what it is
   # given and a gap would only be closed by the next drag in the app.
   group_ids = [for g in yamldecode(file("${path.module}/../../data/groups.yaml")) : g.id if contains(keys(local.groups), g.id)]
 }
@@ -44,4 +44,8 @@ data "discord_permission" "organizer_post" {
 
 data "discord_permission" "hidden" {
   view_channel = "deny"
+}
+
+data "discord_permission" "view" {
+  view_channel = "allow"
 }
