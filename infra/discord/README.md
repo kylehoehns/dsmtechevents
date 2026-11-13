@@ -60,7 +60,7 @@ Onboarding is owned by this config: anything changed by hand in Server Settings 
 
 ## Running it
 
-1. Create a bot in the [Discord Developer Portal](https://discord.com/developers/applications).
+1. Create a bot in the [Discord Developer Portal](https://discord.com/developers/applications). Name it **DSM Tech** and give it the site's icon (`public/icons/icon-512.png`) under Bot; members see both on every message it posts.
 2. Invite the bot with this link, filling in its application ID:
    `https://discord.com/oauth2/authorize?client_id=<application id>&scope=bot&permissions=8`
 
