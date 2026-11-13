@@ -1,14 +1,13 @@
 # Community Discord, as code
 
-OpenTofu (or Terraform) config for the Des Moines tech community Discord server. It builds the server from `data/groups.yaml`, the same file the website uses, so the website and Discord stay in step. A group gets its own section of the server when its entry has a `discord:` block:
+OpenTofu (or Terraform) config for the Des Moines tech community Discord server. It builds the server from `data/groups.yaml`, the same file the website uses, so the website and Discord stay in step. A group gets its own section of the server when its entry has `discord: true`:
 
 ```yaml
 - id: cijug
   name: Central Iowa Java Users Group
   short: CIJUG
   meetup: https://www.meetup.com/central-iowa-java-users-group/
-  discord:
-    color: "#c27c0e"
+  discord: true
 ```
 
 The reasoning behind each choice is in the setup decisions doc (DSM Community Discord: Setup Decisions).
@@ -21,7 +20,7 @@ The reasoning behind each choice is in the setup decisions doc (DSM Community Di
 - **For each group**, a category named after the group's `short` name, containing:
   - `#<id>-announcements`: only organizers post
   - `#<id>-chat`
-  - `<id>-member` role: group color, given by onboarding, not mentionable by members
+  - `<id>-member` role: given by onboarding, not mentionable by members. No color: Discord colors a name by the highest colored role, so with one color per group most names would show whichever group sits on top, and that group would look favored.
   - `<id>-organizer` role: no server-wide powers. Inside its own category it can manage channels, messages, pins, threads and events, and ping its member role.
 - **Onboarding**:
   - the eight community channels as defaults
@@ -52,7 +51,7 @@ Wording to paste:
 
 ## Adding a group
 
-1. Add a `discord:` block with a `color:` to the group's entry in `data/groups.yaml`.
+1. Add `discord: true` to the group's entry in `data/groups.yaml`.
 2. Run `tofu apply`. The group gets its category, channels and roles, and becomes a new answer to the onboarding question.
 3. Existing members aren't asked again. Post in `#announcements` that the group is here and how to join it (see above).
 

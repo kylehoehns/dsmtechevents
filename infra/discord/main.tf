@@ -1,9 +1,9 @@
 # The groups the website lists are the source of truth. A group gets a section
-# of the server when its entry in data/groups.yaml has a `discord:` block.
+# of the server when its entry in data/groups.yaml has `discord: true`.
 locals {
   groups = {
     for g in yamldecode(file("${path.module}/../../data/groups.yaml")) :
-    g.id => g if try(g.discord, null) != null
+    g.id => g if try(g.discord, false) == true
   }
 
   # Discord's @everyone role has the same ID as the server.

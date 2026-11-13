@@ -1,10 +1,14 @@
-# One section per group with a `discord:` block in data/groups.yaml.
+# One section per group with `discord: true` in data/groups.yaml.
 
 resource "discord_role" "member" {
-  for_each    = local.groups
-  server_id   = var.server_id
-  name        = "${each.key}-member"
-  color       = parseint(trimprefix(each.value.discord.color, "#"), 16)
+  for_each  = local.groups
+  server_id = var.server_id
+  name      = "${each.key}-member"
+  # No color. Discord colors a name by its highest colored role, so with a
+  # color per group most names would wear whichever group sits on top.
+  # Provider 2.7 can't clear a color on update (it only sends one above 0),
+  # so a role that once had a color must be cleared in Discord by hand.
+  color       = 0
   permissions = 0
   # Off so any member can't ping the whole group; organizers can ping it in
   # their own section through the Mention permission.
@@ -16,8 +20,7 @@ resource "discord_role" "organizer" {
   server_id   = var.server_id
   name        = "${each.key}-organizer"
   permissions = 0
-  # Organizers get their own block at the top of the member list. No color,
-  # so an organizer who also follows the group shows the group's color.
+  # Organizers get their own block at the top of the member list.
   hoist       = true
   mentionable = false
 }

@@ -15,27 +15,25 @@
 #   eventbrite: (optional) an Eventbrite organizer page (/o/…) the eventbrite
 #             reader pulls events from, for groups that post there
 #   logo:     (optional) image URL, for groups whose logo isn't read from Meetup
-#   discord:  (optional) gives the group its own section of the community
-#             Discord server, built by infra/discord: `color:` is its role color
+#   discord:  (optional) `true` gives the group its own section of the
+#             community Discord server, built by infra/discord
 
 - id: cijug
   name: Central Iowa Java Users Group
   short: CIJUG
   meetup: https://www.meetup.com/central-iowa-java-users-group/
-  discord:
-    color: "#c27c0e"
+  discord: true
 
 - id: pyowa
   name: Iowa Python User Group
   short: Pyowa
   meetup: https://www.meetup.com/pyowa-iowa-python-user-group/
+  discord: true
 
 - id: iadnug
   name: Iowa .NET User Group
   short: IADNUG
   meetup: https://www.meetup.com/iadnug/
-  discord:
-    color: "#9b59b6"
 
 - id: webgeeks
   name: DSM Web Geeks
@@ -46,13 +44,12 @@
   name: DevOpsDSM
   short: DevOpsDSM
   meetup: https://www.meetup.com/devopsdsm/
-  discord:
-    color: "#3498db"
 
 - id: aws
   name: AWS Des Moines
   short: AWS
   meetup: https://www.meetup.com/aws-user-group-des-moines/
+  discord: true
 
 - id: dsmai
   name: Des Moines Artificial Intelligence Group
