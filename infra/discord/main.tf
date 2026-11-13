@@ -46,6 +46,10 @@ data "discord_permission" "hidden" {
   view_channel = "deny"
 }
 
+data "discord_permission" "admin" {
+  administrator = "allow"
+}
+
 data "discord_permission" "view" {
   view_channel = "allow"
 }

@@ -42,7 +42,7 @@ resource "discord_news_channel" "upcoming_events" {
   server_id                = var.server_id
   category                 = discord_category_channel.start_here.id
   name                     = "upcoming-events"
-  topic                    = "What's coming up. RSVP on each group's own page: https://dsmtechevents.com"
+  topic                    = "What's coming up: https://dsmtechevents.com"
   position                 = 2
   sync_perms_with_category = true
   depends_on               = [discord_channel_permission.start_here_read_only]
@@ -109,6 +109,18 @@ resource "discord_voice_channel" "lounge" {
   sync_perms_with_category = true
 }
 
+# Server admins: shown in their own block of the member list so members can
+# see who they are, and mentionable so anyone can ping @admin for help.
+# Given by hand, like the organizer roles.
+resource "discord_role" "admin" {
+  server_id   = var.server_id
+  name        = "admin"
+  permissions = data.discord_permission.admin.allow_bits
+  color       = 0
+  hoist       = true
+  mentionable = true
+}
+
 # Admins only. Community mode sends Discord's notices to an updates channel;
 # choose this one in Server Settings > Community Overview.
 resource "discord_category_channel" "admins" {
@@ -145,6 +157,7 @@ resource "discord_message" "rules" {
     off_topic     = discord_text_channel.off_topic.id
     jobs          = discord_forum_channel.jobs.id
     show_and_tell = discord_text_channel.show_and_tell.id
+    admin         = discord_role.admin.id
   }))
 
   # Discord adds a preview card for a bare link, which provider 2.7 reads back

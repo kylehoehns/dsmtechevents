@@ -34,7 +34,7 @@ The reasoning behind each choice is in the setup decisions doc (DSM Community Di
 - Set up the `#jobs` forum (Edit Channel > Overview). The provider can't do either part: it ignores a forum's `topic`, and it has no forum tags.
   - Post guidelines: "One post per role. Include: company, role, location or remote, salary range, and a link to apply. No "DM me for details". Job posts go here and nowhere else."
   - Tags: hiring, looking, contract, remote.
-- Give people their organizer roles.
+- Give people their `admin` and organizer roles. `admin` has the Administrator permission, shows in its own block of the member list, and anyone can ping it; drag it above the organizer roles in Server Settings > Roles so its block comes first (the provider can't set role order).
 
 ## Joining and leaving groups
 

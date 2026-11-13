@@ -12,8 +12,8 @@ This server is for anyone who works in, studies, or is curious about tech in cen
 
 **5. Keep it safe for work.**
 
-**Need help, or see a problem?** Message an admin or any group organizer, or use Report Message.
+**Need help, or see a problem?** Ping <@&${admin}>, message anyone listed under admin in the member list, or use Report Message.
 
 **Want to follow another user group, or stop following one?** Click **Channels & Roles** at the top of the channel list.
 
-**Looking for meetups?** Every group's events are at <https://dsmtechevents.com>. RSVP on the group's own page.
+**Looking for meetups?** Every group's events are at <https://dsmtechevents.com>.
