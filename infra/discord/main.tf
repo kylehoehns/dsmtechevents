@@ -90,8 +90,28 @@ data "discord_permission" "hidden" {
   view_channel = "deny"
 }
 
+# Moderation, not Administrator. Administrator overrides every channel rule,
+# so admins would see each group's private organizers' room. Structure
+# changes through this repo; admins look after people. Manage Roles lets them
+# give out organizer roles (they could give one to themselves, which shows in
+# the audit log and the room's member list).
 data "discord_permission" "admin" {
-  administrator = "allow"
+  view_audit_log   = "allow"
+  manage_messages  = "allow"
+  manage_threads   = "allow"
+  moderate_members = "allow"
+  kick_members     = "allow"
+  ban_members      = "allow"
+  manage_roles     = "allow"
+  manage_nicknames = "allow"
+  mention_everyone = "allow"
+}
+
+# Where admins need more than members get: posting in read-only Start Here
+# (#announcements), and seeing the hidden Admins and Organizers categories.
+data "discord_permission" "admin_post" {
+  send_messages         = "allow"
+  create_public_threads = "allow"
 }
 
 data "discord_permission" "view" {

@@ -7,6 +7,14 @@ resource "discord_category_channel" "start_here" {
   position  = 0
 }
 
+# Admins post here: they don't bypass channel rules (see the admin role).
+resource "discord_channel_permission" "start_here_admin" {
+  channel_id   = discord_category_channel.start_here.id
+  type         = "role"
+  overwrite_id = discord_role.admin.id
+  allow        = data.discord_permission.admin_post.allow_bits
+}
+
 resource "discord_channel_permission" "start_here_read_only" {
   channel_id   = discord_category_channel.start_here.id
   type         = "role"
@@ -23,7 +31,7 @@ resource "discord_text_channel" "rules" {
   topic                    = "How we treat each other here."
   position                 = local.channel_position.rules
   sync_perms_with_category = true
-  depends_on               = [discord_channel_permission.start_here_read_only]
+  depends_on               = [discord_channel_permission.start_here_read_only, discord_channel_permission.start_here_admin]
 }
 
 resource "discord_news_channel" "announcements" {
@@ -33,7 +41,7 @@ resource "discord_news_channel" "announcements" {
   topic                    = "Server-wide news."
   position                 = local.channel_position.announcements
   sync_perms_with_category = true
-  depends_on               = [discord_channel_permission.start_here_read_only]
+  depends_on               = [discord_channel_permission.start_here_read_only, discord_channel_permission.start_here_admin]
 }
 
 # COMMUNITY: anyone can post.
@@ -110,6 +118,13 @@ resource "discord_category_channel" "admins" {
   position  = 3 + length(local.group_ids)
 }
 
+resource "discord_channel_permission" "admins_visible" {
+  channel_id   = discord_category_channel.admins.id
+  type         = "role"
+  overwrite_id = discord_role.admin.id
+  allow        = data.discord_permission.view.allow_bits
+}
+
 resource "discord_channel_permission" "admins_hidden" {
   channel_id   = discord_category_channel.admins.id
   type         = "role"
@@ -124,7 +139,7 @@ resource "discord_text_channel" "mod_updates" {
   topic                    = "Discord's Community notices, and admin chat."
   position                 = local.channel_position.mod_updates
   sync_perms_with_category = true
-  depends_on               = [discord_channel_permission.admins_hidden]
+  depends_on               = [discord_channel_permission.admins_hidden, discord_channel_permission.admins_visible]
 }
 
 # The rules, posted by the bot. Edit rules.md; an apply edits this message in

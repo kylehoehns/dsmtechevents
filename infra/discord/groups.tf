@@ -106,7 +106,7 @@ resource "discord_text_channel" "group_organizers" {
   server_id                = var.server_id
   category                 = discord_category_channel.group[each.key].id
   name                     = "${each.key}-organizers"
-  topic                    = "${each.value.short} organizers only: plan meetups, speakers and venues."
+  topic                    = "${each.value.short} organizers only (and the server owner): plan meetups, speakers and venues."
   position                 = local.channel_position.group_first + 3 * index(local.group_ids, each.key) + 2
   sync_perms_with_category = false
 }
@@ -143,6 +143,13 @@ resource "discord_channel_permission" "organizers_hidden" {
   deny         = data.discord_permission.hidden.deny_bits
 }
 
+resource "discord_channel_permission" "organizers_admin" {
+  channel_id   = discord_category_channel.organizers.id
+  type         = "role"
+  overwrite_id = discord_role.admin.id
+  allow        = data.discord_permission.view.allow_bits
+}
+
 resource "discord_channel_permission" "organizers_visible" {
   for_each     = local.groups
   channel_id   = discord_category_channel.organizers.id
@@ -161,6 +168,7 @@ resource "discord_text_channel" "organizers" {
   depends_on = [
     discord_channel_permission.organizers_hidden,
     discord_channel_permission.organizers_visible,
+    discord_channel_permission.organizers_admin,
   ]
 }
 

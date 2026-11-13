@@ -43,12 +43,12 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 - Safety (Server Settings > Safety Setup):
   - Safety alerts channel: `#mod-updates`.
   - Raid protection on, with CAPTCHA for suspicious joins.
-  - AutoMod (in Safety Setup). No role exemptions, so nothing to update when groups change; Discord already skips anyone with Administrator or Manage Server. The provider has no AutoMod, but Discord's API does, except for editing the built-in mention spam rule before it has been saved once in the app:
+  - AutoMod (in Safety Setup). The rules apply to everyone but the owner and the bot (Discord skips anyone with Administrator or Manage Server), admins included. The one exemption is Admin on the @everyone rule, so admins can announce to everyone; no group roles are listed, so nothing changes when groups do. The provider has no AutoMod, but Discord's API does, except for editing the built-in mention spam rule before it has been saved once in the app:
     - Mention spam: block at about 8 mentions, alert in `#mod-updates`, and time out for an hour.
     - Suspected spam content: block.
     - Commonly flagged words: slurs and sexual content on, profanity off.
     - Custom keywords, block and alert: `discord.gg/*`, `discord.com/invite/*`, `free nitro`, `steam gift`, `airdrop`, `seed phrase`.
-    - "No @everyone or @here": custom keywords `@everyone` and `@here`, block with the message "Pings to the whole server aren't allowed. Organizers: ping your group's member role instead." and alert. Organizers can mention everyone inside their section (see their role above), so this stops a slip from pinging the whole server.
+    - "No @everyone or @here": custom keywords `@everyone` and `@here`, block with the message "Pings to the whole server aren't allowed. Organizers: ping your group's member role instead." and alert, with the Admin role exempt. Organizers can mention everyone inside their section (see their role above), so this stops a slip from pinging the whole server.
   - Require 2FA for moderation, once the account that owns the bot has 2FA on; without it, applies can start failing.
 - Bot (Developer Portal > Bot): turn Public Bot off, and leave every privileged intent off. OpenTofu only calls Discord's REST API and needs none.
 - Set up the `#jobs` forum (Edit Channel). The provider can't: it ignores a forum's `topic` and has no tags, layout, sort order or slowmode. Discord's API can set all of them.
@@ -69,7 +69,8 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
     > One post per project, talk or write-up. Say what it is, add a link, and say what feedback you'd like.
 
   and a 🔥 default reaction, so anyone can cheer a post with one tap.
-- Give people their Admin and organizer roles. Admin has the Administrator permission, is the only role with its own block in the member list, and anyone can ping it.
+- Give people their Admin and organizer roles. Admin is the only role with its own block in the member list, and anyone can ping it.
+  - Admin moderates; it doesn't have Administrator. It can delete messages, manage threads, time out, kick and ban, view the audit log, change nicknames, ping @everyone and give out roles, and it can post in Start Here and see the Admins and Organizers categories. Without Administrator, admins can't see a group's private `#<id>-organizers` room: only that group's organizers, the owner and the bot can. Admin must stay above the organizer roles in the role list to give them out, which also means an admin could give one to themselves; it shows in the audit log and in the room's member list.
   - An organizer asks an admin for their role (the rules say how to reach one). Check that they're listed as an organizer on the group's Meetup page, then give them `<short> organizer` in Server Settings > Members. To step down or hand over, they tell an admin in `#organizers` (the pinned guide says so).
 - Keep the bot's role at the top of the role list, with Admin right under it (Server Settings > Roles; the provider can't order roles). A role can only manage roles below it. The group roles' order doesn't matter, since nothing else shows it.
 
