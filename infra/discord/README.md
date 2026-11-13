@@ -32,8 +32,17 @@ The reasoning behind each choice is in the setup decisions doc (DSM Community Di
 - Turn on Community mode, choosing `#rules` as the rules channel and `#mod-updates` as the updates channel (Server Settings > Enable Community). See "First run" below for when.
 - Write the Server Guide (welcome message, new member to-dos).
 - Set up the `#jobs` forum (Edit Channel > Overview). The provider can't do either part: it ignores a forum's `topic`, and it has no forum tags.
-  - Post guidelines: "One post per role. Include: company, role, location or remote, salary range, and a link to apply. No "DM me for details". Job posts go here and nowhere else."
-  - Tags: hiring, looking, contract, remote.
+  - Post guidelines:
+
+    > **Tag your post Hiring or Looking.**
+    >
+    > **Hiring:** one post per role. Include the company, role, on-site, hybrid or remote, salary range, and a link to apply.
+    >
+    > **Looking:** say what you do, what you want next, and on-site, hybrid or remote. A resume or LinkedIn link helps.
+    >
+    > No "DM me for details". Job posts go here and nowhere else.
+
+  - Tags: `Hiring` and `Looking`, with "Require people to select tags when posting" on, so every post has one.
 - Give people their `admin` and organizer roles. `admin` has the Administrator permission, shows in its own block of the member list, and anyone can ping it; drag it above the organizer roles in Server Settings > Roles so its block comes first (the provider can't set role order).
 
 ## Joining and leaving groups
