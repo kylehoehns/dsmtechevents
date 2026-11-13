@@ -80,6 +80,8 @@ Wording to paste:
 2. Merge it. The workflow applies it: it creates the group's category, channels and roles, adds it as an answer to the onboarding question, and applies again to put the new channels in order.
 3. Existing members aren't asked again. Post in `#announcements` that the group is here and how to join it (see above).
 
+The onboarding answers are listed in the order groups were added, so a new group is always last; its place in `groups.yaml` doesn't matter. Removing a group is different: the provider keeps each answer's Discord ID by its place in the list, so every answer after the removed one takes the ID of the one before it. Nobody loses a role or a channel, but members' ticks in Channels & Roles may then show a neighboring group until they re-pick.
+
 Onboarding is owned by this config: the question and its answers are replaced on the next apply if changed by hand in Server Settings > Onboarding. The default channels are the exception. Discord returns them in its own order, so the config doesn't compare them and a hand change there stays until the set in `onboarding.tf` changes.
 
 A group's `id` must not change once it has a Discord section. Everything for the group is keyed by it, so a new `id` deletes the group's channels, with their history, and creates new ones.
