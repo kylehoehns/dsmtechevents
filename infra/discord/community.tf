@@ -47,7 +47,7 @@ resource "discord_text_channel" "general" {
   server_id                = var.server_id
   category                 = discord_category_channel.community.id
   name                     = "general"
-  topic                    = "Anything about tech in Des Moines: code, product, data, design, business, careers."
+  topic                    = "Anything about tech in Des Moines: code, testing, product, data, design, ops, security, careers. Questions welcome, including how to break in."
   position                 = local.channel_position.general
   sync_perms_with_category = true
 }
@@ -56,7 +56,7 @@ resource "discord_text_channel" "introductions" {
   server_id                = var.server_id
   category                 = discord_category_channel.community.id
   name                     = "introductions"
-  topic                    = "Say hi: what you do and which groups you're in."
+  topic                    = "Say hi: what you do or are learning, and what you're looking for (a meetup to try, coffee, a job)."
   position                 = local.channel_position.introductions
   sync_perms_with_category = true
 }
@@ -71,11 +71,12 @@ resource "discord_forum_channel" "jobs" {
   # 2.7 accepts `topic` on a forum but never sends it to Discord.
 }
 
-resource "discord_text_channel" "show_and_tell" {
+# A forum, so each project gets its own post and its own replies. Its post
+# guidelines are set by hand (see the README), like #jobs.
+resource "discord_forum_channel" "show_and_tell" {
   server_id                = var.server_id
   category                 = discord_category_channel.community.id
   name                     = "show-and-tell"
-  topic                    = "Things you built, wrote or spoke about."
   position                 = local.channel_position.show_and_tell
   sync_perms_with_category = true
 }
@@ -94,7 +95,7 @@ resource "discord_text_channel" "off_topic" {
 # Given by hand, like the organizer roles.
 resource "discord_role" "admin" {
   server_id   = var.server_id
-  name        = "admin"
+  name        = "Admin"
   permissions = data.discord_permission.admin.allow_bits
   color       = 0
   hoist       = true
@@ -136,7 +137,7 @@ resource "discord_message" "rules" {
     general       = discord_text_channel.general.id
     off_topic     = discord_text_channel.off_topic.id
     jobs          = discord_forum_channel.jobs.id
-    show_and_tell = discord_text_channel.show_and_tell.id
+    show_and_tell = discord_forum_channel.show_and_tell.id
     admin         = discord_role.admin.id
   }))
 

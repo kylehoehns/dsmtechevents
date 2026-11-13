@@ -12,6 +12,8 @@ name: discord
 
 on:
   pull_request:
+    # labeled/unlabeled too, so adding discord-destroy re-runs the plan.
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     paths:
       - 'infra/discord/**'
       - 'data/groups.yaml'
@@ -83,7 +85,7 @@ jobs:
           deleted=$(tofu show -json tfplan | jq -r '
             .resource_changes[]
             | select(.change.actions | index("delete"))
-            | select(.type | test("^discord_(text|news|forum|voice|category)_channel$") or (.address | startswith("discord_role.member")))
+            | select((.type | test("^discord_(text|news|forum|voice|category)_channel$")) or (.address | startswith("discord_role.member")))
             | .address')
           if [ -n "$deleted" ] && ! echo "$LABELS" | jq -e 'index("discord-destroy")' > /dev/null; then
             echo "::error::This PR deletes Discord channels or member roles. Their messages or memberships can't come back. If that's intended, add the discord-destroy label."

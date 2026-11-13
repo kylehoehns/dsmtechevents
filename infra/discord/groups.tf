@@ -3,7 +3,7 @@
 resource "discord_role" "member" {
   for_each  = local.groups
   server_id = var.server_id
-  name      = "${each.key}-member"
+  name      = "${each.value.short} member"
   # No color. Discord colors a name by its highest colored role, so with a
   # color per group most names would wear whichever group sits on top.
   # Provider 2.7 can't clear a color on update (it only sends one above 0),
@@ -18,10 +18,11 @@ resource "discord_role" "member" {
 resource "discord_role" "organizer" {
   for_each    = local.groups
   server_id   = var.server_id
-  name        = "${each.key}-organizer"
+  name        = "${each.value.short} organizer"
   permissions = 0
-  # Organizers get their own block at the top of the member list.
-  hoist       = true
+  # Not its own block in the member list: blocks show in role order, so one
+  # group's organizers would always sit above the others'. Only Admin has one.
+  hoist       = false
   mentionable = false
 }
 
@@ -48,6 +49,8 @@ resource "discord_text_channel" "group_chat" {
   # The group's own page, where people RSVP, exactly as groups.yaml has it.
   topic = join(" ", compact([
     "${each.value.name}.",
+    "Going to a meetup, or want to speak? Start a thread here.",
+    # Last, so no punctuation runs into the link.
     try("Meetups: ${coalesce(try(each.value.meetup, null), try(each.value.website, null), try(each.value.eventbrite, null))}", null),
   ]))
   position                 = local.channel_position.group_first + 2 * index(local.group_ids, each.key) + 1
@@ -117,4 +120,17 @@ resource "discord_text_channel" "organizers" {
     discord_channel_permission.organizers_hidden,
     discord_channel_permission.organizers_visible,
   ]
+}
+
+# The organizer guide, posted by the bot and pinned. Edit organizers.md; an
+# apply edits the message in place.
+resource "discord_message" "organizers_guide" {
+  channel_id = discord_text_channel.organizers.id
+  content    = trimspace(file("${path.module}/organizers.md"))
+  pinned     = true
+
+  # See discord_message.rules: Discord's link preview cards crash the provider.
+  lifecycle {
+    ignore_changes = [embed]
+  }
 }
