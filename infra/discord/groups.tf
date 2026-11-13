@@ -53,7 +53,7 @@ resource "discord_text_channel" "group_chat" {
     # Last, so no punctuation runs into the link.
     try("Meetups: ${coalesce(try(each.value.meetup, null), try(each.value.website, null), try(each.value.eventbrite, null))}", null),
   ]))
-  position = local.channel_position.group_first + 3 * index(local.group_ids, each.key) + 1
+  position = local.channel_position.group_first + 2 * index(local.group_ids, each.key) + 1
   # Its own permissions, not the category's: organizers moderate it but
   # can't rename or delete it (group_chat_organizer).
   sync_perms_with_category = false
@@ -76,7 +76,7 @@ resource "discord_news_channel" "group_announcements" {
   category                 = discord_category_channel.group[each.key].id
   name                     = "${each.key}-announcements"
   topic                    = "News from ${each.value.short} organizers."
-  position                 = local.channel_position.group_first + 3 * index(local.group_ids, each.key)
+  position                 = local.channel_position.group_first + 2 * index(local.group_ids, each.key)
   sync_perms_with_category = false
 }
 
@@ -94,37 +94,6 @@ resource "discord_channel_permission" "group_announcements_organizer" {
   type         = "role"
   overwrite_id = discord_role.organizer[each.key].id
   allow        = data.discord_permission.organizer_post.allow_bits
-  deny         = data.discord_permission.no_manage_channels.deny_bits
-}
-
-# Each group's own organizers' room, inside its section: hidden from everyone
-# but that group's organizer role (and admins), so giving someone the role is
-# all it takes to add them. Like the other two, organizers can't rename or
-# delete it.
-resource "discord_text_channel" "group_organizers" {
-  for_each                 = local.groups
-  server_id                = var.server_id
-  category                 = discord_category_channel.group[each.key].id
-  name                     = "${each.key}-organizers"
-  topic                    = "${each.value.short} organizers only: plan meetups, speakers and venues."
-  position                 = local.channel_position.group_first + 3 * index(local.group_ids, each.key) + 2
-  sync_perms_with_category = false
-}
-
-resource "discord_channel_permission" "group_organizers_hidden" {
-  for_each     = local.groups
-  channel_id   = discord_text_channel.group_organizers[each.key].id
-  type         = "role"
-  overwrite_id = local.everyone
-  deny         = data.discord_permission.hidden.deny_bits
-}
-
-resource "discord_channel_permission" "group_organizers_organizer" {
-  for_each     = local.groups
-  channel_id   = discord_text_channel.group_organizers[each.key].id
-  type         = "role"
-  overwrite_id = discord_role.organizer[each.key].id
-  allow        = data.discord_permission.organizer_room.allow_bits
   deny         = data.discord_permission.no_manage_channels.deny_bits
 }
 
