@@ -13,3 +13,9 @@ prev/
 
 # Playwright MCP browser snapshots
 .playwright-mcp/
+
+# OpenTofu / Terraform state (infra/discord)
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
