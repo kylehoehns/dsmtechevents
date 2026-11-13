@@ -76,8 +76,8 @@ Wording to paste:
 
 ## Adding a group
 
-1. Add `discord: true` to the group's entry in `data/groups.yaml`.
-2. Run `tofu apply` twice. The first creates the group's category, channels and roles and adds it as an answer to the onboarding question; the second puts the new channels in order.
+1. Add `discord: true` to the group's entry in `data/groups.yaml`, in a pull request. The `discord` check on the PR shows what will change in Discord.
+2. Merge it. The workflow applies it: it creates the group's category, channels and roles, adds it as an answer to the onboarding question, and applies again to put the new channels in order.
 3. Existing members aren't asked again. Post in `#announcements` that the group is here and how to join it (see above).
 
 Onboarding is owned by this config: the question and its answers are replaced on the next apply if changed by hand in Server Settings > Onboarding. The default channels are the exception. Discord returns them in its own order, so the config doesn't compare them and a hand change there stays until the set in `onboarding.tf` changes.
@@ -126,14 +126,23 @@ tofu apply -var server_id=<server id>
 4. Run `tofu apply` once more. Discord ignores a channel's position when creating it, so this second run moves channels into their configured order. A plan after that should say "No changes".
 5. Delete the starter channels Discord made with the server ("Text Channels", "Voice Channels" and what's in them). This config doesn't manage them, and they sort above Start Here.
 
-### After that
+### After that: GitHub Actions
 
-```sh
-tofu plan  -var server_id=<server id>
-tofu apply -var server_id=<server id>
-```
+`.github/workflows/discord.yml` runs every change from here on:
 
-An apply that creates channels (a new group, say) needs a second apply to put them in order, for the same reason as step 4 above.
+- **On a pull request** that touches `infra/discord/`, `data/groups.yaml` or the workflow, it plans and puts the result in the run's summary (the check's **Summary** page). If the plan deletes a channel or a member role, it fails unless the PR has the `discord-destroy` label: deleted messages and memberships can't come back.
+- **On a merge to `main`**, or run by hand from the Actions tab, it applies, and keeps applying until a plan is clean (a new channel needs a second apply to take its position).
+
+It reads these from the `discord` environment (Settings > Environments > discord):
+
+| Name | Kind | Value |
+|---|---|---|
+| `DISCORD_TOKEN` | secret | the bot token |
+| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | secret | the R2 key pair (see "State") |
+| `AWS_ENDPOINT_URL_S3` | variable | `https://<cloudflare account id>.r2.cloudflarestorage.com` |
+| `DISCORD_SERVER_ID` | variable | the server's ID |
+
+Running it from a laptop still works the same way (`tofu plan` / `tofu apply -var server_id=<server id>`). An apply there takes the same lock in R2, so it can't overlap with the workflow's.
 
 ## State
 
