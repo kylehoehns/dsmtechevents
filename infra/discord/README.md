@@ -29,6 +29,7 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 ## Still done by hand
 
 - Turn on Community mode, choosing `#rules` as the rules channel and `#mod-updates` as the updates channel (Server Settings > Enable Community). See "First run" below for when.
+- Name the server **Des Moines Tech** and give it the site's icon (`public/icons/icon-512.png`) in Server Settings > Overview. The provider could only set these by owning the server's other settings too.
 - Write the Server Guide (Server Settings > Onboarding > Server Guide):
   - Welcome message: two sentences, ending with the Channels & Roles line under "Joining and leaving groups".
   - New member to-dos: read `#rules`, say hi in `#introductions`, pick your groups in Channels & Roles.
