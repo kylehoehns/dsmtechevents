@@ -66,7 +66,16 @@ Onboarding is owned by this config: anything changed by hand in Server Settings 
 
    `8` is Administrator. The bot needs it because the read-only and hidden channels deny things to @everyone, and those denials apply to the bot as well: it can't see a hidden category, and Discord won't let it set a channel permission it has lost there. Administrator is the only permission that skips channel rules. It also makes the token a full admin key for the server, so keep it out of files and chat, and reset it in the Developer Portal if it leaks.
 3. Drag the bot's role above every role it will manage (Server Settings > Roles).
-4. Set the token in your shell, never in a file: `export DISCORD_TOKEN=...`
+4. Set the secrets in your shell, never in a file (see "State" for the R2 ones):
+
+   ```sh
+   export DISCORD_TOKEN=...          # the bot token
+   export AWS_ACCESS_KEY_ID=...      # R2 key pair
+   export AWS_SECRET_ACCESS_KEY=...
+   export AWS_ENDPOINT_URL_S3=https://<cloudflare account id>.r2.cloudflarestorage.com
+   ```
+
+   On a Mac, keep them in the keychain and read them per shell, e.g. `export DISCORD_TOKEN=$(security find-generic-password -s dsm-tech-discord-bot -w)`. To store one without it landing in your shell history, run `security add-generic-password -a "$USER" -s <name> -w` in Terminal and paste at the prompt.
 5. Run `tofu init` in this folder.
 
 ### First run
@@ -96,6 +105,12 @@ tofu plan  -var server_id=<server id>
 tofu apply -var server_id=<server id>
 ```
 
-State is local for now (`terraform.tfstate`, ignored by git). Before more than one person applies, move it to a shared backend.
+An apply that creates channels (a new group, say) needs a second apply to put them in order, for the same reason as step 4 above.
+
+## State
+
+OpenTofu's record of what it built (which Discord IDs belong to which resource) lives in Cloudflare R2: bucket `dsmtechevents-tofu-state`, key `discord/terraform.tfstate`. While an apply runs it holds a lock file next to it, so two applies can't overlap. The state holds Discord IDs and names, not the bot token.
+
+The R2 key pair comes from Cloudflare > R2 > Manage API tokens: an Account API token with **Object Read & Write**, limited to that bucket.
 
 Point it at a fresh server first. The current playground server has hand-made channels and roles that this config doesn't know about, and applying would replace its onboarding.
