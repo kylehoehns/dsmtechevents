@@ -15,17 +15,21 @@ locals {
   group_ids = [for g in yamldecode(file("${path.module}/../../data/groups.yaml")) : g.id if contains(keys(local.groups), g.id)]
 }
 
-# What an organizer can do inside their own group's section, and nowhere else.
-# Not granted: Manage Permissions (they could widen their own access) and
-# Manage Webhooks (the events feed is set up centrally).
+# What an organizer can do inside their own group's section, and nowhere else:
+# moderate it and ping their members. Not granted:
+# - Manage Channels: channels change through this repo. A channel deleted by
+#   hand loses its history, and the provider then fails every plan until the
+#   state is repaired.
+# - Manage Permissions (they could widen their own access) and Manage Webhooks.
+# - Events: Discord's own event listings would be a second calendar beside
+#   each group's page, and the permission only works on voice channels anyway.
 data "discord_permission" "organizer" {
-  manage_channels  = "allow"
-  manage_messages  = "allow"
-  pin_messages     = "allow"
-  manage_threads   = "allow"
-  mention_everyone = "allow" # lets them ping their member role, only here
-  create_events    = "allow"
-  manage_events    = "allow"
+  manage_messages = "allow"
+  pin_messages    = "allow"
+  manage_threads  = "allow"
+  # Lets them ping their member role. Discord has no narrower permission, so
+  # it also allows @everyone, @here and other groups' roles in these channels.
+  mention_everyone = "allow"
 }
 
 # Read-only for everyone else: announcement-style channels.

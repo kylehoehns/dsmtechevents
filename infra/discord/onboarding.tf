@@ -1,10 +1,9 @@
 locals {
   # Every member sees these. Discord asks for at least 7, 5 of them chattable
-  # (the #jobs forum counts).
+  # (the #jobs forum counts). This is exactly 7 and 5: removing any one fails.
   default_channel_ids = [
     discord_text_channel.rules.id,
     discord_news_channel.announcements.id,
-    discord_news_channel.upcoming_events.id,
     discord_text_channel.general.id,
     discord_text_channel.introductions.id,
     discord_forum_channel.jobs.id,

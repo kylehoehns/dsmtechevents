@@ -41,11 +41,15 @@ resource "discord_channel_permission" "group_organizer" {
 }
 
 resource "discord_text_channel" "group_chat" {
-  for_each                 = local.groups
-  server_id                = var.server_id
-  category                 = discord_category_channel.group[each.key].id
-  name                     = "${each.key}-chat"
-  topic                    = "${each.value.name}. Events: https://dsmtechevents.com"
+  for_each  = local.groups
+  server_id = var.server_id
+  category  = discord_category_channel.group[each.key].id
+  name      = "${each.key}-chat"
+  # The group's own page, where people RSVP, exactly as groups.yaml has it.
+  topic = join(" ", compact([
+    "${each.value.name}.",
+    try("Meetups: ${coalesce(try(each.value.meetup, null), try(each.value.website, null), try(each.value.eventbrite, null))}", null),
+  ]))
   position                 = 1
   sync_perms_with_category = true
   depends_on               = [discord_channel_permission.group_organizer]

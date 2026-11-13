@@ -10,27 +10,39 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
   discord: true
 ```
 
-The reasoning behind each choice is in the setup decisions doc (DSM Community Discord: Setup Decisions).
-
 ## What it builds
 
-- **Start Here** (read-only): `#rules`, `#announcements`, `#upcoming-events`. `#rules` holds one message posted by the bot from `rules.md`; edit that file and apply to change it (the message is edited in place, with no new post or ping).
-- **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell`, `#off-topic`, and the Lounge voice channel
+- **Start Here** (read-only): `#rules`, `#announcements`. `#rules` holds one message posted by the bot from `rules.md`; edit that file and apply to change it (the message is edited in place, with no new post or ping).
+- **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell`, `#off-topic`
 - **Organizers** (hidden; every `<id>-organizer` role can see it): `#organizers`, one room for the organizers of all groups
 - **Admins** (hidden): `#mod-updates`
 - **For each group**, a category named after the group's `short` name, containing:
   - `#<id>-announcements`: only organizers post
   - `#<id>-chat`
   - `<id>-member` role: given by onboarding, not mentionable by members. No color: Discord colors a name by the highest colored role, so with one color per group most names would show whichever group sits on top, and that group would look favored.
-  - `<id>-organizer` role: no server-wide powers. Inside its own category it can manage channels, messages, pins, threads and events, and ping its member role.
+  - `<id>-organizer` role: no server-wide powers. Inside its own category it can delete and pin messages, manage threads, and ping its member role. Discord has no permission for pinging one role only, so it can also ping @everyone, @here and other groups' roles there; organizers should ping only their own members.
+  - The chat channel's topic links to the group's own page (`meetup`, else `website` or `eventbrite`), where people RSVP.
 - **Onboarding**:
-  - the eight community channels as defaults
+  - the seven Start Here and Community channels as defaults: exactly Discord's minimum of 7, with 5 that members can post in, so removing any one breaks onboarding
   - one question, "Which user groups do you want to follow?", with an answer per group that grants the group's category and member role
 
 ## Still done by hand
 
 - Turn on Community mode, choosing `#rules` as the rules channel and `#mod-updates` as the updates channel (Server Settings > Enable Community). See "First run" below for when.
-- Write the Server Guide (welcome message, new member to-dos).
+- Write the Server Guide (Server Settings > Onboarding > Server Guide):
+  - Welcome message: two sentences, ending with the Channels & Roles line under "Joining and leaving groups".
+  - New member to-dos: read `#rules`, say hi in `#introductions`, pick your groups in Channels & Roles.
+  - Resource pages: `#rules`, `#jobs`.
+- Safety (Server Settings > Safety Setup):
+  - Safety alerts channel: `#mod-updates`.
+  - Raid protection on, with CAPTCHA for suspicious joins.
+  - AutoMod, each rule exempting `admin` and the organizer roles:
+    - Mention spam: block at about 8 mentions, alert in `#mod-updates`, and time out for an hour.
+    - Suspected spam content: block.
+    - Commonly flagged words: slurs and sexual content on, profanity off.
+    - Custom keywords, block and alert: `discord.gg/*`, `discord.com/invite/*`, `free nitro`, `steam gift`, `airdrop`, `seed phrase`.
+  - Require 2FA for moderation, once the account that owns the bot has 2FA on; without it, applies can start failing.
+- Bot (Developer Portal > Bot): turn Public Bot off, and leave every privileged intent off. OpenTofu only calls Discord's REST API and needs none.
 - Set up the `#jobs` forum (Edit Channel > Overview). The provider can't do either part: it ignores a forum's `topic`, and it has no forum tags.
   - Post guidelines:
 
@@ -43,7 +55,8 @@ The reasoning behind each choice is in the setup decisions doc (DSM Community Di
     > No "DM me for details". Job posts go here and nowhere else.
 
   - Tags: `Hiring` and `Looking`, with "Require people to select tags when posting" on, so every post has one.
-- Give people their `admin` and organizer roles. `admin` has the Administrator permission, shows in its own block of the member list, and anyone can ping it; drag it above the organizer roles in Server Settings > Roles so its block comes first (the provider can't set role order).
+- Give people their `admin` and organizer roles. `admin` has the Administrator permission, shows in its own block of the member list, and anyone can ping it.
+- Order the roles (Server Settings > Roles; the provider can't): the bot's role, then `admin`, then the organizer roles, then the member roles. A role can only manage roles below it, so an admin below the organizers couldn't assign or moderate them.
 
 ## Joining and leaving groups
 
@@ -62,10 +75,14 @@ Wording to paste:
 ## Adding a group
 
 1. Add `discord: true` to the group's entry in `data/groups.yaml`.
-2. Run `tofu apply`. The group gets its category, channels and roles, and becomes a new answer to the onboarding question.
+2. Run `tofu apply` twice. The first creates the group's category, channels and roles and adds it as an answer to the onboarding question; the second puts the new channels in order.
 3. Existing members aren't asked again. Post in `#announcements` that the group is here and how to join it (see above).
 
-Onboarding is owned by this config: anything changed by hand in Server Settings > Onboarding is replaced on the next apply.
+Onboarding is owned by this config: the question and its answers are replaced on the next apply if changed by hand in Server Settings > Onboarding. The default channels are the exception. Discord returns them in its own order, so the config doesn't compare them and a hand change there stays until the set in `onboarding.tf` changes.
+
+A group's `id` must not change once it has a Discord section. Everything for the group is keyed by it, so a new `id` deletes the group's channels, with their history, and creates new ones.
+
+Don't delete a managed channel or the rules message by hand. The provider then fails every plan with "Failed to fetch channel" until it is removed from the state with `tofu state rm '<address>'`, after which an apply creates it again.
 
 ## Running it
 

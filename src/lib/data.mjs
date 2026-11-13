@@ -108,6 +108,10 @@ function onlyKnown(file, entry, keys) {
 // A group from groups.yaml plus what the refresh cached for it.
 function readGroup(g, dataDir) {
   onlyKnown('groups.yaml', g, GROUP_KEYS);
+  // infra/discord builds a group's Discord section when this is exactly true.
+  // OpenTofu reads YAML 1.1 (`yes` is true there, a string here), so anything
+  // else is refused rather than meaning different things to each.
+  if ('discord' in g && g.discord !== true) throw new Error(`groups.yaml: "${g.id}" has discord: ${JSON.stringify(g.discord)}, not true`);
   const cacheFile = path.join(dataDir, 'cache', `${g.id}.json`);
   const cache = fs.existsSync(cacheFile) ? JSON.parse(fs.readFileSync(cacheFile, 'utf8')) : { events: [] };
   const slug = meetupSlug(g.meetup);

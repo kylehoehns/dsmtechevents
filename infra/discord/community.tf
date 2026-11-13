@@ -36,18 +36,6 @@ resource "discord_news_channel" "announcements" {
   depends_on               = [discord_channel_permission.start_here_read_only]
 }
 
-# Kept for a possible dsmtechevents.com feed. Whether to build one is
-# undecided (feeds are ruled out in docs/decisions/0006), so nothing posts here yet.
-resource "discord_news_channel" "upcoming_events" {
-  server_id                = var.server_id
-  category                 = discord_category_channel.start_here.id
-  name                     = "upcoming-events"
-  topic                    = "What's coming up: https://dsmtechevents.com"
-  position                 = 2
-  sync_perms_with_category = true
-  depends_on               = [discord_channel_permission.start_here_read_only]
-}
-
 # COMMUNITY: anyone can post.
 resource "discord_category_channel" "community" {
   server_id = var.server_id
@@ -98,14 +86,6 @@ resource "discord_text_channel" "off_topic" {
   name                     = "off-topic"
   topic                    = "Everything that isn't work: pets, food, games, weekend plans."
   position                 = 4
-  sync_perms_with_category = true
-}
-
-resource "discord_voice_channel" "lounge" {
-  server_id                = var.server_id
-  category                 = discord_category_channel.community.id
-  name                     = "Lounge"
-  position                 = 5
   sync_perms_with_category = true
 }
 
