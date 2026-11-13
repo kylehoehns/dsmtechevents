@@ -9,7 +9,7 @@ locals {
     discord_text_channel.general.id,
     discord_text_channel.introductions.id,
     discord_forum_channel.jobs.id,
-    discord_text_channel.show_and_tell.id,
+    discord_forum_channel.show_and_tell.id,
     discord_text_channel.off_topic.id,
   ]
 }

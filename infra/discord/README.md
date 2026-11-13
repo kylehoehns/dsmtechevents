@@ -13,14 +13,14 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 ## What it builds
 
 - **Start Here** (read-only): `#rules`, `#announcements`. `#rules` holds one message posted by the bot from `rules.md`; edit that file and apply to change it (the message is edited in place, with no new post or ping).
-- **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell`, `#off-topic`
-- **Organizers** (hidden; every `<id>-organizer` role can see it): `#organizers`, one room for the organizers of all groups
+- **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell` (forum), `#off-topic`
+- **Organizers** (hidden; every organizer role can see it): `#organizers`, one room for the organizers of all groups. It holds a pinned guide posted by the bot from `organizers.md`, edited in place like the rules.
 - **Admins** (hidden): `#mod-updates`
 - **For each group**, a category named after the group's `short` name, containing:
   - `#<id>-announcements`: only organizers post
   - `#<id>-chat`
-  - `<id>-member` role: given by onboarding, not mentionable by members. No color: Discord colors a name by the highest colored role, so with one color per group most names would show whichever group sits on top, and that group would look favored.
-  - `<id>-organizer` role: no server-wide powers. Inside its own category it can delete and pin messages, manage threads, and ping its member role. Discord has no permission for pinging one role only, so it can also ping @everyone, @here and other groups' roles there; organizers should ping only their own members.
+  - `<short> member` role (e.g. "CIJUG member"): given by onboarding, not mentionable by members. No color: Discord colors a name by the highest colored role, so with one color per group most names would show whichever group sits on top, and that group would look favored.
+  - `<short> organizer` role: no server-wide powers, and no block of its own in the member list (blocks show in role order, so one group's organizers would always sit on top). Inside its own category it can delete and pin messages, manage threads, and ping its member role. Discord has no permission for pinging one role only, so it can also ping @everyone, @here and other groups' roles there; organizers should ping only their own members.
     - It can't add, rename or delete channels: those change through this repo, since a channel deleted by hand loses its history. For another space (a workshop, a study group), organizers start a thread off a message in `#<id>-chat`. Anyone can follow it, and it archives itself when it goes quiet. If a group outgrows threads, add channels for it here.
   - The chat channel's topic links to the group's own page (`meetup`, else `website` or `eventbrite`), where people RSVP.
 - **Onboarding**:
@@ -34,7 +34,7 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 - Write the Server Guide (Server Settings > Onboarding > Server Guide):
   - Welcome message: two sentences, ending with the Channels & Roles line under "Joining and leaving groups".
   - New member to-dos: read `#rules`, say hi in `#introductions`, pick your groups in Channels & Roles.
-  - Resource pages: `#rules`, `#jobs`.
+  - Resource page: `#rules`. (Only read-only channels can be resource pages, so not `#jobs`.)
 - Safety (Server Settings > Safety Setup):
   - Safety alerts channel: `#mod-updates`.
   - Raid protection on, with CAPTCHA for suspicious joins.
@@ -57,8 +57,11 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
     > No "DM me for details". Job posts go here and nowhere else.
 
   - Tags: `Hiring` and `Looking`, with "Require people to select tags when posting" on, so every post has one.
-- Give people their `admin` and organizer roles. `admin` has the Administrator permission, shows in its own block of the member list, and anyone can ping it.
-- Order the roles (Server Settings > Roles; the provider can't): the bot's role, then `admin`, then the organizer roles, then the member roles. A role can only manage roles below it, so an admin below the organizers couldn't assign or moderate them.
+- Set up the `#show-and-tell` forum's post guidelines the same way:
+
+    > One post per project, talk or write-up. Say what it is, add a link, and say what feedback you'd like.
+- Give people their Admin and organizer roles. Admin has the Administrator permission, is the only role with its own block in the member list, and anyone can ping it.
+- Keep the bot's role at the top of the role list, with Admin right under it (Server Settings > Roles; the provider can't order roles). A role can only manage roles below it. The group roles' order doesn't matter, since nothing else shows it.
 
 ## Joining and leaving groups
 
