@@ -137,8 +137,11 @@ resource "discord_text_channel" "organizers" {
 # apply edits the message in place.
 resource "discord_message" "organizers_guide" {
   channel_id = discord_text_channel.organizers.id
-  content    = trimspace(file("${path.module}/organizers.md"))
-  pinned     = true
+  # Channel names in the guide are <#id> mentions, so they link.
+  content = trimspace(templatefile("${path.module}/organizers.md", {
+    events = discord_forum_channel.events.id
+  }))
+  pinned = true
 
   # See discord_message.rules: Discord's link preview cards crash the provider.
   lifecycle {
