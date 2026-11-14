@@ -22,9 +22,11 @@ every event on the site.
 upcoming event. `scripts/discord-events.mjs` keeps it in step after each
 refresh:
 
-- A new event gets a post: who, when (Des Moines time), where, and the RSVP
-  link to the group's own page. A series' repeats are skipped, as the site
-  folds them.
+- A new event gets a post: who, when (Des Moines time), where, the group's
+  whole write-up (formatted as the site formats it, so it reads in one
+  place), and the RSVP link to the group's own page. A series' repeats are
+  skipped, as the site folds them. (The write-up was a 300-character excerpt
+  until 2026-11-14.)
 - A post is edited when its event changes. A placeholder replaced by the
   real event (same hosts, same day, new id) keeps its post.
 - A post is closed (archived and locked) 3 days after its event ends.

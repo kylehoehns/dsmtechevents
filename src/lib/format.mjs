@@ -171,8 +171,10 @@ export const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&
 // paragraphs). Meetup puts a backslash before punctuation ("Monday\, 6pm \|
 // Source Allies"); drop it. An escaped star becomes &#42; so it can't start
 // bold or italics. Escaping runs first, so \& reaches here as \&amp;.
-const ESCAPE = /\\(&(?:amp|lt|gt|quot|#39);|[!-/:-@[-`{-~])/g;
-const ITALIC = /(^|[^\w*\\])\*(?=\S)([^*\n]*?\S)\*(?![\w*])/gm;
+// The Discord #events posts read the same Markdown the same way
+// (discordMarkdown() in scripts/discord-events.mjs).
+export const ESCAPE = /\\(&(?:amp|lt|gt|quot|#39);|[!-/:-@[-`{-~])/g;
+export const ITALIC = /(^|[^\w*\\])\*(?=\S)([^*\n]*?\S)\*(?![\w*])/gm;
 export function formatDescription(text = '') {
   return escapeHtml(text)
     .replace(ESCAPE, (_, c) => (c === '*' ? '&#42;' : c))

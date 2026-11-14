@@ -10,7 +10,7 @@ const ev = (over = {}) => ({
 });
 const postFor = (e, over = {}) => ({ id: `t-${e.id}`, ...render(e), archived: false, ...over });
 
-test('a post: the day in the title; the hours, group and place in the message; the card has the hook; buttons open the page and directions', () => {
+test('a post: the day in the title; the hours, group and place in the message; the card has the write-up; buttons open the page and directions', () => {
   const e = ev({ address: '1 Main St, Des Moines, IA', description: 'Learn how Python packaging works and why it keeps changing.\n\nPizza at 6.', photo: { large: 'https://img/p.jpg' } });
   const { name, content, embeds, components } = render(e);
   assert.equal(name, 'Thu Nov 19 · Python Night');
@@ -21,7 +21,7 @@ test('a post: the day in the title; the hours, group and place in the message; t
   assert.deepEqual(refOf(embeds[0].footer.text), { id: 'pyowa-1', day: '2026-11-19', host: 'pyowa' });
   assert.deepEqual(embeds, [{
     color: 0xff4fa3,
-    description: 'Learn how Python packaging works and why it keeps changing.',
+    description: 'Learn how Python packaging works and why it keeps changing.\n\nPizza at 6.',
     image: { url: 'https://img/p.jpg' },
     footer: { text: 'ref pyowa-1 2026-11-19 pyowa' },
   }]);
@@ -32,16 +32,18 @@ test('a post: the day in the title; the hours, group and place in the message; t
   assert.doesNotMatch(content + JSON.stringify(embeds), /Des Moines time|RSVP on|\]\(/);
 });
 
-test('the hook skips a title repeat, short logistics and a pointer to another link, and drops a "from <group>" sign-off', () => {
-  const hookOf = (description, over = {}) => render(ev({ description, ...over })).embeds[0].description;
-  assert.equal(hookOf('Python Night\n\nDoors open at 6 PM.\n\nCheck out https://pyowa.org for details on this.\n\nA hands-on night of packaging tips for every level of Python user.'),
-    'A hands-on night of packaging tips for every level of Python user.');
-  assert.equal(hookOf('An evening of talks and community, from Pyowa.'), 'An evening of talks and community.');
-  const long = `${'This sentence is about forty characters. '.repeat(6)}And then it keeps on going without a break for a while longer.`;
-  assert.equal(hookOf(long), 'This sentence is about forty characters. '.repeat(6).trim());
-  assert.ok(hookOf(long).length <= 300 && hookOf(long).endsWith('.'));
-  assert.ok(hookOf('word '.repeat(100)).endsWith('…'));
-  assert.equal(render(ev({ description: '' })).embeds[0].description, undefined, 'no hook, no description');
+test('the card carries the whole write-up, formatted the way the site formats it', () => {
+  const about = (description) => render(ev({ description })).embeds[0].description;
+  assert.equal(about('## Agenda\n\n**6:00** Pizza \\| drinks at *Lean Techniques*\nSee [the slides](https://x.com/a_b) or https://y.com/c_d.\n\n---\n\n![🍕](https://e/x.png) Doors open at 6.'),
+    '**Agenda**\n\n**6:00** Pizza \\| drinks at *Lean Techniques*\nSee [the slides](https://x.com/a_b) or https://y.com/c_d.\n\n🍕 Doors open at 6.');
+  // Meetup's escaped star is only a star; other marks show as typed.
+  assert.equal(about('2 \\* 3 is _six_ ~~maybe~~\n- one'), '2 \\* 3 is \\_six\\_ \\~\\~maybe\\~\\~\n\\- one');
+  // A link's label is escaped, so it can't open a second link.
+  assert.equal(about('[a](https://x.com/) [b]](https://y.com/)'), '[a](https://x.com/) \\[b\\]\\](https://y.com/)');
+  // Longer than a card holds: whole paragraphs up to Discord's 4096 characters.
+  const long = about(Array.from({ length: 30 }, () => 'x'.repeat(200)).join('\n\n'));
+  assert.ok(long.length <= 4096 && long.endsWith('\n\n…'));
+  assert.equal(render(ev({ description: '' })).embeds[0].description, undefined, 'no write-up, no description');
 });
 
 test('online, hybrid, no venue yet, all day, several days and a series each read right', () => {
@@ -62,8 +64,8 @@ test('online, hybrid, no venue yet, all day, several days and a series each read
 test('the group\'s text is escaped, so it shows as typed and can\'t ping anyone', () => {
   const { content, embeds } = render(ev({ venue: '**Big** <@everyone> Hall', description: '# Tonight: a hands-on night of _fun_ with @everyone, and all are welcome to come.' }));
   assert.match(content, /📍 \\\*\\\*Big\\\*\\\* \\<\\@everyone\\> Hall$/);
-  // The site's plainText() already drops a leading "#" heading; a hyphen inside a word is left alone.
-  assert.match(embeds[0].description, /^Tonight: a hands-on night of \\_fun\\_ with \\@everyone/);
+  // A leading "#" heading becomes a bold line; its text is still escaped.
+  assert.match(embeds[0].description, /^\*\*Tonight: a hands-on night of \\_fun\\_ with \\@everyone/);
 });
 
 test('long titles are cut to Discord\'s 100 characters', () => {

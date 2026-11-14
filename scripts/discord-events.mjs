@@ -21,7 +21,7 @@
 //     in a job of its own, with DISCORD_TOKEN and DISCORD_SERVER_ID set and
 //     nothing installed: syncs the forum (or, dry run, prints the plan)
 import fs from 'node:fs';
-import { DAY, dayKey, dayRange, day, hours, month, plainText, weekday } from '../src/lib/format.mjs';
+import { DAY, dayKey, dayRange, day, ESCAPE, hours, ITALIC, month, weekday } from '../src/lib/format.mjs';
 
 const CLOSE_AFTER = 3 * DAY;
 const CANCELLED = 'Cancelled · ';
@@ -40,30 +40,44 @@ const cut = (s, n) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s);
 // quote mark only counts at the start of a line, so only there.
 const md = (s) => s.replace(/[\\*_~`|[\]<>@]/g, '\\$&').replace(/^([#>-])/gm, '\\$1');
 
-// The hook: the group's first real paragraph, whole if it's short, else cut
-// at the last full sentence that fits (about 300 characters), else at a word.
-// Skips what isn't a hook: a paragraph repeating the title, one that's mostly
-// a link, and short logistics ("Doors open at 6 PM.", parking, food).
-const HOOK = 300;
-const LOGISTICS = /^(doors? open|parking|pizza|food|drinks|snacks|agenda|schedule|location|where|when|rsvp|note)\b/i;
-function hook(e) {
-  const squash = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
-  const paras = (e.description ?? '').split(/\n\s*\n/).map((p) => plainText(p).replace(/\s+/g, ' ').trim()).filter(Boolean);
-  const real = paras.find((p) => {
-    const words = p.replace(/https?:\/\/\S+/g, '').trim();
-    if (words.length < 40) return false; // too short to be a hook, or mostly a link
-    if (/https?:\/\//.test(p) && p.length < 120) return false; // "Check out <link> for details"
-    if (squash(p) === squash(e.title) || squash(e.title).includes(squash(p))) return false;
-    return !(LOGISTICS.test(p) && p.length < 120);
-  });
-  if (!real) return '';
-  // "…, from IA Women in Tech." loses its last words: the card is titled with the group.
-  const by = e.hostsLabel && new RegExp(`,?\\s+(?:from|by|hosted by)\\s+(?:the\\s+)?${e.hostsLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=[.!?]?$)`, 'i');
-  const text = by ? real.replace(by, '') : real;
-  if (text.length <= HOOK) return text;
-  const sentences = text.slice(0, HOOK).match(/^.*[.!?](?=\s|$)/s)?.[0];
-  if (sentences && sentences.length >= 80) return sentences;
-  return `${text.slice(0, HOOK - 1).replace(/\s+\S*$/, '')}…`;
+// The group's whole write-up as Discord markdown, read the way the site's
+// formatDescription() reads it (src/lib/format.mjs): paragraphs, line
+// breaks, **bold**, *italics*, [links](url), bare URLs, ![images](url) as
+// their alt text, "## headings" (bold lines: a card shows no headings) and
+// rule lines dropped. Everything else is escaped by md(), so it shows as
+// typed. The marks it keeps stand in as private-use characters while md() runs.
+const BOLD = '\uE001';
+const ITAL = '\uE002';
+const STAR = '\uE003'; // Meetup's escaped \*: a star that is only a star
+const LINK = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|(^|[\s(])(https?:\/\/[^\s<)]+?)(?=[.,;:!?]*(?:[\s<)]|$))/g;
+const CARD_MAX = 4096; // Discord's limit for a card's text
+export function discordMarkdown(text = '') {
+  const paras = String(text)
+    .replace(ESCAPE, (_, c) => (c === '*' ? STAR : c))
+    .replace(/^[ \t]*([-*_])(?:[ \t]*\1){2,}[ \t]*$/gm, '')
+    .split(/\n{2,}/)
+    .map((para) => {
+      const links = [];
+      const stash = (s) => `\uE000${links.push(s) - 1}\uE000`;
+      const marked = para.trim()
+        .replace(/!\[([^\]]*)\]\([^)\s]*\)/g, '$1')
+        .replace(LINK, (_, label, url, before, bare) => (url ? stash(`[${md(label)}](${url})`) : `${before}${stash(bare)}`))
+        .replace(/\*\*([^*]+)\*\*/g, `${BOLD}$1${BOLD}`)
+        .replace(ITALIC, `$1${ITAL}$2${ITAL}`)
+        .replace(/^#{1,6}\s+(.*)/, `${BOLD}$1${BOLD}`);
+      return md(marked)
+        .replaceAll(BOLD, '**').replaceAll(ITAL, '*').replaceAll(STAR, '\\*')
+        .replace(/\uE000(\d+)\uE000/g, (_, i) => links[i]);
+    })
+    .filter(Boolean);
+  // Whole paragraphs up to the limit, so a cut can't leave a mark unclosed.
+  let out = '';
+  for (const p of paras) {
+    const next = out ? `${out}\n\n${p}` : p;
+    if (next.length > CARD_MAX - 2) return out ? `${out}\n\n…` : cut(p, CARD_MAX);
+    out = next;
+  }
+  return out;
 }
 
 // The place: a few plain words for the message (the forum's list shows the
@@ -100,12 +114,12 @@ export function render(e) {
   // The link inside <…>, so a scraped URL holding ")[" can't add a link of its
   // own. An event with no usable link gets a card without one.
   const site = URL.canParse(e.url ?? '') ? new URL(e.url).hostname.replace(/^www\./, '') : '';
-  const about = hook(e);
+  const about = discordMarkdown(e.description);
   // No title: the group is named in the message. The links are buttons under
   // it, big enough to find and tap: the event's page, then directions.
   const card = {
     color: ACCENT,
-    ...(about ? { description: md(about) } : {}),
+    ...(about ? { description: about } : {}),
     // The event's own photo, big. Without one, the group's logo, small in the
     // corner: the site leaves out a photo that only repeats the logo, since its
     // cards show the logo too, but nothing else in a post does.
