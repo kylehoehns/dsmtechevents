@@ -63,17 +63,22 @@ function hook(e) {
   return `${text.slice(0, HOOK - 1).replace(/\s+\S*$/, '')}…`;
 }
 
-// The place, in two short lines: the venue, then the address as a map link.
+// The place: a few plain words for the message (the forum's list shows the
+// message as plain text, so it can't hold a link), and a map search for the
+// card's Directions link (the site's own query: venue plus address).
 function where(e) {
   const venue = e.venue && e.venue !== 'Online' ? e.venue : '';
-  if (!venue) return e.online || e.hybrid || e.venue === 'Online' ? ['💻 **Online**'] : ['📍 **Place to be announced**'];
-  const address = e.fullAddress ?? e.address;
-  const map = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([venue, address ?? 'Des Moines, IA'].join(', '))}`;
-  return [
-    `📍 **${md(venue)}**${e.hybrid ? ' · also online' : ''}`,
-    address && address !== venue ? `[${md(address)}](<${map}>)` : `[Map](<${map}>)`,
-  ];
+  if (!venue) return { place: e.online || e.hybrid || e.venue === 'Online' ? '💻 Online' : '📍 Place to be announced', map: null };
+  const query = [venue, e.fullAddress ?? e.address ?? 'Des Moines, IA'].join(', ');
+  return {
+    place: `📍 ${md(venue)}${e.hybrid ? ' · also online' : ''}`,
+    map: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`,
+  };
 }
+
+// Meetup serves each photo as .jpeg as well as the .webp the site uses
+// (src/lib/meetup.mjs); Discord labels a .webp "GIF" in the forum's list.
+const forDiscord = (url) => url.replace(/^(https:\/\/secure\.meetupstatic\.com\/photos\/.+)\.webp$/, '$1.jpeg');
 
 // The post for one event: its title, its first message, and one card.
 // Typeset like a poster: the title says the day, the message says the hours
@@ -84,8 +89,8 @@ export function render(e) {
   const date = e.multiDay ? dayRange(e.start, e.end) : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
   const rel = `<t:${Math.floor(Date.parse(e.start) / 1000)}:R>`;
   const repeats = e.series?.rule ? `${e.series.rule.replace(/^./, (c) => c.toLowerCase())}${e.series.until ? ` through ${e.series.until}` : ''}` : '';
-  const when = [`## ${hours(e)}`, `-# ${[rel, ...(repeats ? [repeats] : [])].join(' · ')}`];
-  const content = [when, where(e)].map((b) => b.join('\n')).join('\n\n');
+  const { place, map } = where(e);
+  const content = `## ${hours(e)}\n-# ${[rel, ...(repeats ? [repeats] : []), place].join(' · ')}`;
 
   // The link inside <…>, so a scraped URL holding ")[" can't add a link of its
   // own. An event with no usable link gets a card without one.
@@ -95,8 +100,11 @@ export function render(e) {
     color: ACCENT,
     title: cut(e.hostsLabel || 'Event page', 256),
     ...(site ? { url: e.url } : {}),
-    description: [...(about ? [md(about)] : []), ...(site ? [`[Read more on ${site}](<${e.url}>)`] : [])].join('\n\n'),
-    ...(e.photo?.large ? { image: { url: e.photo.large } } : {}),
+    description: [
+      ...(about ? [md(about)] : []),
+      [...(map ? [`[Directions](<${map}>)`] : []), ...(site ? [`[Read more on ${site}](<${e.url}>)`] : [])].join(' · '),
+    ].filter(Boolean).join('\n\n'),
+    ...(e.photo?.large ? { image: { url: forDiscord(e.photo.large) } } : {}),
     footer: { text: `ref ${refId(e)} ${dayKey(e.start)} ${hostKey(e)}` },
   };
   return { name: cut(`${date} · ${e.title}`, NAME_MAX), content, embeds: [card] };
