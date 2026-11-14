@@ -81,25 +81,26 @@ function where(e) {
 const forDiscord = (url) => url.replace(/^(https:\/\/secure\.meetupstatic\.com\/photos\/.+)\.webp$/, '$1.jpeg');
 
 // The post for one event: its title, its first message, and one card.
-// Typeset like a poster: the title says the day, the message says the hours
-// and the place, and the card is the group's: their name linked to their
-// page (where people RSVP), their words and their photo. The ref line is the
+// Typeset like a poster: the title says the day, the message says the hours,
+// the group and the place, and the card is the group's: their words, links to
+// directions and to their page (where people RSVP), and their photo. The ref line is the
 // card's footer, the last thing on screen.
 export function render(e) {
   const date = e.multiDay ? dayRange(e.start, e.end) : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
   const rel = `<t:${Math.floor(Date.parse(e.start) / 1000)}:R>`;
   const repeats = e.series?.rule ? `${e.series.rule.replace(/^./, (c) => c.toLowerCase())}${e.series.until ? ` through ${e.series.until}` : ''}` : '';
   const { place, map } = where(e);
-  const content = `## ${hours(e)}\n-# ${[rel, ...(repeats ? [repeats] : []), place].join(' · ')}`;
+  // Who's hosting sits with when and where, so the forum's list shows all three.
+  const host = e.hostsLabel ? [`**${md(e.hostsLabel)}**`] : [];
+  const content = `## ${hours(e)}\n-# ${[rel, ...(repeats ? [repeats] : []), ...host, place].join(' · ')}`;
 
   // The link inside <…>, so a scraped URL holding ")[" can't add a link of its
   // own. An event with no usable link gets a card without one.
   const site = URL.canParse(e.url ?? '') ? new URL(e.url).hostname.replace(/^www\./, '') : '';
   const about = hook(e);
+  // No title: the group is named in the message, and "Read more" links its page.
   const card = {
     color: ACCENT,
-    title: cut(e.hostsLabel || 'Event page', 256),
-    ...(site ? { url: e.url } : {}),
     description: [
       ...(about ? [md(about)] : []),
       [...(map ? [`[Directions](<${map}>)`] : []), ...(site ? [`[Read more on ${site}](<${e.url}>)`] : [])].join(' · '),
