@@ -15,15 +15,16 @@ locals {
   ]
 }
 
-# Discord hands the default channels back in its own order, so comparing the
-# list would show a change on every plan. The onboarding ignores the list and
-# is rebuilt instead when this sorted copy of it changes.
-resource "terraform_data" "default_channels" {
-  input = sort(local.default_channel_ids)
-}
-
-# Owns the whole onboarding setup: anything added by hand in Server Settings >
-# Onboarding is replaced on the next apply. Change it here instead.
+# Owns the onboarding question: its answers are updated in place as groups
+# come and go, which keeps the prompt's and answers' IDs, and with them every
+# member's picks.
+#
+# The default channels are set only when onboarding is first created.
+# Discord hands them back in its own order, so comparing them would show a
+# change on every plan, and rebuilding onboarding to apply a change gives the
+# question new IDs, which wipes every member's picks. So the list is ignored
+# after creation: change the default channels in Server Settings >
+# Onboarding (the README says how).
 resource "discord_server_onboarding" "this" {
   server_id           = var.server_id
   enabled             = true
@@ -31,8 +32,7 @@ resource "discord_server_onboarding" "this" {
   default_channel_ids = local.default_channel_ids
 
   lifecycle {
-    ignore_changes       = [default_channel_ids]
-    replace_triggered_by = [terraform_data.default_channels]
+    ignore_changes = [default_channel_ids]
   }
 
   prompt {

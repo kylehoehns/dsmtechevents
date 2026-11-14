@@ -96,7 +96,9 @@ Wording to paste:
 
 The onboarding answers are listed in the order groups were added, so a new group is always last; its place in `groups.yaml` doesn't matter. Removing a group is different: the provider keeps each answer's Discord ID by its place in the list, so every answer after the removed one takes the ID of the one before it. Nobody loses a role or a channel, but members' ticks in Channels & Roles may then show a neighboring group until they re-pick.
 
-Onboarding is owned by this config: the question and its answers are replaced on the next apply if changed by hand in Server Settings > Onboarding. The default channels are the exception. Discord returns them in its own order, so the config doesn't compare them and a hand change there stays until the set in `onboarding.tf` changes.
+Onboarding is owned by this config: the question and its answers are put back on the next apply if changed by hand in Server Settings > Onboarding. They're updated in place, which keeps the question's IDs and so every member's picks. Never make onboarding be recreated (for example with `-replace`): it gets new IDs and every member's picks are lost.
+
+The default channels are the exception: the config sets them only when onboarding is first created. To change them later, edit them in Server Settings > Onboarding > Default Channels, and update the list in `onboarding.tf` to match so a rebuilt server gets the same.
 
 A group's `id` must not change once it has a Discord section. Everything for the group is keyed by it, so a new `id` deletes the group's channels, with their history, and creates new ones.
 
