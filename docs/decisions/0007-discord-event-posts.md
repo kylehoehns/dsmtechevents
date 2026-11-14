@@ -40,6 +40,18 @@ Members reply in posts but can't start them. Each post ends with a small
 "ref" line naming its event, so the posts are their own record and nothing
 else is stored.
 
+How a post looks (2026-11-14, chosen from real mock-ups in a private
+forum): one Components V2 message. A V2 post shows no text in the forum's
+list, only its title and its first image, so the title carries the facts
+("Tue Nov 17 · 5:30p–7:30p · DSM AI · The Distributed Graph…", only the
+event's name ever cut). The message is one card: one picture (the event's
+photo, else the group's logo, never both, since the list shows the first
+and the gallery view shows all of them side by side), the place with a
+Directions button beside it, the write-up, and "Starts in 3 days" beside a
+"Details on <site>" button. The ref line sits under the card. A V2
+message can't be turned back, and older posts can't be turned into one, so
+the switch made every open post again (none had replies yet).
+
 The sync runs in its own job of `refresh.yml`. It holds the Discord bot's
 token, so like `publish` ([decision 4](0004-refresh-pushes-with-deploy-key.md))
 it installs nothing from npm: the `refresh` job writes `discord-events.json`,

@@ -10,8 +10,8 @@
 //   - one pinned, locked post, "Coming up", lists the next two weeks soonest
 //     first, each linking to its post: Discord can't sort a forum by event
 //     date, so this is the list in date order
-// Each post's card ends with a small "ref" line naming its event, so the posts
-// are their own record: nothing else is stored. Only the bot's own posts are
+// Each post ends with a small "ref" line naming its event, so the posts are
+// their own record: nothing else is stored. Only the bot's own posts are
 // read.
 // Two steps, so the Discord token never shares a machine with npm packages
 // (see .github/workflows/refresh.yml):
@@ -19,7 +19,8 @@
 //     in the refresh job: the site's events, reduced to what a post needs
 //   node scripts/discord-events.mjs --from events.json [--dry-run]
 //     in a job of its own, with DISCORD_TOKEN and DISCORD_SERVER_ID set and
-//     nothing installed: syncs the forum (or, dry run, prints the plan)
+//     nothing installed: syncs the forum (or, dry run, prints the plan);
+//     DISCORD_FORUM names another forum to try a change on first
 import fs from 'node:fs';
 import { DAY, dayKey, dayRange, day, ESCAPE, hours, ITALIC, month, weekday } from '../src/lib/format.mjs';
 
@@ -33,6 +34,8 @@ const refId = (e) => e.id.replace(/\s+/g, '_');
 const hostKey = (e) => (e.groupIds.length ? e.groupIds.join('+') : (e.hostsLabel ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-')) || 'none';
 
 const ACCENT = 0xff4fa3; // the site's pink: one strip for every group
+const GREY = 0x80848e; // a cancelled post's strip
+const V2 = 1 << 15; // IS_COMPONENTS_V2: the message is laid out by components
 
 const cut = (s, n) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s);
 // Group text shown as Discord markdown: escape the marks so it shows as typed
@@ -43,14 +46,16 @@ const md = (s) => s.replace(/[\\*_~`|[\]<>@]/g, '\\$&').replace(/^([#>-])/gm, '\
 // The group's whole write-up as Discord markdown, read the way the site's
 // formatDescription() reads it (src/lib/format.mjs): paragraphs, line
 // breaks, **bold**, *italics*, [links](url), bare URLs, ![images](url) as
-// their alt text, "## headings" (bold lines: a card shows no headings) and
+// their alt text, "## headings" (bold lines, under the post's own headings) and
 // rule lines dropped. Everything else is escaped by md(), so it shows as
 // typed. The marks it keeps stand in as private-use characters while md() runs.
 const BOLD = '\uE001';
 const ITAL = '\uE002';
 const STAR = '\uE003'; // Meetup's escaped \*: a star that is only a star
 const LINK = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|(^|[\s(])(https?:\/\/[^\s<)]+?)(?=[.,;:!?]*(?:[\s<)]|$))/g;
-const CARD_MAX = 4096; // Discord's limit for a card's text
+// A V2 message holds 4,000 characters across all its text; the rest of the
+// post (place, start, ref) takes about 200.
+const CARD_MAX = 3700;
 export function discordMarkdown(text = '') {
   const paras = String(text)
     .replace(ESCAPE, (_, c) => (c === '*' ? STAR : c))
@@ -80,9 +85,8 @@ export function discordMarkdown(text = '') {
   return out;
 }
 
-// The place: a few plain words for the message (the forum's list shows the
-// message as plain text, so it can't hold a link), and a map search for the
-// card's Directions link (the site's own query: venue plus address).
+// The place: a few plain words for the post, and a map search for its
+// Directions button (the site's own query: venue plus address).
 function where(e) {
   const venue = e.venue && e.venue !== 'Online' ? e.venue : '';
   if (!venue) return { place: e.online || e.hybrid || e.venue === 'Online' ? '💻 Online' : '📍 Place to be announced', map: null };
@@ -97,39 +101,46 @@ function where(e) {
 // (src/lib/meetup.mjs); Discord labels a .webp "GIF" in the forum's list.
 const forDiscord = (url) => url.replace(/^(https:\/\/secure\.meetupstatic\.com\/photos\/.+)\.webp$/, '$1.jpeg');
 
-// The post for one event: its title, its first message, and one card.
-// Typeset like a poster: the title says the day, the message says the hours,
-// the group and the place, the card is the group's words and photo, and two
-// buttons open the event's page (where people RSVP) and directions. The ref line is the
-// card's footer, the last thing on screen.
+const text = (content) => ({ type: 10, content });
+const divider = { type: 14, divider: true, spacing: 1 };
+const linkButton = (label, url) => ({ type: 2, style: 5, label, url }); // style 5: a link button
+// A line with a button beside it; just the line when there's no button.
+const withButton = (content, button) => (button ? { type: 9, components: [text(content)], accessory: button } : text(content));
+
+// The post for one event: its title and one Components V2 message.
+// A V2 post shows no text in the forum's list, only its title and its first
+// image, so the title carries the facts, soonest-needed first, and only the
+// event's own name is ever cut: "Tue Nov 17 · 5:30p–7:30p · DSM AI · The…".
+// The message is one pink card: one picture (the event's photo, else the
+// group's logo; never both, since the list shows the first and the gallery
+// view shows every one), the place with Directions beside it, the group's
+// write-up, and when it starts with the event's page beside that (where
+// people RSVP). The ref line sits under the card.
 export function render(e) {
   const date = e.multiDay ? dayRange(e.start, e.end) : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
+  const facts = [date, hours(e), ...(e.hostsLabel ? [e.hostsLabel] : [])].join(' · ');
   const rel = `<t:${Math.floor(Date.parse(e.start) / 1000)}:R>`;
   const repeats = e.series?.rule ? `${e.series.rule.replace(/^./, (c) => c.toLowerCase())}${e.series.until ? ` through ${e.series.until}` : ''}` : '';
   const { place, map } = where(e);
-  // Who's hosting sits with when and where, so the forum's list shows all three.
-  const host = e.hostsLabel ? [`**${md(e.hostsLabel)}**`] : [];
-  const content = `## ${hours(e)}\n-# ${[rel, ...(repeats ? [repeats] : []), ...host, place].join(' · ')}`;
-
-  // The link inside <…>, so a scraped URL holding ")[" can't add a link of its
-  // own. An event with no usable link gets a card without one.
+  const address = map && e.address ? `\n${md(e.address)}` : '';
   const site = URL.canParse(e.url ?? '') ? new URL(e.url).hostname.replace(/^www\./, '') : '';
   const about = discordMarkdown(e.description);
-  // No title: the group is named in the message. The links are buttons under
-  // it, big enough to find and tap: the event's page, then directions.
-  const card = {
-    color: ACCENT,
-    ...(about ? { description: about } : {}),
-    // The event's own photo, big. Without one, the group's logo, small in the
-    // corner: the site leaves out a photo that only repeats the logo, since its
-    // cards show the logo too, but nothing else in a post does.
-    ...(e.photo?.large ? { image: { url: forDiscord(e.photo.large) } } : e.logo ? { thumbnail: { url: forDiscord(e.logo) } } : {}),
-    footer: { text: `ref ${refId(e)} ${dayKey(e.start)} ${hostKey(e)}` },
+  const picture = e.photo?.large ? { url: forDiscord(e.photo.large), alt: 'Event photo' } : e.logo ? { url: forDiscord(e.logo), alt: `${e.hostsLabel ?? 'Group'} logo` } : null;
+
+  const card = [
+    ...(picture ? [{ type: 12, items: [{ media: { url: picture.url }, description: picture.alt }] }] : []),
+    withButton(`### ${place}${address}`, map && linkButton('Directions', map)),
+    divider,
+    ...(about ? [text(about), divider] : []),
+    withButton(`**Starts ${rel}**${repeats ? ` · ${repeats}` : ''}`, site && linkButton(`Details on ${site}`, e.url)),
+  ];
+  return {
+    name: cut(`${facts} · ${e.title}`, NAME_MAX),
+    components: [
+      { type: 17, accent_color: ACCENT, components: card },
+      text(`-# ref ${refId(e)} ${dayKey(e.start)} ${hostKey(e)}`),
+    ],
   };
-  const button = (label, url) => ({ type: 2, style: 5, label, url }); // style 5: a link button
-  const buttons = [...(site ? [button(`Details on ${site}`, e.url)] : []), ...(map ? [button('Directions', map)] : [])];
-  const components = buttons.length ? [{ type: 1, components: buttons }] : [];
-  return { name: cut(`${date} · ${e.title}`, NAME_MAX), content, embeds: [card], components };
 }
 
 // A ref line, "ref <id> <day> <host>": { id, day, host }, or null.
@@ -137,25 +148,35 @@ export function refOf(text = '') {
   const m = text.match(/^(?:-# )?ref (\S+) (\d{4}-\d{2}-\d{2}) (\S+)$/m);
   return m ? { id: m[1], day: m[2], host: m[3] } : null;
 }
-// A post's ref: in its card's footer, or, for posts made before the card,
-// the last line of its message.
-const refOfPost = (p) => refOf(p.embeds?.find((c) => c.footer?.text)?.footer.text) ?? refOf(p.content);
+// The components as we send them. Discord's copy adds ids, image sizes and
+// proxy URLs, so only the fields render() sets are kept for comparing.
+const SENT = ['type', 'accent_color', 'content', 'style', 'label', 'url', 'divider', 'spacing'];
+export function shape(list = []) {
+  return list.map((c) => ({
+    ...Object.fromEntries(SENT.filter((k) => c[k] !== undefined && c[k] !== null).map((k) => [k, c[k]])),
+    ...(c.items ? { items: c.items.map((i) => ({ media: { url: i.media?.url }, ...(i.description ? { description: i.description } : {}) })) } : {}),
+    ...(c.components ? { components: shape(c.components) } : {}),
+    ...(c.accessory ? { accessory: shape([c.accessory])[0] } : {}),
+  }));
+}
+const texts = (list = []) => list.flatMap((c) => [c.content ?? '', ...texts(c.components), ...texts(c.accessory ? [c.accessory] : [])]);
+// A post's ref: a line of its V2 message, or, from before V2, its card's
+// footer or the last line of its message.
+const refOfPost = (p) => texts(p.components).map((t) => refOf(t)).find(Boolean)
+  ?? refOf(p.embeds?.find((c) => c.footer?.text)?.footer.text) ?? refOf(p.content);
+const isV2 = (p) => ((p.flags ?? 0) & V2) === V2;
 
-// Whether a post's cards are the ones render() makes. Only the fields we send
-// are compared: Discord adds sizes and proxy URLs, and its own link previews
-// (type "link", from an older post's bare link) don't count as ours.
-const cardOf = (c) => JSON.stringify([c.color ?? null, c.title ?? null, c.url ?? null, c.description ?? null, c.image?.url ?? null, c.thumbnail?.url ?? null, c.footer?.text ?? null]);
-const buttonsOf = (rows = []) => JSON.stringify(rows.flatMap((r) => (r.components ?? []).map((b) => [b.label ?? null, b.url ?? null])));
-const sameButtons = (have, want) => buttonsOf(have) === buttonsOf(want);
-const sameCards = (have = [], want = []) => {
-  const ours = have.filter((c) => !c.type || c.type === 'rich');
-  return ours.length === want.length && ours.every((c, i) => cardOf(c) === cardOf(want[i]));
-};
+// A cancelled post: a notice on top, the card grey and without its picture,
+// so the forum's list shows the post without one.
+function cancelled(components) {
+  const notice = text("**No longer listed.** This event was cancelled or taken down. Check the group's page for what's on instead.");
+  return [notice, ...shape(components).map((c) => (c.type === 17 ? { ...c, accent_color: GREY, components: c.components.filter((x) => x.type !== 12) } : c))];
+}
 
 // Decide what to do. `upcoming` and `past` are the site's events (upcoming
 // already without a series' repeats); `posts` are the forum's open posts by
-// the bot, locked ones left out: [{ id, name, content, embeds, components,
-// archived }].
+// the bot, locked ones left out: [{ id, name, flags, content, embeds,
+// components, archived }].
 // Pure, so it can be tested.
 // `matched`, if given, is filled with each upcoming event's post: ref id → post id.
 export function planPosts({ upcoming, past, posts, now = Date.now(), matched = new Map() }) {
@@ -183,7 +204,9 @@ export function planPosts({ upcoming, past, posts, now = Date.now(), matched = n
     if (!post) { actions.push({ type: 'create', event: e.id, ...want }); continue; }
     used.add(post.id);
     matched.set(refId(e), post.id);
-    if (post.name !== want.name || post.content !== want.content || !sameCards(post.embeds, want.embeds) || !sameButtons(post.components, want.components) || post.archived) {
+    // A post from before V2 can't be turned into one, so it's made again.
+    if (!isV2(post)) actions.push({ type: 'replace', post: post.id, event: e.id, ...want });
+    else if (post.name !== want.name || JSON.stringify(shape(post.components)) !== JSON.stringify(want.components) || post.archived) {
       actions.push({ type: 'edit', post: post.id, event: e.id, ...want });
     }
   }
@@ -194,11 +217,10 @@ export function planPosts({ upcoming, past, posts, now = Date.now(), matched = n
     if (ended) {
       if (now - Date.parse(ended.end) >= CLOSE_AFTER) actions.push({ type: 'close', post: p.id, event: p.ref.id });
     } else if (!p.name.startsWith(CANCELLED)) {
-      actions.push({
-        type: 'cancel', post: p.id, event: p.ref.id,
-        name: cut(`${CANCELLED}${p.name}`, NAME_MAX),
-        content: `**No longer listed.** This event was cancelled or taken down. Check the group's page for what's on instead.\n\n${p.content}`,
-      });
+      const name = cut(`${CANCELLED}${p.name}`, NAME_MAX);
+      actions.push(isV2(p)
+        ? { type: 'cancel', post: p.id, event: p.ref.id, name, components: cancelled(p.components) }
+        : { type: 'cancel', post: p.id, event: p.ref.id, name, content: `**No longer listed.** This event was cancelled or taken down. Check the group's page for what's on instead.\n\n${p.content}` });
     }
   }
   return actions;
@@ -206,8 +228,8 @@ export function planPosts({ upcoming, past, posts, now = Date.now(), matched = n
 
 // The pinned "Coming up" post: the next two weeks in date order, since the
 // forum itself can only sort by newest post or latest reply. Each line links
-// to the event's post (its title already says the day) and adds who and what
-// hours. Found again by its name, or by being the bot's pinned post.
+// to the event's post, whose title already says the day, the hours and who.
+// Found again by its name, or by being the bot's pinned post.
 export const COMING_UP = 'Coming up';
 const SOON = 14 * DAY;
 const PINNED = 2; // a forum post's "pinned" flag
@@ -219,7 +241,7 @@ export function renderComingUp({ upcoming, postIds = new Map(), now = Date.now()
     .sort((a, b) => a.start.localeCompare(b.start));
   const line = (e) => {
     const id = postIds.get(refId(e));
-    return [id ? `<#${id}>` : `**${md(render(e).name)}**`, ...(e.hostsLabel ? [md(e.hostsLabel)] : []), hours(e)].join(' · ');
+    return id ? `<#${id}>` : `**${md(render(e).name)}**`;
   };
   const head = '-# The next two weeks, soonest first. Tap one to open its post. Kept up to date automatically.';
   if (!soon.length) return `${head}\n\nNothing in the next two weeks. Events further out have their own posts below.`;
@@ -284,20 +306,22 @@ async function readPosts(api, guildId, forumId) {
     if (t.owner_id !== me.id || t.thread_metadata?.locked) continue;
     // A forum post's first message has the post's own id.
     const first = await api('GET', `/channels/${t.id}/messages/${t.id}`);
-    posts.push({ id: t.id, name: t.name, content: first.content, embeds: first.embeds, components: first.components, archived: !!t.thread_metadata?.archived });
+    posts.push({ id: t.id, name: t.name, flags: first.flags ?? 0, content: first.content, embeds: first.embeds, components: first.components, archived: !!t.thread_metadata?.archived });
   }
   return { posts, comingUp };
 }
 
 // Carry out the plan. Mentions are never parsed: the text is the groups'.
-const message = (a) => ({ content: a.content, embeds: a.embeds, components: a.components, allowed_mentions: { parse: [] } });
+const message = (a) => ({ flags: V2, components: a.components, allowed_mentions: { parse: [] } });
 // Returns the new posts: ref id → post id.
 async function apply(api, forumId, actions) {
   const created = new Map();
   for (const a of actions) {
-    if (a.type === 'create') {
+    if (a.type === 'create' || a.type === 'replace') {
       const post = await api('POST', `/channels/${forumId}/threads`, { name: a.name, auto_archive_duration: 10080, message: message(a) });
       if (post?.id) created.set(refId({ id: a.event }), post.id);
+      // The old post goes only once its replacement exists.
+      if (a.type === 'replace') await api('DELETE', `/channels/${a.post}`);
     } else if (a.type === 'edit') {
       // Unarchive first: an archived post can't be edited.
       await api('PATCH', `/channels/${a.post}`, { name: a.name, archived: false });
@@ -306,7 +330,8 @@ async function apply(api, forumId, actions) {
       await api('PATCH', `/channels/${a.post}`, { archived: true, locked: true });
     } else if (a.type === 'cancel') {
       await api('PATCH', `/channels/${a.post}`, { archived: false });
-      await api('PATCH', `/channels/${a.post}/messages/${a.post}`, { content: a.content, allowed_mentions: { parse: [] } });
+      const body = a.components ? { components: a.components } : { content: a.content };
+      await api('PATCH', `/channels/${a.post}/messages/${a.post}`, { ...body, allowed_mentions: { parse: [] } });
       await api('PATCH', `/channels/${a.post}`, { name: a.name, archived: true, locked: true });
     }
   }
@@ -327,9 +352,9 @@ async function applyComingUp(api, forumId, a) {
 
 // One run: read the forum, plan against the site's events, and apply unless
 // it's a dry run. Returns the plan.
-export async function syncEvents({ api, guildId, data, now = Date.now(), dryRun = false }) {
-  const forum = (await api('GET', `/guilds/${guildId}/channels`)).find((c) => c.type === 15 && c.name === 'events');
-  if (!forum) throw new Error('No #events forum channel in the server (infra/discord creates it).');
+export async function syncEvents({ api, guildId, data, now = Date.now(), dryRun = false, forumName = 'events' }) {
+  const forum = (await api('GET', `/guilds/${guildId}/channels`)).find((c) => c.type === 15 && c.name === forumName);
+  if (!forum) throw new Error(`No #${forumName} forum channel in the server (infra/discord creates #events).`);
   const { posts, comingUp } = await readPosts(api, guildId, forum.id);
   const upcoming = data.upcoming.filter((e) => !e.repeat);
   const matched = new Map();
@@ -366,7 +391,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const { DISCORD_TOKEN: token, DISCORD_SERVER_ID: guildId } = process.env;
   if (!token || !guildId || !process.argv.includes('--from')) throw new Error('Usage: --write <file>, or --from <file> with DISCORD_TOKEN and DISCORD_SERVER_ID set.');
   const data = JSON.parse(fs.readFileSync(arg('--from'), 'utf8'));
-  const actions = await syncEvents({ api: discordApi(token), guildId, data, dryRun });
+  const actions = await syncEvents({ api: discordApi(token), guildId, data, dryRun, forumName: process.env.DISCORD_FORUM || 'events' });
   if (!actions.length) console.log('#events is up to date.');
   for (const a of actions) {
     console.log(`${dryRun ? '[dry run] ' : ''}${a.type}${a.event ? ` ${a.event}` : ''}${a.name ? `: ${a.name}` : ''}`);
