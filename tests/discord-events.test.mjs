@@ -10,17 +10,17 @@ const ev = (over = {}) => ({
 });
 const postFor = (e, over = {}) => ({ id: `t-${e.id}`, ...render(e), archived: false, ...over });
 
-test('a post: the day in the title; the hours, place and a map link in the message; the group\'s card links to its page', () => {
+test('a post: the day in the title; the hours, group and place in the message; the card has the hook, directions and the group\'s page', () => {
   const e = ev({ address: '1 Main St, Des Moines, IA', description: 'Learn how Python packaging works and why it keeps changing.\n\nPizza at 6.', photo: { large: 'https://img/p.jpg' } });
   const { name, content, embeds } = render(e);
   assert.equal(name, 'Thu Nov 19 · Python Night');
   const map = 'https://www.google.com/maps/search/?api=1&query=Lean%20Techniques%2C%201%20Main%20St%2C%20Des%20Moines%2C%20IA';
   // The forum's list shows the message as plain text, so it holds no links.
-  assert.equal(content, `## 6p–8p\n-# <t:${Date.parse('2026-11-20T00:00:00Z') / 1000}:R> · 📍 Lean Techniques`);
+  assert.equal(content, `## 6p–8p\n-# <t:${Date.parse('2026-11-20T00:00:00Z') / 1000}:R> · **Pyowa** · 📍 Lean Techniques`);
   assert.doesNotMatch(content, /\]\(|https?:/);
   assert.deepEqual(refOf(embeds[0].footer.text), { id: 'pyowa-1', day: '2026-11-19', host: 'pyowa' });
   assert.deepEqual(embeds, [{
-    color: 0xff4fa3, title: 'Pyowa', url: 'https://www.meetup.com/pyowa/events/1/',
+    color: 0xff4fa3,
     description: `Learn how Python packaging works and why it keeps changing.\n\n[Directions](<${map}>) · [Read more on meetup.com](<https://www.meetup.com/pyowa/events/1/>)`,
     image: { url: 'https://img/p.jpg' },
     footer: { text: 'ref pyowa-1 2026-11-19 pyowa' },
@@ -42,7 +42,7 @@ test('the hook skips a title repeat, short logistics and a pointer to another li
 
 test('online, hybrid, no venue yet, all day, several days and a series each read right', () => {
   const online = render(ev({ venue: 'Online', online: true }));
-  assert.match(online.content, /:R> · 💻 Online$/);
+  assert.match(online.content, /:R> · \*\*Pyowa\*\* · 💻 Online$/);
   assert.match(online.embeds[0].description, /^\[Read more on meetup\.com\]/, 'no Directions for an online event');
   assert.match(render(ev({ venue: '', online: false })).content, /📍 Place to be announced$/);
   assert.match(render(ev({ hybrid: true })).content, /📍 Lean Techniques · also online$/);
@@ -51,7 +51,8 @@ test('online, hybrid, no venue yet, all day, several days and a series each read
   assert.equal(conf.name, 'Thu–Fri Dec 3–4 · Python Night');
   assert.match(conf.content, /^## All day\n/);
   assert.equal(refOf(conf.embeds[0].footer.text).host, 'iowa-tech-week');
-  assert.match(render(ev({ series: { rule: 'Every 2nd Monday', until: 'Dec 2027' } })).content, /:R> · every 2nd Monday through Dec 2027 · 📍/);
+  assert.match(render(ev({ series: { rule: 'Every 2nd Monday', until: 'Dec 2027' } })).content, /:R> · every 2nd Monday through Dec 2027 · \*\*Pyowa\*\* · 📍/);
+  assert.doesNotMatch(render(ev({ hostsLabel: '' })).content, /\*\*/, 'no empty bold when there are no hosts');
 });
 
 test('the group\'s text is escaped, so it shows as typed and can\'t ping anyone', () => {
@@ -249,7 +250,6 @@ test('a scraped URL can\'t add a link of its own, an event without a link still 
   const { embeds } = render(ev({ url: sneaky, description: '' }));
   assert.match(embeds[0].description, new RegExp(` · \\[Read more on their\\.site\\]\\(<${sneaky.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}>\\)$`));
   const noLink = render(ev({ url: undefined })).embeds[0];
-  assert.equal(noLink.url, undefined);
   assert.doesNotMatch(noLink.description, /Read more/);
   const odd = render(ev({ id: 'ical-abc 123@cal' }));
   assert.equal(refOf(odd.embeds[0].footer.text).id, 'ical-abc_123@cal');
