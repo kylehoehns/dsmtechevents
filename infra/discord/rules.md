@@ -7,7 +7,6 @@ This server is for anyone who works in, studies, or is curious about tech in cen
 3. **Jobs go in <#${jobs}>.** No job posts or recruiting anywhere else, and no cold DMs about roles.
 4. **No spam.** Share your own work, talks and projects in <#${show_and_tell}>, not across every channel.
 5. **Keep it safe for work.**
-6. **Make it readable.** Paste code and errors as text, not screenshots, and describe your images.
 
 **Need help, or see a problem?** Message an admin privately: they're at the top of the member list (on a phone, swipe left). If it's urgent, ping <@&${admin}>.
 
