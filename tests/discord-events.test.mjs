@@ -277,3 +277,20 @@ test('a post from before the buttons (links in the card) is edited to add them',
   const before = { id: 'p', name: want.name, content: want.content, embeds: want.embeds, components: [], archived: false };
   assert.deepEqual(planPosts({ upcoming: [ev()], past: [], posts: [before], now }).map((a) => [a.type, a.components.length]), [['edit', 1]]);
 });
+
+test('an event without its own photo shows the group\'s logo, small in the corner; a photo wins', () => {
+  const logo = 'https://secure.meetupstatic.com/photos/event/7/b/600_9.webp';
+  const noPhoto = render(ev({ logo })).embeds[0];
+  assert.deepEqual(noPhoto.thumbnail, { url: 'https://secure.meetupstatic.com/photos/event/7/b/600_9.jpeg' });
+  assert.equal(noPhoto.image, undefined);
+  const both = render(ev({ logo, photo: { large: 'https://img/p.jpg' } })).embeds[0];
+  assert.deepEqual([both.image?.url, both.thumbnail], ['https://img/p.jpg', undefined]);
+  assert.equal(render(ev()).embeds[0].thumbnail, undefined, 'no photo, no logo: no image');
+});
+
+test('the events file carries each event\'s group logo, so the sync step needs no group data', () => {
+  const data = { upcoming: [ev({ groupIds: ['nologo', 'pyowa'] }), ev({ id: 'manual-x', groupIds: [] })], past: [], byId: { pyowa: { logo: 'l.png' }, nologo: {} } };
+  const out = slim(data);
+  assert.equal(out.upcoming[0].logo, 'l.png');
+  assert.equal(out.upcoming[1].logo, undefined);
+});
