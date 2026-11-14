@@ -15,4 +15,4 @@ This server is for anyone who works in, studies, or is curious about tech in cen
 
 **Don't see your group here?** Say so in <#${general}>.
 
-**Looking for meetups?** Every group's events are at <https://dsmtechevents.com>.
+**Looking for meetups?** Every one has a post in <#${events}>, and they're all at <https://dsmtechevents.com>.

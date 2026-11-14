@@ -10,24 +10,56 @@ const ev = (over = {}) => ({
 });
 const postFor = (e, over = {}) => ({ id: `t-${e.id}`, ...render(e), archived: false, ...over });
 
-test('a post says who, when (Des Moines time), where and where to RSVP, and names its event', () => {
-  const { name, content } = render(ev());
-  assert.equal(name, 'Nov 19 · Python Night');
+test('a post: the day in the title; the hours, place and a map link in the message; the group\'s card links to its page', () => {
+  const e = ev({ address: '1 Main St, Des Moines, IA', description: 'Learn how Python packaging works and why it keeps changing.\n\nPizza at 6.', photo: { large: 'https://img/p.jpg' } });
+  const { name, content, embeds } = render(e);
+  assert.equal(name, 'Thu Nov 19 · Python Night');
+  const map = 'https://www.google.com/maps/search/?api=1&query=Lean%20Techniques%2C%201%20Main%20St%2C%20Des%20Moines%2C%20IA';
   assert.equal(content, [
-    '**Pyowa**',
-    `Thu Nov 19 · 6p–8p (<t:${Date.parse('2026-11-20T00:00:00Z') / 1000}:R>)`,
-    '📍 Lean Techniques',
-    "RSVP on the group's page: https://www.meetup.com/pyowa/events/1/",
-    '-# ref pyowa-1 2026-11-19 pyowa',
+    '## 6p–8p',
+    `-# <t:${Date.parse('2026-11-20T00:00:00Z') / 1000}:R>`,
+    '',
+    '📍 **Lean Techniques**',
+    `[1 Main St, Des Moines, IA](<${map}>)`,
   ].join('\n'));
-  assert.deepEqual(refOf(content), { id: 'pyowa-1', day: '2026-11-19', host: 'pyowa' });
+  assert.deepEqual(refOf(embeds[0].footer.text), { id: 'pyowa-1', day: '2026-11-19', host: 'pyowa' });
+  assert.deepEqual(embeds, [{
+    color: 0xff4fa3, title: 'Pyowa', url: 'https://www.meetup.com/pyowa/events/1/',
+    description: 'Learn how Python packaging works and why it keeps changing.\n\n[Read more on meetup.com](<https://www.meetup.com/pyowa/events/1/>)',
+    image: { url: 'https://img/p.jpg' },
+    footer: { text: 'ref pyowa-1 2026-11-19 pyowa' },
+  }]);
+  assert.doesNotMatch(content + JSON.stringify(embeds), /Des Moines time|RSVP on/);
 });
 
-test('a conference over several days shows the range; a hand-added event uses its hosts for matching', () => {
-  const { content } = render(ev({ id: 'manual-devcon', multiDay: true, allDay: true, start: '2026-12-03T06:00:00Z', end: '2026-12-05T06:00:00Z', groupIds: [], hostsLabel: 'Iowa Tech Week', venue: '' }));
-  assert.match(content, /^\*\*Iowa Tech Week\*\*\nThu–Fri Dec 3–4 · All day/);
-  assert.doesNotMatch(content, /📍/);
-  assert.equal(refOf(content).host, 'iowa-tech-week');
+test('the hook skips a title repeat, short logistics and a pointer to another link, and drops a "from <group>" sign-off', () => {
+  const hookOf = (description, over = {}) => render(ev({ description, ...over })).embeds[0].description.split('\n\n[Read more')[0];
+  assert.equal(hookOf('Python Night\n\nDoors open at 6 PM.\n\nCheck out https://pyowa.org for details on this.\n\nA hands-on night of packaging tips for every level of Python user.'),
+    'A hands-on night of packaging tips for every level of Python user.');
+  assert.equal(hookOf('An evening of talks and community, from Pyowa.'), 'An evening of talks and community.');
+  const long = `${'This sentence is about forty characters. '.repeat(6)}And then it keeps on going without a break for a while longer.`;
+  assert.equal(hookOf(long), 'This sentence is about forty characters. '.repeat(6).trim());
+  assert.ok(hookOf(long).length <= 300 && hookOf(long).endsWith('.'));
+  assert.ok(hookOf('word '.repeat(100)).endsWith('…'));
+  assert.equal(render(ev({ description: '' })).embeds[0].description, '[Read more on meetup.com](<https://www.meetup.com/pyowa/events/1/>)');
+});
+
+test('online, hybrid, no venue yet, all day, several days and a series each read right', () => {
+  assert.match(render(ev({ venue: 'Online', online: true })).content, /\n💻 \*\*Online\*\*$/);
+  assert.match(render(ev({ venue: '', online: false })).content, /📍 \*\*Place to be announced\*\*/);
+  assert.match(render(ev({ hybrid: true })).content, /📍 \*\*Lean Techniques\*\* · also online\n\[Map\]\(</);
+  const conf = render(ev({ id: 'manual-devcon', multiDay: true, allDay: true, start: '2026-12-03T06:00:00Z', end: '2026-12-05T06:00:00Z', groupIds: [], hostsLabel: 'Iowa Tech Week', venue: '' }));
+  assert.equal(conf.name, 'Thu–Fri Dec 3–4 · Python Night');
+  assert.match(conf.content, /^## All day\n/);
+  assert.equal(refOf(conf.embeds[0].footer.text).host, 'iowa-tech-week');
+  assert.match(render(ev({ series: { rule: 'Every 2nd Monday', until: 'Dec 2027' } })).content, /:R> · every 2nd Monday through Dec 2027\n/);
+});
+
+test('the group\'s text is escaped, so it shows as typed and can\'t ping anyone', () => {
+  const { content, embeds } = render(ev({ venue: '**Big** <@everyone> Hall', description: '# Tonight: a hands-on night of _fun_ with @everyone, and all are welcome to come.' }));
+  assert.match(content, /📍 \*\*\\\*\\\*Big\\\*\\\* \\<\\@everyone\\> Hall\*\*/);
+  // The site's plainText() already drops a leading "#" heading; a hyphen inside a word is left alone.
+  assert.match(embeds[0].description, /^Tonight: a hands-on night of \\_fun\\_ with \\@everyone/);
 });
 
 test('long titles are cut to Discord\'s 100 characters', () => {
@@ -64,7 +96,7 @@ test('a placeholder replaced by the real event (same hosts, same day, new id) ke
   const real = ev({ id: 'pyowa-999', title: 'Testing with pytest' });
   const actions = planPosts({ upcoming: [real], past: [], posts: [postFor(placeholder)], now });
   assert.deepEqual(actions.map((a) => [a.type, a.post, a.event]), [['edit', 't-manual-pyowa-2026-11-19', 'pyowa-999']]);
-  assert.match(actions[0].content, /ref pyowa-999 /);
+  assert.match(actions[0].embeds[0].footer.text, /^ref pyowa-999 /);
 });
 
 test('a post is closed 3 days after its event ends, not before', () => {
@@ -78,7 +110,7 @@ test('a post whose upcoming event disappeared is marked cancelled once', () => {
   const gone = ev({ id: 'pyowa-gone' });
   const [a] = planPosts({ upcoming: [], past: [], posts: [postFor(gone)], now });
   assert.equal(a.type, 'cancel');
-  assert.equal(a.name, 'Cancelled · Nov 19 · Python Night');
+  assert.equal(a.name, 'Cancelled · Thu Nov 19 · Python Night');
   assert.match(a.content, /^\*\*No longer listed\.\*\*/);
   assert.deepEqual(planPosts({ upcoming: [], past: [], posts: [{ ...postFor(gone), name: a.name, content: a.content }], now }), []);
 });
@@ -101,7 +133,7 @@ function fakeDiscord({ threads = [], firsts = {}, archived = [], forum = true } 
   const api = async (method, path, body) => {
     if (method !== 'GET') { writes.push([method, path, body]); return {}; }
     const m = path.match(/^\/channels\/(\w+)\/messages\/\1$/);
-    if (m) return { content: firsts[m[1]] };
+    if (m) return firsts[m[1]];
     if (!(`${method} ${path}` in routes)) throw new Error(`unexpected ${method} ${path}`);
     return routes[`${method} ${path}`];
   };
@@ -118,7 +150,7 @@ test('a sync reads the bot\'s open posts, skips others and locked ones, and appl
       { id: 'c', parent_id: 'other', owner_id: 'bot', name: 'elsewhere', thread_metadata: {} },
     ],
     archived: [{ id: 'd', parent_id: 'f', owner_id: 'bot', name: 'closed', thread_metadata: { archived: true, locked: true } }],
-    firsts: { a: render(changed).content },
+    firsts: { a: render(changed) },
   });
   const actions = await syncEvents({ api, guildId: 'g', data: data([ev(), { ...changed, title: 'New title' }, ev({ id: 'rep', repeat: true })]), now });
   assert.deepEqual(actions.map((a) => [a.type, a.event]), [['create', 'pyowa-1'], ['edit', 'aws-3']]);
@@ -132,7 +164,7 @@ test('closing and cancelling write the right changes; a dry run writes nothing',
   const setup = () => fakeDiscord({
     threads: [{ id: 'p', parent_id: 'f', owner_id: 'bot', name: render(done).name, thread_metadata: {} }],
     archived: [{ id: 'q', parent_id: 'f', owner_id: 'bot', name: render(gone).name, thread_metadata: { archived: true } }],
-    firsts: { p: render(done).content, q: render(gone).content },
+    firsts: { p: render(done), q: render(gone) },
   });
   const dry = setup();
   assert.deepEqual((await syncEvents({ api: dry.api, guildId: 'g', data: data([], [done]), now, dryRun: true })).map((a) => a.type), ['close', 'cancel']);
@@ -188,8 +220,43 @@ test('the API client sends the token, retries rate limits and Discord errors, an
 });
 
 test('the file handed to the sync step carries only what a post needs', () => {
-  const full = { ...ev(), description: 'long text', image: 'x.jpg', going: 12, extra: undefined };
+  const full = { ...ev(), description: 'text', photo: { large: 'l.jpg', small: 's.jpg', width: 600 }, going: 12, image: 'x.jpg', venueKey: 'k', extra: undefined, address: null };
   const out = slim({ upcoming: [full], past: [ev({ id: 'old', repeat: true })] });
-  assert.deepEqual(Object.keys(out.upcoming[0]).sort(), ['allDay', 'end', 'groupIds', 'hostsLabel', 'id', 'multiDay', 'start', 'title', 'url', 'venue']);
+  assert.deepEqual(Object.keys(out.upcoming[0]).sort(), ['allDay', 'description', 'end', 'groupIds', 'hostsLabel', 'id', 'multiDay', 'photo', 'start', 'title', 'url', 'venue']);
+  assert.deepEqual(out.upcoming[0].photo, { large: 'l.jpg' });
   assert.equal(out.past[0].repeat, true);
+});
+
+test('a post from the old format (no card, Discord\'s own link preview) is edited; Discord\'s extra card fields don\'t count as a change', () => {
+  const want = render(ev());
+  const oldStyle = { id: 't', name: want.name, content: `${want.content}\n\n-# ref pyowa-1 2026-11-19 pyowa`, embeds: [{ type: 'link', url: 'https://www.meetup.com/pyowa/events/1/' }], archived: false };
+  assert.deepEqual(planPosts({ upcoming: [ev()], past: [], posts: [oldStyle], now }).map((a) => a.type), ['edit']);
+  const withPhoto = render(ev({ photo: { large: 'x' } }));
+  const asStored = { id: 't', name: withPhoto.name, content: withPhoto.content, embeds: [{ ...withPhoto.embeds[0], type: 'rich', image: { url: 'x', proxy_url: 'p', width: 1, height: 1 } }], archived: false };
+  assert.deepEqual(planPosts({ upcoming: [ev({ photo: { large: 'x' } })], past: [], posts: [asStored], now }), []);
+});
+
+test('a post from before the card, with its ref as the message\'s last line, is recognized and moved to the new format', () => {
+  const want = render(ev());
+  const legacy = { id: 'old', name: 'Nov 19 · Python Night', content: '**Pyowa**\nThu Nov 19 · 6p–8p\n-# ref pyowa-1 2026-11-19 pyowa', embeds: [], archived: false };
+  const actions = planPosts({ upcoming: [ev()], past: [], posts: [legacy], now });
+  assert.deepEqual(actions.map((a) => [a.type, a.post]), [['edit', 'old']]);
+  assert.equal(actions[0].embeds[0].footer.text, 'ref pyowa-1 2026-11-19 pyowa');
+  assert.doesNotMatch(want.content, /ref /);
+});
+
+test('a scraped URL can\'t add a link of its own, an event without a link still gets a card, and an id with spaces still round-trips', () => {
+  const sneaky = 'https://their.site/x)[meetup.com/rsvp](https://evil.example/login';
+  const { embeds } = render(ev({ url: sneaky, description: '' }));
+  assert.equal(embeds[0].description, `[Read more on their.site](<${sneaky}>)`);
+  const noLink = render(ev({ url: undefined })).embeds[0];
+  assert.equal(noLink.url, undefined);
+  assert.doesNotMatch(noLink.description, /Read more/);
+  const odd = render(ev({ id: 'ical-abc 123@cal' }));
+  assert.equal(refOf(odd.embeds[0].footer.text).id, 'ical-abc_123@cal');
+});
+
+test('an event whose id has spaces matches its own post instead of making a new one', () => {
+  const odd = ev({ id: 'ical-abc 123@cal' });
+  assert.deepEqual(planPosts({ upcoming: [odd], past: [], posts: [postFor(odd)], now }), []);
 });

@@ -153,6 +153,7 @@ resource "discord_message" "rules" {
     jobs          = discord_forum_channel.jobs.id
     show_and_tell = discord_forum_channel.show_and_tell.id
     admin         = discord_role.admin.id
+    events        = discord_forum_channel.events.id
   }))
 
   # Discord adds a preview card for a bare link, which provider 2.7 reads back
