@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { COMING_UP, discordApi, planComingUp, planPosts, refOf, render, renderComingUp, slim, syncEvents } from '../scripts/discord-events.mjs';
+import { COMING_UP, discordApi, planComingUp, planPosts, refOf, render, renderComingUp, shape, slim, syncEvents } from '../scripts/discord-events.mjs';
 
 const now = Date.parse('2026-11-14T18:00:00Z');
 const ev = (over = {}) => ({
@@ -8,70 +8,77 @@ const ev = (over = {}) => ({
   allDay: false, multiDay: false, url: 'https://www.meetup.com/pyowa/events/1/', venue: 'Lean Techniques',
   groupIds: ['pyowa'], hostsLabel: 'Pyowa', ...over,
 });
-const postFor = (e, over = {}) => ({ id: `t-${e.id}`, ...render(e), archived: false, ...over });
+const V2 = 32768;
+const postFor = (e, over = {}) => ({ id: `t-${e.id}`, flags: V2, ...render(e), archived: false, ...over });
+// The pieces of a rendered post: the card's parts, its picture, its lines with
+// a button beside them, and every bit of text in it.
+const card = (r) => r.components[0].components;
+const picture = (r) => card(r).find((c) => c.type === 12)?.items[0];
+const rows = (r) => card(r).filter((c) => c.type === 9 || c.type === 10).map((c) => (c.type === 9 ? [c.components[0].content, c.accessory.label, c.accessory.url] : [c.content]));
+const refLine = (r) => r.components.at(-1).content;
+const about = (r) => card(r).filter((c) => c.type === 10).map((c) => c.content)[0];
 
-test('a post: the day in the title; the hours, group and place in the message; the card has the write-up; buttons open the page and directions', () => {
-  const e = ev({ address: '1 Main St, Des Moines, IA', description: 'Learn how Python packaging works and why it keeps changing.\n\nPizza at 6.', photo: { large: 'https://img/p.jpg' } });
-  const { name, content, embeds, components } = render(e);
-  assert.equal(name, 'Thu Nov 19 · Python Night');
+test('a post: day, hours and group in the title; one pink card with the picture, the place and Directions, the write-up, and when it starts beside the event\'s page', () => {
+  const e = ev({ address: '1 Main St', fullAddress: '1 Main St, Des Moines, IA', description: 'Learn how Python packaging works.\n\nPizza at 6.', photo: { large: 'https://img/p.jpg' } });
+  const r = render(e);
+  assert.equal(r.name, 'Thu Nov 19 · 6p–8p · Pyowa · Python Night');
   const map = 'https://www.google.com/maps/search/?api=1&query=Lean%20Techniques%2C%201%20Main%20St%2C%20Des%20Moines%2C%20IA';
-  // The forum's list shows the message as plain text, so it holds no links.
-  assert.equal(content, `## 6p–8p\n-# <t:${Date.parse('2026-11-20T00:00:00Z') / 1000}:R> · **Pyowa** · 📍 Lean Techniques`);
-  assert.doesNotMatch(content, /\]\(|https?:/);
-  assert.deepEqual(refOf(embeds[0].footer.text), { id: 'pyowa-1', day: '2026-11-19', host: 'pyowa' });
-  assert.deepEqual(embeds, [{
-    color: 0xff4fa3,
-    description: 'Learn how Python packaging works and why it keeps changing.\n\nPizza at 6.',
-    image: { url: 'https://img/p.jpg' },
-    footer: { text: 'ref pyowa-1 2026-11-19 pyowa' },
-  }]);
-  assert.deepEqual(components, [{ type: 1, components: [
-    { type: 2, style: 5, label: 'Details on meetup.com', url: 'https://www.meetup.com/pyowa/events/1/' },
-    { type: 2, style: 5, label: 'Directions', url: map },
-  ] }]);
-  assert.doesNotMatch(content + JSON.stringify(embeds), /Des Moines time|RSVP on|\]\(/);
+  const t = Date.parse('2026-11-20T00:00:00Z') / 1000;
+  assert.deepEqual(r.components, [
+    { type: 17, accent_color: 0xff4fa3, components: [
+      { type: 12, items: [{ media: { url: 'https://img/p.jpg' }, description: 'Event photo' }] },
+      { type: 9, components: [{ type: 10, content: '### 📍 Lean Techniques\n1 Main St' }], accessory: { type: 2, style: 5, label: 'Directions', url: map } },
+      { type: 14, divider: true, spacing: 1 },
+      { type: 10, content: 'Learn how Python packaging works.\n\nPizza at 6.' },
+      { type: 14, divider: true, spacing: 1 },
+      { type: 9, components: [{ type: 10, content: `**Starts <t:${t}:R>**` }], accessory: { type: 2, style: 5, label: 'Details on meetup.com', url: 'https://www.meetup.com/pyowa/events/1/' } },
+    ] },
+    { type: 10, content: '-# ref pyowa-1 2026-11-19 pyowa' },
+  ]);
+  assert.deepEqual(refOf(refLine(r)), { id: 'pyowa-1', day: '2026-11-19', host: 'pyowa' });
+  assert.doesNotMatch(JSON.stringify(r), /Des Moines time|RSVP/);
 });
 
 test('the card carries the whole write-up, formatted the way the site formats it', () => {
-  const about = (description) => render(ev({ description })).embeds[0].description;
-  assert.equal(about('## Agenda\n\n**6:00** Pizza \\| drinks at *Lean Techniques*\nSee [the slides](https://x.com/a_b) or https://y.com/c_d.\n\n---\n\n![🍕](https://e/x.png) Doors open at 6.'),
+  const of = (description) => about(render(ev({ description })));
+  assert.equal(of('## Agenda\n\n**6:00** Pizza \\| drinks at *Lean Techniques*\nSee [the slides](https://x.com/a_b) or https://y.com/c_d.\n\n---\n\n![🍕](https://e/x.png) Doors open at 6.'),
     '**Agenda**\n\n**6:00** Pizza \\| drinks at *Lean Techniques*\nSee [the slides](https://x.com/a_b) or https://y.com/c_d.\n\n🍕 Doors open at 6.');
   // Meetup's escaped star is only a star; other marks show as typed.
-  assert.equal(about('2 \\* 3 is _six_ ~~maybe~~\n- one'), '2 \\* 3 is \\_six\\_ \\~\\~maybe\\~\\~\n\\- one');
+  assert.equal(of('2 \\* 3 is _six_ ~~maybe~~\n- one'), '2 \\* 3 is \\_six\\_ \\~\\~maybe\\~\\~\n\\- one');
   // A link's label is escaped, so it can't open a second link.
-  assert.equal(about('[a](https://x.com/) [b]](https://y.com/)'), '[a](https://x.com/) \\[b\\]\\](https://y.com/)');
-  // Longer than a card holds: whole paragraphs up to Discord's 4096 characters.
-  const long = about(Array.from({ length: 30 }, () => 'x'.repeat(200)).join('\n\n'));
-  assert.ok(long.length <= 4096 && long.endsWith('\n\n…'));
-  assert.equal(render(ev({ description: '' })).embeds[0].description, undefined, 'no write-up, no description');
+  assert.equal(of('[a](https://x.com/) [b]](https://y.com/)'), '[a](https://x.com/) \\[b\\]\\](https://y.com/)');
+  // Longer than a V2 message holds (4,000 across all its text): whole paragraphs, then "…".
+  const long = render(ev({ description: Array.from({ length: 30 }, () => 'x'.repeat(200)).join('\n\n') }));
+  const all = JSON.stringify(long.components).match(/"content":"(?:[^"\\]|\\.)*"/g).map((c) => JSON.parse(`{${c}}`).content).join('');
+  assert.ok(all.length <= 4000 && about(long).endsWith('\n\n…'));
+  // No write-up: no write-up and no second divider.
+  assert.deepEqual(card(render(ev({ description: '' }))).map((c) => c.type), [9, 14, 9]);
 });
 
 test('online, hybrid, no venue yet, all day, several days and a series each read right', () => {
   const online = render(ev({ venue: 'Online', online: true }));
-  assert.match(online.content, /:R> · \*\*Pyowa\*\* · 💻 Online$/);
-  assert.deepEqual(online.components[0].components.map((b) => b.label), ['Details on meetup.com'], 'no Directions for an online event');
-  assert.match(render(ev({ venue: '', online: false })).content, /📍 Place to be announced$/);
-  assert.match(render(ev({ hybrid: true })).content, /📍 Lean Techniques · also online$/);
-  assert.equal(render(ev()).components[0].components[1].url, 'https://www.google.com/maps/search/?api=1&query=Lean%20Techniques%2C%20Des%20Moines%2C%20IA');
+  assert.deepEqual(rows(online)[0], ['### 💻 Online'], 'no Directions for an online event');
+  assert.deepEqual(rows(render(ev({ venue: '', online: false })))[0], ['### 📍 Place to be announced']);
+  assert.equal(rows(render(ev({ hybrid: true, address: '1 Main St' })))[0][0], '### 📍 Lean Techniques · also online\n1 Main St');
+  assert.equal(rows(render(ev()))[0][2], 'https://www.google.com/maps/search/?api=1&query=Lean%20Techniques%2C%20Des%20Moines%2C%20IA');
   const conf = render(ev({ id: 'manual-devcon', multiDay: true, allDay: true, start: '2026-12-03T06:00:00Z', end: '2026-12-05T06:00:00Z', groupIds: [], hostsLabel: 'Iowa Tech Week', venue: '' }));
-  assert.equal(conf.name, 'Thu–Fri Dec 3–4 · Python Night');
-  assert.match(conf.content, /^## All day\n/);
-  assert.equal(refOf(conf.embeds[0].footer.text).host, 'iowa-tech-week');
-  assert.match(render(ev({ series: { rule: 'Every 2nd Monday', until: 'Dec 2027' } })).content, /:R> · every 2nd Monday through Dec 2027 · \*\*Pyowa\*\* · 📍/);
-  assert.doesNotMatch(render(ev({ hostsLabel: '' })).content, /\*\*/, 'no empty bold when there are no hosts');
+  assert.equal(conf.name, 'Thu–Fri Dec 3–4 · All day · Iowa Tech Week · Python Night');
+  assert.equal(refOf(refLine(conf)).host, 'iowa-tech-week');
+  assert.match(rows(render(ev({ series: { rule: 'Every 2nd Monday', until: 'Dec 2027' } })))[1][0], /:R>\*\* · every 2nd Monday through Dec 2027$/);
+  assert.equal(render(ev({ hostsLabel: '' })).name, 'Thu Nov 19 · 6p–8p · Python Night', 'no empty slot when there are no hosts');
 });
 
 test('the group\'s text is escaped, so it shows as typed and can\'t ping anyone', () => {
-  const { content, embeds } = render(ev({ venue: '**Big** <@everyone> Hall', description: '# Tonight: a hands-on night of _fun_ with @everyone, and all are welcome to come.' }));
-  assert.match(content, /📍 \\\*\\\*Big\\\*\\\* \\<\\@everyone\\> Hall$/);
+  const r = render(ev({ venue: '**Big** <@everyone> Hall', address: '@here St', description: '# Tonight: a hands-on night of _fun_ with @everyone, and all are welcome to come.' }));
+  assert.equal(rows(r)[0][0], '### 📍 \\*\\*Big\\*\\* \\<\\@everyone\\> Hall\n\\@here St');
   // A leading "#" heading becomes a bold line; its text is still escaped.
-  assert.match(embeds[0].description, /^\*\*Tonight: a hands-on night of \\_fun\\_ with \\@everyone/);
+  assert.match(about(r), /^\*\*Tonight: a hands-on night of \\_fun\\_ with \\@everyone/);
 });
 
-test('long titles are cut to Discord\'s 100 characters', () => {
+test('long titles are cut to Discord\'s 100 characters, losing only the event\'s own name', () => {
   const { name } = render(ev({ title: 'x'.repeat(200) }));
   assert.equal(name.length, 100);
-  assert.ok(name.endsWith('…'));
+  assert.match(name, /^Thu Nov 19 · 6p–8p · Pyowa · x+…$/);
 });
 
 test('refOf ignores messages that are not event posts', () => {
@@ -93,7 +100,7 @@ test('a post whose event changed is edited, and one Discord archived for quiet i
   const moved = ev({ venue: 'We Write Code' });
   const [a] = planPosts({ upcoming: [moved], past: [], posts: [postFor(ev())], now });
   assert.deepEqual([a.type, a.post], ['edit', 't-pyowa-1']);
-  assert.match(a.content, /We Write Code/);
+  assert.match(rows(a)[0][0], /We Write Code/);
   assert.deepEqual(planPosts({ upcoming: [ev()], past: [], posts: [postFor(ev(), { archived: true })], now }).map((x) => x.type), ['edit']);
 });
 
@@ -102,7 +109,7 @@ test('a placeholder replaced by the real event (same hosts, same day, new id) ke
   const real = ev({ id: 'pyowa-999', title: 'Testing with pytest' });
   const actions = planPosts({ upcoming: [real], past: [], posts: [postFor(placeholder)], now });
   assert.deepEqual(actions.map((a) => [a.type, a.post, a.event]), [['edit', 't-manual-pyowa-2026-11-19', 'pyowa-999']]);
-  assert.match(actions[0].embeds[0].footer.text, /^ref pyowa-999 /);
+  assert.match(refLine(actions[0]), /^-# ref pyowa-999 /);
 });
 
 test('a post is closed 3 days after its event ends, not before', () => {
@@ -112,13 +119,19 @@ test('a post is closed 3 days after its event ends, not before', () => {
   assert.deepEqual(planPosts({ upcoming: [], past: [done], posts, now }).map((a) => a.type), ['close']);
 });
 
-test('a post whose upcoming event disappeared is marked cancelled once', () => {
-  const gone = ev({ id: 'pyowa-gone' });
+test('a post whose upcoming event disappeared is marked cancelled once: a notice on top, the card grey and without its picture', () => {
+  const gone = ev({ id: 'pyowa-gone', photo: { large: 'https://img/p.jpg' } });
   const [a] = planPosts({ upcoming: [], past: [], posts: [postFor(gone)], now });
   assert.equal(a.type, 'cancel');
-  assert.equal(a.name, 'Cancelled · Thu Nov 19 · Python Night');
-  assert.match(a.content, /^\*\*No longer listed\.\*\*/);
-  assert.deepEqual(planPosts({ upcoming: [], past: [], posts: [{ ...postFor(gone), name: a.name, content: a.content }], now }), []);
+  assert.equal(a.name, 'Cancelled · Thu Nov 19 · 6p–8p · Pyowa · Python Night');
+  assert.match(a.components[0].content, /^\*\*No longer listed\.\*\*/);
+  assert.equal(a.components[1].accent_color, 0x80848e);
+  assert.ok(!a.components[1].components.some((c) => c.type === 12));
+  assert.equal(refOf(a.components.at(-1).content).id, 'pyowa-gone');
+  assert.deepEqual(planPosts({ upcoming: [], past: [], posts: [{ ...postFor(gone), name: a.name, components: a.components }], now }), []);
+  // A post from before V2 is cancelled the old way, in its text.
+  const [old] = planPosts({ upcoming: [], past: [], posts: [{ id: 'o', name: 'Thu Nov 19 · Python Night', content: 'x\n-# ref pyowa-gone 2026-11-19 pyowa', archived: false }], now });
+  assert.match(old.content, /^\*\*No longer listed\.\*\*/);
 });
 
 test('posts without a ref, and a second post for the same event, are ignored', () => {
@@ -156,7 +169,7 @@ test('a sync reads the bot\'s open posts, skips others and locked ones, and appl
       { id: 'c', parent_id: 'other', owner_id: 'bot', name: 'elsewhere', thread_metadata: {} },
     ],
     archived: [{ id: 'd', parent_id: 'f', owner_id: 'bot', name: 'closed', thread_metadata: { archived: true, locked: true } }],
-    firsts: { a: render(changed) },
+    firsts: { a: { flags: V2, ...render(changed) } },
   });
   const actions = await syncEvents({ api, guildId: 'g', data: data([ev(), { ...changed, title: 'New title' }, ev({ id: 'rep', repeat: true })]), now });
   assert.deepEqual(actions.map((a) => [a.type, a.event]), [['create', 'pyowa-1'], ['edit', 'aws-3'], ['coming-up', undefined]]);
@@ -165,9 +178,11 @@ test('a sync reads the bot\'s open posts, skips others and locked ones, and appl
     'POST /channels/f/threads', 'PATCH /channels/new4',
   ]);
   assert.equal(writes[0][2].auto_archive_duration, 10080);
+  assert.equal(writes[0][2].message.flags, V2);
+  assert.deepEqual(writes[0][2].message.allowed_mentions, { parse: [] });
   // The "Coming up" post links both events' posts, the new one included, and is pinned and locked.
-  assert.match(writes[3][2].message.content, /<#new1> · Pyowa · 6p–8p/);
-  assert.match(writes[3][2].message.content, /<#a> · AWS/);
+  assert.match(writes[3][2].message.content, /<#new1>/);
+  assert.match(writes[3][2].message.content, /<#a>/);
   assert.deepEqual(writes[4][2], { name: COMING_UP, flags: 2, locked: true });
 });
 
@@ -177,7 +192,7 @@ test('closing and cancelling write the right changes; a dry run writes nothing',
   const setup = () => fakeDiscord({
     threads: [{ id: 'p', parent_id: 'f', owner_id: 'bot', name: render(done).name, thread_metadata: {} }],
     archived: [{ id: 'q', parent_id: 'f', owner_id: 'bot', name: render(gone).name, thread_metadata: { archived: true } }],
-    firsts: { p: render(done), q: render(gone) },
+    firsts: { p: { flags: V2, ...render(done) }, q: { flags: V2, ...render(gone) } },
   });
   const dry = setup();
   assert.deepEqual((await syncEvents({ api: dry.api, guildId: 'g', data: data([], [done]), now, dryRun: true })).map((a) => a.type), ['close', 'cancel', 'coming-up']);
@@ -189,6 +204,7 @@ test('closing and cancelling write the right changes; a dry run writes nothing',
     ['PATCH', '/channels/q', null], ['PATCH', '/channels/q/messages/q', null], ['PATCH', '/channels/q', true],
     ['POST', '/channels/f/threads', null], ['PATCH', '/channels/new5', true],
   ]);
+  assert.ok(real.writes[2][2].components && !('content' in real.writes[2][2]), 'a V2 post is cancelled through its components');
 });
 
 test('a server without the #events forum fails loudly', async () => {
@@ -241,35 +257,36 @@ test('the file handed to the sync step carries only what a post needs', () => {
   assert.equal(out.past[0].repeat, true);
 });
 
-test('a post from the old format (no card, Discord\'s own link preview) is edited; Discord\'s extra card fields don\'t count as a change', () => {
-  const want = render(ev());
-  const oldStyle = { id: 't', name: want.name, content: `${want.content}\n\n-# ref pyowa-1 2026-11-19 pyowa`, embeds: [{ type: 'link', url: 'https://www.meetup.com/pyowa/events/1/' }], archived: false };
-  assert.deepEqual(planPosts({ upcoming: [ev()], past: [], posts: [oldStyle], now }).map((a) => a.type), ['edit']);
-  const withPhoto = render(ev({ photo: { large: 'x' } }));
-  const asStored = { id: 't', name: withPhoto.name, content: withPhoto.content, embeds: [{ ...withPhoto.embeds[0], type: 'rich', image: { url: 'x', proxy_url: 'p', width: 1, height: 1 } }],
-    components: withPhoto.components.map((r) => ({ ...r, id: 1, components: r.components.map((b, i) => ({ ...b, id: i + 2 })) })), archived: false };
-  assert.deepEqual(planPosts({ upcoming: [ev({ photo: { large: 'x' } })], past: [], posts: [asStored], now }), []);
+test('a post from before V2 is made again: the new post first, then the old one deleted', async () => {
+  const before = { id: 'old', name: 'Thu Nov 19 · Python Night', content: '## 6p–8p', embeds: [{ footer: { text: 'ref pyowa-1 2026-11-19 pyowa' } }], archived: false };
+  assert.deepEqual(planPosts({ upcoming: [ev()], past: [], posts: [before], now }).map((a) => [a.type, a.post, a.event]), [['replace', 'old', 'pyowa-1']]);
+  // Even older: the ref as the message's last line.
+  const legacy = { id: 'older', name: 'Nov 19 · Python Night', content: '**Pyowa**\n-# ref pyowa-1 2026-11-19 pyowa', embeds: [], archived: false };
+  assert.deepEqual(planPosts({ upcoming: [ev()], past: [], posts: [legacy], now }).map((a) => a.type), ['replace']);
+  const { api, writes } = fakeDiscord({ threads: [{ id: 'old', parent_id: 'f', owner_id: 'bot', name: before.name, thread_metadata: {} }], firsts: { old: before } });
+  await syncEvents({ api, guildId: 'g', data: data([ev()]), now });
+  assert.deepEqual(writes.slice(0, 2).map(([m, p]) => `${m} ${p}`), ['POST /channels/f/threads', 'DELETE /channels/old']);
+  assert.match(writes[2][2].message.content, /<#new1>/, '"Coming up" links the new post');
 });
 
-test('a post from before the card, with its ref as the message\'s last line, is recognized and moved to the new format', () => {
-  const want = render(ev());
-  const legacy = { id: 'old', name: 'Nov 19 · Python Night', content: '**Pyowa**\nThu Nov 19 · 6p–8p\n-# ref pyowa-1 2026-11-19 pyowa', embeds: [], archived: false };
-  const actions = planPosts({ upcoming: [ev()], past: [], posts: [legacy], now });
-  assert.deepEqual(actions.map((a) => [a.type, a.post]), [['edit', 'old']]);
-  assert.equal(actions[0].embeds[0].footer.text, 'ref pyowa-1 2026-11-19 pyowa');
-  assert.doesNotMatch(want.content, /ref /);
+test('Discord\'s copy of a post (ids, image sizes, proxy URLs) counts as unchanged', () => {
+  const e = ev({ photo: { large: 'https://img/p.jpg' } });
+  const addIds = (list) => list.map((c, i) => ({ ...c, id: i + 1,
+    ...(c.items ? { items: c.items.map((x) => ({ ...x, spoiler: false, media: { ...x.media, proxy_url: 'p', width: 1, height: 1, content_type: 'image/jpeg' } })) } : {}),
+    ...(c.components ? { components: addIds(c.components) } : {}),
+    ...(c.accessory ? { accessory: { ...c.accessory, id: 99 } } : {}) }));
+  const stored = { ...postFor(e), components: addIds(render(e).components) };
+  assert.deepEqual(shape(stored.components), render(e).components);
+  assert.deepEqual(planPosts({ upcoming: [e], past: [], posts: [stored], now }), []);
 });
 
 test('a scraped URL only ever becomes a button\'s link, an event without a link gets no Details button, and an id with spaces still round-trips', () => {
   const sneaky = 'https://their.site/x)[meetup.com/rsvp](https://evil.example/login';
-  const { embeds, components } = render(ev({ url: sneaky, description: '' }));
-  assert.deepEqual(components[0].components[0], { type: 2, style: 5, label: 'Details on their.site', url: sneaky });
-  assert.equal(embeds[0].description, undefined);
-  const noLink = render(ev({ url: undefined }));
-  assert.deepEqual(noLink.components[0].components.map((b) => b.label), ['Directions']);
-  assert.deepEqual(render(ev({ url: undefined, venue: 'Online', online: true })).components, [], 'no link and online: no buttons at all');
-  const odd = render(ev({ id: 'ical-abc 123@cal' }));
-  assert.equal(refOf(odd.embeds[0].footer.text).id, 'ical-abc_123@cal');
+  const r = render(ev({ url: sneaky, description: '' }));
+  assert.deepEqual(rows(r)[1].slice(1), ['Details on their.site', sneaky]);
+  assert.doesNotMatch(JSON.stringify(rows(r).map((x) => x[0])), /evil/);
+  assert.equal(rows(render(ev({ url: undefined })))[1].length, 1, 'no link: the start line has no button');
+  assert.equal(refOf(refLine(render(ev({ id: 'ical-abc 123@cal' })))).id, 'ical-abc_123@cal');
 });
 
 test('an event whose id has spaces matches its own post instead of making a new one', () => {
@@ -277,25 +294,14 @@ test('an event whose id has spaces matches its own post instead of making a new 
   assert.deepEqual(planPosts({ upcoming: [odd], past: [], posts: [postFor(odd)], now }), []);
 });
 
-test('a Meetup photo is sent as .jpeg, so Discord doesn\'t label it GIF; other photos are sent as they are', () => {
-  assert.equal(render(ev({ photo: { large: 'https://secure.meetupstatic.com/photos/event/b/f/600_1.webp' } })).embeds[0].image.url, 'https://secure.meetupstatic.com/photos/event/b/f/600_1.jpeg');
-  assert.equal(render(ev({ photo: { large: 'https://images.lumacdn.com/x.webp' } })).embeds[0].image.url, 'https://images.lumacdn.com/x.webp');
-});
-
-test('a post from before the buttons (links in the card) is edited to add them', () => {
-  const want = render(ev());
-  const before = { id: 'p', name: want.name, content: want.content, embeds: want.embeds, components: [], archived: false };
-  assert.deepEqual(planPosts({ upcoming: [ev()], past: [], posts: [before], now }).map((a) => [a.type, a.components.length]), [['edit', 1]]);
-});
-
-test('an event without its own photo shows the group\'s logo, small in the corner; a photo wins', () => {
+test('one picture: the event\'s photo, else the group\'s logo, else none; a Meetup photo is sent as .jpeg', () => {
   const logo = 'https://secure.meetupstatic.com/photos/event/7/b/600_9.webp';
-  const noPhoto = render(ev({ logo })).embeds[0];
-  assert.deepEqual(noPhoto.thumbnail, { url: 'https://secure.meetupstatic.com/photos/event/7/b/600_9.jpeg' });
-  assert.equal(noPhoto.image, undefined);
-  const both = render(ev({ logo, photo: { large: 'https://img/p.jpg' } })).embeds[0];
-  assert.deepEqual([both.image?.url, both.thumbnail], ['https://img/p.jpg', undefined]);
-  assert.equal(render(ev()).embeds[0].thumbnail, undefined, 'no photo, no logo: no image');
+  assert.deepEqual(picture(render(ev({ logo }))), { media: { url: 'https://secure.meetupstatic.com/photos/event/7/b/600_9.jpeg' }, description: 'Pyowa logo' });
+  const both = render(ev({ logo, photo: { large: 'https://images.lumacdn.com/x.webp' } }));
+  assert.equal(card(both).filter((c) => c.type === 12).length, 1);
+  assert.equal(picture(both).media.url, 'https://images.lumacdn.com/x.webp');
+  assert.equal(picture(render(ev())), undefined, 'no photo, no logo: no picture');
+  assert.ok(!JSON.stringify(both).includes('"type":11'), 'never a thumbnail beside the text');
 });
 
 test('the events file carries each event\'s group logo, so the sync step needs no group data', () => {
@@ -305,14 +311,15 @@ test('the events file carries each event\'s group logo, so the sync step needs n
   assert.equal(out.upcoming[1].logo, undefined);
 });
 
-test('"Coming up" lists the next two weeks soonest first, each linking to its post, with who and what hours', () => {
+test('"Coming up" lists the next two weeks soonest first, each linking to its post', () => {
   const soon = ev({ id: 'aws-1', groupIds: ['aws'], hostsLabel: 'AWS', start: '2026-11-17T23:30:00.000Z', end: '2026-11-18T01:00:00.000Z' });
   const far = ev({ id: 'far', start: '2026-12-10T00:00:00.000Z', end: '2026-12-10T02:00:00.000Z' });
   const ended = ev({ id: 'ended', start: '2026-11-14T15:00:00.000Z', end: '2026-11-14T16:00:00.000Z' });
   const text = renderComingUp({ upcoming: [ev(), far, soon, ended], postIds: new Map([['pyowa-1', '111'], ['aws-1', '222']]), now });
-  assert.deepEqual(text.split('\n').slice(2), ['<#222> · AWS · 5:30p–7p', '<#111> · Pyowa · 6p–8p']);
+  // The link shows the post's title, which already says the day, the hours and who.
+  assert.deepEqual(text.split('\n').slice(2), ['<#222>', '<#111>']);
   // An event whose post doesn't exist yet (a dry run) shows its post's title instead.
-  assert.match(renderComingUp({ upcoming: [ev()], now }), /\*\*Thu Nov 19 · Python Night\*\* · Pyowa/);
+  assert.match(renderComingUp({ upcoming: [ev()], now }), /\*\*Thu Nov 19 · 6p–8p · Pyowa · Python Night\*\*$/m);
   assert.match(renderComingUp({ upcoming: [far], now }), /Nothing in the next two weeks/);
 });
 
