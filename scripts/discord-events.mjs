@@ -7,6 +7,9 @@
 //     keeps its post, edited to the real event
 //   - a post whose event is over is closed (archived and locked) 3 days later
 //   - a post whose upcoming event disappeared is marked cancelled and closed
+//   - one pinned, locked post, "Coming up", lists the next two weeks soonest
+//     first, each linking to its post: Discord can't sort a forum by event
+//     date, so this is the list in date order
 // Each post's card ends with a small "ref" line naming its event, so the posts
 // are their own record: nothing else is stored. Only the bot's own posts are
 // read.
@@ -140,7 +143,8 @@ const sameCards = (have = [], want = []) => {
 // the bot, locked ones left out: [{ id, name, content, embeds, components,
 // archived }].
 // Pure, so it can be tested.
-export function planPosts({ upcoming, past, posts, now = Date.now() }) {
+// `matched`, if given, is filled with each upcoming event's post: ref id → post id.
+export function planPosts({ upcoming, past, posts, now = Date.now(), matched = new Map() }) {
   const actions = [];
   const byRef = new Map();
   for (const p of posts) {
@@ -164,6 +168,7 @@ export function planPosts({ upcoming, past, posts, now = Date.now() }) {
     }
     if (!post) { actions.push({ type: 'create', event: e.id, ...want }); continue; }
     used.add(post.id);
+    matched.set(refId(e), post.id);
     if (post.name !== want.name || post.content !== want.content || !sameCards(post.embeds, want.embeds) || !sameButtons(post.components, want.components) || post.archived) {
       actions.push({ type: 'edit', post: post.id, event: e.id, ...want });
     }
@@ -183,6 +188,42 @@ export function planPosts({ upcoming, past, posts, now = Date.now() }) {
     }
   }
   return actions;
+}
+
+// The pinned "Coming up" post: the next two weeks in date order, since the
+// forum itself can only sort by newest post or latest reply. Each line links
+// to the event's post (its title already says the day) and adds who and what
+// hours. Found again by its name, or by being the bot's pinned post.
+export const COMING_UP = 'Coming up';
+const SOON = 14 * DAY;
+const PINNED = 2; // a forum post's "pinned" flag
+const MESSAGE_MAX = 2000;
+
+export function renderComingUp({ upcoming, postIds = new Map(), now = Date.now() }) {
+  const soon = upcoming
+    .filter((e) => Date.parse(e.end ?? e.start) > now && Date.parse(e.start) - now < SOON)
+    .sort((a, b) => a.start.localeCompare(b.start));
+  const line = (e) => {
+    const id = postIds.get(refId(e));
+    return [id ? `<#${id}>` : `**${md(render(e).name)}**`, ...(e.hostsLabel ? [md(e.hostsLabel)] : []), hours(e)].join(' · ');
+  };
+  const head = '-# The next two weeks, soonest first. Tap one to open its post. Kept up to date automatically.';
+  if (!soon.length) return `${head}\n\nNothing in the next two weeks. Events further out have their own posts below.`;
+  // Discord's message limit: drop lines from the end, saying how many.
+  const lines = soon.map(line);
+  const text = (n) => [head, '', ...lines.slice(0, n), ...(n < lines.length ? [`-# …and ${lines.length - n} more below.`] : [])].join('\n');
+  let shown = lines.length;
+  while (text(shown).length > MESSAGE_MAX) shown--;
+  return text(shown);
+}
+
+// What the "Coming up" post needs: made, or brought back to `content`,
+// reopened, pinned and locked. Null when it already is.
+export function planComingUp(post, content) {
+  if (!post) return { type: 'coming-up', post: null, name: COMING_UP, content };
+  const pinned = (post.flags & PINNED) === PINNED;
+  if (post.content === content && !post.archived && post.locked && pinned && post.name === COMING_UP) return null;
+  return { type: 'coming-up', post: post.id, name: COMING_UP, content };
 }
 
 // Discord's API, with a retry for rate limits and Discord's own hiccups (5xx).
@@ -216,7 +257,13 @@ async function readPosts(api, guildId, forumId) {
     before = r.threads.at(-1).thread_metadata.archive_timestamp;
   }
   const posts = [];
+  let comingUp = null;
   for (const t of threads) {
+    if (t.owner_id === me.id && !comingUp && (t.name === COMING_UP || (t.flags & PINNED) === PINNED)) {
+      const first = await api('GET', `/channels/${t.id}/messages/${t.id}`);
+      comingUp = { id: t.id, name: t.name, flags: t.flags ?? 0, content: first.content, archived: !!t.thread_metadata?.archived, locked: !!t.thread_metadata?.locked };
+      continue;
+    }
     // Locked posts are finished (closed or cancelled), and the site forgets
     // events after 90 days, so reading them would only cost requests and
     // mistake an aged-out event for a cancelled one.
@@ -225,15 +272,18 @@ async function readPosts(api, guildId, forumId) {
     const first = await api('GET', `/channels/${t.id}/messages/${t.id}`);
     posts.push({ id: t.id, name: t.name, content: first.content, embeds: first.embeds, components: first.components, archived: !!t.thread_metadata?.archived });
   }
-  return posts;
+  return { posts, comingUp };
 }
 
 // Carry out the plan. Mentions are never parsed: the text is the groups'.
 const message = (a) => ({ content: a.content, embeds: a.embeds, components: a.components, allowed_mentions: { parse: [] } });
+// Returns the new posts: ref id → post id.
 async function apply(api, forumId, actions) {
+  const created = new Map();
   for (const a of actions) {
     if (a.type === 'create') {
-      await api('POST', `/channels/${forumId}/threads`, { name: a.name, auto_archive_duration: 10080, message: message(a) });
+      const post = await api('POST', `/channels/${forumId}/threads`, { name: a.name, auto_archive_duration: 10080, message: message(a) });
+      if (post?.id) created.set(refId({ id: a.event }), post.id);
     } else if (a.type === 'edit') {
       // Unarchive first: an archived post can't be edited.
       await api('PATCH', `/channels/${a.post}`, { name: a.name, archived: false });
@@ -246,6 +296,19 @@ async function apply(api, forumId, actions) {
       await api('PATCH', `/channels/${a.post}`, { name: a.name, archived: true, locked: true });
     }
   }
+  return created;
+}
+
+async function applyComingUp(api, forumId, a) {
+  const body = { content: a.content, allowed_mentions: { parse: [] } };
+  let id = a.post;
+  if (!id) {
+    id = (await api('POST', `/channels/${forumId}/threads`, { name: a.name, auto_archive_duration: 10080, message: body })).id;
+  } else {
+    await api('PATCH', `/channels/${id}`, { archived: false });
+    await api('PATCH', `/channels/${id}/messages/${id}`, body);
+  }
+  await api('PATCH', `/channels/${id}`, { name: a.name, flags: PINNED, locked: true });
 }
 
 // One run: read the forum, plan against the site's events, and apply unless
@@ -253,9 +316,17 @@ async function apply(api, forumId, actions) {
 export async function syncEvents({ api, guildId, data, now = Date.now(), dryRun = false }) {
   const forum = (await api('GET', `/guilds/${guildId}/channels`)).find((c) => c.type === 15 && c.name === 'events');
   if (!forum) throw new Error('No #events forum channel in the server (infra/discord creates it).');
-  const posts = await readPosts(api, guildId, forum.id);
-  const actions = planPosts({ upcoming: data.upcoming.filter((e) => !e.repeat), past: data.past, posts, now });
-  if (!dryRun) await apply(api, forum.id, actions);
+  const { posts, comingUp } = await readPosts(api, guildId, forum.id);
+  const upcoming = data.upcoming.filter((e) => !e.repeat);
+  const matched = new Map();
+  const actions = planPosts({ upcoming, past: data.past, posts, now, matched });
+  if (!dryRun) for (const [ref, id] of await apply(api, forum.id, actions)) matched.set(ref, id);
+  // After the posts, so a new event's line can link to its new post.
+  const pin = planComingUp(comingUp, renderComingUp({ upcoming, postIds: matched, now }));
+  if (pin) {
+    actions.push(pin);
+    if (!dryRun) await applyComingUp(api, forum.id, pin);
+  }
   return actions;
 }
 
@@ -283,5 +354,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const data = JSON.parse(fs.readFileSync(arg('--from'), 'utf8'));
   const actions = await syncEvents({ api: discordApi(token), guildId, data, dryRun });
   if (!actions.length) console.log('#events is up to date.');
-  for (const a of actions) console.log(`${dryRun ? '[dry run] ' : ''}${a.type} ${a.event}${a.name ? `: ${a.name}` : ''}`);
+  for (const a of actions) {
+    console.log(`${dryRun ? '[dry run] ' : ''}${a.type}${a.event ? ` ${a.event}` : ''}${a.name ? `: ${a.name}` : ''}`);
+    if (dryRun && a.type === 'coming-up') console.log(a.content.replace(/^/gm, '    '));
+  }
 }

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { discordApi, planPosts, refOf, render, slim, syncEvents } from '../scripts/discord-events.mjs';
+import { COMING_UP, discordApi, planComingUp, planPosts, refOf, render, renderComingUp, slim, syncEvents } from '../scripts/discord-events.mjs';
 
 const now = Date.parse('2026-11-14T18:00:00Z');
 const ev = (over = {}) => ({
@@ -135,7 +135,7 @@ function fakeDiscord({ threads = [], firsts = {}, archived = [], forum = true } 
     'GET /channels/f/threads/archived/public?limit=100': { threads: archived, has_more: false },
   };
   const api = async (method, path, body) => {
-    if (method !== 'GET') { writes.push([method, path, body]); return {}; }
+    if (method !== 'GET') { writes.push([method, path, body]); return method === 'POST' ? { id: `new${writes.length}` } : {}; }
     const m = path.match(/^\/channels\/(\w+)\/messages\/\1$/);
     if (m) return firsts[m[1]];
     if (!(`${method} ${path}` in routes)) throw new Error(`unexpected ${method} ${path}`);
@@ -157,9 +157,16 @@ test('a sync reads the bot\'s open posts, skips others and locked ones, and appl
     firsts: { a: render(changed) },
   });
   const actions = await syncEvents({ api, guildId: 'g', data: data([ev(), { ...changed, title: 'New title' }, ev({ id: 'rep', repeat: true })]), now });
-  assert.deepEqual(actions.map((a) => [a.type, a.event]), [['create', 'pyowa-1'], ['edit', 'aws-3']]);
-  assert.deepEqual(writes.map(([m, p]) => `${m} ${p}`), ['POST /channels/f/threads', 'PATCH /channels/a', 'PATCH /channels/a/messages/a']);
+  assert.deepEqual(actions.map((a) => [a.type, a.event]), [['create', 'pyowa-1'], ['edit', 'aws-3'], ['coming-up', undefined]]);
+  assert.deepEqual(writes.map(([m, p]) => `${m} ${p}`), [
+    'POST /channels/f/threads', 'PATCH /channels/a', 'PATCH /channels/a/messages/a',
+    'POST /channels/f/threads', 'PATCH /channels/new4',
+  ]);
   assert.equal(writes[0][2].auto_archive_duration, 10080);
+  // The "Coming up" post links both events' posts, the new one included, and is pinned and locked.
+  assert.match(writes[3][2].message.content, /<#new1> · Pyowa · 6p–8p/);
+  assert.match(writes[3][2].message.content, /<#a> · AWS/);
+  assert.deepEqual(writes[4][2], { name: COMING_UP, flags: 2, locked: true });
 });
 
 test('closing and cancelling write the right changes; a dry run writes nothing', async () => {
@@ -171,13 +178,14 @@ test('closing and cancelling write the right changes; a dry run writes nothing',
     firsts: { p: render(done), q: render(gone) },
   });
   const dry = setup();
-  assert.deepEqual((await syncEvents({ api: dry.api, guildId: 'g', data: data([], [done]), now, dryRun: true })).map((a) => a.type), ['close', 'cancel']);
+  assert.deepEqual((await syncEvents({ api: dry.api, guildId: 'g', data: data([], [done]), now, dryRun: true })).map((a) => a.type), ['close', 'cancel', 'coming-up']);
   assert.deepEqual(dry.writes, []);
   const real = setup();
   await syncEvents({ api: real.api, guildId: 'g', data: data([], [done]), now });
   assert.deepEqual(real.writes.map(([m, p, b]) => [m, p, b.locked ?? null]), [
     ['PATCH', '/channels/p', true],
     ['PATCH', '/channels/q', null], ['PATCH', '/channels/q/messages/q', null], ['PATCH', '/channels/q', true],
+    ['POST', '/channels/f/threads', null], ['PATCH', '/channels/new5', true],
   ]);
 });
 
@@ -293,4 +301,40 @@ test('the events file carries each event\'s group logo, so the sync step needs n
   const out = slim(data);
   assert.equal(out.upcoming[0].logo, 'l.png');
   assert.equal(out.upcoming[1].logo, undefined);
+});
+
+test('"Coming up" lists the next two weeks soonest first, each linking to its post, with who and what hours', () => {
+  const soon = ev({ id: 'aws-1', groupIds: ['aws'], hostsLabel: 'AWS', start: '2026-11-17T23:30:00.000Z', end: '2026-11-18T01:00:00.000Z' });
+  const far = ev({ id: 'far', start: '2026-12-10T00:00:00.000Z', end: '2026-12-10T02:00:00.000Z' });
+  const ended = ev({ id: 'ended', start: '2026-11-14T15:00:00.000Z', end: '2026-11-14T16:00:00.000Z' });
+  const text = renderComingUp({ upcoming: [ev(), far, soon, ended], postIds: new Map([['pyowa-1', '111'], ['aws-1', '222']]), now });
+  assert.deepEqual(text.split('\n').slice(2), ['<#222> · AWS · 5:30p–7p', '<#111> · Pyowa · 6p–8p']);
+  // An event whose post doesn't exist yet (a dry run) shows its post's title instead.
+  assert.match(renderComingUp({ upcoming: [ev()], now }), /\*\*Thu Nov 19 · Python Night\*\* · Pyowa/);
+  assert.match(renderComingUp({ upcoming: [far], now }), /Nothing in the next two weeks/);
+});
+
+test('"Coming up" stays under Discord\'s 2000 characters, saying how many more there are', () => {
+  const many = Array.from({ length: 80 }, (_, i) => ev({ id: `e${i}`, hostsLabel: 'A rather long group name for testing' }));
+  const text = renderComingUp({ upcoming: many, now });
+  assert.ok(text.length <= 2000);
+  assert.match(text, /\n-# …and \d+ more below\.$/);
+});
+
+test('"Coming up" is made once, then edited only when it changed or came unpinned, unlocked or archived', () => {
+  assert.deepEqual(planComingUp(null, 'x'), { type: 'coming-up', post: null, name: COMING_UP, content: 'x' });
+  const post = { id: 'c', name: COMING_UP, flags: 2, content: 'x', archived: false, locked: true };
+  assert.equal(planComingUp(post, 'x'), null);
+  for (const change of [{ content: 'old' }, { flags: 0 }, { locked: false }, { archived: true }, { name: 'renamed' }]) {
+    assert.equal(planComingUp({ ...post, ...change }, 'x')?.post, 'c', JSON.stringify(change));
+  }
+});
+
+test('a sync finds its pinned "Coming up" post, even locked, and doesn\'t treat it as an event', async () => {
+  const { api, writes } = fakeDiscord({
+    threads: [{ id: 'c', parent_id: 'f', owner_id: 'bot', name: COMING_UP, flags: 2, thread_metadata: { locked: true } }],
+    firsts: { c: { content: renderComingUp({ upcoming: [], now }) } },
+  });
+  assert.deepEqual(await syncEvents({ api, guildId: 'g', data: data([]), now }), []);
+  assert.deepEqual(writes, []);
 });
