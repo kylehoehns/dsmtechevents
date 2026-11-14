@@ -10,24 +10,57 @@ const ev = (over = {}) => ({
 });
 const postFor = (e, over = {}) => ({ id: `t-${e.id}`, ...render(e), archived: false, ...over });
 
-test('a post says who, when (Des Moines time), where and where to RSVP, and names its event', () => {
-  const { name, content } = render(ev());
-  assert.equal(name, 'Nov 19 · Python Night');
+test('a post: the day in the title; the hours, place and a map link in the message; the group\'s card links to its page', () => {
+  const e = ev({ address: '1 Main St, Des Moines, IA', description: 'Learn how Python packaging works and why it keeps changing.\n\nPizza at 6.', photo: { large: 'https://img/p.jpg' } });
+  const { name, content, embeds } = render(e);
+  assert.equal(name, 'Thu Nov 19 · Python Night');
+  const map = 'https://www.google.com/maps/search/?api=1&query=Lean%20Techniques%2C%201%20Main%20St%2C%20Des%20Moines%2C%20IA';
   assert.equal(content, [
-    '**Pyowa**',
-    `Thu Nov 19 · 6p–8p (<t:${Date.parse('2026-11-20T00:00:00Z') / 1000}:R>)`,
-    '📍 Lean Techniques',
-    "RSVP on the group's page: https://www.meetup.com/pyowa/events/1/",
+    '## 6p–8p',
+    `-# <t:${Date.parse('2026-11-20T00:00:00Z') / 1000}:R>`,
+    '',
+    '📍 **Lean Techniques**',
+    `[1 Main St, Des Moines, IA](<${map}>)`,
+    '',
     '-# ref pyowa-1 2026-11-19 pyowa',
   ].join('\n'));
   assert.deepEqual(refOf(content), { id: 'pyowa-1', day: '2026-11-19', host: 'pyowa' });
+  assert.deepEqual(embeds, [{
+    color: 0xff4fa3, title: 'Pyowa', url: 'https://www.meetup.com/pyowa/events/1/',
+    description: 'Learn how Python packaging works and why it keeps changing.\n\n[Read more on meetup.com](https://www.meetup.com/pyowa/events/1/)',
+    image: { url: 'https://img/p.jpg' },
+  }]);
+  assert.doesNotMatch(content + JSON.stringify(embeds), /Des Moines time|RSVP on/);
 });
 
-test('a conference over several days shows the range; a hand-added event uses its hosts for matching', () => {
-  const { content } = render(ev({ id: 'manual-devcon', multiDay: true, allDay: true, start: '2026-12-03T06:00:00Z', end: '2026-12-05T06:00:00Z', groupIds: [], hostsLabel: 'Iowa Tech Week', venue: '' }));
-  assert.match(content, /^\*\*Iowa Tech Week\*\*\nThu–Fri Dec 3–4 · All day/);
-  assert.doesNotMatch(content, /📍/);
-  assert.equal(refOf(content).host, 'iowa-tech-week');
+test('the hook skips a title repeat, short logistics and a pointer to another link, and drops a "from <group>" sign-off', () => {
+  const hookOf = (description, over = {}) => render(ev({ description, ...over })).embeds[0].description.split('\n\n[Read more')[0];
+  assert.equal(hookOf('Python Night\n\nDoors open at 6 PM.\n\nCheck out https://pyowa.org for details on this.\n\nA hands-on night of packaging tips for every level of Python user.'),
+    'A hands-on night of packaging tips for every level of Python user.');
+  assert.equal(hookOf('An evening of talks and community, from Pyowa.'), 'An evening of talks and community.');
+  const long = `${'This sentence is about forty characters. '.repeat(6)}And then it keeps on going without a break for a while longer.`;
+  assert.equal(hookOf(long), 'This sentence is about forty characters. '.repeat(6).trim());
+  assert.ok(hookOf(long).length <= 300 && hookOf(long).endsWith('.'));
+  assert.ok(hookOf('word '.repeat(100)).endsWith('…'));
+  assert.equal(render(ev({ description: '' })).embeds[0].description, '[Read more on meetup.com](https://www.meetup.com/pyowa/events/1/)');
+});
+
+test('online, hybrid, no venue yet, all day, several days and a series each read right', () => {
+  assert.match(render(ev({ venue: 'Online', online: true })).content, /\n💻 \*\*Online\*\*\n/);
+  assert.match(render(ev({ venue: '', online: false })).content, /📍 \*\*Place to be announced\*\*/);
+  assert.match(render(ev({ hybrid: true })).content, /📍 \*\*Lean Techniques\*\* · also online\n\[Map\]\(</);
+  const conf = render(ev({ id: 'manual-devcon', multiDay: true, allDay: true, start: '2026-12-03T06:00:00Z', end: '2026-12-05T06:00:00Z', groupIds: [], hostsLabel: 'Iowa Tech Week', venue: '' }));
+  assert.equal(conf.name, 'Thu–Fri Dec 3–4 · Python Night');
+  assert.match(conf.content, /^## All day\n/);
+  assert.equal(refOf(conf.content).host, 'iowa-tech-week');
+  assert.match(render(ev({ series: { rule: 'Every 2nd Monday', until: 'Dec 2027' } })).content, /:R> · every 2nd Monday through Dec 2027\n/);
+});
+
+test('the group\'s text is escaped, so it shows as typed and can\'t ping anyone', () => {
+  const { content, embeds } = render(ev({ venue: '**Big** <@everyone> Hall', description: '# Tonight: a hands-on night of _fun_ with @everyone, and all are welcome to come.' }));
+  assert.match(content, /📍 \*\*\\\*\\\*Big\\\*\\\* \\<\\@everyone\\> Hall\*\*/);
+  // The site's plainText() already drops a leading "#" heading; a hyphen inside a word is left alone.
+  assert.match(embeds[0].description, /^Tonight: a hands-on night of \\_fun\\_ with \\@everyone/);
 });
 
 test('long titles are cut to Discord\'s 100 characters', () => {
@@ -78,7 +111,7 @@ test('a post whose upcoming event disappeared is marked cancelled once', () => {
   const gone = ev({ id: 'pyowa-gone' });
   const [a] = planPosts({ upcoming: [], past: [], posts: [postFor(gone)], now });
   assert.equal(a.type, 'cancel');
-  assert.equal(a.name, 'Cancelled · Nov 19 · Python Night');
+  assert.equal(a.name, 'Cancelled · Thu Nov 19 · Python Night');
   assert.match(a.content, /^\*\*No longer listed\.\*\*/);
   assert.deepEqual(planPosts({ upcoming: [], past: [], posts: [{ ...postFor(gone), name: a.name, content: a.content }], now }), []);
 });
@@ -188,8 +221,17 @@ test('the API client sends the token, retries rate limits and Discord errors, an
 });
 
 test('the file handed to the sync step carries only what a post needs', () => {
-  const full = { ...ev(), description: 'long text', image: 'x.jpg', going: 12, extra: undefined };
+  const full = { ...ev(), description: 'text', photo: { large: 'l.jpg', small: 's.jpg', width: 600 }, going: 12, image: 'x.jpg', venueKey: 'k', extra: undefined, address: null };
   const out = slim({ upcoming: [full], past: [ev({ id: 'old', repeat: true })] });
-  assert.deepEqual(Object.keys(out.upcoming[0]).sort(), ['allDay', 'end', 'groupIds', 'hostsLabel', 'id', 'multiDay', 'start', 'title', 'url', 'venue']);
+  assert.deepEqual(Object.keys(out.upcoming[0]).sort(), ['allDay', 'description', 'end', 'groupIds', 'hostsLabel', 'id', 'multiDay', 'photo', 'start', 'title', 'url', 'venue']);
+  assert.deepEqual(out.upcoming[0].photo, { large: 'l.jpg' });
   assert.equal(out.past[0].repeat, true);
+});
+
+test('a post from the old format (no card, Discord\'s own link preview) is edited; Discord\'s extra card fields don\'t count as a change', () => {
+  const want = render(ev());
+  const oldStyle = { id: 't', name: want.name, content: want.content, embeds: [{ type: 'link', url: 'https://www.meetup.com/pyowa/events/1/' }], archived: false };
+  assert.deepEqual(planPosts({ upcoming: [ev()], past: [], posts: [oldStyle], now }).map((a) => a.type), ['edit']);
+  const asStored = { ...oldStyle, embeds: [{ ...want.embeds[0], type: 'rich', image: { url: 'x', proxy_url: 'p', width: 1, height: 1 } }] };
+  assert.deepEqual(planPosts({ upcoming: [ev({ photo: { large: 'x' } })], past: [], posts: [{ ...asStored, embeds: [{ ...render(ev({ photo: { large: 'x' } })).embeds[0], type: 'rich', image: { url: 'x', proxy_url: 'p', width: 1, height: 1 } }] }], now }), []);
 });

@@ -13,7 +13,7 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 ## What it builds
 
 - **Start Here** (read-only): `#rules`, `#announcements`, `#events`.
-  - `#events` is a forum with one post per upcoming event on dsmtechevents.com, which members reply in but can't start. `scripts/discord-events.mjs` makes and edits the posts after each refresh (the `discord-events` job in `refresh.yml`; `docs/decisions/0007`), so they're never edited by hand. `#rules` holds one message posted by the bot from `rules.md`; edit that file and apply to change it (the message is edited in place, with no new post or ping).
+  - `#events` is a forum with one post per upcoming event on dsmtechevents.com, which members reply in but can't start. Each post's title is the day and the event; the message has the hours, the place with a map link, and a card with the group's name (linked to its event page, where people RSVP), the opening of its description and its photo. `scripts/discord-events.mjs` makes and edits the posts after each refresh (the `discord-events` job in `refresh.yml`; `docs/decisions/0007`), so they're never edited by hand. `#rules` holds one message posted by the bot from `rules.md`; edit that file and apply to change it (the message is edited in place, with no new post or ping).
 - **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell` (forum), `#off-topic`
 - **Organizers** (hidden; every organizer role can see it): `#organizers`, one room for the organizers of all groups. It holds a pinned guide posted by the bot from `organizers.md`, edited in place like the rules.
 - **Admins** (hidden): `#mod-updates`
