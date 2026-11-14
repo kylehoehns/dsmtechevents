@@ -133,3 +133,15 @@ jobs:
           done
           echo "::error::Discord still differs from the config after three applies."
           exit 1
+      # Onboarding isn't OpenTofu's (see infra/discord/onboarding.tf): this
+      # sets it from the apply's output, keeping each answer's ID so members'
+      # picks stay put. Plain Node and the repo's own script, nothing from npm.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: set onboarding
+        env:
+          DISCORD_SERVER_ID: ${{ vars.DISCORD_SERVER_ID }}
+        run: |
+          tofu output -json onboarding > "$RUNNER_TEMP/onboarding.json"
+          node "$GITHUB_WORKSPACE/scripts/discord-onboarding.mjs" --from "$RUNNER_TEMP/onboarding.json"

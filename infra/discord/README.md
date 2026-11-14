@@ -27,8 +27,9 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
     - Removing a group through this repo deletes its two channels and its category. Channels its organizers added are left outside any category; delete them by hand.
   - The chat channel's topic links to the group's own page (`meetup`, else `website` or `eventbrite`), where people RSVP.
 - **Onboarding**:
-  - the seven Start Here and Community channels as defaults: exactly Discord's minimum of 7, with 5 that members can post in, so removing any one breaks onboarding
-  - one question, "Which user groups do you want to follow?", with an answer per group that grants the group's category and member role
+  - the eight Start Here and Community channels as defaults. Discord asks for at least 7, with 5 that members can post in (`#events` doesn't count, since members only reply there), so removing one of the five breaks onboarding.
+  - one question, "Which user groups do you want to follow?", with an answer per group, A to Z, that grants the group's category and member role
+  - Set by `scripts/discord-onboarding.mjs`, not OpenTofu: the discord workflow runs it after each apply, from the `onboarding` output.
 
 ## Still done by hand
 
@@ -94,11 +95,7 @@ Wording to paste:
 2. Merge it. The workflow applies it: it creates the group's category, channels and roles, adds it as an answer to the onboarding question, and applies again to put the new channels in order.
 3. Existing members aren't asked again. Post in `#announcements` that the group is here and how to join it (see above).
 
-The onboarding answers are listed in the order groups were added, so a new group is always last; its place in `groups.yaml` doesn't matter. Removing a group is different: the provider keeps each answer's Discord ID by its place in the list, so every answer after the removed one takes the ID of the one before it. Nobody loses a role or a channel, but members' ticks in Channels & Roles may then show a neighboring group until they re-pick.
-
-Onboarding is owned by this config: the question and its answers are put back on the next apply if changed by hand in Server Settings > Onboarding. They're updated in place, which keeps the question's IDs and so every member's picks. Never make onboarding be recreated (for example with `-replace`): it gets new IDs and every member's picks are lost.
-
-The default channels are the exception: the config sets them only when onboarding is first created. To change them later, edit them in Server Settings > Onboarding > Default Channels, and update the list in `onboarding.tf` to match so a rebuilt server gets the same.
+Onboarding is set by `scripts/discord-onboarding.mjs` after each apply, so anything changed by hand in Server Settings > Onboarding is put back. Change the default channels in `onboarding.tf`, and the groups in `groups.yaml`. Members' picks are saved against each answer's Discord ID, and the script keeps every answer's ID, finding it by the group's member role. So a group added anywhere in the alphabet, or removed, never moves anyone's picks onto another group. (The OpenTofu provider keeps IDs by position, which is why it no longer manages onboarding.)
 
 A group's `id` must not change once it has a Discord section. Everything for the group is keyed by it, so a new `id` deletes the group's channels, with their history, and creates new ones.
 
@@ -160,7 +157,12 @@ It reads these from the `discord` environment (Settings > Environments > discord
 | `AWS_ENDPOINT_URL_S3` | variable | `https://<cloudflare account id>.r2.cloudflarestorage.com` |
 | `DISCORD_SERVER_ID` | variable | the server's ID |
 
-Running it from a laptop still works the same way (`tofu plan` / `tofu apply -var server_id=<server id>`). An apply there takes the same lock in R2, so it can't overlap with the workflow's.
+Running it from a laptop still works the same way (`tofu plan` / `tofu apply -var server_id=<server id>`). An apply there takes the same lock in R2, so it can't overlap with the workflow's. After applying from a laptop, set onboarding as the workflow does (with `DISCORD_SERVER_ID` set too):
+
+```sh
+tofu output -json onboarding > /tmp/onboarding.json
+node ../../scripts/discord-onboarding.mjs --from /tmp/onboarding.json
+```
 
 ## State
 
