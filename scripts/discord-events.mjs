@@ -103,7 +103,10 @@ export function render(e) {
   const card = {
     color: ACCENT,
     ...(about ? { description: md(about) } : {}),
-    ...(e.photo?.large ? { image: { url: forDiscord(e.photo.large) } } : {}),
+    // The event's own photo, big. Without one, the group's logo, small in the
+    // corner: the site leaves out a photo that only repeats the logo, since its
+    // cards show the logo too, but nothing else in a post does.
+    ...(e.photo?.large ? { image: { url: forDiscord(e.photo.large) } } : e.logo ? { thumbnail: { url: forDiscord(e.logo) } } : {}),
     footer: { text: `ref ${refId(e)} ${dayKey(e.start)} ${hostKey(e)}` },
   };
   const button = (label, url) => ({ type: 2, style: 5, label, url }); // style 5: a link button
@@ -124,7 +127,7 @@ const refOfPost = (p) => refOf(p.embeds?.find((c) => c.footer?.text)?.footer.tex
 // Whether a post's cards are the ones render() makes. Only the fields we send
 // are compared: Discord adds sizes and proxy URLs, and its own link previews
 // (type "link", from an older post's bare link) don't count as ours.
-const cardOf = (c) => JSON.stringify([c.color ?? null, c.title ?? null, c.url ?? null, c.description ?? null, c.image?.url ?? null, c.footer?.text ?? null]);
+const cardOf = (c) => JSON.stringify([c.color ?? null, c.title ?? null, c.url ?? null, c.description ?? null, c.image?.url ?? null, c.thumbnail?.url ?? null, c.footer?.text ?? null]);
 const buttonsOf = (rows = []) => JSON.stringify(rows.flatMap((r) => (r.components ?? []).map((b) => [b.label ?? null, b.url ?? null])));
 const sameButtons = (have, want) => buttonsOf(have) === buttonsOf(want);
 const sameCards = (have = [], want = []) => {
@@ -257,11 +260,13 @@ export async function syncEvents({ api, guildId, data, now = Date.now(), dryRun 
 }
 
 // The fields render() and planPosts() read, and nothing else.
-const FIELDS = ['id', 'title', 'start', 'end', 'allDay', 'multiDay', 'url', 'description', 'venue', 'address', 'fullAddress', 'online', 'hybrid', 'photo', 'series', 'groupIds', 'hostsLabel', 'repeat'];
+const FIELDS = ['id', 'title', 'start', 'end', 'allDay', 'multiDay', 'url', 'description', 'venue', 'address', 'fullAddress', 'online', 'hybrid', 'photo', 'logo', 'series', 'groupIds', 'hostsLabel', 'repeat'];
 export const slim = (data) => {
   const keep = (k, v) => (k === 'photo' ? { large: v.large } : v);
+  // The hosting group's logo, from groups.yaml or what the refresh read.
+  const withLogo = (e) => ({ ...e, logo: e.groupIds.map((id) => data.byId?.[id]?.logo).find(Boolean) });
   const pick = (e) => Object.fromEntries(FIELDS.filter((k) => e[k] !== undefined && e[k] !== null).map((k) => [k, keep(k, e[k])]));
-  return { upcoming: data.upcoming.map(pick), past: data.past.map(pick) };
+  return { upcoming: data.upcoming.map((e) => pick(withLogo(e))), past: data.past.map(pick) };
 };
 
 if (import.meta.url === `file://${process.argv[1]}`) {
