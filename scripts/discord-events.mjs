@@ -7,8 +7,9 @@
 //     keeps its post, edited to the real event
 //   - a post whose event is over is closed (archived and locked) 3 days later
 //   - a post whose upcoming event disappeared is marked cancelled and closed
-// Each post ends with a small "ref" line naming its event, so the posts are
-// their own record: nothing else is stored. Only the bot's own posts are read.
+// Each post's card ends with a small "ref" line naming its event, so the posts
+// are their own record: nothing else is stored. Only the bot's own posts are
+// read.
 // Two steps, so the Discord token never shares a machine with npm packages
 // (see .github/workflows/refresh.yml):
 //   node scripts/discord-events.mjs --write events.json
@@ -74,15 +75,14 @@ function where(e) {
 // The post for one event: its title, its first message, and one card.
 // Typeset like a poster: the title says the day, the message says the hours
 // and the place, and the card is the group's: their name linked to their
-// page (where people RSVP), their words and their photo. The ref line stays
-// the last line of the message.
+// page (where people RSVP), their words and their photo. The ref line is the
+// card's footer, the last thing on screen.
 export function render(e) {
   const date = e.multiDay ? dayRange(e.start, e.end) : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
   const rel = `<t:${Math.floor(Date.parse(e.start) / 1000)}:R>`;
   const repeats = e.series?.rule ? `${e.series.rule.replace(/^./, (c) => c.toLowerCase())}${e.series.until ? ` through ${e.series.until}` : ''}` : '';
   const when = [`## ${hours(e)}`, `-# ${[rel, ...(repeats ? [repeats] : [])].join(' · ')}`];
-  const content = [when, where(e), [`-# ref ${e.id} ${dayKey(e.start)} ${hostKey(e)}`]]
-    .map((b) => b.join('\n')).join('\n\n');
+  const content = [when, where(e)].map((b) => b.join('\n')).join('\n\n');
 
   const site = new URL(e.url).hostname.replace(/^www\./, '');
   const about = hook(e);
@@ -92,21 +92,24 @@ export function render(e) {
     url: e.url,
     description: [...(about ? [md(about)] : []), `[Read more on ${site}](${e.url})`].join('\n\n'),
     ...(e.photo?.large ? { image: { url: e.photo.large } } : {}),
+    footer: { text: `ref ${e.id} ${dayKey(e.start)} ${hostKey(e)}` },
   };
   return { name: cut(`${date} · ${e.title}`, NAME_MAX), content, embeds: [card] };
 }
 
-// The ref line of a post's first message: { id, day, host }, or null if the
-// post isn't one of these.
-export function refOf(content = '') {
-  const m = content.match(/^-# ref (\S+) (\d{4}-\d{2}-\d{2}) (\S+)$/m);
+// A ref line, "ref <id> <day> <host>": { id, day, host }, or null.
+export function refOf(text = '') {
+  const m = text.match(/^(?:-# )?ref (\S+) (\d{4}-\d{2}-\d{2}) (\S+)$/m);
   return m ? { id: m[1], day: m[2], host: m[3] } : null;
 }
+// A post's ref: in its card's footer, or, for posts made before the card,
+// the last line of its message.
+const refOfPost = (p) => refOf(p.embeds?.find((c) => c.footer?.text)?.footer.text) ?? refOf(p.content);
 
 // Whether a post's cards are the ones render() makes. Only the fields we send
 // are compared: Discord adds sizes and proxy URLs, and its own link previews
 // (type "link", from an older post's bare link) don't count as ours.
-const cardOf = (c) => JSON.stringify([c.color ?? null, c.title ?? null, c.url ?? null, c.description ?? null, c.image?.url ?? null]);
+const cardOf = (c) => JSON.stringify([c.color ?? null, c.title ?? null, c.url ?? null, c.description ?? null, c.image?.url ?? null, c.footer?.text ?? null]);
 const sameCards = (have = [], want = []) => {
   const ours = have.filter((c) => !c.type || c.type === 'rich');
   return ours.length === want.length && ours.every((c, i) => cardOf(c) === cardOf(want[i]));
@@ -120,7 +123,7 @@ export function planPosts({ upcoming, past, posts, now = Date.now() }) {
   const actions = [];
   const byRef = new Map();
   for (const p of posts) {
-    const ref = refOf(p.content);
+    const ref = refOfPost(p);
     if (ref && !byRef.has(ref.id)) byRef.set(ref.id, { ...p, ref });
   }
   const used = new Set();
