@@ -10,9 +10,9 @@ const ev = (over = {}) => ({
 });
 const postFor = (e, over = {}) => ({ id: `t-${e.id}`, ...render(e), archived: false, ...over });
 
-test('a post: the day in the title; the hours, group and place in the message; the card has the hook, directions and the group\'s page', () => {
+test('a post: the day in the title; the hours, group and place in the message; the card has the hook; buttons open the page and directions', () => {
   const e = ev({ address: '1 Main St, Des Moines, IA', description: 'Learn how Python packaging works and why it keeps changing.\n\nPizza at 6.', photo: { large: 'https://img/p.jpg' } });
-  const { name, content, embeds } = render(e);
+  const { name, content, embeds, components } = render(e);
   assert.equal(name, 'Thu Nov 19 · Python Night');
   const map = 'https://www.google.com/maps/search/?api=1&query=Lean%20Techniques%2C%201%20Main%20St%2C%20Des%20Moines%2C%20IA';
   // The forum's list shows the message as plain text, so it holds no links.
@@ -21,15 +21,19 @@ test('a post: the day in the title; the hours, group and place in the message; t
   assert.deepEqual(refOf(embeds[0].footer.text), { id: 'pyowa-1', day: '2026-11-19', host: 'pyowa' });
   assert.deepEqual(embeds, [{
     color: 0xff4fa3,
-    description: `Learn how Python packaging works and why it keeps changing.\n\n[Directions](<${map}>) · [Read more on meetup.com](<https://www.meetup.com/pyowa/events/1/>)`,
+    description: 'Learn how Python packaging works and why it keeps changing.',
     image: { url: 'https://img/p.jpg' },
     footer: { text: 'ref pyowa-1 2026-11-19 pyowa' },
   }]);
-  assert.doesNotMatch(content + JSON.stringify(embeds), /Des Moines time|RSVP on/);
+  assert.deepEqual(components, [{ type: 1, components: [
+    { type: 2, style: 5, label: 'Details on meetup.com', url: 'https://www.meetup.com/pyowa/events/1/' },
+    { type: 2, style: 5, label: 'Directions', url: map },
+  ] }]);
+  assert.doesNotMatch(content + JSON.stringify(embeds), /Des Moines time|RSVP on|\]\(/);
 });
 
 test('the hook skips a title repeat, short logistics and a pointer to another link, and drops a "from <group>" sign-off', () => {
-  const hookOf = (description, over = {}) => render(ev({ description, ...over })).embeds[0].description.split('\n\n[Directions')[0];
+  const hookOf = (description, over = {}) => render(ev({ description, ...over })).embeds[0].description;
   assert.equal(hookOf('Python Night\n\nDoors open at 6 PM.\n\nCheck out https://pyowa.org for details on this.\n\nA hands-on night of packaging tips for every level of Python user.'),
     'A hands-on night of packaging tips for every level of Python user.');
   assert.equal(hookOf('An evening of talks and community, from Pyowa.'), 'An evening of talks and community.');
@@ -37,16 +41,16 @@ test('the hook skips a title repeat, short logistics and a pointer to another li
   assert.equal(hookOf(long), 'This sentence is about forty characters. '.repeat(6).trim());
   assert.ok(hookOf(long).length <= 300 && hookOf(long).endsWith('.'));
   assert.ok(hookOf('word '.repeat(100)).endsWith('…'));
-  assert.match(render(ev({ description: '' })).embeds[0].description, /^\[Directions\]\(<[^>]+>\) · \[Read more on meetup\.com\]\(<https:\/\/www\.meetup\.com\/pyowa\/events\/1\/>\)$/);
+  assert.equal(render(ev({ description: '' })).embeds[0].description, undefined, 'no hook, no description');
 });
 
 test('online, hybrid, no venue yet, all day, several days and a series each read right', () => {
   const online = render(ev({ venue: 'Online', online: true }));
   assert.match(online.content, /:R> · \*\*Pyowa\*\* · 💻 Online$/);
-  assert.match(online.embeds[0].description, /^\[Read more on meetup\.com\]/, 'no Directions for an online event');
+  assert.deepEqual(online.components[0].components.map((b) => b.label), ['Details on meetup.com'], 'no Directions for an online event');
   assert.match(render(ev({ venue: '', online: false })).content, /📍 Place to be announced$/);
   assert.match(render(ev({ hybrid: true })).content, /📍 Lean Techniques · also online$/);
-  assert.match(render(ev()).embeds[0].description, /\[Directions\]\(<https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=Lean%20Techniques%2C%20Des%20Moines%2C%20IA>\)/);
+  assert.equal(render(ev()).components[0].components[1].url, 'https://www.google.com/maps/search/?api=1&query=Lean%20Techniques%2C%20Des%20Moines%2C%20IA');
   const conf = render(ev({ id: 'manual-devcon', multiDay: true, allDay: true, start: '2026-12-03T06:00:00Z', end: '2026-12-05T06:00:00Z', groupIds: [], hostsLabel: 'Iowa Tech Week', venue: '' }));
   assert.equal(conf.name, 'Thu–Fri Dec 3–4 · Python Night');
   assert.match(conf.content, /^## All day\n/);
@@ -232,7 +236,8 @@ test('a post from the old format (no card, Discord\'s own link preview) is edite
   const oldStyle = { id: 't', name: want.name, content: `${want.content}\n\n-# ref pyowa-1 2026-11-19 pyowa`, embeds: [{ type: 'link', url: 'https://www.meetup.com/pyowa/events/1/' }], archived: false };
   assert.deepEqual(planPosts({ upcoming: [ev()], past: [], posts: [oldStyle], now }).map((a) => a.type), ['edit']);
   const withPhoto = render(ev({ photo: { large: 'x' } }));
-  const asStored = { id: 't', name: withPhoto.name, content: withPhoto.content, embeds: [{ ...withPhoto.embeds[0], type: 'rich', image: { url: 'x', proxy_url: 'p', width: 1, height: 1 } }], archived: false };
+  const asStored = { id: 't', name: withPhoto.name, content: withPhoto.content, embeds: [{ ...withPhoto.embeds[0], type: 'rich', image: { url: 'x', proxy_url: 'p', width: 1, height: 1 } }],
+    components: withPhoto.components.map((r) => ({ ...r, id: 1, components: r.components.map((b, i) => ({ ...b, id: i + 2 })) })), archived: false };
   assert.deepEqual(planPosts({ upcoming: [ev({ photo: { large: 'x' } })], past: [], posts: [asStored], now }), []);
 });
 
@@ -245,12 +250,14 @@ test('a post from before the card, with its ref as the message\'s last line, is 
   assert.doesNotMatch(want.content, /ref /);
 });
 
-test('a scraped URL can\'t add a link of its own, an event without a link still gets a card, and an id with spaces still round-trips', () => {
+test('a scraped URL only ever becomes a button\'s link, an event without a link gets no Details button, and an id with spaces still round-trips', () => {
   const sneaky = 'https://their.site/x)[meetup.com/rsvp](https://evil.example/login';
-  const { embeds } = render(ev({ url: sneaky, description: '' }));
-  assert.match(embeds[0].description, new RegExp(` · \\[Read more on their\\.site\\]\\(<${sneaky.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}>\\)$`));
-  const noLink = render(ev({ url: undefined })).embeds[0];
-  assert.doesNotMatch(noLink.description, /Read more/);
+  const { embeds, components } = render(ev({ url: sneaky, description: '' }));
+  assert.deepEqual(components[0].components[0], { type: 2, style: 5, label: 'Details on their.site', url: sneaky });
+  assert.equal(embeds[0].description, undefined);
+  const noLink = render(ev({ url: undefined }));
+  assert.deepEqual(noLink.components[0].components.map((b) => b.label), ['Directions']);
+  assert.deepEqual(render(ev({ url: undefined, venue: 'Online', online: true })).components, [], 'no link and online: no buttons at all');
   const odd = render(ev({ id: 'ical-abc 123@cal' }));
   assert.equal(refOf(odd.embeds[0].footer.text).id, 'ical-abc_123@cal');
 });
@@ -263,4 +270,10 @@ test('an event whose id has spaces matches its own post instead of making a new 
 test('a Meetup photo is sent as .jpeg, so Discord doesn\'t label it GIF; other photos are sent as they are', () => {
   assert.equal(render(ev({ photo: { large: 'https://secure.meetupstatic.com/photos/event/b/f/600_1.webp' } })).embeds[0].image.url, 'https://secure.meetupstatic.com/photos/event/b/f/600_1.jpeg');
   assert.equal(render(ev({ photo: { large: 'https://images.lumacdn.com/x.webp' } })).embeds[0].image.url, 'https://images.lumacdn.com/x.webp');
+});
+
+test('a post from before the buttons (links in the card) is edited to add them', () => {
+  const want = render(ev());
+  const before = { id: 'p', name: want.name, content: want.content, embeds: want.embeds, components: [], archived: false };
+  assert.deepEqual(planPosts({ upcoming: [ev()], past: [], posts: [before], now }).map((a) => [a.type, a.components.length]), [['edit', 1]]);
 });
