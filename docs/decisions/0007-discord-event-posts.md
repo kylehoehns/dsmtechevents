@@ -29,6 +29,10 @@ refresh:
   real event (same hosts, same day, new id) keeps its post.
 - A post is closed (archived and locked) 3 days after its event ends.
 - A post whose upcoming event disappears is marked cancelled and closed.
+- One pinned, locked post, "Coming up", lists the next two weeks soonest
+  first, each line linking to its event's post. Discord sorts a forum only
+  by newest post or latest reply, so a reply on an event six weeks out would
+  otherwise sit above tonight's. (Added 2026-11-13.)
 
 Members reply in posts but can't start them. Each post ends with a small
 "ref" line naming its event, so the posts are their own record and nothing
