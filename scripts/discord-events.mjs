@@ -82,8 +82,8 @@ const forDiscord = (url) => url.replace(/^(https:\/\/secure\.meetupstatic\.com\/
 
 // The post for one event: its title, its first message, and one card.
 // Typeset like a poster: the title says the day, the message says the hours,
-// the group and the place, and the card is the group's: their words, links to
-// directions and to their page (where people RSVP), and their photo. The ref line is the
+// the group and the place, the card is the group's words and photo, and two
+// buttons open the event's page (where people RSVP) and directions. The ref line is the
 // card's footer, the last thing on screen.
 export function render(e) {
   const date = e.multiDay ? dayRange(e.start, e.end) : `${weekday(e.start)} ${month(e.start)} ${day(e.start)}`;
@@ -98,17 +98,18 @@ export function render(e) {
   // own. An event with no usable link gets a card without one.
   const site = URL.canParse(e.url ?? '') ? new URL(e.url).hostname.replace(/^www\./, '') : '';
   const about = hook(e);
-  // No title: the group is named in the message, and "Read more" links its page.
+  // No title: the group is named in the message. The links are buttons under
+  // it, big enough to find and tap: the event's page, then directions.
   const card = {
     color: ACCENT,
-    description: [
-      ...(about ? [md(about)] : []),
-      [...(map ? [`[Directions](<${map}>)`] : []), ...(site ? [`[Read more on ${site}](<${e.url}>)`] : [])].join(' · '),
-    ].filter(Boolean).join('\n\n'),
+    ...(about ? { description: md(about) } : {}),
     ...(e.photo?.large ? { image: { url: forDiscord(e.photo.large) } } : {}),
     footer: { text: `ref ${refId(e)} ${dayKey(e.start)} ${hostKey(e)}` },
   };
-  return { name: cut(`${date} · ${e.title}`, NAME_MAX), content, embeds: [card] };
+  const button = (label, url) => ({ type: 2, style: 5, label, url }); // style 5: a link button
+  const buttons = [...(site ? [button(`Details on ${site}`, e.url)] : []), ...(map ? [button('Directions', map)] : [])];
+  const components = buttons.length ? [{ type: 1, components: buttons }] : [];
+  return { name: cut(`${date} · ${e.title}`, NAME_MAX), content, embeds: [card], components };
 }
 
 // A ref line, "ref <id> <day> <host>": { id, day, host }, or null.
@@ -124,6 +125,8 @@ const refOfPost = (p) => refOf(p.embeds?.find((c) => c.footer?.text)?.footer.tex
 // are compared: Discord adds sizes and proxy URLs, and its own link previews
 // (type "link", from an older post's bare link) don't count as ours.
 const cardOf = (c) => JSON.stringify([c.color ?? null, c.title ?? null, c.url ?? null, c.description ?? null, c.image?.url ?? null, c.footer?.text ?? null]);
+const buttonsOf = (rows = []) => JSON.stringify(rows.flatMap((r) => (r.components ?? []).map((b) => [b.label ?? null, b.url ?? null])));
+const sameButtons = (have, want) => buttonsOf(have) === buttonsOf(want);
 const sameCards = (have = [], want = []) => {
   const ours = have.filter((c) => !c.type || c.type === 'rich');
   return ours.length === want.length && ours.every((c, i) => cardOf(c) === cardOf(want[i]));
@@ -131,7 +134,8 @@ const sameCards = (have = [], want = []) => {
 
 // Decide what to do. `upcoming` and `past` are the site's events (upcoming
 // already without a series' repeats); `posts` are the forum's open posts by
-// the bot, locked ones left out: [{ id, name, content, embeds, archived }].
+// the bot, locked ones left out: [{ id, name, content, embeds, components,
+// archived }].
 // Pure, so it can be tested.
 export function planPosts({ upcoming, past, posts, now = Date.now() }) {
   const actions = [];
@@ -157,7 +161,7 @@ export function planPosts({ upcoming, past, posts, now = Date.now() }) {
     }
     if (!post) { actions.push({ type: 'create', event: e.id, ...want }); continue; }
     used.add(post.id);
-    if (post.name !== want.name || post.content !== want.content || !sameCards(post.embeds, want.embeds) || post.archived) {
+    if (post.name !== want.name || post.content !== want.content || !sameCards(post.embeds, want.embeds) || !sameButtons(post.components, want.components) || post.archived) {
       actions.push({ type: 'edit', post: post.id, event: e.id, ...want });
     }
   }
@@ -216,13 +220,13 @@ async function readPosts(api, guildId, forumId) {
     if (t.owner_id !== me.id || t.thread_metadata?.locked) continue;
     // A forum post's first message has the post's own id.
     const first = await api('GET', `/channels/${t.id}/messages/${t.id}`);
-    posts.push({ id: t.id, name: t.name, content: first.content, embeds: first.embeds, archived: !!t.thread_metadata?.archived });
+    posts.push({ id: t.id, name: t.name, content: first.content, embeds: first.embeds, components: first.components, archived: !!t.thread_metadata?.archived });
   }
   return posts;
 }
 
 // Carry out the plan. Mentions are never parsed: the text is the groups'.
-const message = (a) => ({ content: a.content, embeds: a.embeds, allowed_mentions: { parse: [] } });
+const message = (a) => ({ content: a.content, embeds: a.embeds, components: a.components, allowed_mentions: { parse: [] } });
 async function apply(api, forumId, actions) {
   for (const a of actions) {
     if (a.type === 'create') {
