@@ -24,6 +24,9 @@ const CLOSE_AFTER = 3 * DAY;
 const CANCELLED = 'Cancelled · ';
 const NAME_MAX = 100; // Discord's limit for a post title
 
+// An event's id as its ref line carries it: no whitespace, or refOf()
+// couldn't read it back and the post would be made again on every refresh.
+const refId = (e) => e.id.replace(/\s+/g, '_');
 const hostKey = (e) => (e.groupIds.length ? e.groupIds.join('+') : (e.hostsLabel ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-')) || 'none';
 
 const ACCENT = 0xff4fa3; // the site's pink: one strip for every group
@@ -84,15 +87,17 @@ export function render(e) {
   const when = [`## ${hours(e)}`, `-# ${[rel, ...(repeats ? [repeats] : [])].join(' · ')}`];
   const content = [when, where(e)].map((b) => b.join('\n')).join('\n\n');
 
-  const site = new URL(e.url).hostname.replace(/^www\./, '');
+  // The link inside <…>, so a scraped URL holding ")[" can't add a link of its
+  // own. An event with no usable link gets a card without one.
+  const site = URL.canParse(e.url ?? '') ? new URL(e.url).hostname.replace(/^www\./, '') : '';
   const about = hook(e);
   const card = {
     color: ACCENT,
     title: cut(e.hostsLabel || 'Event page', 256),
-    url: e.url,
-    description: [...(about ? [md(about)] : []), `[Read more on ${site}](${e.url})`].join('\n\n'),
+    ...(site ? { url: e.url } : {}),
+    description: [...(about ? [md(about)] : []), ...(site ? [`[Read more on ${site}](<${e.url}>)`] : [])].join('\n\n'),
     ...(e.photo?.large ? { image: { url: e.photo.large } } : {}),
-    footer: { text: `ref ${e.id} ${dayKey(e.start)} ${hostKey(e)}` },
+    footer: { text: `ref ${refId(e)} ${dayKey(e.start)} ${hostKey(e)}` },
   };
   return { name: cut(`${date} · ${e.title}`, NAME_MAX), content, embeds: [card] };
 }
@@ -127,8 +132,8 @@ export function planPosts({ upcoming, past, posts, now = Date.now() }) {
     if (ref && !byRef.has(ref.id)) byRef.set(ref.id, { ...p, ref });
   }
   const used = new Set();
-  const pastById = new Map(past.map((e) => [e.id, e]));
-  const upcomingIds = new Set(upcoming.map((e) => e.id));
+  const pastById = new Map(past.map((e) => [refId(e), e]));
+  const upcomingIds = new Set(upcoming.map(refId));
 
   // A post whose event is gone but which shares hosts and day with a new
   // event: a placeholder that became the real thing.
@@ -137,7 +142,7 @@ export function planPosts({ upcoming, past, posts, now = Date.now() }) {
   // Soonest last: the forum lists the newest post first.
   for (const e of [...upcoming].sort((a, b) => b.start.localeCompare(a.start))) {
     const want = render(e);
-    let post = byRef.get(e.id);
+    let post = byRef.get(refId(e));
     if (!post) {
       post = orphans.find((p) => !used.has(p.id) && p.ref.day === dayKey(e.start) && p.ref.host === hostKey(e));
     }

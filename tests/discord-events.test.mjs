@@ -25,7 +25,7 @@ test('a post: the day in the title; the hours, place and a map link in the messa
   assert.deepEqual(refOf(embeds[0].footer.text), { id: 'pyowa-1', day: '2026-11-19', host: 'pyowa' });
   assert.deepEqual(embeds, [{
     color: 0xff4fa3, title: 'Pyowa', url: 'https://www.meetup.com/pyowa/events/1/',
-    description: 'Learn how Python packaging works and why it keeps changing.\n\n[Read more on meetup.com](https://www.meetup.com/pyowa/events/1/)',
+    description: 'Learn how Python packaging works and why it keeps changing.\n\n[Read more on meetup.com](<https://www.meetup.com/pyowa/events/1/>)',
     image: { url: 'https://img/p.jpg' },
     footer: { text: 'ref pyowa-1 2026-11-19 pyowa' },
   }]);
@@ -41,7 +41,7 @@ test('the hook skips a title repeat, short logistics and a pointer to another li
   assert.equal(hookOf(long), 'This sentence is about forty characters. '.repeat(6).trim());
   assert.ok(hookOf(long).length <= 300 && hookOf(long).endsWith('.'));
   assert.ok(hookOf('word '.repeat(100)).endsWith('…'));
-  assert.equal(render(ev({ description: '' })).embeds[0].description, '[Read more on meetup.com](https://www.meetup.com/pyowa/events/1/)');
+  assert.equal(render(ev({ description: '' })).embeds[0].description, '[Read more on meetup.com](<https://www.meetup.com/pyowa/events/1/>)');
 });
 
 test('online, hybrid, no venue yet, all day, several days and a series each read right', () => {
@@ -243,4 +243,20 @@ test('a post from before the card, with its ref as the message\'s last line, is 
   assert.deepEqual(actions.map((a) => [a.type, a.post]), [['edit', 'old']]);
   assert.equal(actions[0].embeds[0].footer.text, 'ref pyowa-1 2026-11-19 pyowa');
   assert.doesNotMatch(want.content, /ref /);
+});
+
+test('a scraped URL can\'t add a link of its own, an event without a link still gets a card, and an id with spaces still round-trips', () => {
+  const sneaky = 'https://their.site/x)[meetup.com/rsvp](https://evil.example/login';
+  const { embeds } = render(ev({ url: sneaky, description: '' }));
+  assert.equal(embeds[0].description, `[Read more on their.site](<${sneaky}>)`);
+  const noLink = render(ev({ url: undefined })).embeds[0];
+  assert.equal(noLink.url, undefined);
+  assert.doesNotMatch(noLink.description, /Read more/);
+  const odd = render(ev({ id: 'ical-abc 123@cal' }));
+  assert.equal(refOf(odd.embeds[0].footer.text).id, 'ical-abc_123@cal');
+});
+
+test('an event whose id has spaces matches its own post instead of making a new one', () => {
+  const odd = ev({ id: 'ical-abc 123@cal' });
+  assert.deepEqual(planPosts({ upcoming: [odd], past: [], posts: [postFor(odd)], now }), []);
 });
