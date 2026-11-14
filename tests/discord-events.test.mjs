@@ -15,17 +15,13 @@ test('a post: the day in the title; the hours, place and a map link in the messa
   const { name, content, embeds } = render(e);
   assert.equal(name, 'Thu Nov 19 · Python Night');
   const map = 'https://www.google.com/maps/search/?api=1&query=Lean%20Techniques%2C%201%20Main%20St%2C%20Des%20Moines%2C%20IA';
-  assert.equal(content, [
-    '## 6p–8p',
-    `-# <t:${Date.parse('2026-11-20T00:00:00Z') / 1000}:R>`,
-    '',
-    '📍 **Lean Techniques**',
-    `[1 Main St, Des Moines, IA](<${map}>)`,
-  ].join('\n'));
+  // The forum's list shows the message as plain text, so it holds no links.
+  assert.equal(content, `## 6p–8p\n-# <t:${Date.parse('2026-11-20T00:00:00Z') / 1000}:R> · 📍 Lean Techniques`);
+  assert.doesNotMatch(content, /\]\(|https?:/);
   assert.deepEqual(refOf(embeds[0].footer.text), { id: 'pyowa-1', day: '2026-11-19', host: 'pyowa' });
   assert.deepEqual(embeds, [{
     color: 0xff4fa3, title: 'Pyowa', url: 'https://www.meetup.com/pyowa/events/1/',
-    description: 'Learn how Python packaging works and why it keeps changing.\n\n[Read more on meetup.com](<https://www.meetup.com/pyowa/events/1/>)',
+    description: `Learn how Python packaging works and why it keeps changing.\n\n[Directions](<${map}>) · [Read more on meetup.com](<https://www.meetup.com/pyowa/events/1/>)`,
     image: { url: 'https://img/p.jpg' },
     footer: { text: 'ref pyowa-1 2026-11-19 pyowa' },
   }]);
@@ -33,7 +29,7 @@ test('a post: the day in the title; the hours, place and a map link in the messa
 });
 
 test('the hook skips a title repeat, short logistics and a pointer to another link, and drops a "from <group>" sign-off', () => {
-  const hookOf = (description, over = {}) => render(ev({ description, ...over })).embeds[0].description.split('\n\n[Read more')[0];
+  const hookOf = (description, over = {}) => render(ev({ description, ...over })).embeds[0].description.split('\n\n[Directions')[0];
   assert.equal(hookOf('Python Night\n\nDoors open at 6 PM.\n\nCheck out https://pyowa.org for details on this.\n\nA hands-on night of packaging tips for every level of Python user.'),
     'A hands-on night of packaging tips for every level of Python user.');
   assert.equal(hookOf('An evening of talks and community, from Pyowa.'), 'An evening of talks and community.');
@@ -41,23 +37,26 @@ test('the hook skips a title repeat, short logistics and a pointer to another li
   assert.equal(hookOf(long), 'This sentence is about forty characters. '.repeat(6).trim());
   assert.ok(hookOf(long).length <= 300 && hookOf(long).endsWith('.'));
   assert.ok(hookOf('word '.repeat(100)).endsWith('…'));
-  assert.equal(render(ev({ description: '' })).embeds[0].description, '[Read more on meetup.com](<https://www.meetup.com/pyowa/events/1/>)');
+  assert.match(render(ev({ description: '' })).embeds[0].description, /^\[Directions\]\(<[^>]+>\) · \[Read more on meetup\.com\]\(<https:\/\/www\.meetup\.com\/pyowa\/events\/1\/>\)$/);
 });
 
 test('online, hybrid, no venue yet, all day, several days and a series each read right', () => {
-  assert.match(render(ev({ venue: 'Online', online: true })).content, /\n💻 \*\*Online\*\*$/);
-  assert.match(render(ev({ venue: '', online: false })).content, /📍 \*\*Place to be announced\*\*/);
-  assert.match(render(ev({ hybrid: true })).content, /📍 \*\*Lean Techniques\*\* · also online\n\[Map\]\(</);
+  const online = render(ev({ venue: 'Online', online: true }));
+  assert.match(online.content, /:R> · 💻 Online$/);
+  assert.match(online.embeds[0].description, /^\[Read more on meetup\.com\]/, 'no Directions for an online event');
+  assert.match(render(ev({ venue: '', online: false })).content, /📍 Place to be announced$/);
+  assert.match(render(ev({ hybrid: true })).content, /📍 Lean Techniques · also online$/);
+  assert.match(render(ev()).embeds[0].description, /\[Directions\]\(<https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=Lean%20Techniques%2C%20Des%20Moines%2C%20IA>\)/);
   const conf = render(ev({ id: 'manual-devcon', multiDay: true, allDay: true, start: '2026-12-03T06:00:00Z', end: '2026-12-05T06:00:00Z', groupIds: [], hostsLabel: 'Iowa Tech Week', venue: '' }));
   assert.equal(conf.name, 'Thu–Fri Dec 3–4 · Python Night');
   assert.match(conf.content, /^## All day\n/);
   assert.equal(refOf(conf.embeds[0].footer.text).host, 'iowa-tech-week');
-  assert.match(render(ev({ series: { rule: 'Every 2nd Monday', until: 'Dec 2027' } })).content, /:R> · every 2nd Monday through Dec 2027\n/);
+  assert.match(render(ev({ series: { rule: 'Every 2nd Monday', until: 'Dec 2027' } })).content, /:R> · every 2nd Monday through Dec 2027 · 📍/);
 });
 
 test('the group\'s text is escaped, so it shows as typed and can\'t ping anyone', () => {
   const { content, embeds } = render(ev({ venue: '**Big** <@everyone> Hall', description: '# Tonight: a hands-on night of _fun_ with @everyone, and all are welcome to come.' }));
-  assert.match(content, /📍 \*\*\\\*\\\*Big\\\*\\\* \\<\\@everyone\\> Hall\*\*/);
+  assert.match(content, /📍 \\\*\\\*Big\\\*\\\* \\<\\@everyone\\> Hall$/);
   // The site's plainText() already drops a leading "#" heading; a hyphen inside a word is left alone.
   assert.match(embeds[0].description, /^Tonight: a hands-on night of \\_fun\\_ with \\@everyone/);
 });
@@ -248,7 +247,7 @@ test('a post from before the card, with its ref as the message\'s last line, is 
 test('a scraped URL can\'t add a link of its own, an event without a link still gets a card, and an id with spaces still round-trips', () => {
   const sneaky = 'https://their.site/x)[meetup.com/rsvp](https://evil.example/login';
   const { embeds } = render(ev({ url: sneaky, description: '' }));
-  assert.equal(embeds[0].description, `[Read more on their.site](<${sneaky}>)`);
+  assert.match(embeds[0].description, new RegExp(` · \\[Read more on their\\.site\\]\\(<${sneaky.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}>\\)$`));
   const noLink = render(ev({ url: undefined })).embeds[0];
   assert.equal(noLink.url, undefined);
   assert.doesNotMatch(noLink.description, /Read more/);
@@ -259,4 +258,9 @@ test('a scraped URL can\'t add a link of its own, an event without a link still 
 test('an event whose id has spaces matches its own post instead of making a new one', () => {
   const odd = ev({ id: 'ical-abc 123@cal' });
   assert.deepEqual(planPosts({ upcoming: [odd], past: [], posts: [postFor(odd)], now }), []);
+});
+
+test('a Meetup photo is sent as .jpeg, so Discord doesn\'t label it GIF; other photos are sent as they are', () => {
+  assert.equal(render(ev({ photo: { large: 'https://secure.meetupstatic.com/photos/event/b/f/600_1.webp' } })).embeds[0].image.url, 'https://secure.meetupstatic.com/photos/event/b/f/600_1.jpeg');
+  assert.equal(render(ev({ photo: { large: 'https://images.lumacdn.com/x.webp' } })).embeds[0].image.url, 'https://images.lumacdn.com/x.webp');
 });
