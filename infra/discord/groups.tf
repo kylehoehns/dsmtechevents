@@ -69,27 +69,44 @@ resource "discord_channel_permission" "group_chat_organizer" {
 }
 
 # Organizers post; members read. Not synced with the category, so it carries
-# the organizer's permissions plus Send Messages itself. For a group with its
-# own server, nobody here posts: an admin follows that server's announcement
-# channel into this one (README, "Still done by hand"), and the topic sends
-# people there to talk.
+# the organizer's permissions plus Send Messages itself.
 resource "discord_news_channel" "group_announcements" {
-  for_each  = local.sections
-  server_id = var.server_id
-  category  = discord_category_channel.group[each.key].id
-  name      = "${each.key}-announcements"
-  topic = (contains(keys(local.follows), each.key)
-    # The invite last, so no punctuation runs into the link.
-    ? "News from ${each.value.short}, copied from their own Discord. Chat with them there: ${local.follows[each.key]}"
-    : "News from ${each.value.short} organizers."
-  )
+  for_each                 = local.groups
+  server_id                = var.server_id
+  category                 = discord_category_channel.group[each.key].id
+  name                     = "${each.key}-announcements"
+  topic                    = "News from ${each.value.short} organizers."
   position                 = local.group_channel_first[each.key]
   sync_perms_with_category = false
 }
 
 resource "discord_channel_permission" "group_announcements_read_only" {
-  for_each     = local.sections
+  for_each     = local.groups
   channel_id   = discord_news_channel.group_announcements[each.key].id
+  type         = "role"
+  overwrite_id = local.everyone
+  deny         = data.discord_permission.read_only.deny_bits
+}
+
+# For a group with its own server: nobody here posts. An admin follows that
+# server's announcement channel into this one (README, "Following a group's
+# own server"), and the topic sends people there to talk. A text channel, not
+# an announcement one, because Discord only delivers followed posts to text
+# channels. Read-only doesn't stop them: they arrive through a webhook.
+resource "discord_text_channel" "group_followed" {
+  for_each  = local.follows
+  server_id = var.server_id
+  category  = discord_category_channel.group[each.key].id
+  name      = "${each.key}-announcements"
+  # The invite last, so no punctuation runs into the link.
+  topic                    = "News from ${local.sections[each.key].short}, copied from their own Discord. Chat with them there: ${each.value}"
+  position                 = local.group_channel_first[each.key]
+  sync_perms_with_category = false
+}
+
+resource "discord_channel_permission" "group_followed_read_only" {
+  for_each     = local.follows
+  channel_id   = discord_text_channel.group_followed[each.key].id
   type         = "role"
   overwrite_id = local.everyone
   deny         = data.discord_permission.read_only.deny_bits
