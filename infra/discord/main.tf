@@ -1,10 +1,22 @@
 # The groups the website lists are the source of truth. A group gets a section
-# of the server when its entry in data/groups.yaml has `discord: true`.
+# of the server when its entry in data/groups.yaml has `discord:`. With `true`
+# it's a full section (announcements, chat, organizer role). With an invite to
+# the group's own server it's announcements only, followed from that server,
+# so the conversation stays there instead of splitting in two.
 locals {
-  groups = {
-    for g in yamldecode(file("${path.module}/../../data/groups.yaml")) :
-    g.id => g if try(g.discord, false) == true
+  all_groups = yamldecode(file("${path.module}/../../data/groups.yaml"))
+  # Same pattern as DISCORD_INVITE in src/lib/data.mjs, which refuses others.
+  invite = "^https://(discord\\.gg|discord\\.com/invite)/[\\w-]+$"
+
+  # Every group with a section: category, member role, announcements, onboarding.
+  sections = {
+    for g in local.all_groups : g.id => g
+    if try(g.discord, false) == true || can(regex(local.invite, tostring(try(g.discord, ""))))
   }
+  # Sections of our own, with chat and organizers.
+  groups = { for id, g in local.sections : id => g if g.discord == true }
+  # Sections that follow the group's own server: id => its invite link.
+  follows = { for id, g in local.sections : id => g.discord if g.discord != true }
 
   # Discord's @everyone role has the same ID as the server.
   everyone = var.server_id
@@ -12,12 +24,16 @@ locals {
   # Category order: Start Here, Community, the groups in groups.yaml order,
   # Organizers, then Admins. Positions stay contiguous because Discord stores what it is
   # given and a gap would only be closed by the next drag in the app.
-  group_ids = [for g in yamldecode(file("${path.module}/../../data/groups.yaml")) : g.id if contains(keys(local.groups), g.id)]
+  group_ids = [for g in local.all_groups : g.id if contains(keys(local.sections), g.id)]
 
   # Channel positions count across the whole server, not within a category:
   # Discord renumbers them that way (rules 0, announcements 1, ...), and
-  # numbering per category would show as drift every time it does. Each
-  # group takes two places (announcements, then chat).
+  # numbering per category would show as drift every time it does. A full
+  # section takes two places (announcements, then chat), a followed one one.
+  channel_count = [for id in local.group_ids : contains(keys(local.groups), id) ? 2 : 1]
+  group_channel_first = {
+    for i, id in local.group_ids : id => 8 + sum(concat([0], slice(local.channel_count, 0, i)))
+  }
   channel_position = {
     rules         = 0
     announcements = 1
@@ -27,9 +43,8 @@ locals {
     jobs          = 5
     show_and_tell = 6
     off_topic     = 7
-    group_first   = 8
-    organizers    = 8 + 2 * length(local.group_ids)
-    mod_updates   = 9 + 2 * length(local.group_ids)
+    organizers    = 8 + sum(concat([0], local.channel_count))
+    mod_updates   = 9 + sum(concat([0], local.channel_count))
   }
 }
 

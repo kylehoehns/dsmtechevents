@@ -98,6 +98,8 @@ function readStatus(dataDir, groups) {
 // The keys each file documents in its header comment. Anything else is a typo
 // (`venu:`, `headlinr:`) that would otherwise be dropped without a word.
 const GROUP_KEYS = new Set(['id', 'name', 'short', 'meetup', 'ical', 'source', 'website', 'eventbrite', 'logo', 'discord']);
+// Same pattern as `invite` in infra/discord/main.tf.
+const DISCORD_INVITE = /^https:\/\/(discord\.gg|discord\.com\/invite)\/[\w-]+$/;
 const EVENT_KEYS = new Set(['title', 'id', 'url', 'start', 'end', 'time', 'endTime', 'venue', 'address', 'description', 'tags', 'hosts', 'hostedBy', 'headliner', 'luma']);
 
 function onlyKnown(file, entry, keys) {
@@ -108,10 +110,13 @@ function onlyKnown(file, entry, keys) {
 // A group from groups.yaml plus what the refresh cached for it.
 function readGroup(g, dataDir) {
   onlyKnown('groups.yaml', g, GROUP_KEYS);
-  // infra/discord builds a group's Discord section when this is exactly true.
+  // infra/discord builds a full Discord section when this is exactly true, and
+  // an announcements-only one when it's the invite to the group's own server.
   // OpenTofu reads YAML 1.1 (`yes` is true there, a string here), so anything
   // else is refused rather than meaning different things to each.
-  if ('discord' in g && g.discord !== true) throw new Error(`groups.yaml: "${g.id}" has discord: ${JSON.stringify(g.discord)}, not true`);
+  if ('discord' in g && g.discord !== true && !DISCORD_INVITE.test(g.discord)) {
+    throw new Error(`groups.yaml: "${g.id}" has discord: ${JSON.stringify(g.discord)}, not true or a Discord invite link`);
+  }
   const cacheFile = path.join(dataDir, 'cache', `${g.id}.json`);
   const cache = fs.existsSync(cacheFile) ? JSON.parse(fs.readFileSync(cacheFile, 'utf8')) : { events: [] };
   const slug = meetupSlug(g.meetup);

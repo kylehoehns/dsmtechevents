@@ -100,16 +100,18 @@ test('a misspelled key in events.yaml or groups.yaml fails loudly instead of bei
   assert.throws(() => loadData({ dataDir: dir, now }), /groups.yaml: "x" has unknown meetups:/);
 });
 
-test('discord: in groups.yaml is true or absent, so the site and infra/discord agree on it', () => {
+test('discord: in groups.yaml is true, an invite link or absent, so the site and infra/discord agree on it', () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'dsm-'));
   cpSync(dataDir, dir, { recursive: true });
   // OpenTofu reads YAML 1.1, where `yes` is true; the site's parser reads it as a string.
-  for (const value of ['yes', '"true"', '{}', 'false']) {
+  for (const value of ['yes', '"true"', '{}', 'false', 'follow', 'https://discord.gg/', 'https://example.com/invite/abc']) {
     writeFileSync(path.join(dir, 'groups.yaml'), `- { id: x, name: X, short: X, meetup: https://www.meetup.com/x/, discord: ${value} }\n`);
-    assert.throws(() => loadData({ dataDir: dir, now }), /groups.yaml: "x" has discord: .*, not true/, value);
+    assert.throws(() => loadData({ dataDir: dir, now }), /groups.yaml: "x" has discord: .*, not true or a Discord invite link/, value);
   }
-  writeFileSync(path.join(dir, 'groups.yaml'), '- { id: x, name: X, short: X, meetup: https://www.meetup.com/x/, discord: true }\n');
-  assert.doesNotThrow(() => loadData({ dataDir: dir, now }));
+  for (const value of ['true', 'https://discord.gg/KSsEVdVpGZ', 'https://discord.com/invite/aqcDKzVYw3']) {
+    writeFileSync(path.join(dir, 'groups.yaml'), `- { id: x, name: X, short: X, meetup: https://www.meetup.com/x/, discord: ${value} }\n`);
+    assert.doesNotThrow(() => loadData({ dataDir: dir, now }), value);
+  }
 });
 
 test('a luma: event takes its details from the fetched copy, and its own fields win', () => {

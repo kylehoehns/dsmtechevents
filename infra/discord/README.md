@@ -10,6 +10,16 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
   discord: true
 ```
 
+A group that already runs its own server gets a smaller section instead: give `discord:` the invite link to that server, as the group publishes it.
+
+```yaml
+- id: secdsm
+  short: SecDSM
+  discord: https://discord.com/invite/aqcDKzVYw3
+```
+
+Its section has only `#<id>-announcements`, which follows their server's announcement channel (see "Following a group's own server"), and whose topic sends people to their server to talk. There's no chat and no organizer role, so we don't start a second community next to theirs. Members still pick it in onboarding like any other group, which is the only way most of them would find it.
+
 ## What it builds
 
 - **Start Here** (read-only): `#rules`, `#announcements`, `#events`.
@@ -17,7 +27,7 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 - **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell` (forum), `#off-topic`
 - **Organizers** (hidden; every organizer role can see it): `#organizers`, one room for the organizers of all groups. It holds a pinned guide posted by the bot from `organizers.md`, edited in place like the rules.
 - **Admins** (hidden): `#mod-updates`
-- **For each group**, a category named after the group's `short` name, containing:
+- **For each group with `discord: true`**, a category named after the group's `short` name, containing:
   - `#<id>-announcements`: only organizers post
   - `#<id>-chat`
   - `<short> member` role (e.g. "CIJUG member"): given by onboarding, not mentionable by members. No color: Discord colors a name by the highest colored role, so with one color per group most names would show whichever group sits on top, and that group would look favored.
@@ -26,6 +36,7 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
     - Discord ties creating channels in a category to managing the category, so organizers could delete the category itself (it asks them to type its name first). Its channels then fall out of it, and plans fail with "Failed to fetch channel". To rebuild it: `tofu state rm 'discord_category_channel.group["<id>"]'`, then apply; the apply makes a new category and moves its two channels back. Channels an organizer added have to be moved back by hand.
     - Removing a group through this repo deletes its two channels and its category. Channels its organizers added are left outside any category; delete them by hand.
   - The chat channel's topic links to the group's own page (`meetup`, else `website` or `eventbrite`), where people RSVP.
+- **For each group with an invite link**, a category named after the group's `short` name, containing only `#<id>-announcements` (read-only for everyone; the followed server's posts arrive through a webhook Discord adds) and the `<short> member` role. Its onboarding answer says the announcements come from their own Discord.
 - **Onboarding**:
   - the eight Start Here and Community channels as defaults. Discord asks for at least 7, with 5 that members can post in (`#events` doesn't count, since members only reply there), so removing one of the five breaks onboarding.
   - one question, "Which user groups do you want to follow?", with an answer per group, A to Z, that grants the group's category and member role
@@ -74,6 +85,14 @@ OpenTofu (or Terraform) config for the Des Moines tech community Discord server.
 - Give people their Admin and organizer roles. Admin has the Administrator permission, is the only role with its own block in the member list, and anyone can ping it.
   - An organizer asks an admin for their role (the rules say how to reach one). Check that they're listed as an organizer on the group's Meetup page, then give them `<short> organizer` in Server Settings > Members. To step down or hand over, they tell an admin in `#organizers` (the pinned guide says so).
 - Keep the bot's role at the top of the role list, with Admin right under it (Server Settings > Roles; the provider can't order roles). A role can only manage roles below it. The group roles' order doesn't matter, since nothing else shows it.
+
+## Following a group's own server
+
+For a group with an invite link, after the apply that makes its section:
+
+1. Ask the group's organizers first, and which of their channels is worth following. Following needs no permission from them, but our server shows in their channel's follower list.
+2. Join their server, open that announcement channel, click **Follow**, and pick `#<id>-announcements` here. It takes someone in both servers with Manage Webhooks here (an admin); the bot isn't in theirs, so it can't.
+3. Only posts they **Publish** in that channel are copied. If they unfollow or delete the channel, ours goes quiet; nothing breaks.
 
 ## Joining and leaving groups
 

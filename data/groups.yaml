@@ -16,7 +16,10 @@
 #             reader pulls events from, for groups that post there
 #   logo:     (optional) image URL, for groups whose logo isn't read from Meetup
 #   discord:  (optional) `true` gives the group its own section of the
-#             community Discord server, built by infra/discord
+#             community Discord server, built by infra/discord. For a group
+#             with its own server, the invite link to it (as the group
+#             publishes it) instead: the section is then one read-only
+#             channel that follows their announcements, and points there.
 
 - id: cijug
   name: Central Iowa Java Users Group
@@ -102,6 +105,7 @@
   source: secdsm
   website: https://secdsm.org/
   logo: https://secdsm.org/images/og-logo.png
+  discord: https://discord.com/invite/aqcDKzVYw3
 
 - id: iot
   name: Iowans of Things
