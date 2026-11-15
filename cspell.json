@@ -7,7 +7,7 @@
   "ignoreRegExpList": ["Urls", "/%[0-9A-F]{2}\\w*/g", "/\\b(?:FBAN|FBAV|EdgiOS)\\b/g"],
   "words": [
     "appinstalled", "beforeinstallprompt", "checkdist", "cijug", "cloudflarestorage", "coworking", "dsmtechevents", "eventbrite", "ical", "IIBA", "ISSA", "kyhoehns", "lede", "llms", "Luma",
-    "meetupstatic", "minical", "nocrypt", "Moines", "precached", "prerendered", "pyowa", "qrcode", "setlist",
+    "meetupstatic", "minical", "nocrypt", "Moines", "precached", "prerendered", "pyowa", "qrcode", "secdsm", "setlist",
     "slowmode", "speculationrules", "subgrid", "tfstate", "topk", "untick", "unticking", "urlname", "webcal", "zizmor"
   ]
 }

@@ -25,8 +25,9 @@ output "onboarding" {
   value = {
     default_channel_ids = local.default_channel_ids
     groups = [for id in local.group_ids : {
-      short    = local.groups[id].short
-      name     = local.groups[id].name
+      short = local.sections[id].short
+      # A followed group's answer says where its people actually talk.
+      name     = contains(keys(local.follows), id) ? "${local.sections[id].name}: announcements from their own Discord" : local.sections[id].name
       role     = discord_role.member[id].id
       category = discord_category_channel.group[id].id
     }]

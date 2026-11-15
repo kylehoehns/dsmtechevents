@@ -1,7 +1,7 @@
-# One section per group with `discord: true` in data/groups.yaml.
+# One section per group with `discord:` in data/groups.yaml (main.tf).
 
 resource "discord_role" "member" {
-  for_each  = local.groups
+  for_each  = local.sections
   server_id = var.server_id
   name      = "${each.value.short} member"
   # No color. Discord colors a name by its highest colored role, so with a
@@ -27,7 +27,7 @@ resource "discord_role" "organizer" {
 }
 
 resource "discord_category_channel" "group" {
-  for_each  = local.groups
+  for_each  = local.sections
   server_id = var.server_id
   name      = each.value.short
   position  = 2 + index(local.group_ids, each.key)
@@ -53,7 +53,7 @@ resource "discord_text_channel" "group_chat" {
     # Last, so no punctuation runs into the link.
     try("Meetups: ${coalesce(try(each.value.meetup, null), try(each.value.website, null), try(each.value.eventbrite, null))}", null),
   ]))
-  position = local.channel_position.group_first + 2 * index(local.group_ids, each.key) + 1
+  position = local.group_channel_first[each.key] + 1
   # Its own permissions, not the category's: organizers moderate it but
   # can't rename or delete it (group_chat_organizer).
   sync_perms_with_category = false
@@ -69,19 +69,26 @@ resource "discord_channel_permission" "group_chat_organizer" {
 }
 
 # Organizers post; members read. Not synced with the category, so it carries
-# the organizer's permissions plus Send Messages itself.
+# the organizer's permissions plus Send Messages itself. For a group with its
+# own server, nobody here posts: an admin follows that server's announcement
+# channel into this one (README, "Still done by hand"), and the topic sends
+# people there to talk.
 resource "discord_news_channel" "group_announcements" {
-  for_each                 = local.groups
-  server_id                = var.server_id
-  category                 = discord_category_channel.group[each.key].id
-  name                     = "${each.key}-announcements"
-  topic                    = "News from ${each.value.short} organizers."
-  position                 = local.channel_position.group_first + 2 * index(local.group_ids, each.key)
+  for_each  = local.sections
+  server_id = var.server_id
+  category  = discord_category_channel.group[each.key].id
+  name      = "${each.key}-announcements"
+  topic = (contains(keys(local.follows), each.key)
+    # The invite last, so no punctuation runs into the link.
+    ? "News from ${each.value.short}, copied from their own Discord. Chat with them there: ${local.follows[each.key]}"
+    : "News from ${each.value.short} organizers."
+  )
+  position                 = local.group_channel_first[each.key]
   sync_perms_with_category = false
 }
 
 resource "discord_channel_permission" "group_announcements_read_only" {
-  for_each     = local.groups
+  for_each     = local.sections
   channel_id   = discord_news_channel.group_announcements[each.key].id
   type         = "role"
   overwrite_id = local.everyone
