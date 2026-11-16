@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-11-16T22:32:56.740Z",
+  "fetchedAt": "2026-11-16T23:21:15.160Z",
   "logo": "https://secure.meetupstatic.com/photos/event/7/b/c/a/600_535291690.jpeg",
   "members": 853,
   "pastCount": 52,
   "lastMet": "2026-10-14T21:30:00.000Z",
   "events": [
-    {
-      "id": "producttank-315588233",
-      "sourceId": "315588233",
-      "allDay": false,
-      "title": "The Best User Story I Never Wrote",
-      "start": "2026-08-18T21:30:00.000Z",
-      "end": "2026-08-18T23:00:00.000Z",
-      "description": "What if the PM’s job isn’t to write — it’s to ask the right questions? In this session, we explore how one team is using AI not to automate product management, but to make it sharper.\n\nCome for a demonstration of the tooling Jon Harcey uses every day to build production products.\n\nAttendees will leave with: a new frame for AI as a thinking partner (not a replacement), practical guidance on enterprise-safe AI infrastructure, and a workflow they can adapt for their own team immediately.\n\nThanks to our sponsor: [Source Allies](https://www.sourceallies.com/)\n\n4:30 - 5:00 Networking\n5:00 - 6:00 Presentation",
-      "url": "https://www.meetup.com/producttank-des-moines-ames/events/315588233/",
-      "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr, Urbandale",
-      "online": false,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/7/b/c/a/600_535291690.jpeg",
-      "going": 21
-    },
     {
       "id": "producttank-316421956",
       "sourceId": "316421956",
@@ -68,7 +52,7 @@
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/7/b/c/a/600_535291690.jpeg",
-      "going": 17,
+      "going": 18,
       "added": "2026-10-15T19:13:46.787Z"
     }
   ]
