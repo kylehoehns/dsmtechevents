@@ -144,6 +144,25 @@ resource "discord_channel_permission" "organizers_visible" {
   allow        = data.discord_permission.view.allow_bits
 }
 
+# For organizers whose group has no section here: its community lives on its
+# own server, it hasn't asked for one, or it's a conference rather than a
+# group. Its only power is seeing #organizers. Given by hand, after the same
+# check as the group roles.
+resource "discord_role" "organizer_any" {
+  server_id   = var.server_id
+  name        = "Organizer"
+  permissions = 0
+  hoist       = false
+  mentionable = false
+}
+
+resource "discord_channel_permission" "organizers_visible_any" {
+  channel_id   = discord_category_channel.organizers.id
+  type         = "role"
+  overwrite_id = discord_role.organizer_any.id
+  allow        = data.discord_permission.view.allow_bits
+}
+
 resource "discord_text_channel" "organizers" {
   server_id                = var.server_id
   category                 = discord_category_channel.organizers.id
@@ -154,6 +173,7 @@ resource "discord_text_channel" "organizers" {
   depends_on = [
     discord_channel_permission.organizers_hidden,
     discord_channel_permission.organizers_visible,
+    discord_channel_permission.organizers_visible_any,
   ]
 }
 
