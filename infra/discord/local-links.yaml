@@ -1,0 +1,28 @@
+# The #local-links message, posted by scripts/discord-local-links.mjs after
+# each apply as one Components V2 card. Edit here; the next apply edits the
+# message in place (no new post, no ping).
+#
+# Each link: `name`, one plain line of `about`, and `url` (the button). Keep
+# each section A to Z, and leave out member counts: they go stale and read as
+# a ranking. A Discord invite must be one that never expires: check with
+# https://discord.com/api/v10/invites/<code>?with_expiration=true
+# (expires_at: null). <#${general}> is a channel mention.
+
+title: Where else Des Moines tech talks
+intro: This server is the shared place for every group. Some groups also have a space of their own, and you're welcome in both.
+
+sections:
+  - heading: Discord servers
+    button: Join
+    links:
+      - name: Iowa .NET User Group
+        about: The .NET meetup.
+        url: https://discord.com/invite/twmu4qwbrh
+      - name: Iowa Code Camp
+        about: The yearly developer conference in Ankeny.
+        url: https://discord.com/invite/ebkUh4Daey
+      - name: SecDSM
+        about: The information security meetup.
+        url: https://discord.com/invite/aqcDKzVYw3
+
+footer: "**Know a local server, Slack, newsletter or podcast that belongs here?** Say so in <#${general}>."

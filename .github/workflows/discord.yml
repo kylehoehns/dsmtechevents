@@ -145,3 +145,9 @@ jobs:
         run: |
           tofu output -json onboarding > "$RUNNER_TEMP/onboarding.json"
           node "$GITHUB_WORKSPACE/scripts/discord-onboarding.mjs" --from "$RUNNER_TEMP/onboarding.json"
+      # The #local-links card is Components V2, which the provider can't post:
+      # this posts or edits it from the apply's output (infra/discord/local-links.yaml).
+      - name: set the #local-links message
+        run: |
+          tofu output -json local_links > "$RUNNER_TEMP/local-links.json"
+          node "$GITHUB_WORKSPACE/scripts/discord-local-links.mjs" --from "$RUNNER_TEMP/local-links.json"
