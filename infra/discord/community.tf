@@ -50,6 +50,28 @@ resource "discord_forum_channel" "events" {
   depends_on               = [discord_channel_permission.start_here_read_only]
 }
 
+# Where else local tech people talk: groups' own servers and the like. One
+# Components V2 message, which the provider can't post, so
+# scripts/discord-local-links.mjs posts and edits it after each apply, from
+# local-links.yaml (output "local_links" below). Also a Server Guide
+# resource page, set by hand; see the README.
+resource "discord_text_channel" "local_links" {
+  server_id                = var.server_id
+  category                 = discord_category_channel.start_here.id
+  name                     = "local-links"
+  topic                    = "Other places Des Moines tech people talk."
+  position                 = local.channel_position.local_links
+  sync_perms_with_category = true
+  depends_on               = [discord_channel_permission.start_here_read_only]
+}
+
+output "local_links" {
+  # Channel mentions in the YAML are template variables, like rules.md's.
+  value = merge({ channel_id = discord_text_channel.local_links.id }, yamldecode(templatefile("${path.module}/local-links.yaml", {
+    general = discord_text_channel.general.id
+  })))
+}
+
 # COMMUNITY: anyone can post.
 resource "discord_category_channel" "community" {
   server_id = var.server_id

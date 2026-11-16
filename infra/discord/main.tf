@@ -32,19 +32,20 @@ locals {
   # section takes two places (announcements, then chat), a followed one one.
   channel_count = [for id in local.group_ids : contains(keys(local.groups), id) ? 2 : 1]
   group_channel_first = {
-    for i, id in local.group_ids : id => 8 + sum(concat([0], slice(local.channel_count, 0, i)))
+    for i, id in local.group_ids : id => 9 + sum(concat([0], slice(local.channel_count, 0, i)))
   }
   channel_position = {
     rules         = 0
     announcements = 1
     events        = 2
-    general       = 3
-    introductions = 4
-    jobs          = 5
-    show_and_tell = 6
-    off_topic     = 7
-    organizers    = 8 + sum(concat([0], local.channel_count))
-    mod_updates   = 9 + sum(concat([0], local.channel_count))
+    local_links   = 3
+    general       = 4
+    introductions = 5
+    jobs          = 6
+    show_and_tell = 7
+    off_topic     = 8
+    organizers    = 9 + sum(concat([0], local.channel_count))
+    mod_updates   = 10 + sum(concat([0], local.channel_count))
   }
 }
 

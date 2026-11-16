@@ -22,7 +22,8 @@ Its section has only `#<id>-announcements`, which follows their server's announc
 
 ## What it builds
 
-- **Start Here** (read-only): `#rules`, `#announcements`, `#events`.
+- **Start Here** (read-only): `#rules`, `#announcements`, `#events`, `#local-links`.
+  - `#local-links` holds one Components V2 card listing where else local tech people talk (groups' own servers and the like), posted and edited by `scripts/discord-local-links.mjs` after each apply from `local-links.yaml`. AutoMod stops members posting invite links, so this is where those links live. Invites in it must never expire; the YAML says how to check.
   - `#events` is a forum with one post per upcoming event on dsmtechevents.com, which members reply in but can't start. Each post's title is the day and the event; the message has the hours, the place with a map link, and a card with the group's name (linked to its event page, where people RSVP), the opening of its description and its photo. `scripts/discord-events.mjs` makes and edits the posts after each refresh (the `discord-events` job in `refresh.yml`; `docs/decisions/0007`), so they're never edited by hand. Discord can only sort a forum by newest post or latest reply, not by event date, so the same script keeps one pinned, locked post, "Coming up", listing the next two weeks soonest first, each line linking to its event's post. `#rules` holds one message posted by the bot from `rules.md`; edit that file and apply to change it (the message is edited in place, with no new post or ping).
 - **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell` (forum), `#off-topic`
 - **Organizers** (hidden; every organizer role can see it, and so can `Organizer`, the role for organizers whose group has no section here): `#organizers`, one room for the organizers of all groups. It holds a pinned guide posted by the bot from `organizers.md`, edited in place like the rules.
@@ -51,7 +52,7 @@ Its section has only `#<id>-announcements`, which follows their server's announc
 - Write the Server Guide (Server Settings > Onboarding > Server Guide):
   - Welcome message: two sentences, ending with the Channels & Roles line under "Joining and leaving groups".
   - New member to-dos: read `#rules`, say hi in `#introductions`, pick your groups in Channels & Roles.
-  - Resource page: `#rules`. (Only read-only channels can be resource pages, so not `#jobs`.)
+  - Resource pages: `#rules`, and `#local-links` titled "More local tech spaces" with the description "Local groups' own Discords, plus Slacks, newsletters and podcasts from central Iowa." (Only read-only channels can be resource pages, so not `#jobs`.)
 - Safety (Server Settings > Safety Setup):
   - Safety alerts channel: `#mod-updates`.
   - Raid protection on, with CAPTCHA for suspicious joins.

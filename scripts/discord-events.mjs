@@ -33,9 +33,9 @@ const NAME_MAX = 100; // Discord's limit for a post title
 const refId = (e) => e.id.replace(/\s+/g, '_');
 const hostKey = (e) => (e.groupIds.length ? e.groupIds.join('+') : (e.hostsLabel ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-')) || 'none';
 
-const ACCENT = 0xff4fa3; // the site's pink: one strip for every group
+export const ACCENT = 0xff4fa3; // the site's pink: one strip for every group
 const GREY = 0x80848e; // a cancelled post's strip
-const V2 = 1 << 15; // IS_COMPONENTS_V2: the message is laid out by components
+export const V2 = 1 << 15; // IS_COMPONENTS_V2: the message is laid out by components
 
 const cut = (s, n) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s);
 // Group text shown as Discord markdown: escape the marks so it shows as typed
@@ -101,11 +101,11 @@ function where(e) {
 // (src/lib/meetup.mjs); Discord labels a .webp "GIF" in the forum's list.
 const forDiscord = (url) => url.replace(/^(https:\/\/secure\.meetupstatic\.com\/photos\/.+)\.webp$/, '$1.jpeg');
 
-const text = (content) => ({ type: 10, content });
-const divider = { type: 14, divider: true, spacing: 1 };
-const linkButton = (label, url) => ({ type: 2, style: 5, label, url }); // style 5: a link button
+export const text = (content) => ({ type: 10, content });
+export const divider = { type: 14, divider: true, spacing: 1 };
+export const linkButton = (label, url) => ({ type: 2, style: 5, label, url }); // style 5: a link button
 // A line with a button beside it; just the line when there's no button.
-const withButton = (content, button) => (button ? { type: 9, components: [text(content)], accessory: button } : text(content));
+export const withButton = (content, button) => (button ? { type: 9, components: [text(content)], accessory: button } : text(content));
 
 // The post for one event: its title and one Components V2 message.
 // A V2 post shows no text in the forum's list, only its title and its first
