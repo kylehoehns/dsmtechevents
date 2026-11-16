@@ -25,7 +25,7 @@ Its section has only `#<id>-announcements`, which follows their server's announc
 - **Start Here** (read-only): `#rules`, `#announcements`, `#events`.
   - `#events` is a forum with one post per upcoming event on dsmtechevents.com, which members reply in but can't start. Each post's title is the day and the event; the message has the hours, the place with a map link, and a card with the group's name (linked to its event page, where people RSVP), the opening of its description and its photo. `scripts/discord-events.mjs` makes and edits the posts after each refresh (the `discord-events` job in `refresh.yml`; `docs/decisions/0007`), so they're never edited by hand. Discord can only sort a forum by newest post or latest reply, not by event date, so the same script keeps one pinned, locked post, "Coming up", listing the next two weeks soonest first, each line linking to its event's post. `#rules` holds one message posted by the bot from `rules.md`; edit that file and apply to change it (the message is edited in place, with no new post or ping).
 - **Community** (anyone posts): `#general`, `#introductions`, `#jobs` (forum), `#show-and-tell` (forum), `#off-topic`
-- **Organizers** (hidden; every organizer role can see it): `#organizers`, one room for the organizers of all groups. It holds a pinned guide posted by the bot from `organizers.md`, edited in place like the rules.
+- **Organizers** (hidden; every organizer role can see it, and so can `Organizer`, the role for organizers whose group has no section here): `#organizers`, one room for the organizers of all groups. It holds a pinned guide posted by the bot from `organizers.md`, edited in place like the rules.
 - **Admins** (hidden): `#mod-updates`
 - **For each group with `discord: true`**, a category named after the group's `short` name, containing:
   - `#<id>-announcements`: only organizers post
@@ -83,7 +83,7 @@ Its section has only `#<id>-announcements`, which follows their server's announc
 
   and a 🔥 default reaction, so anyone can cheer a post with one tap.
 - Give people their Admin and organizer roles. Admin has the Administrator permission, is the only role with its own block in the member list, and anyone can ping it.
-  - An organizer asks an admin for their role (the rules say how to reach one). Check that they're listed as an organizer on the group's Meetup page, then give them `<short> organizer` in Server Settings > Members. To step down or hand over, they tell an admin in `#organizers` (the pinned guide says so).
+  - An organizer asks an admin for their role (the rules say how to reach one). Check that they're listed as an organizer on the group's Meetup page, then give them `<short> organizer` in Server Settings > Members. If their group has no section of its own (it talks on its own server, hasn't asked for one, or it's a conference), give them `Organizer` instead: it only lets them see `#organizers`. To step down or hand over, they tell an admin in `#organizers` (the pinned guide says so).
 - Keep the bot's role at the top of the role list, with Admin right under it (Server Settings > Roles; the provider can't order roles). A role can only manage roles below it. The group roles' order doesn't matter, since nothing else shows it.
 
 ## Following a group's own server
