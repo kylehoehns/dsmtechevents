@@ -181,8 +181,8 @@ test('a sync reads the bot\'s open posts, skips others and locked ones, and appl
   assert.equal(writes[0][2].message.flags, V2);
   assert.deepEqual(writes[0][2].message.allowed_mentions, { parse: [] });
   // The "Coming up" post links both events' posts, the new one included, and is pinned and locked.
-  assert.match(writes[3][2].message.content, /<#new1>/);
-  assert.match(writes[3][2].message.content, /<#a>/);
+  assert.match(JSON.stringify(writes[3][2].message.components), /channels\/g\/new1\)/);
+  assert.match(JSON.stringify(writes[3][2].message.components), /channels\/g\/a\)/);
   assert.deepEqual(writes[4][2], { name: COMING_UP, flags: 2, locked: true });
 });
 
@@ -266,7 +266,7 @@ test('a post from before V2 is made again: the new post first, then the old one 
   const { api, writes } = fakeDiscord({ threads: [{ id: 'old', parent_id: 'f', owner_id: 'bot', name: before.name, thread_metadata: {} }], firsts: { old: before } });
   await syncEvents({ api, guildId: 'g', data: data([ev()]), now });
   assert.deepEqual(writes.slice(0, 2).map(([m, p]) => `${m} ${p}`), ['POST /channels/f/threads', 'DELETE /channels/old']);
-  assert.match(writes[2][2].message.content, /<#new1>/, '"Coming up" links the new post');
+  assert.match(JSON.stringify(writes[2][2].message.components), /channels\/g\/new1\)/, '"Coming up" links the new post');
 });
 
 test('Discord\'s copy of a post (ids, image sizes, proxy URLs) counts as unchanged', () => {
@@ -311,38 +311,59 @@ test('the events file carries each event\'s group logo, so the sync step needs n
   assert.equal(out.upcoming[1].logo, undefined);
 });
 
-test('"Coming up" lists the next two weeks soonest first, each linking to its post', () => {
+// The "Coming up" card's text blocks, dividers as ---.
+const comingUpText = (components) => components[0].components.map((c) => (c.type === 14 ? '---' : c.content));
+
+test('"Coming up" is one pink card: a heading per day, then each event with its start, who, and a link to its post', () => {
   const soon = ev({ id: 'aws-1', groupIds: ['aws'], hostsLabel: 'AWS', start: '2026-11-17T23:30:00.000Z', end: '2026-11-18T01:00:00.000Z' });
+  const sameDay = ev({ id: 'aws-2', hostsLabel: 'AWS', title: 'Late [night]', start: '2026-11-18T02:00:00.000Z', end: '2026-11-18T03:00:00.000Z' });
   const far = ev({ id: 'far', start: '2026-12-10T00:00:00.000Z', end: '2026-12-10T02:00:00.000Z' });
   const ended = ev({ id: 'ended', start: '2026-11-14T15:00:00.000Z', end: '2026-11-14T16:00:00.000Z' });
-  const text = renderComingUp({ upcoming: [ev(), far, soon, ended], postIds: new Map([['pyowa-1', '111'], ['aws-1', '222']]), now });
-  // The link shows the post's title, which already says the day, the hours and who.
-  assert.deepEqual(text.split('\n').slice(2), ['<#222>', '<#111>']);
-  // An event whose post doesn't exist yet (a dry run) shows its post's title instead.
-  assert.match(renderComingUp({ upcoming: [ev()], now }), /\*\*Thu Nov 19 · 6p–8p · Pyowa · Python Night\*\*$/m);
-  assert.match(renderComingUp({ upcoming: [far], now }), /Nothing in the next two weeks/);
+  const card = renderComingUp({ upcoming: [ev(), far, sameDay, soon, ended], postIds: new Map([['pyowa-1', '111'], ['aws-1', '222']]), guildId: 'g', now });
+  assert.equal(card[0].type, 17);
+  assert.deepEqual(comingUpText(card).slice(1), [
+    '---',
+    '### Tue Nov 17\n**5:30p**  AWS · [Python Night](https://discord.com/channels/g/222)\n**8p**  AWS · Late \\[night\\]',
+    '---',
+    '### Thu Nov 19\n**6p**  Pyowa · [Python Night](https://discord.com/channels/g/111)',
+  ]);
+  assert.match(comingUpText(renderComingUp({ upcoming: [far], now })).at(-1), /Nothing in the next two weeks/);
 });
 
-test('"Coming up" stays under Discord\'s 2000 characters, saying how many more there are', () => {
-  const many = Array.from({ length: 80 }, (_, i) => ev({ id: `e${i}`, hostsLabel: 'A rather long group name for testing' }));
-  const text = renderComingUp({ upcoming: many, now });
-  assert.ok(text.length <= 2000);
-  assert.match(text, /\n-# …and \d+ more below\.$/);
+test('"Coming up" stays under Discord\'s 4000 characters of text, saying how many more there are', () => {
+  const many = Array.from({ length: 200 }, (_, i) => ev({ id: `e${i}`, hostsLabel: 'A rather long group name for testing' }));
+  const parts = comingUpText(renderComingUp({ upcoming: many, now }));
+  assert.ok(parts.join('').length <= 4000);
+  assert.match(parts.at(-1), /^-# …and \d+ more below\.$/);
 });
 
 test('"Coming up" is made once, then edited only when it changed or came unpinned, unlocked or archived', () => {
-  assert.deepEqual(planComingUp(null, 'x'), { type: 'coming-up', post: null, name: COMING_UP, content: 'x' });
-  const post = { id: 'c', name: COMING_UP, flags: 2, content: 'x', archived: false, locked: true };
-  assert.equal(planComingUp(post, 'x'), null);
-  for (const change of [{ content: 'old' }, { flags: 0 }, { locked: false }, { archived: true }, { name: 'renamed' }]) {
-    assert.equal(planComingUp({ ...post, ...change }, 'x')?.post, 'c', JSON.stringify(change));
+  const card = renderComingUp({ upcoming: [ev()], now });
+  assert.deepEqual(planComingUp(null, card), { type: 'coming-up', post: null, name: COMING_UP, components: card });
+  const post = { id: 'c', name: COMING_UP, flags: 2, messageFlags: 1 << 15, components: card, archived: false, locked: true };
+  assert.equal(planComingUp(post, card), null);
+  for (const change of [{ components: renderComingUp({ upcoming: [], now }) }, { flags: 0 }, { locked: false }, { archived: true }, { name: 'renamed' }]) {
+    assert.equal(planComingUp({ ...post, ...change }, card)?.post, 'c', JSON.stringify(change));
   }
+});
+
+test('a plain-text "Coming up" post is made again as a V2 card, and the old one deleted once the new one exists', async () => {
+  const plan = planComingUp({ id: 'old', name: COMING_UP, flags: 2, messageFlags: 0, content: 'old text', archived: false, locked: true }, renderComingUp({ upcoming: [], now }));
+  assert.equal(plan.post, null);
+  assert.equal(plan.replaces, 'old');
+  const { api, writes } = fakeDiscord({
+    threads: [{ id: 'old', parent_id: 'f', owner_id: 'bot', name: COMING_UP, flags: 2, thread_metadata: { locked: true } }],
+    firsts: { old: { content: 'old text' } },
+  });
+  await syncEvents({ api, guildId: 'g', data: data([]), now });
+  const calls = writes.map(([method, path]) => `${method} ${path}`);
+  assert.ok(calls.indexOf('DELETE /channels/old') > calls.findIndex((c) => c.startsWith('POST')), calls.join(', '));
 });
 
 test('a sync finds its pinned "Coming up" post, even locked, and doesn\'t treat it as an event', async () => {
   const { api, writes } = fakeDiscord({
     threads: [{ id: 'c', parent_id: 'f', owner_id: 'bot', name: COMING_UP, flags: 2, thread_metadata: { locked: true } }],
-    firsts: { c: { content: renderComingUp({ upcoming: [], now }) } },
+    firsts: { c: { flags: 1 << 15, components: renderComingUp({ upcoming: [], now }) } },
   });
   assert.deepEqual(await syncEvents({ api, guildId: 'g', data: data([]), now }), []);
   assert.deepEqual(writes, []);
