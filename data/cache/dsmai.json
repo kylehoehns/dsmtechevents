@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-11-16T15:21:14.326Z",
+  "fetchedAt": "2026-11-17T05:06:57.864Z",
   "logo": "https://secure.meetupstatic.com/photos/event/5/5/7/600_514381367.jpeg",
   "members": 1121,
   "pastCount": 31,
   "lastMet": "2026-10-20T22:30:00.000Z",
   "events": [
-    {
-      "id": "dsmai-311239023",
-      "sourceId": "311239023",
-      "allDay": false,
-      "title": "Trust, But Verify: Human-in-the-Loop for Agents That Actually Matter",
-      "start": "2026-08-18T22:30:00.000Z",
-      "end": "2026-08-19T00:30:00.000Z",
-      "description": "AI agents are getting good at taking action. The hard part isn't making them capable, it's knowing when to make them stop.\n\nIn this talk we'll walk through the full spectrum of human-in-the-loop patterns, from lightweight inline confirmations to out-of-band permission gates to handing your agent a wallet with real money in it and more. Each pattern fits a different level of consequence, and knowing which to reach for is what separates demo agents from production ones. We'll cover the honest tradeoffs of latency, user experience, and trust so you can make the right call for your specific use case.\n\nThe entire talk is built around various live demos that escalate in stakes with every step. You'll leave with a mental model and working reference architecture you can apply the same day.\n\n_____________________________\nJoin us for the next DSM AI Group!\n\n5:30 - 6:00 - Socializing/Networking\n6:00 - Speaker begins",
-      "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/311239023/",
-      "venue": "We Write Code",
-      "address": "130 E 3rd St Suite 202, Des Moines",
-      "online": false,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/b/f/e/e/600_525949134.jpeg",
-      "going": 35
-    },
     {
       "id": "dsmai-316356573",
       "sourceId": "316356573",
@@ -68,7 +52,7 @@
       "online": false,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/b/f/e/e/600_525949134.jpeg",
-      "going": 23,
+      "going": 22,
       "added": "2026-09-24T20:25:28.000Z"
     }
   ]
