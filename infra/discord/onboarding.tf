@@ -5,6 +5,7 @@ locals {
     discord_text_channel.rules.id,
     discord_news_channel.announcements.id,
     discord_forum_channel.events.id,
+    discord_text_channel.local_links.id,
     discord_text_channel.general.id,
     discord_text_channel.introductions.id,
     discord_forum_channel.jobs.id,

@@ -39,7 +39,7 @@ Its section has only `#<id>-announcements`, which follows their server's announc
   - The chat channel's topic links to the group's own page (`meetup`, else `website` or `eventbrite`), where people RSVP.
 - **For each group with an invite link**, a category named after the group's `short` name, containing only `#<id>-announcements` (read-only for everyone; the followed server's posts arrive through a webhook Discord adds). It's a text channel, not an announcement channel: Discord's Follow only offers text channels as a destination and the `<short> member` role. Its onboarding answer says the announcements come from their own Discord.
 - **Onboarding**:
-  - the eight Start Here and Community channels as defaults. Discord asks for at least 7, with 5 that members can post in (`#events` doesn't count, since members only reply there), so removing one of the five breaks onboarding.
+  - the nine Start Here and Community channels as defaults. Discord asks for at least 7, with 5 that members can post in (`#events` doesn't count, since members only reply there), so removing one of the five breaks onboarding.
   - one question, "Which user groups do you want to follow?", with an answer per group, A to Z, that grants the group's category and member role
   - Set by `scripts/discord-onboarding.mjs`, not OpenTofu: the discord workflow runs it after each apply, from the `onboarding` output.
 
