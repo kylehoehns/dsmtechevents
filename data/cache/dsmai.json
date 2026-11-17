@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-17T05:06:57.864Z",
+  "fetchedAt": "2026-11-17T15:21:14.862Z",
   "logo": "https://secure.meetupstatic.com/photos/event/5/5/7/600_514381367.jpeg",
   "members": 1121,
   "pastCount": 31,
@@ -54,6 +54,23 @@
       "image": "https://secure.meetupstatic.com/photos/event/b/f/e/e/600_525949134.jpeg",
       "going": 22,
       "added": "2026-09-24T20:25:28.000Z"
+    },
+    {
+      "id": "dsmai-317469033",
+      "sourceId": "317469033",
+      "title": "DSM AI Group Monthly Meeting (Speaker TBD)",
+      "start": "2027-01-19T23:30:00.000Z",
+      "end": "2027-01-20T01:30:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/317469033/",
+      "description": "*Note: There will be no December meeting. See you after the holidays!*\n\nJoin us for the next DSM AI Group!\n\nTopic and Speaker will be announced closer to the posted date.",
+      "venue": "We Write Code",
+      "address": "130 E 3rd St Suite 202, Des Moines",
+      "online": false,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/5/5/7/600_514381367.jpeg",
+      "going": 2,
+      "added": "2026-11-17T15:21:14.862Z"
     }
   ]
 }
