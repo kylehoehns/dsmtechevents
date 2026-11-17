@@ -42,11 +42,13 @@
   name: DSM Web Geeks
   short: Web Geeks
   meetup: https://www.meetup.com/des-moines-web-geeks/
+  discord: true
 
 - id: devopsdsm
   name: DevOpsDSM
   short: DevOpsDSM
   meetup: https://www.meetup.com/devopsdsm/
+  discord: true
 
 - id: aws
   name: AWS Des Moines
