@@ -53,8 +53,9 @@ resource "discord_forum_channel" "events" {
 # Where else local tech people talk: groups' own servers and the like. One
 # Components V2 message, which the provider can't post, so
 # scripts/discord-local-links.mjs posts and edits it after each apply, from
-# local-links.yaml (output "local_links" below). Also a Server Guide
-# resource page, set by hand; see the README.
+# local-links.yaml (output "local_links" below). A default onboarding
+# channel, not a Server Guide resource page, which would hide it from the
+# channel list.
 resource "discord_text_channel" "local_links" {
   server_id                = var.server_id
   category                 = discord_category_channel.start_here.id

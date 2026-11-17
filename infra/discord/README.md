@@ -52,7 +52,7 @@ Its section has only `#<id>-announcements`, which follows their server's announc
 - Write the Server Guide (Server Settings > Onboarding > Server Guide):
   - Welcome message: two sentences, ending with the Channels & Roles line under "Joining and leaving groups".
   - New member to-dos: read `#rules`, say hi in `#introductions`, pick your groups in Channels & Roles.
-  - Resource pages: `#rules`, and `#local-links` titled "More local tech spaces" with the description "Local groups' own Discords, plus Slacks, newsletters and podcasts from central Iowa." (Only read-only channels can be resource pages, so not `#jobs`.)
+  - No resource pages. Discord takes a resource page's channel out of the channel list and Browse Channels, so it can then only be opened from the guide; `#rules` and `#local-links` were hidden that way until 2026-11-17.
 - Safety (Server Settings > Safety Setup):
   - Safety alerts channel: `#mod-updates`.
   - Raid protection on, with CAPTCHA for suspicious joins.
