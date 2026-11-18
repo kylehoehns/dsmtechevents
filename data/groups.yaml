@@ -37,6 +37,7 @@
   name: Iowa .NET User Group
   short: IADNUG
   meetup: https://www.meetup.com/iadnug/
+  discord: true
 
 - id: webgeeks
   name: DSM Web Geeks
