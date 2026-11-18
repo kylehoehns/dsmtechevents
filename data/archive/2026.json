@@ -1247,5 +1247,15 @@
   "going": 24,
   "url": "https://www.meetup.com/des-moines-artificial-intelligence-group/events/316699314/",
   "description": "As organizations scale, their data often becomes trapped in fragmented microservices and siloed APIs. This slows down feature delivery, frustrates frontend teams, and makes integrating modern AI tools incredibly difficult due to a lack of unified context. The solution? Distributed GraphQL. In this live coding session, we will build a distributed architecture from the ground up using Apollo Federation. We will start by creating multiple independent backend subgraphs representing different domains, and then seamlessly compose them into a single, unified distributed graph ready for enterprise"
+ },
+ {
+  "id": "manual-women-in-tech-happy-hour-2026-11-18",
+  "hostedBy": "IA Women in Tech",
+  "title": "Women in Tech Happy Hour",
+  "start": "2026-11-18T21:00:00.000Z",
+  "end": "2026-11-18T23:00:00.000Z",
+  "venue": "Source Allies",
+  "url": "https://www.linkedin.com/company/ia-women-in-tech/",
+  "description": "An afternoon of connection, conversation, and community, from IA Women in Tech. Whether you're building something at a startup, part of a large technology team, early in your career, or have been in the industry for years, there's a place for you at this table. This is a chance to step away from the day-to-day, meet other women working across Iowa's technology community, hear real stories and experiences, and leave with a few new connections in your corner. What's planned 3:00 Welcome and networking 3:30 Panel discussion 4:00 Fireside chat 4:30 Networking The event is free and open to the"
  }
 ]
