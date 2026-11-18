@@ -74,21 +74,22 @@ jobs:
             tofu show -no-color tfplan
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-      # Deleting a channel loses its messages, and deleting a member role
-      # drops everyone from the group. Changing a group's `id` does both
-      # without looking like it. Fail loudly unless the PR has the
-      # `discord-destroy` label to say it's meant.
-      - name: no channel or member role deleted by accident
+      # Deleting a channel loses its messages, and deleting a role drops
+      # everyone who had it: a member role's group, or an organizer or Admin
+      # role an admin gave by hand after checking the person. Changing a
+      # group's `id` does both without looking like it. Fail loudly unless
+      # the PR has the `discord-destroy` label to say it's meant.
+      - name: no channel or role deleted by accident
         env:
           LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
         run: |
           deleted=$(tofu show -json tfplan | jq -r '
             .resource_changes[]
             | select(.change.actions | index("delete"))
-            | select((.type | test("^discord_(text|news|forum|voice|category)_channel$")) or (.address | startswith("discord_role.member")))
+            | select((.type | test("^discord_(text|news|forum|voice|category)_channel$")) or .type == "discord_role")
             | .address')
           if [ -n "$deleted" ] && ! echo "$LABELS" | jq -e 'index("discord-destroy")' > /dev/null; then
-            echo "::error::This PR deletes Discord channels or member roles. Their messages or memberships can't come back. If that's intended, add the discord-destroy label."
+            echo "::error::This PR deletes Discord channels or roles. Their messages, or who had the role, can't come back. If that's intended, add the discord-destroy label."
             echo "$deleted"
             exit 1
           fi

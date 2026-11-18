@@ -407,6 +407,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (!actions.length) console.log('#events is up to date.');
   for (const a of actions) {
     console.log(`${dryRun ? '[dry run] ' : ''}${a.type}${a.event ? ` ${a.event}` : ''}${a.name ? `: ${a.name}` : ''}`);
-    if (dryRun && a.type === 'coming-up') console.log(a.content.replace(/^/gm, '    '));
+    if (dryRun && a.type === 'coming-up') console.log(texts(a.components).filter(Boolean).join('\n').replace(/^/gm, '    '));
   }
 }
