@@ -1,1 +1,10 @@
-{}
+{
+  "issa": {
+    "kind": "fetch",
+    "since": "2026-11-18"
+  },
+  "techbrew": {
+    "kind": "fetch",
+    "since": "2026-11-18"
+  }
+}
