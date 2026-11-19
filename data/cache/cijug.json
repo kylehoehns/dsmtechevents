@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-11-11T13:17:09.688Z",
+  "fetchedAt": "2026-11-19T01:17:14.049Z",
   "logo": "https://secure.meetupstatic.com/photos/event/7/8/6/c/600_460890828.jpeg",
   "members": 897,
   "pastCount": 79,
   "lastMet": "2026-11-10T23:30:00.000Z",
   "events": [
-    {
-      "id": "cijug-315859295",
-      "sourceId": "315859295",
-      "allDay": false,
-      "title": "The Past Didn't Go Anywhere: Fundamentals > AI",
-      "start": "2026-08-20T22:30:00.000Z",
-      "end": "2026-08-21T00:00:00.000Z",
-      "description": "For decades, our industry has predicted that the next wave of technology would replace software developers. From COBOL to the dot-com boom, DevOps, and now AI, each shift has promised to fundamentally change our profession.\nYet developers are still here.\n\nThe difference is that every wave has demanded new skills, not fewer developers. As AI continues to reshape software engineering, one thing has become increasingly clear: the developers who thrive will be the ones who understand the fundamentals.\n\nJoin CIJUG as Dustin Thostenson explores why design patterns, system thinking, effective communication, testing, and quality engineering remain just as important today as they've ever been. Rather than focusing on AI tools themselves, this session examines how developers can avoid common pitfalls like AI-generated technical debt, missed business outcomes, and systems that become increasingly difficult to understand and maintain.\nYou'll learn practical approaches to defining problems clearly, designing systems with well-defined responsibilities, and writing tests that build confidence instead of simply checking boxes.\n\n**About the Speaker**\nDustin Thostenson is an independent consultant leading Delta3Consulting. Over the course of his career, he has served as a developer, mentor, trainer, and agile coach, with a passion for helping people grow and teams deliver better outcomes. Dustin also helps lead the Iowa .NET User Group and is an active volunteer in the Central Iowa technology community.\n\n**Event Details**\nThursday, August 20th, 2026\n5:30 PM to 7:00 PM\nHosted at Source Allies\nFood and drinks will be provided.",
-      "url": "https://www.meetup.com/central-iowa-java-users-group/events/315859295/",
-      "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr, Urbandale",
-      "online": false,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/4/b/c/d/600_535399405.jpeg",
-      "going": 13
-    },
     {
       "id": "cijug-316358683",
       "sourceId": "316358683",
