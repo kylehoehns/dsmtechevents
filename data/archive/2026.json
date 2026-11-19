@@ -1257,5 +1257,16 @@
   "venue": "Source Allies",
   "url": "https://www.linkedin.com/company/ia-women-in-tech/",
   "description": "An afternoon of connection, conversation, and community, from IA Women in Tech. Whether you're building something at a startup, part of a large technology team, early in your career, or have been in the industry for years, there's a place for you at this table. This is a chance to step away from the day-to-day, meet other women working across Iowa's technology community, hear real stories and experiences, and leave with a few new connections in your corner. What's planned 3:00 Welcome and networking 3:30 Panel discussion 4:00 Fireside chat 4:30 Networking The event is free and open to the"
+ },
+ {
+  "id": "scrum-masters-317061265",
+  "group": "scrum-masters",
+  "title": "Clarity Governs the System: Rethinking Planning & Problem Solving in Agile",
+  "start": "2026-11-19T18:00:00.000Z",
+  "end": "2026-11-19T19:00:00.000Z",
+  "online": true,
+  "going": 66,
+  "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/317061265/",
+  "description": "There is no shortage of frameworks, methodologies, tools, and practices designed to help organizations improve how they work, solve problems, and deliver value. Yet, despite all these approaches, organizations continue to struggle with challenges that seem to persist regardless of how much effort is invested in solving them. Why? Could it be that we're sometimes attempting to solve problems we haven't fully understood? Or that we're solving individual problems without recognizing how they are interconnected? And perhaps more importantly, how do we know we're solving the problems that will"
  }
 ]
