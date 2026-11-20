@@ -1,8 +1,26 @@
 {
-  "fetchedAt": "2026-10-20T19:20:56.124Z",
+  "fetchedAt": "2026-11-20T18:39:13.944Z",
   "logo": "https://secure.meetupstatic.com/photos/event/6/5/a/8/600_498566024.jpeg",
   "members": 946,
   "pastCount": 89,
   "lastMet": "2026-07-22T17:00:00.000Z",
-  "events": []
+  "events": [
+    {
+      "id": "azure-317500031",
+      "sourceId": "317500031",
+      "title": "How AI (helped) Built A 6 Figure Business",
+      "start": "2026-12-02T18:00:00.000Z",
+      "end": "2026-12-02T19:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/317500031/",
+      "description": "AI didn't build this business. It helped, and this talk is about what that help actually looked like.\n\nAlec walks through the full history of a real product built on Azure, .NET, and Angular, from the first idea to six figures in revenue. He covers where AI saved weeks, where it made confident mistakes that had to be torn out by hand, and the development workflow.\n\nYou'll leave with:\n\n• An honest picture of where AI speeds up building a product and where it slows you down\n• A workflow you can apply to your own .NET and Angular projects\n• A view of how AI-assisted development is changing for small teams shipping real products\n\nSpeaker bio\n\nAlec Harrison is a Staff AI Engineer at LeanTECHniques, where he builds production RAG systems, Semantic Kernel agent workflows, Model Context Protocol integrations, and Azure AI Foundry solutions. He is a Microsoft MVP in AI and a Microsoft Certified Trainer, and he teaches the generative AI section of LinkedIn Learning's AI-102 course. Alec leads Azure user groups in Iowa, Omaha, and Kansas City, which together reach more than 4,000 engineers. He also runs Xerikos, a consulting practice focused on AI, cloud, and governance, and maintains Offline Assist, an open-source AI coding assistant for VS Code.",
+      "venue": "Online",
+      "address": null,
+      "online": true,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/6/5/a/8/600_498566024.jpeg",
+      "going": 4,
+      "added": "2026-11-20T18:39:13.944Z"
+    }
+  ]
 }
