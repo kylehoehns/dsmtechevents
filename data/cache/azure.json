@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-20T20:45:14.740Z",
+  "fetchedAt": "2026-11-21T10:21:16.313Z",
   "logo": "https://secure.meetupstatic.com/photos/event/6/5/a/8/600_498566024.jpeg",
   "members": 946,
   "pastCount": 89,
@@ -19,8 +19,25 @@
       "online": true,
       "hybrid": false,
       "image": "https://secure.meetupstatic.com/photos/event/6/5/a/8/600_498566024.jpeg",
-      "going": 5,
+      "going": 8,
       "added": "2026-11-20T18:39:13.944Z"
+    },
+    {
+      "id": "azure-317523431",
+      "sourceId": "317523431",
+      "title": "Architecting AI-Ready Enterprises on Azure",
+      "start": "2026-12-09T18:00:00.000Z",
+      "end": "2026-12-09T19:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/iowa-microsoft-azure-user-group/events/317523431/",
+      "description": "Summary:\n\nAI features are easy to demo. AI systems are hard to trust.\n\nMost enterprises aren't struggling to find AI use cases — they're struggling to build the foundation that makes those use cases safe to ship, scalable, and defensible when something goes wrong.\n\nIn this session, we'll examine the architectural decisions that make an enterprise AI-ready on Azure: governance patterns using Azure AI Foundry and managed identity, integration strategies that keep AI capabilities inside your security boundary, and the operational model you need before you put an LLM anywhere near production data.\n\nYou'll leave with a concrete framework for making Azure AI architectural decisions that hold up under pressure — not just under a deadline.\n\nYou will learn:\n\\- How to evaluate Azure AI governance patterns including Azure AI Foundry\\, managed identity\\, and private endpoints for securing AI workloads in production\n\\- How to design integration architectures that embed AI capabilities into existing enterprise systems without creating shadow infrastructure or security gaps\n\\- How to build an operational framework for auditing\\, monitoring\\, and scaling Azure\\-based AI systems across the enterprise\n\nBio:\n\nTony Champion is a software architect with 25+ years of experience on the Microsoft stack, specializing in modern APIs, distributed systems, and cross-platform architecture. An eight-time Microsoft MVP, published author and international speaker, he focuses on practical, production-ready solutions and helping developers think and operate at a senior, architectural level.",
+      "venue": "Online",
+      "address": null,
+      "online": true,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/6/5/a/8/600_498566024.jpeg",
+      "going": 3,
+      "added": "2026-11-21T10:21:16.313Z"
     }
   ]
 }
