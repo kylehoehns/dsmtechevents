@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-21T10:21:16.313Z",
+  "fetchedAt": "2026-11-21T17:37:31.991Z",
   "logo": "https://secure.meetupstatic.com/photos/event/9/b/7/5/600_512859797.jpeg",
   "members": 7667,
   "pastCount": 231,
@@ -103,6 +103,23 @@
       "image": "https://secure.meetupstatic.com/photos/event/2/5/a/1/600_536709633.jpeg",
       "going": 64,
       "added": "2026-10-20T16:39:24.000Z"
+    },
+    {
+      "id": "scrum-masters-317526522",
+      "sourceId": "317526522",
+      "title": "Ask Me Anything with Paul Barrett",
+      "start": "2026-12-14T18:00:00.000Z",
+      "end": "2026-12-14T19:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/317526522/",
+      "description": "We are thrilled to welcome back Paul Barrett for another ***Ask Me Anything*** . . . and **you** set the agenda!\n\nBring the retro that has been stuck on “it went fine” since March, or the question you’ve been too polite to ask your own coach. If you’ve joined Paul on a Wednesday for his weekly ***At The Core Of It Is People*** webinars, you already know how he likes these conversations to go: we start with something real and follow it wherever the people in it want to take it. If you haven’t been to one yet, think of this as the sampler.\n\nSome conversations will uncover an answer while others will reveal a better question. Every so often, someone across the room will describe an experience that suddenly gives language to something you've been feeling for months.\n\nThis will be a room full of thoughtful people who care about teams, leadership, and learning. People willing to share what worked, what didn't, and what they discovered along the way. Whether you're discovering Scrum for the first time, coaching seasoned organizations, or leading people through the uncertainty that seems to find all of us eventually, there's a place for you here.\n\nBring your curiosity.\n\nGo home a little wiser than you arrived.",
+      "venue": "Online",
+      "address": null,
+      "online": true,
+      "hybrid": false,
+      "image": "https://secure.meetupstatic.com/photos/event/d/2/9/c/600_537233916.jpeg",
+      "going": 4,
+      "added": "2026-11-21T17:37:31.991Z"
     }
   ]
 }
