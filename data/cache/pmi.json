@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-10T17:56:39.906Z",
+  "fetchedAt": "2026-11-23T23:21:12.649Z",
   "logo": "https://pmi-centraliowa.org/static/img/logo-login.jpg",
   "events": [
     {
@@ -26,6 +26,32 @@
       "venue": "Paragon IT Professionals - Gray’s Landing Conference Room",
       "address": "220 SW 9th Street, Suite 150, Des Moines, IA, 50309",
       "added": "2026-11-05T18:05:50.027Z"
+    },
+    {
+      "id": "pmi-48355",
+      "sourceId": "48355",
+      "title": "Wreaths Across America",
+      "start": "2026-12-19T16:00:00.000Z",
+      "end": "2026-12-19T17:30:00.000Z",
+      "allDay": false,
+      "url": "https://pmi-centraliowa.org/calendar?eventId=48355",
+      "description": "Thank you for volunteering to help place veterans' wreaths on the headstones of American Heroes as part of National Wreaths Across America Day! We thank you for your support!\n\nYou’re welcome to bring your family and friends to National Wreaths Across America Day — no separate registration is required.\n\nWreaths Across America ceremonies are open to the public, and everyone is invited to participate!\n\nIf you haven’t yet sponsored a wreath, we encourage you to do so to help ensure that there are enough wreaths for every participant to place one in honor of our fallen heroes.\n\nPlease make note of the event details below and reach out with any questions. For your reference, a registration number is included below, but please note that it is not required for admittance: \n\nRegistration No: IAMDGC-625329",
+      "venue": "McDivitt Grove Cemetery",
+      "address": "7001 Meredith Dr, Urbandale, IA, 50322",
+      "added": "2026-11-23T23:21:12.649Z"
+    },
+    {
+      "id": "pmi-48356",
+      "sourceId": "48356",
+      "title": "2027 Professional Development Day - Save the date!",
+      "start": "2027-04-30T13:00:00.000Z",
+      "end": "2027-04-30T21:30:00.000Z",
+      "allDay": false,
+      "url": "https://pmi-centraliowa.org/calendar?eventId=48356",
+      "description": "",
+      "venue": "Hilton Garden Inn",
+      "address": "205 64th St., West Des Moines, IA, 50266",
+      "added": "2026-11-23T23:21:12.649Z"
     }
   ]
 }
