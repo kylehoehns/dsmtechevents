@@ -27,7 +27,7 @@
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans": "^5.3.0",
     "@fontsource/permanent-marker": "^5.3.0",
-    "astro": "^7.4.7",
+    "astro": "^7.4.12",
     "node-ical": "^0.27.6",
     "qrcode": "^1.5.4",
     "yaml": "^2.9.1"
@@ -36,17 +36,17 @@
     "@astrojs/check": "0.9.12",
     "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "10.0.1",
-    "@playwright/test": "^1.65.0",
+    "@playwright/test": "^1.65.1",
     "@resvg/resvg-js": "^2.6.2",
     "@types/node": "26.6.6",
     "@types/qrcode": "1.5.6",
-    "cspell": "10.4.1",
-    "eslint": "10.14.0",
+    "cspell": "10.5.1",
+    "eslint": "10.15.0",
     "eslint-plugin-astro": "3.2.1",
     "globals": "17.14.0",
-    "knip": "6.44.2",
+    "knip": "6.45.1",
     "satori": "^0.63.2",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.72.1"
+    "typescript-eslint": "8.72.2"
   }
 }
