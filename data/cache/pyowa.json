@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-11-08T16:43:11.003Z",
+  "fetchedAt": "2026-11-24T00:24:42.127Z",
   "logo": "https://secure.meetupstatic.com/photos/event/2/b/9/b/600_525311163.jpeg",
   "members": 329,
   "pastCount": 20,
   "lastMet": "2026-10-27T22:30:00.000Z",
   "events": [
-    {
-      "id": "pyowa-315907190",
-      "sourceId": "315907190",
-      "allDay": false,
-      "title": "Roboflow",
-      "start": "2026-08-25T22:30:00.000Z",
-      "end": "2026-08-26T00:00:00.000Z",
-      "description": "Roboflow: Building a Real-Time Computer Vision Checkout with Python\n\nComputer vision has become more accessible than ever, but what does it take to build a complete, real-time application from camera to customer?\n\nJoin Pyowa on Tuesday, August 25th, as Zac Crane presents \"Roboflow.\" In this session, Zac will demonstrate a computer vision project that uses Python to recognize concession stand items and calculate an order total in real time.\n\nYou'll get a behind-the-scenes look at how Python and Roboflow work together to connect a camera feed, edge computing, an object detection model, pricing logic, and WebSocket communication that instantly sends the running total to a phone display. Along the way, Zac will share lessons learned while building an end-to-end computer vision application that bridges machine learning and real-world software engineering.\n\nAs always, we'll wrap up with time for questions, discussion, and networking with fellow members of the Pyowa community.\nJoin us from 5:30-7pm hosted at Source Allies. Food, drinks, and great conversation are included.",
-      "url": "https://www.meetup.com/pyowa-iowa-python-user-group/events/315907190/",
-      "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr, Urbandale",
-      "online": false,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/1/a/f/600_535440431.jpeg",
-      "going": 17
-    },
     {
       "id": "pyowa-316355128",
       "sourceId": "316355128",
