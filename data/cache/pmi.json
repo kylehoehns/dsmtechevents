@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-23T23:21:12.649Z",
+  "fetchedAt": "2026-11-24T06:59:19.978Z",
   "logo": "https://pmi-centraliowa.org/static/img/logo-login.jpg",
   "events": [
     {
@@ -48,7 +48,7 @@
       "end": "2027-04-30T21:30:00.000Z",
       "allDay": false,
       "url": "https://pmi-centraliowa.org/calendar?eventId=48356",
-      "description": "",
+      "description": "Details to follow.",
       "venue": "Hilton Garden Inn",
       "address": "205 64th St., West Des Moines, IA, 50266",
       "added": "2026-11-23T23:21:12.649Z"
