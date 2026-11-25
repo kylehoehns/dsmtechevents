@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-11-16T19:21:28.713Z",
+  "fetchedAt": "2026-11-25T05:29:33.884Z",
   "logo": "https://secure.meetupstatic.com/photos/event/5/e/8/6/600_526884198.jpeg",
   "members": 1082,
   "pastCount": 63,
   "lastMet": "2026-10-28T23:00:00.000Z",
   "events": [
-    {
-      "id": "devopsdsm-315859296",
-      "sourceId": "315859296",
-      "allDay": false,
-      "title": "The SaaS Startup Dependency Graph",
-      "start": "2026-08-26T23:00:00.000Z",
-      "end": "2026-08-27T00:00:00.000Z",
-      "description": "Launching a SaaS product takes much more than writing great code. Before customers can sign up, there are business, financial, security, and infrastructure decisions that all have to happen in the right order. Miss a dependency, and you can lose days untangling problems that could have been avoided.\n\nJoin us on Tuesday, August 26th, as Travis Smith presents \"The SaaS Startup Dependency Graph.\" Travis will walk through the real sequence of tasks involved in launching a SaaS business, from forming an LLC and obtaining an EIN to setting up banking, cloud identity, payment processing, and a secure production environment. Along the way, he'll highlight the privacy, identity, and architectural decisions that are easiest to make early and most costly to change later.\n\nWhether you're building a side project, launching a startup, or just interested in the operational side of software delivery, this session goes well beyond just the code.\n\nAs always, we'll have time for questions, discussion, and networking with fellow members of the DevOpsDSM community.\n\nHosted at Source Allies from 6:00–7:00 PM, with food, drinks, and a live stream available for remote attendees.",
-      "url": "https://www.meetup.com/devopsdsm/events/315859296/",
-      "venue": "Source Allies",
-      "address": "4501 NW Urbandale Dr, Urbandale",
-      "online": false,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/4/b/a/d/600_535399373.jpeg",
-      "going": 17
-    },
     {
       "id": "devopsdsm-316404457",
       "sourceId": "316404457",
