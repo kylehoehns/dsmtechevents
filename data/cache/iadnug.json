@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-13T10:21:11.797Z",
+  "fetchedAt": "2026-11-25T23:21:15.443Z",
   "logo": "https://secure.meetupstatic.com/photos/event/b/3/e/6/600_525706054.jpeg",
   "members": 1509,
   "pastCount": 122,
@@ -53,6 +53,23 @@
       "image": "https://secure.meetupstatic.com/photos/event/b/3/e/6/600_525706054.jpeg",
       "going": 14,
       "added": "2026-10-31T22:34:41.257Z"
+    },
+    {
+      "id": "iadnug-317493551",
+      "sourceId": "317493551",
+      "title": "Hybrid .NET@ Night- GitHub Copilot: from Prompt to Pull Request Workshop",
+      "start": "2026-12-10T23:00:00.000Z",
+      "end": "2026-12-11T02:00:00.000Z",
+      "allDay": false,
+      "url": "https://www.meetup.com/iadnug/events/317493551/",
+      "description": "**Agenda**\n\nThis will be a Hybrid workshop hosted on both Zoom and in-person at the Lean TECHniques office (9131 Northpark Dr in Johnston, IA).\n\n5:00pm-5:15pm - Pizza, Beverages (Pop, Water), Socialize\n5:15pm-8:10pm - Workshop\n8:10pm-8:15pm - JetBrains giveaway\n\n**GitHub Copilot: from Prompt to Pull Request Workshop**\n\nIn this workshop, we'll get hands on with GitHub Copilot. We'll start from the basics and ramp up to advanced workflows that will show you everything on how to get the most productivity out GitHub Copilot. We'll use the Copilot CLI, but we'll also show off the Copilot App, the future of IDEs.\n\nThroughout this workshop you'll learn things like\n\n**The Basics:**\n\\- Prompting\n\\- Models and their tradeoffs\n\\- Effort\n\\- Context Management\n\\- AGENTS\\.md\n\\- Plan mode\n\\- Token Management\n\\- Copilot CLI\n\n**The Intermediate:**\n\\- Autopilot mode\n\\- Built\\-in Commands and Skills\n\\- Copilot App and managing multiple sessions\n\\- Projects\n\\- Copilot Fusion\n\\- Worktrees\n\\- MCP Servers and CLIs\n\\- Copilot Code Reviews and how to tune them\n\n**The Advanced:**\n\\- GitHub Agentic Workflows\n\\- Creating a Software Factory\n\nAnd more!\n\nIf you want to be hands on, come prepared with:\n\\- A GitHub account\n\\- A GitHub Copilot license\n\\- \\.NET 11 installed\n\n**Meeting Sponsor - QCI**\n\n**Platinum Sponsor – QCI**\n\nSince 1995, QCI has grown to be one of the largest, Iowa-based, technology consulting firms, one client at a time. There is no secret to our success. We simply hire the best people and support a culture that is obsessed with delivering excellent service to our clients. In QCI, our clients have a partner that is large enough to provide highly skilled consultants across a wide area of expertise. Our dedication to client service has resulted in a long-term relationships through which we understand that placing the interests of our clients first is the key to being a trusted partner.\n\nFor more information, visit [https://www.qci.com](https://www.qci.com/)\n\n**Platinum Sponsor – So",
+      "venue": "Lean Techniques, Inc.",
+      "address": "9131 Northpark Dr, Johnston, IA 50131",
+      "online": false,
+      "hybrid": true,
+      "image": "https://secure.meetupstatic.com/photos/event/b/3/e/6/600_525706054.jpeg",
+      "going": 1,
+      "added": "2026-11-25T23:21:15.443Z"
     }
   ]
 }
