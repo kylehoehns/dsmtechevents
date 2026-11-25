@@ -1,19 +1,7 @@
 {
-  "fetchedAt": "2026-11-12T01:25:38.799Z",
+  "fetchedAt": "2026-11-25T19:21:28.984Z",
   "logo": "https://clubrunner.blob.core.windows.net/00000400579/Favicon/macIcon.png",
   "events": [
-    {
-      "id": "iiba-9879fbf8-5df5-4fcc-86bc-3d5b0d860eec",
-      "sourceId": "9879fbf8-5df5-4fcc-86bc-3d5b0d860eec",
-      "title": "AI as Your BA Partner: Plan Faster. Lead Smarter. Deliver Better.",
-      "start": "2026-08-27T16:00:00.000Z",
-      "end": "2026-08-27T18:00:00.000Z",
-      "allDay": false,
-      "url": "https://centraliowa.iiba.org/events/ai-as-your-ba-partner-plan-faster.-lead-smarter.-deliver-better./",
-      "description": "AI can bring speed, structure, and fresh ideas, but you bring the experience, judgment, leadership, and credibility that move a project forward. This session puts the project manager firmly in control and shows how AI can strengthen the work without replacing the person behind it.\n\nAttendees will see practical ways to use AI for project plans, roadmaps, budgets, risk matrices, status updates, stakeholder communication, and decision support. The goal is simple: reduce busywork, improve clarity, and help project managers lead with greater confidence and deliver stronger results.\n\n**Speaker Bio**\n\nAngie Weller is a product, business analysis, and delivery leader with more than 15 years of experience turning complex business needs into actionable plans and measurable results. Her background includes Agile leadership, project and product delivery, stakeholder alignment, roadmaps, budgeting, risk management, process improvement, and large-scale technology transformation.\n\nAngie is actively involved in Central Iowa’s business analysis and project management communities and is passionate about helping professionals use AI to work smarter while keeping human judgment, personality, and leadership at the core.",
-      "venue": "QCi",
-      "address": "3001 Westown Parkway, West Des Moines, IA"
-    },
     {
       "id": "iiba-4015ea6b-10a3-436a-8d9f-5ebdc822aa32",
       "sourceId": "4015ea6b-10a3-436a-8d9f-5ebdc822aa32",

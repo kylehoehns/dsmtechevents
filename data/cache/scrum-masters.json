@@ -1,26 +1,10 @@
 {
-  "fetchedAt": "2026-11-25T15:21:18.495Z",
+  "fetchedAt": "2026-11-25T19:21:28.984Z",
   "logo": "https://secure.meetupstatic.com/photos/event/9/b/7/5/600_512859797.jpeg",
   "members": 7667,
   "pastCount": 231,
   "lastMet": "2026-11-19T18:00:00.000Z",
   "events": [
-    {
-      "id": "scrum-masters-315968759",
-      "sourceId": "315968759",
-      "allDay": false,
-      "title": "Ask Us Anything (We Might Know) with Paul Barrett & Jamie Kriegel",
-      "start": "2026-08-27T17:00:00.000Z",
-      "end": "2026-08-27T18:00:00.000Z",
-      "description": "You can find plenty of places to learn the mechanics of Agile. This gathering is about the moments that happen after the mechanics.\n\nThe conversation that doesn't go the way you expected. The team whose energy slowly disappeared. The Product Owner whose priorities seem to shift every week. The stakeholder searching for certainty while the ground keeps moving. The retrospective that left everyone feeling farther apart than when it started. That one \"nobody wants to talk about it\" question that lingers in your mind. Bring the questions you've been carrying around. The stories you've been meaning to tell. The situations that made you wonder whether anyone else has ever sat where you're sitting.\n\nWe'll explore them together.\n\nSome conversations will uncover an answer. Others will reveal a better question. Every so often, someone across the room will describe an experience that suddenly gives language to something you've been feeling for months.\n\nThis is simply a room full of thoughtful people who care about teams, leadership, and learning. People willing to share what worked, what didn't, and what they discovered along the way. Whether you're discovering Scrum for the first time, coaching seasoned organizations, or leading people through the uncertainty that seems to find all of us eventually, there's a place for you here.\n\nBring your curiosity.\n\nGo home a little wiser than you arrived.",
-      "url": "https://www.meetup.com/scrum-masters-of-the-universe/events/315968759/",
-      "venue": "Online",
-      "address": null,
-      "online": true,
-      "hybrid": false,
-      "image": "https://secure.meetupstatic.com/photos/event/1/f/a/c/600_535508108.jpeg",
-      "going": 38
-    },
     {
       "id": "scrum-masters-316354258",
       "sourceId": "316354258",
