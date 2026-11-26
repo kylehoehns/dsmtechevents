@@ -47,6 +47,8 @@ test('the card carries the whole write-up, formatted the way the site formats it
   assert.equal(of('2 \\* 3 is _six_ ~~maybe~~\n- one'), '2 \\* 3 is \\_six\\_ \\~\\~maybe\\~\\~\n\\- one');
   // A link's label is escaped, so it can't open a second link.
   assert.equal(of('[a](https://x.com/) [b]](https://y.com/)'), '[a](https://x.com/) \\[b\\]\\](https://y.com/)');
+  // Discord shows a link whose label is itself a URL as raw markdown, so it goes out as the bare href.
+  assert.equal(of('Visit [https://www.qci.com](https://www.qci.com/) or [www.x.com](https://x.com/a).'), 'Visit https://www.qci.com/ or https://x.com/a.');
   // Longer than a V2 message holds (4,000 across all its text): whole paragraphs, then "…".
   const long = render(ev({ description: Array.from({ length: 30 }, () => 'x'.repeat(200)).join('\n\n') }));
   const all = JSON.stringify(long.components).match(/"content":"(?:[^"\\]|\\.)*"/g).map((c) => JSON.parse(`{${c}}`).content).join('');
