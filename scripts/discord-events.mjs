@@ -53,6 +53,9 @@ const BOLD = '\uE001';
 const ITAL = '\uE002';
 const STAR = '\uE003'; // Meetup's escaped \*: a star that is only a star
 const LINK = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|(^|[\s(])(https?:\/\/[^\s<)]+?)(?=[.,;:!?]*(?:[\s<)]|$))/g;
+// Discord won't mask a link behind a label that is itself a URL (it shows the
+// raw [label](url) instead), so such a link goes out as its bare href.
+const URLISH = /^\s*(https?:\/\/|www\.)/i;
 // A V2 message holds 4,000 characters across all its text; the rest of the
 // post (place, start, ref) takes about 200.
 const CARD_MAX = 3700;
@@ -66,7 +69,7 @@ export function discordMarkdown(text = '') {
       const stash = (s) => `\uE000${links.push(s) - 1}\uE000`;
       const marked = para.trim()
         .replace(/!\[([^\]]*)\]\([^)\s]*\)/g, '$1')
-        .replace(LINK, (_, label, url, before, bare) => (url ? stash(`[${md(label)}](${url})`) : `${before}${stash(bare)}`))
+        .replace(LINK, (_, label, url, before, bare) => (url ? stash(URLISH.test(label) ? url : `[${md(label)}](${url})`) : `${before}${stash(bare)}`))
         .replace(/\*\*([^*]+)\*\*/g, `${BOLD}$1${BOLD}`)
         .replace(ITALIC, `$1${ITAL}$2${ITAL}`)
         .replace(/^#{1,6}\s+(.*)/, `${BOLD}$1${BOLD}`);
