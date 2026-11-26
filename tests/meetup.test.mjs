@@ -225,6 +225,8 @@ test('formatAddress and cleanDescription', () => {
   assert.equal(formatAddress(null), null);
   assert.equal(cleanDescription('Pyowa\r\nHello', 'Pyowa'), 'Hello');
   assert.equal(cleanDescription('Hello', 'Pyowa'), 'Hello');
+  // A long description stays whole (IADNUG's run past 2,000 characters with their sponsor blurbs).
+  assert.equal(cleanDescription('x'.repeat(3000), 'Pyowa').length, 3000);
 });
 
 test('mergeCache keeps group facts and leaves them out when unknown', () => {

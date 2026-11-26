@@ -42,7 +42,7 @@ export function parseEventsPage(html, slug) {
       title: e.title?.trim(),
       start: new Date(e.dateTime).toISOString(),
       end: new Date(e.endTime ?? e.dateTime).toISOString(),
-      description: (e.description ?? '').trim().slice(0, 2000),
+      description: (e.description ?? '').trim(),
       status: e.status,
       url: e.eventUrl,
       venue: online ? 'Online' : venue?.name || null,
@@ -140,5 +140,5 @@ export function formatAddress(venue) {
 export function cleanDescription(text = '', groupName) {
   const lines = text.replace(/\r/g, '').split('\n');
   if (lines[0]?.trim() === groupName) lines.shift();
-  return lines.join('\n').trim().slice(0, 2000);
+  return lines.join('\n').trim();
 }
