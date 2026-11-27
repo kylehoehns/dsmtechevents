@@ -1,8 +1,4 @@
 {
-  "pmi": {
-    "kind": "fetch",
-    "since": "2026-11-26"
-  },
   "techbrew": {
     "kind": "fetch",
     "since": "2026-11-26"
